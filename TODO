@@ -2,3 +2,5 @@ Text files and build configs
 ----------------------------
     * Clean up all text files
     * Update config for build API documentation from generated 'Doxygen' file
+    * Cool text for config script options
+    * Enable options for module and interfaces buildings

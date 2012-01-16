@@ -19,6 +19,13 @@ SET (APPLICATION_VENDOR_URL "kronverk-studio.ru")
 SET (APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
 
 #
+# Flags for modules and project
+#
+OPTION( WITH_CONSOLE "Enable build of console application " ON )
+OPTION( WITH_APACHE2 "Enable build of Apache 2 module" ON )
+
+
+#
 # Debugging Options
 #
 SET (CMAKE_VERBOSE_MAKEFILE 0) # Use 1 for debugging, 0 for release

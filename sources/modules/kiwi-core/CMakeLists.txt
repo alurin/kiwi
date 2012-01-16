@@ -1,0 +1,7 @@
+# Configure Kiwi Core library
+
+# Grab all source files
+FILE(GLOB_RECURSE SOURCE_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
+ADD_LIBRARY(kiwi-core SHARED ${SOURCE_CPP})
+
+SET_TARGET_PROPERTIES(kiwi-core PROPERTIES OUTPUT_NAME kiwi)

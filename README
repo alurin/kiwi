@@ -13,6 +13,7 @@
   * GCC or an alternative, reasonably conformant C++ compiler.
   * Boost C++ Libraries v1.37+ [HEADERS and LIBRARIES]
   * UnitTest++ (a.k.a. unittest-cpp)
+  * Llvm 3.0+
 
 == 2. BUILDING ==
 
@@ -31,3 +32,7 @@
 == 4. CONTRIBUTING ==
 
  TODO: Enhance section.
+
+== 5. ACKNOWLEDGMENTS ==
+
+Project files and layout is modified version of http://code.google.com/p/cpp-project-template/

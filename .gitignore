@@ -35,3 +35,6 @@ intermediate
 publish
 build
 .idea
+
+/lib
+/bin
