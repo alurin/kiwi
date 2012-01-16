@@ -1,0 +1,4 @@
+Text files and build configs
+----------------------------
+    * Clean up all text files
+    * Update config for build API documentation from generated 'Doxygen' file
