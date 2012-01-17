@@ -19,11 +19,11 @@ namespace kiwi {
 
     /// Startup Kiwi and related libraries
     /// @todo Must renamed to good name
-    void startup();
+    KIWI_API void startup();
 
     /// Shutdown Kiwi and related libraries
     /// @todo Must renamed to good name
-    void shutdown();
+    KIWI_API void shutdown();
 } // namespace kiwi
 
 #endif

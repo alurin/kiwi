@@ -4,11 +4,11 @@
 namespace kiwi {
     /// This namespace containts all Apache related compound elements
     namespace apache {
-        class ApacheDomain : public Domain {
+        class ApacheDomain  {
         public:
             ApacheDomain();
 
-            void ~ApacheDomain();
+            virtual ~ApacheDomain();
         };
     }
 }

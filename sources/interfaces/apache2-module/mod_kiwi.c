@@ -8,11 +8,9 @@
 #include "ap_config.h"
 #include <unicode/uclean.h>
 
-extern "C" {
-
 static void kiwi_register_hooks(apr_pool_t *p)
 {
-    ap_hook_handler(kiwi_handler, NULL, NULL, APR_HOOK_MIDDLE);
+    // ap_hook_handler(kiwi_handler, NULL, NULL, APR_HOOK_MIDDLE);
 }
 
 /* Dispatch list for API hooks */
@@ -25,5 +23,3 @@ module AP_MODULE_DECLARE_DATA kiwi_module = {
     NULL,                  /* table of config file commands       */
     kiwi_register_hooks    /* register hooks                      */
 }; // kiwi_module
-
-} // extern "C"

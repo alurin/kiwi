@@ -21,7 +21,17 @@ set(
 
 list(REMOVE_DUPLICATES SOURCE_CPP)
 
-add_library(kiwi-core SHARED ${SOURCE_CPP})
+if (${KIWI_LIBRARY})
+    add_definitions(-DKIWI_LIBRARY_EXPORTS)
+    add_library(kiwi-core SHARED ${SOURCE_CPP})
+else (${KIWI_LIBRARY})
+    if (${BUILD_SHARED_LIBS})
+        add_definitions(-DKIWI_LIBRARY_EXPORTS)
+    endif(${BUILD_SHARED_LIBS})
+    add_library(kiwi-core ${SOURCE_CPP})
+endif (${KIWI_LIBRARY})
+
+
 set_target_properties(kiwi-core PROPERTIES OUTPUT_NAME kiwi)
 target_link_libraries(kiwi-core icuuc icuio)
 
