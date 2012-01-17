@@ -1,3 +1,3 @@
-ADD_SUBDIRECTORY(modules/kiwi-core)
-ADD_SUBDIRECTORY(interfaces/console)
-ADD_SUBDIRECTORY(interfaces/apache2-module)
+add_subdirectory(modules/kiwi-core)
+add_subdirectory(interfaces/console)
+add_subdirectory(interfaces/apache2-module)

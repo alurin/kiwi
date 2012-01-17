@@ -15,6 +15,8 @@
   * UnitTest++ (a.k.a. unittest-cpp)
   * Llvm 3.0+
   * ICU 4.4+
+  * Bison 2.4.1
+  * Flex 2.5.35
 
 == 2. BUILDING ==
 

@@ -4,6 +4,8 @@ Text files and build configs
     * Update config for build API documentation from generated 'Doxygen' file
     * Cool text for config script options
     * Enable options for module and interfaces buildings
+    * Enable debug build
+    * Treats all warning as errors
 
 Idea!!!
 -------
