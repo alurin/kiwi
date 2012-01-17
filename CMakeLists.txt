@@ -12,7 +12,7 @@ set (APPLICATION_COPYRIGHT_YEARS "2012")
 set (APPLICATION_VERSION_MAJOR 0)
 set (APPLICATION_VERSION_MINOR 1)
 set (APPLICATION_VERSION_PATCH 0)
-set (APPLICATION_VERSION_TYPE SNAPSHO)
+set (APPLICATION_VERSION_TYPE SNAPSHOT)
 set (APPLICATION_VERSION_STRING "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}.${APPLICATION_VERSION_PATCH}-${APPLICATION_VERSION_TYPE}" )
 set (APPLICATION_VENDOR_ID "ru.kronverk-studio")
 set (APPLICATION_VENDOR_NAME "Vasiliy Sheredeko")
@@ -97,7 +97,6 @@ foreach (CONFIGINPUT ${CONFIGINPUTS})
     string (REPLACE ".hpp.in.cmake" ".hpp" CONFIGOUTPUT2 "${CONFIGOUTPUT1}")
     configure_file ("${CONFIGINPUT}" "${CONFIGOUTPUT2}")
 endforeach (CONFIGINPUT ${CONFIGINPUTS})
-configure_file ("Doxyfile.in" Doxyfile)
 
 #
 # Add Build Targets
@@ -115,4 +114,5 @@ endif (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFO
 #
 # Add Documentation Targets
 #
+configure_file ("Doxyfile.in" Doxyfile)
 include (DocumentationTargets)

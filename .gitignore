@@ -38,4 +38,5 @@ build
 
 /lib
 /bin
+/docs
 /include/kiwi/Config.hpp
