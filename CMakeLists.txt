@@ -3,100 +3,116 @@
 #
 # Project Properties
 #
-CMAKE_MINIMUM_REQUIRED (VERSION 2.6.2)
-PROJECT (kiwi)
-SET (APPLICATION_NAME "Kiwi")
-SET (APPLICATION_CODENAME "${PROJECT_NAME}")
-SET (APPLICATION_COPYRIGHT_YEARS "2012")
-SET (APPLICATION_VERSION_MAJOR 0)
-SET (APPLICATION_VERSION_MINOR 1)
-SET (APPLICATION_VERSION_PATCH 0)
-SET (APPLICATION_VERSION_TYPE SNAPSHOT)
-SET (APPLICATION_VERSION_STRING "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}.${APPLICATION_VERSION_PATCH}-${APPLICATION_VERSION_TYPE}")
-SET (APPLICATION_VENDOR_ID "ru.kronverk-studio")
-SET (APPLICATION_VENDOR_NAME "Vasiliy Sheredeko")
-SET (APPLICATION_VENDOR_URL "kronverk-studio.ru")
-SET (APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
+cmake_minimum_required (VERSION 2.8)
+
+project (kiwi)
+set (APPLICATION_NAME "Kiwi")
+set (APPLICATION_CODENAME "${PROJECT_NAME}")
+set (APPLICATION_COPYRIGHT_YEARS "2012")
+set (APPLICATION_VERSION_MAJOR 0)
+set (APPLICATION_VERSION_MINOR 1)
+set (APPLICATION_VERSION_PATCH 0)
+set (APPLICATION_VERSION_TYPE SNAPSHO)
+set (APPLICATION_VERSION_STRING "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}.${APPLICATION_VERSION_PATCH}-${APPLICATION_VERSION_TYPE}" )
+set (APPLICATION_VENDOR_ID "ru.kronverk-studio")
+set (APPLICATION_VENDOR_NAME "Vasiliy Sheredeko")
+set (APPLICATION_VENDOR_URL "kronverk-studio.ru")
+set (APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
 
 #
 # Flags for modules and project
 #
-OPTION( WITH_CONSOLE "Enable build of console application " ON )
-OPTION( WITH_APACHE2 "Enable build of Apache 2 module" ON )
+option( SHARED "Enable build for core as shared library" ON )
+option( DEBUG "Enable debug build for source" ON )
+#option( WITH_CONSOLE "Enable build of console application " ON )
+#option( WITH_APACHE2 "Enable build of Apache 2 module" ON )
 
+if( ${SHARED} )
+    set( KIWI_LIBRARY 1 )
+else( ${SHARED} )
+    set( KIWI_LIBRARY 0 )
+endif( ${SHARED} )
+
+if( ${DEBUG} )
+    set( KIWI_DEBUG  0 )
+    set( KIWI_RELEASE 1 )
+else( ${DEBUG} )
+    set( KIWI_DEBUG 1 )
+    set( KIWI_RELEASE 0 )
+endif( ${DEBUG} )
 
 #
 # Debugging Options
 #
-SET (CMAKE_VERBOSE_MAKEFILE 0) # Use 1 for debugging, 0 for release
+set (CMAKE_VERBOSE_MAKEFILE 0) # Use 1 for debugging, 0 for release
 
 #
 # Project Output Paths
 #
-SET (MAINFOLDER ${PROJECT_SOURCE_DIR})
-SET (EXECUTABLE_OUTPUT_PATH "${MAINFOLDER}/bin")
-SET (LIBRARY_OUTPUT_PATH "${MAINFOLDER}/lib")
+set (MAINFOLDER ${PROJECT_SOURCE_DIR})
+set (EXECUTABLE_OUTPUT_PATH "${MAINFOLDER}/bin")
+set (LIBRARY_OUTPUT_PATH "${MAINFOLDER}/lib")
 
 #
 # Project Search Paths
 #
-LIST (APPEND CMAKE_PREFIX_PATH "${MAINFOLDER}")
-LIST (APPEND CMAKE_PREFIX_PATH "${MAINFOLDER}/tools")
-LIST (APPEND CMAKE_PREFIX_PATH "${MAINFOLDER}/thirdparty")
-SET (CMAKE_MODULE_PATH "${MAINFOLDER}/tools/share/cmake")
-INCLUDE_DIRECTORIES("${MAINFOLDER}/include")
+list (APPEND CMAKE_PREFIX_PATH "${MAINFOLDER}")
+list (APPEND CMAKE_PREFIX_PATH "${MAINFOLDER}/tools")
+list (APPEND CMAKE_PREFIX_PATH "${MAINFOLDER}/thirdparty")
+set (CMAKE_MODULE_PATH "${MAINFOLDER}/tools/share/cmake")
+include_directories("${MAINFOLDER}/include")
 
 #
 # Locate Project Prerequisites
 #
 
 # Boost
-SET (Boost_ADDITIONAL_VERSIONS "1.39" "1.39.0" "1.40" "1.40.0" "1.41" "1.41.0" "1.42" "1.42.0" "1.43" "1.43.0" "1.44" "1.44.0" "1.45" "1.45.0" "1.46" "1.46.0" "1.47" "1.47.0" "1.48" "1.48.0" "1.49" "1.49.0" "1.50" "1.50.0")
-FIND_PACKAGE (Boost 1.37 COMPONENTS "date_time" "filesystem" "graph" "iostreams" "program_options" "regex" "serialization" "signals" "system" "thread" "wserialization" REQUIRED)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+set (Boost_ADDITIONAL_VERSIONS "1.39" "1.39.0" "1.40" "1.40.0" "1.41" "1.41.0" "1.42" "1.42.0" "1.43" "1.43.0" "1.44" "1.44.0" "1.45" "1.45.0" "1.46" "1.46.0" "1.47" "1.47.0" "1.48" "1.48.0" "1.49" "1.49.0" "1.50" "1.50.0")
+find_package (Boost 1.37 COMPONENTS "date_time" "filesystem" "graph" "iostreams" "program_options" "regex" "serialization" "signals" "system" "thread" "wserialization" REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
 
 # UnitTest++
-FIND_PACKAGE (UnitTestPlusPlus REQUIRED)
-INCLUDE_DIRECTORIES(${UnitTestPlusPlus_INCLUDE_DIRS})
-LINK_DIRECTORIES(${UnitTestPlusPlus_LIBRARY_DIRS})
+find_package (UnitTestPlusPlus REQUIRED)
+include_directories(${UnitTestPlusPlus_INCLUDE_DIRS})
+link_directories(${UnitTestPlusPlus_LIBRARY_DIRS})
 
 #
 # Configure Files
 #
-FILE (GLOB_RECURSE CONFIGINPUTS1 include/*.in.hpp.cmake)
-FILE (GLOB_RECURSE CONFIGINPUTS2 include/*.hpp.in.cmake)
-FILE (GLOB_RECURSE CONFIGINPUTS3 sources/*.in.hpp.cmake)
-FILE (GLOB_RECURSE CONFIGINPUTS4 sources/*.hpp.in.cmake)
-FILE (GLOB_RECURSE CONFIGINPUTS5 tests/*.in.hpp.cmake)
-FILE (GLOB_RECURSE CONFIGINPUTS6 tests/*.hpp.in.cmake)
-LIST (APPEND CONFIGINPUTS "${CONFIGINPUTS1}")
-LIST (APPEND CONFIGINPUTS "${CONFIGINPUTS2}")
-LIST (APPEND CONFIGINPUTS "${CONFIGINPUTS3}")
-LIST (APPEND CONFIGINPUTS "${CONFIGINPUTS4}")
-LIST (APPEND CONFIGINPUTS "${CONFIGINPUTS5}")
-LIST (APPEND CONFIGINPUTS "${CONFIGINPUTS6}")
-FOREACH (CONFIGINPUT ${CONFIGINPUTS})
-    STRING (REPLACE ".in.hpp.cmake" ".hpp" CONFIGOUTPUT1 "${CONFIGINPUT}")
-    STRING (REPLACE ".hpp.in.cmake" ".hpp" CONFIGOUTPUT2 "${CONFIGOUTPUT1}")
-    CONFIGURE_FILE ("${CONFIGINPUT}" "${CONFIGOUTPUT2}")
-ENDFOREACH (CONFIGINPUT ${CONFIGINPUTS})
-CONFIGURE_FILE ("Doxyfile.in" Doxyfile)
+file (GLOB_RECURSE CONFIGINPUTS1 include/*.in.hpp.cmake)
+file (GLOB_RECURSE CONFIGINPUTS2 include/*.hpp.in.cmake)
+file (GLOB_RECURSE CONFIGINPUTS3 sources/*.in.hpp.cmake)
+file (GLOB_RECURSE CONFIGINPUTS4 sources/*.hpp.in.cmake)
+file (GLOB_RECURSE CONFIGINPUTS5 tests/*.in.hpp.cmake)
+file (GLOB_RECURSE CONFIGINPUTS6 tests/*.hpp.in.cmake)
+list (APPEND CONFIGINPUTS "${CONFIGINPUTS1}")
+list (APPEND CONFIGINPUTS "${CONFIGINPUTS2}")
+list (APPEND CONFIGINPUTS "${CONFIGINPUTS3}")
+list (APPEND CONFIGINPUTS "${CONFIGINPUTS4}")
+list (APPEND CONFIGINPUTS "${CONFIGINPUTS5}")
+list (APPEND CONFIGINPUTS "${CONFIGINPUTS6}")
+foreach (CONFIGINPUT ${CONFIGINPUTS})
+    string (REPLACE ".in.hpp.cmake" ".hpp" CONFIGOUTPUT1 "${CONFIGINPUT}")
+    string (REPLACE ".hpp.in.cmake" ".hpp" CONFIGOUTPUT2 "${CONFIGOUTPUT1}")
+    configure_file ("${CONFIGINPUT}" "${CONFIGOUTPUT2}")
+endforeach (CONFIGINPUT ${CONFIGINPUTS})
+configure_file ("Doxyfile.in" Doxyfile)
 
 #
 # Add Build Targets
 #
-ADD_SUBDIRECTORY(sources)
-ADD_SUBDIRECTORY(tests)
+add_subdirectory(sources)
+add_subdirectory(tests)
 
 #
 # Add Install Targets
 #
-IF (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}")
-    INSTALL(DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}" DESTINATION "include")
-ENDIF (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}")
+if (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}")
+    install(DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}" DESTINATION "include")
+endif (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}")
 
 #
 # Add Documentation Targets
 #
-INCLUDE (DocumentationTargets)
+include (DocumentationTargets)

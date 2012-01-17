@@ -1,16 +1,16 @@
 # Configure Kiwi Apache 2 Module Interface
 
-FIND_PACKAGE( Apache2 )
-FIND_PACKAGE( APR )
+find_package( Apache2 )
+find_package( APR )
 
-FILE(GLOB_RECURSE SOURCE_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c)
-FILE(GLOB_RECURSE SOURCE_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
+file(GLOB_RECURSE SOURCE_C RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c)
+file(GLOB_RECURSE SOURCE_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
 
-ADD_LIBRARY( kiwi-apache2-module SHARED ${SOURCE_C} ${SOURCE_CPP} )
-TARGET_LINK_LIBRARIES( kiwi-apache2-module kiwi-core ${APR_LIBRARY} )
-INCLUDE_DIRECTORIES( ${APACHE2_INCLUDE_DIR} ${APR_INCLUDE_DIR})
+add_library( kiwi-apache2-module SHARED ${SOURCE_C} ${SOURCE_CPP} )
+target_link_libraries( kiwi-apache2-module kiwi-core ${APR_LIBRARY} )
+include_directories( ${APACHE2_INCLUDE_DIR} ${APR_INCLUDE_DIR})
 
-SET_TARGET_PROPERTIES(kiwi-apache2-module
+set_target_properties(kiwi-apache2-module
     PROPERTIES
     OUTPUT_NAME mod_kiwi
     COMPILE_FLAGS "${APR_CFLAGS} ${APR_INCLUDES}"

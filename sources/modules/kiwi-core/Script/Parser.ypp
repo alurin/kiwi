@@ -1,0 +1,279 @@
+%skeleton   "lalr1.cc"
+%require    "2.4"
+%define parser_class_name   "Parser"
+%define namespace           "kiwi::script"
+// %define filename_type       "String"
+%defines
+%locations
+%error-verbose
+%debug
+// %verbose
+// %no-lines
+
+%parse-param    { Driver& driver             }
+%parse-param    { Lexer& lexer               }
+
+%code requires {
+    #include "Driver.hpp"
+    #include "CompoundList.hpp"
+
+    namespace kiwi {
+        namespace script {
+            class Driver;
+            class Lexer;
+        }
+    }
+}
+
+
+//===----------------------------------------------------------------------===//
+// Non-terminals
+//===----------------------------------------------------------------------===//
+
+%token              T_EOF           0       "end of stream"
+
+%token              T_SCRIPT_BEGIN          "<%"
+%token              T_SCRIPT_PRINT          "<%:"
+%token              T_SCRIPT_END            "%>"
+%token  <sval>      T_SCRIPT_STRING         "text"
+%token              T_SCRIPT_NEWLINE        "end of line"
+
+%token              T_PRINT                 "put"
+%token              T_PRINT_NL              "putn"
+
+%token              T_IN                    "in"
+%token              T_REF                   "ref"
+%token              T_OUT                   "out"
+%token              T_DOTS                  "..."
+
+%token              T_INSERT                "=>"
+%token              T_SHL                   "<<"
+%token              T_SHR                   ">>"
+%token              T_OR                    "||"
+%token              T_AND                   "&&"
+%token              T_EQ                    "=="
+%token              T_NE                    "!="
+%token              T_GE                    ">="
+%token              T_LE                    "<="
+%token              T_INC                   "++"
+%token              T_DEC                   "--"
+%token              T_AADD                  "+="
+%token              T_ASUB                  "-="
+%token              T_ADIV                  "/="
+%token              T_AMUL                  "*="
+%token              T_ASHL                  "<<="
+%token              T_ASHR                  ">>="
+%token              T_AAND                  "&="
+%token              T_AOR                   "|="
+
+%token  <sval>      T_IDENTIFIER            "identifier"
+%token  <sval>      T_SYMBOL                "symbol"
+%token  <sval>      T_VARIABLE              "variable"
+%token  <sval>      T_INSTANCE_FIELD        "instance field"
+%token  <sval>      T_STATIC_FIELD          "static field"
+
+%token              T_AUTO                  "auto"
+%token              T_DECL                  "decl"
+%token              T_VOID                  "void"
+%token              T_BOOL                  "bool"
+%token              T_INT                   "int"
+%token              T_CHAR                  "char"
+%token              T_STRING                "string"
+%token              T_DOUBLE                "double"
+
+%token              T_AS                    "as"
+%token              T_IS                    "is"
+%token              T_NEW                   "new"
+%token              T_IF                    "if"
+%token              T_ELSE                  "else"
+%token              T_ELSEIF                "elseif"
+%token              T_FOR                   "for"
+%token              T_FOREACH               "foreach"
+%token              T_WHILE                 "while"
+%token              T_REPEAT                "repeat"
+%token              T_BREAK                 "break"
+%token              T_CONTINUE              "continue"
+%token              T_RETURN                "return"
+%token              T_TRY                   "try"
+%token              T_CATCH                 "catch"
+%token              T_FINALLY               "finally"
+%token              T_THROW                 "throw"
+
+%token              T_NULL                  "null"
+%token              T_TRUE                  "true"
+%token              T_FALSE                 "false"
+%token  <ival>      T_CONST_INTEGER         "integer const"
+%token  <cval>      T_CONST_CHAR            "character const"
+%token  <sval>      T_CONST_STRING          "string const"
+
+%token              T_NAMESPACE             "namespace"
+%token              T_CLASS                 "class"
+%token              T_INTERFACE             "interface"
+%token              T_ASPECT                "aspect"
+%token              T_ENUM                  "enum"
+%token              T_DELEGATE              "delegate"
+%token              T_MIXIN                 "mixin"
+%token              T_FUNCTION              "function"
+
+%token              T_STATIC                "static"
+%token              T_ABSTRACT              "abstract"
+%token              T_FINAL                 "final"
+%token              T_PRIVATE               "private"
+%token              T_PROTECTED             "protected"
+%token              T_PUBLIC                "public"
+
+%token              T_VAR                   "var"
+%token              T_NS_SEPARATOR          "::"
+
+%token              T_BOGUS
+//===----------------------------------------------------------------------===//
+// Precidence
+//===----------------------------------------------------------------------===//
+
+%nonassoc      MEMBER
+
+%left		'=' "+=" "-=" "/=" "*=" "<<=" ">>=" "&=" "|="
+%left		"||"
+%left		"&&"
+%left		'|'
+%left		'^'
+%left		'&'
+%nonassoc       "==" "!="
+%nonassoc	'<' '>' "<=" ">="
+%left		">>" "<<"
+%left		'-' '+'
+%left		'*' '/' '%'
+%right		UMINUS
+%right      PRE '.' '[' '('
+
+
+//===----------------------------------------------------------------------===//
+// Union type for terminal & non-terminal values
+//===----------------------------------------------------------------------===//
+
+%union {
+    //===- Lexer values----------------------------------------------------===//
+    int64_t                                 ival;           ///< Integer constant
+    UChar                                   cval;           ///< Text constant
+    String*                                 sval;           ///< String constant or identifier
+}
+
+//===----------------------------------------------------------------------===//
+// Destructors
+//===----------------------------------------------------------------------===//
+
+%destructor {            } <ival> <cval>
+%destructor { delete $$; } <*>
+
+//===----------------------------------------------------------------------===//
+// Definitions
+//===----------------------------------------------------------------------===//
+
+%{
+    #include "Driver.hpp"
+    #include "Lexer.hpp"
+    #define yylex lexer.lex
+
+    #define yyfree(__px1)                               delete __px1; __px1 = 0;
+    #define yyfree2(__px1, __px2)                       yyfree(__px1); yyfree(__px2);
+
+    using namespace kiwi;
+
+    /// Combine identificator to full quil
+    String* combineIdentificator(String* s1, String* s2);
+%}
+
+%initial-action
+{
+    /// @todo Memory leak posibly??
+    Path streamName = driver.getStreamNameUTF8();
+    @$.initialize(&streamName);
+};
+
+%start start
+
+%%
+
+start
+    : namespace_declare start
+    | T_EOF
+    ;
+
+namespace_declare
+    : T_NAMESPACE qualified_identificator ';'                   
+    ;
+
+namespace_body
+    : class_declare namespace_body
+    |
+    ;
+
+class_declare
+    : T_CLASS T_IDENTIFIER                                      { driver.declareClass(*$2);                     }
+        '{' class_body '}'                                      { driver.finishClass(); yyfree($2);             }
+    ;
+
+class_body
+    : field_declare
+    | method_declare
+    ;
+
+field_declare
+    : T_VAR T_INSTANCE_FIELD anonym_type
+    | T_VAR T_STATIC_FIELD anonym_type
+    ;
+
+method_declare
+    : T_FUNCTION T_IDENTIFIER '(' argument_list_declare ')' ':' type
+    ;
+
+argument_list_declare
+    : T_VARIABLE anonym_type
+    ;
+
+
+anonym_type : ':' type | ;
+type : ;
+
+
+///==--------------------------------------------------------------------------------------------------------------==///
+///   Fully qualified identifiers
+///==--------------------------------------------------------------------------------------------------------------==///
+
+%type <sval> qualified_identificator;
+qualified_identificator
+    : T_IDENTIFIER qualified_identificator_part                 { $$ = combineIdentificator($1, $2); yyfree($2); }
+    ;
+
+%type <sval> qualified_identificator_part;
+qualified_identificator_part
+    : T_NS_SEPARATOR T_IDENTIFIER qualified_identificator_part  { $$ = combineIdentificator($2, $3); yyfree($3); }
+    |                                                           { $$ = NULL; }
+    ;
+
+%%
+
+//#include "kiwi/Stream.hpp"
+//#include <iostream>
+using namespace kiwi;
+using namespace kiwi::script;
+
+String* combineIdentificator(String* s1, String* s2) {
+    KIWI_DEBUG_ASSERT(s1 && "First identificator must not be null");
+    if (s2) {
+        *s1 = *s1 + "::" + *s2;
+    }
+    return s1;
+}
+
+void Parser::error (const location_type& loc, const std::string& msg) {
+    /* driver.error(support::SYNTAX_ERROR) << loc << String(msg.c_str());*/
+    //OutputStream stre(driver.getEngine());
+    //stre << msg << "\n";
+}
+
+/*Location::Location(const location& loc) {
+    Filename_ = *(loc.begin.filename);
+    Begin_    = Position(loc.begin.line, loc.begin.column);
+    End_      = Position(loc.end.line, loc.end.column);
+}*/

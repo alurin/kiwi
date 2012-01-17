@@ -1,0 +1,299 @@
+%option c++
+%option prefix="Kiwi"
+%option noyywrap
+%option nounput
+%option batch
+%option debug
+%option never-interactive
+
+%{  /* -*- C++ -*- */
+    # include "Driver.hpp"
+    # include "Parser.tab.hpp"
+    # include "Lexer.hpp"
+    # include <string>
+    # include <sstream>
+
+    using namespace kiwi;
+    using namespace kiwi::script;
+
+    typedef Parser::token      token;
+    typedef Parser::token_type token_type;
+
+    # define yyterminate() return token::T_EOF
+    # define YY_USER_ACTION yylloc->columns (yyleng);
+
+    # ifndef EOF
+    #  define EOF (-1)
+    # endif
+%}
+
+ws          [ \t]
+newl        \n|\n\r|\r\n
+delim       {ws}+
+ident       [a-zA-Z_][a-zA-Z0-9_]*
+unix        #![^\r\n]*\r?\n
+number      [0-9]+
+comment "//"[^\r\n]*[\r\n]
+
+%s CodeState
+%s ScriptState
+%s PrintState
+%s UnicodeStringState
+%s UnicodeCharState
+
+%%
+
+%{
+    std::stringstream strBuffer; /// Utf-8 string buffer
+    yylloc->step ();
+%}
+
+<INITIAL>{
+    {unix} { /* skip unix decloration and comments */
+        yylloc->lines(1);
+        yylloc->step();
+        BEGIN(CodeState);
+    }
+
+    "<%" { /* Begin template code */
+        BEGIN(CodeState);
+    }
+
+    "<%:" { /* Begin print template code */
+        BEGIN(CodeState);
+        return token::T_SCRIPT_PRINT;
+    }
+
+    {newl} { /* skip whitespaces */
+        yylloc->lines(yyleng);
+        yylloc->step();
+        BEGIN(ScriptState);
+        return token::T_SCRIPT_NEWLINE;
+    }
+
+    .*   { /* Begin template */
+        BEGIN(ScriptState);
+        strBuffer << yytext;
+        yylval->sval = new UnicodeString(strBuffer.str().c_str());
+        yylloc->columns (yyleng);
+        strBuffer.str(std::string());
+        return token::T_SCRIPT_STRING;
+    }
+}
+
+<ScriptState>{
+    {newl} { /* skip whitespaces */
+        yylloc->lines(yyleng);
+        yylloc->step();
+        return token::T_SCRIPT_NEWLINE;
+    }
+
+    "<%"            BEGIN(CodeState);
+
+    "<%:" {         /* Begin print template code */
+                    BEGIN(PrintState);
+                    return token::T_PRINT;
+    }
+
+    .* {            /* Begin template */
+                    strBuffer << yytext;
+                    yylval->sval = new UnicodeString(strBuffer.str().c_str());
+                    yylloc->columns (yyleng);
+                    strBuffer.str(std::string());
+                    return token::T_SCRIPT_STRING;
+    }
+}
+
+<CodeState>{
+    {delim}+        yylloc->step();                        /* skip whitespaces                     */
+    {newl}          yylloc->lines(yyleng); yylloc->step(); /* skip whitespaces                     */
+    {unix}          yylloc->lines(1); yylloc->step();      /* skip unix decloration and comments   */
+    {comment}       yylloc->lines(1); yylloc->step();      /* skip line comment                    */
+
+    "namespace"     return token::T_NAMESPACE;
+    "class"         return token::T_CLASS;
+    "interface"     return token::T_INTERFACE;
+    "aspect"        return token::T_ASPECT;
+    "enum"          return token::T_ENUM;
+    "delegate"      return token::T_DELEGATE;
+    "mixin"         return token::T_MIXIN;
+    "function"      return token::T_FUNCTION;
+
+    "private"       return token::T_PRIVATE;
+    "protected"     return token::T_PROTECTED;
+    "public"        return token::T_PUBLIC;
+    "static"        return token::T_STATIC;
+    "abstract"      return token::T_ABSTRACT;
+    "final"         return token::T_FINAL;
+
+    "++"            return token::T_INC;
+    "--"            return token::T_DEC;
+    "and"           return token::T_AND;
+    "&&"            return token::T_AND;
+    "or"            return token::T_OR;
+    "||"            return token::T_OR;
+    "=="            return token::T_EQ;
+    "!="            return token::T_NE;
+    "<="            return token::T_LE;
+    ">="            return token::T_GE;
+    "<<"            return token::T_SHL;
+    ">>"            return token::T_SHR;
+    "+="            return token::T_AADD;
+    "-="            return token::T_ASUB;
+    "/="            return token::T_ADIV;
+    "*="            return token::T_AMUL;
+    "<<="           return token::T_ASHL;
+    ">>="           return token::T_ASHR;
+    "&="            return token::T_AAND;
+    "|="            return token::T_AOR;
+    "=>"            return token::T_INSERT;
+
+    "::"            return token::T_NS_SEPARATOR;
+    "auto"          return token::T_AUTO;
+    "decl"          return token::T_DECL;
+    "void"          return token::T_VOID;
+    "bool"          return token::T_BOOL;
+    "int"           return token::T_INT;
+    "char"          return token::T_CHAR;
+    "string"        return token::T_STRING;
+
+    "in"            return token::T_IN;
+    "ref"           return token::T_REF;
+    "out"           return token::T_OUT;
+
+    "as"            return token::T_AS;
+    "is"            return token::T_IS;
+
+    "..."           return token::T_DOTS;
+
+    "if"            return token::T_IF;
+    "else"          return token::T_ELSE;
+    "elseif"        return token::T_ELSEIF;
+    "for"           return token::T_FOR;
+    "foreach"       return token::T_FOREACH;
+    "while"         return token::T_WHILE;
+    "break"         return token::T_BREAK;
+    "continue"      return token::T_CONTINUE;
+    "try"           return token::T_TRY;
+    "catch"         return token::T_CATCH;
+    "finally"       return token::T_FINALLY;
+    "throw"         return token::T_THROW;
+    "new"           return token::T_NEW;
+
+    "null"          return token::T_NULL;
+    "true"          return token::T_TRUE;
+    "false"         return token::T_FALSE;
+
+    "var"           return token::T_VAR;
+    "return"        return token::T_RETURN;
+
+    "put"           return token::T_PRINT;
+    "putn"          return token::T_PRINT_NL;
+    "puts"          return token::T_PRINT_NL;
+
+    "%>"            BEGIN(PrintState);
+    "'"             BEGIN(UnicodeCharState);
+    "\""            BEGIN(UnicodeStringState);
+
+    "$"{ident} {    /* Identifier */
+                    yylval->sval = new UnicodeString(yytext + 1);
+                    return token::T_VARIABLE;
+    }
+
+    "@@"{ident} {    /* Identifier */
+                    yylval->sval = new UnicodeString(yytext + 1);
+                    return token::T_STATIC_FIELD;
+    }
+
+    "@"{ident} {    /* Identifier */
+                    yylval->sval = new UnicodeString(yytext + 1);
+                    return token::T_INSTANCE_FIELD;
+    }
+
+    ":"{ident} {
+                    yylval->sval = new UnicodeString(yytext + 1);
+                    return token::T_SYMBOL;
+    }
+
+    {ident} {
+                    yylval->sval = new UnicodeString(yytext);
+                    return token::T_IDENTIFIER;
+    }
+
+    {number} {
+                    yylval->ival  = atoll(yytext);
+                    return token::T_CONST_INTEGER;
+    }
+
+    . {
+                    return static_cast<token_type>(*yytext);
+    }
+}
+
+<PrintState>{
+    {newl} {        /* skip whitespaces */
+                    yylloc->lines(yyleng);
+                    yylloc->step();
+                    yylval->cval = *yytext;
+                    return token::T_SCRIPT_STRING;
+    }
+
+    "<%" {          /* Begin template code */
+                    BEGIN(CodeState);
+    }
+
+    "<%:" {         /* Begin print template code */
+                    BEGIN(CodeState);
+                    return token::T_PRINT;
+    }
+
+    . {             /* Begin template */
+                    yylval->cval = *yytext;
+                    return token::T_SCRIPT_STRING;
+    }
+}
+
+<UnicodeStringState>{
+    \\\\            strBuffer << '\\';
+    \\\"            strBuffer << '"';
+    \\t             strBuffer << '\t';
+    \\n             strBuffer << '\n';
+    \n+             strBuffer << yytext; yylloc->lines (yyleng);
+    \r+             strBuffer << yytext; yylloc->lines (yyleng);
+    [\t\b]+         strBuffer << yytext; yylloc->columns (yyleng);
+
+    \"  {           /* END OF STRING */
+                    yylval->sval = new UnicodeString(strBuffer.str().c_str());
+                    yylloc->columns (yyleng);
+                    strBuffer.str(std::string());
+                    BEGIN(CodeState);
+                    return token::T_CONST_STRING;
+        }
+
+    [^"\\]{0,100}   strBuffer << yytext; yylloc->columns (yyleng);
+}
+
+<UnicodeCharState>{
+    \'  {           /* END OF CHAR */
+                    UnicodeString str(strBuffer.str().c_str());
+                    strBuffer.str(std::string());
+                    if (str.length() != 1) {
+                      yylval->sval = new UnicodeString(str);
+                      BEGIN(CodeState);
+                      return token::T_CONST_STRING;
+                    } else {
+                      yylval->cval = str[0];
+                      BEGIN(CodeState);
+                      return token::T_CONST_CHAR;
+                    }
+        }
+
+    .   {
+        strBuffer << *yytext;
+    }
+}
+
+%%
+
+/* For KiwiFlexLexer vtable */
+int KiwiFlexLexer::yylex() { return token::T_EOF; }

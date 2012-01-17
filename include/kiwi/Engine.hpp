@@ -1,11 +1,11 @@
 #ifndef KIWI_ENGINE_HPP_INCLUDED
 #define KIWI_ENGINE_HPP_INCLUDED
 
-#include "llvm/LLVMContext.h"
+#include "kiwi/Config.hpp"
 
+/// Main namespace for all Kiwi core and releated compounds
 namespace kiwi {
-    /// The Engine class represents genral point for Kiwi
-    ///
+    /// The Engine class represents general point for Kiwi
     /// @since 0.1
     class Engine {
     public:
@@ -16,6 +16,14 @@ namespace kiwi {
         /// and
         ~Engine();
     }; // class Engine
+
+    /// Startup Kiwi and related libraries
+    /// @todo Must renamed to good name
+    void startup();
+
+    /// Shutdown Kiwi and related libraries
+    /// @todo Must renamed to good name
+    void shutdown();
 } // namespace kiwi
 
 #endif
