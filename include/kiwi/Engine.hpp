@@ -1,3 +1,10 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
+
 #ifndef KIWI_ENGINE_HPP_INCLUDED
 #define KIWI_ENGINE_HPP_INCLUDED
 

@@ -1,13 +1,10 @@
 /*
  *******************************************************************************
- *   Copyright (C) 2010 Kiwi Developers Group
- *   All Rights Reserved.
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-/**
- * @file
- * @brief
- */
+
 #ifndef KIWI_SCRIPT_COMPOUNDLIST_HPP_INCLUDED
 #define KIWI_SCRIPT_COMPOUNDLIST_HPP_INCLUDED
 

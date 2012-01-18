@@ -1,3 +1,10 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
+
 %skeleton   "lalr1.cc"
 %require    "2.4"
 %define parser_class_name   "Parser"

@@ -1,3 +1,10 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
+
 #include "kiwi/String.hpp"
 #include "kiwi/Engine.hpp"
 #include "kiwi/Script/Driver.hpp"

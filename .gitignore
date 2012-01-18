@@ -36,7 +36,4 @@ publish
 build
 .idea
 
-/lib
-/bin
-/docs
 /include/kiwi/Config.hpp

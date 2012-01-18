@@ -1,3 +1,10 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
+
 #include "kiwi/Engine.hpp"
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/LLVMContext.h>

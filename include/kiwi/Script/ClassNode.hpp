@@ -1,3 +1,10 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
+
 #ifndef KIWI_SCRIPT_CLASSNODE_HPP_INCLUDED
 #define KIWI_SCRIPT_CLASSNODE_HPP_INCLUDED
 

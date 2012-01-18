@@ -1,13 +1,10 @@
 /*
  *******************************************************************************
- *   Copyright (C) 2010-2011 Kiwi Developers Group
- *   All Rights Reserved.
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-/**
- * @file
- * @brief File containts extends base generation lexer by Flex
- */
+
 #include "Driver.hpp"
 #include "Lexer.hpp"
 #include "kiwi/Engine.hpp"
@@ -34,6 +31,7 @@ Path DriverImpl::getStreamNameUTF8() const {
     return m_streamNameUTF8;
 }
 
+/// @todo exception if error in parser or lexer
 RootNode* DriverImpl::parseStream(std::istream& in, const String& sname) {
     m_streamName = sname;
 
@@ -52,6 +50,7 @@ RootNode* Driver::parseStream(Engine* engine, std::istream& in, const String& sn
     return impl.parseStream(in, sname);
 }
 
+/// @todo exception if file not found
 RootNode* Driver::parseFile(Engine* engine, const Path& filename) {
     const char* sname = filename.c_str();
     std::ifstream in(sname);
