@@ -200,7 +200,7 @@ start
     ;
 
 namespace_declare
-    : T_NAMESPACE qualified_identificator ';'                   
+    : T_NAMESPACE qualified_identificator ';'
     ;
 
 namespace_body

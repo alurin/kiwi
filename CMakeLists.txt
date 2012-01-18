@@ -9,11 +9,14 @@ project (kiwi)
 set (APPLICATION_NAME "Kiwi")
 set (APPLICATION_CODENAME "${PROJECT_NAME}")
 set (APPLICATION_COPYRIGHT_YEARS "2012")
+set (APPLICATION_COPYRIGHT_LICENSE "MIT License")
 set (APPLICATION_VERSION_MAJOR 0)
 set (APPLICATION_VERSION_MINOR 1)
 set (APPLICATION_VERSION_PATCH 0)
 set (APPLICATION_VERSION_TYPE SNAPSHOT)
-set (APPLICATION_VERSION_STRING "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}.${APPLICATION_VERSION_PATCH}-${APPLICATION_VERSION_TYPE}" )
+set (APPLICATION_VERSION_STRING
+    "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}.${APPLICATION_VERSION_PATCH}-${APPLICATION_VERSION_TYPE}"
+)
 set (APPLICATION_VENDOR_ID "ru.kronverk-studio")
 set (APPLICATION_VENDOR_NAME "Vasiliy Sheredeko")
 set (APPLICATION_VENDOR_URL "kronverk-studio.ru")
@@ -27,11 +30,54 @@ option( DEBUG "Enable debug build for source" ON )
 #option( WITH_CONSOLE "Enable build of console application " ON )
 #option( WITH_APACHE2 "Enable build of Apache 2 module" ON )
 
+
+#
+# Flags for builds
+#
+
 if( ${SHARED} )
     set( KIWI_LIBRARY 1 )
 else( ${SHARED} )
     set( KIWI_LIBRARY 0 )
 endif( ${SHARED} )
+
+if( ${DEBUG} )
+    set( KIWI_DEBUG  0 )
+    set( KIWI_RELEASE 1 )
+else( ${DEBUG} )
+    set( KIWI_DEBUG 1 )
+    set( KIWI_RELEASE 0 )
+endif( ${DEBUG} )
+
+#
+# OS flags
+#
+
+## Operation system detect
+if (UNIX)
+    set( KIWI_UNIX 1 )
+    if (CMAKE_COMPILER_IS_GNUCC AND KIWI_DEBUG)
+        message("-- Set GNU C++ normal arguments")
+        set(CMAKE_C_FLAGS           ${CMAKE_C_FLAGS}            "-g3 -gdwarf-2 -g -O0 -Wall -pedantic")
+        set(CMAKE_CXX_FLAGS         "-g3 -gdwarf-2 -g -O0 -Wall -pedantic")
+        set(CMAKE_EXE_LINKER_FLAGS  "-g3 -gdwarf-2 -g -O0 -Wall -pedantic")
+    endif (CMAKE_COMPILER_IS_GNUCC AND KIWI_DEBUG)
+else (UNIX)
+    set( KIWI_UNIX 0 )
+endif (UNIX)
+
+if (WIN32)
+    set( KIWI_WIN32 1 )
+else()
+    set( KIWI_WIN32 0 )
+endif (WIN32)
+
+
+if( WIN32 )
+    set( KIWI_WIN32 1 )
+else( WIN32 )
+    set( KIWI_WIN32 0 )
+endif( WIN32 )
 
 if( ${DEBUG} )
     set( KIWI_DEBUG  0 )

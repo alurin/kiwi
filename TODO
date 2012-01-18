@@ -1,11 +1,19 @@
-Text files and build configs
+Build configs
 ----------------------------
-    * Clean up all text files
-    * Update config for build API documentation from generated 'Doxygen' file
-    * Cool text for config script options
-    * Enable options for module and interfaces buildings
     * Enable debug build
     * Treats all warning as errors
+    * FindICU.cmake - fing ICU libraries and headers
+
+Documention
+-----------
+    * Update config for build API documentation from generated 'Doxygen' file
+
+Minor
+-----
+    * Clean up all text files
+    * Cool text for config script options
+    * Enable options for module and interfaces buildings
+    * Add license and comment information to sources
 
 Idea!!!
 -------
