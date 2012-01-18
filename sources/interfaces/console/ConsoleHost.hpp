@@ -15,6 +15,8 @@ namespace kiwi {
         class ConsoleHost : public Host {
         public:
             ConsoleHost();
+            
+            virtual ~ConsoleHost();
         };
     }
 }

@@ -85,3 +85,15 @@ if (KIWI_DEBUG)
     set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Script/Lexer.tab.cpp PROPERTY COMPILE_FLAGS "-g")
 endif(KIWI_DEBUG)
 
+#ignore GCC warnings
+if (CMAKE_COMPILER_IS_GNUCC)
+    set_source_files_properties(
+        ${CMAKE_CURRENT_SOURCE_DIR}/Script/Driver.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Script/Lexer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Script/Lexer.tab.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Script/Parser.tab.cpp
+
+        PROPERTIES
+        COMPILE_FLAGS -Wno-parentheses
+    )
+endif (CMAKE_COMPILER_IS_GNUCC)

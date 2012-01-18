@@ -18,7 +18,7 @@ using namespace kiwi::script;
 
 bool Driver::s_debug = false;
 
-DriverImpl::DriverImpl(Engine* engine) : m_lexer(0) {
+DriverImpl::DriverImpl(Engine* engine) : m_engine(engine), m_lexer(0) {
 }
 
 DriverImpl::~DriverImpl() {

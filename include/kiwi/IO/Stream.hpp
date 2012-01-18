@@ -30,7 +30,7 @@ namespace kiwi {
             /// @param buffer Buffer is filled
             /// @param count The number of characters to read from file
             /// @return Actual count of readed characters
-            size_t read(UChar* buffer, size_t count);
+            size_t read(UChar* buffer, const size_t count);
 
             virtual ~InputStream();
         protected:
@@ -48,6 +48,8 @@ namespace kiwi {
             /// Create output stream from file
             static OutputStream* createFromFile(UFILE* file);
 
+            size_t write(const UChar* buffer, const size_t count);
+            
             virtual ~OutputStream();
         protected:
             UFILE* m_file;

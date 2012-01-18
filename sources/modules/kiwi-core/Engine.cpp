@@ -14,8 +14,8 @@
 using namespace kiwi;
 
 // Create engine
-Engine::Engine() {
-
+Engine::Engine(Host* host) : m_host(host) {
+    kiwi_assert(host && "Host must not be is null");
 }
 
 // Destruct engine 

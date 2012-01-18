@@ -12,16 +12,28 @@
 
 /// Main namespace for all Kiwi core and releated compounds
 namespace kiwi {
+    class Host;
+
     /// The Engine class represents general point for Kiwi
     /// @since 0.1
     class Engine {
     public:
         /// Engine constructor. This set up engine configuration
-        Engine();
+        Engine(Host* host);
 
         /// Engine desctructor. This is clean up all resource requested by engine
         /// and
         ~Engine();
+
+        /**
+         * Returns engine host
+         */
+        Host* getHost() const {
+            return m_host;
+        }
+
+    protected:
+        Host* m_host;
     }; // class Engine
 
     /// Startup Kiwi and related libraries

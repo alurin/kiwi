@@ -16,3 +16,9 @@ ConsoleHost::ConsoleHost() {
     m_outputStream = OutputStream::createFromFile(stdout);
     m_errorStream  = OutputStream::createFromFile(stderr);
 }
+
+ConsoleHost::~ConsoleHost() {
+    delete m_inputStream;
+    delete m_outputStream;
+    delete m_errorStream;
+}

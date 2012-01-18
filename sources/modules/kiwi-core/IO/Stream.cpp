@@ -46,6 +46,10 @@ OutputStream* OutputStream::createFromFile(FILE* file) {
     return new OutputStream(ufile);
 }
 
-size_t InputStream::read(UChar* buffer, size_t count) {
+size_t InputStream::read(UChar* buffer, const size_t count) {
     return u_file_read(buffer, count, m_file);
+}
+
+size_t OutputStream::write(const UChar* buffer, const size_t count) {
+    return u_file_write_44(buffer, count, m_file);
 }

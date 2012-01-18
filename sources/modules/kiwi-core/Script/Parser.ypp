@@ -207,41 +207,8 @@ start
     ;
 
 namespace_declare
-    : T_NAMESPACE qualified_identificator ';'
+    : T_NAMESPACE qualified_identificator ';' { yyfree($2); }
     ;
-
-namespace_body
-    : class_declare namespace_body
-    |
-    ;
-
-class_declare
-    : T_CLASS T_IDENTIFIER                                      { driver.declareClass(*$2);                     }
-        '{' class_body '}'                                      { driver.finishClass(); yyfree($2);             }
-    ;
-
-class_body
-    : field_declare
-    | method_declare
-    ;
-
-field_declare
-    : T_VAR T_INSTANCE_FIELD anonym_type
-    | T_VAR T_STATIC_FIELD anonym_type
-    ;
-
-method_declare
-    : T_FUNCTION T_IDENTIFIER '(' argument_list_declare ')' ':' type
-    ;
-
-argument_list_declare
-    : T_VARIABLE anonym_type
-    ;
-
-
-anonym_type : ':' type | ;
-type : ;
-
 
 ///==--------------------------------------------------------------------------------------------------------------==///
 ///   Fully qualified identifiers
@@ -260,9 +227,12 @@ qualified_identificator_part
 
 %%
 
-//#include "kiwi/Stream.hpp"
-//#include <iostream>
+#include "kiwi/Engine.hpp"
+#include "kiwi/Host.hpp"
+#include "kiwi/IO/Stream.hpp"
+
 using namespace kiwi;
+using namespace kiwi::io;
 using namespace kiwi::script;
 
 String* combineIdentificator(String* s1, String* s2) {
@@ -273,7 +243,19 @@ String* combineIdentificator(String* s1, String* s2) {
     return s1;
 }
 
+/**
+ * 
+ * @todo Replace output to exception or e.g.
+ */
 void Parser::error (const location_type& loc, const std::string& msg) {
+    Engine*       engine = driver.getEngine();
+    Host*         host   = engine->getHost();
+    OutputStream* stream = host->getErrorStream();
+
+    UnicodeString message(msg.c_str());
+    stream->write(message.getTerminatedBuffer(), message.length());
+    message.releaseBuffer();
+
     /* driver.error(support::SYNTAX_ERROR) << loc << String(msg.c_str());*/
     //OutputStream stre(driver.getEngine());
     //stre << msg << "\n";

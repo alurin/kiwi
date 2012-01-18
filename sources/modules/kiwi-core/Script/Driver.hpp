@@ -40,6 +40,11 @@ namespace kiwi {
              */
             virtual ~DriverImpl();
 
+            /// Returns owner engine
+            Engine* getEngine() const { 
+                return m_engine;
+            }
+            
             //===----------------------------------------------------------------===//
             // Driver debug & trace
             //===----------------------------------------------------------------===//
@@ -54,14 +59,9 @@ namespace kiwi {
             RootNode* parseStream(std::istream& in,
                               const String& sname = "stream input");
 
-            /** General error handling. This can be modified to output the error
-             * e.g. to a dialog box. */
-
             //===----------------------------------------------------------------===//
             // Driver debug & trace
             //===----------------------------------------------------------------===//
-
-
 
             /// Get stream name
             String getStreamName() const {
@@ -71,6 +71,9 @@ namespace kiwi {
             /// Returns stream name in utf-8 encoding
             Path getStreamNameUTF8() const;
         protected:
+            /// Owner engine
+            Engine* m_engine;
+
             /// Stream name
             String m_streamName;
 

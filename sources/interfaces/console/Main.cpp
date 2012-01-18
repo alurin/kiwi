@@ -71,8 +71,7 @@ int main(int argc, char** argv)
     /// Create engine and start process
     {
         ConsoleHost host;
-        Engine engine;
-
+        Engine engine(&host);
 
 //        // Backend* backend = new vm::VmBackend();
 //        // Frontend* frontend = new console::ConsoleFrontend();
