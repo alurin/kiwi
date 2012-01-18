@@ -42,11 +42,13 @@ else( ${SHARED} )
 endif( ${SHARED} )
 
 if( ${DEBUG} )
-    set( KIWI_DEBUG  0 )
-    set( KIWI_RELEASE 1 )
-else( ${DEBUG} )
     set( KIWI_DEBUG 1 )
     set( KIWI_RELEASE 0 )
+    set( CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+else( ${DEBUG} )
+    set( KIWI_DEBUG  0 )
+    set( KIWI_RELEASE 1 )
+    set( CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif( ${DEBUG} )
 
 #
@@ -78,14 +80,6 @@ if( WIN32 )
 else( WIN32 )
     set( KIWI_WIN32 0 )
 endif( WIN32 )
-
-if( ${DEBUG} )
-    set( KIWI_DEBUG  0 )
-    set( KIWI_RELEASE 1 )
-else( ${DEBUG} )
-    set( KIWI_DEBUG 1 )
-    set( KIWI_RELEASE 0 )
-endif( ${DEBUG} )
 
 #
 # Debugging Options

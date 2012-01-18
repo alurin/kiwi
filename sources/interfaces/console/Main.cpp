@@ -1,5 +1,6 @@
 #include "kiwi/String.hpp"
 #include "kiwi/Engine.hpp"
+#include "kiwi/Script/Driver.hpp"
 #include "ConsoleHost.hpp"
 
 #include <boost/program_options.hpp>
@@ -10,6 +11,7 @@
 
 using namespace kiwi;
 using namespace kiwi::console;
+using namespace kiwi::script;
 namespace po = boost::program_options;
 
 int main(int argc, char** argv)
@@ -40,32 +42,31 @@ int main(int argc, char** argv)
 #endif
         po::notify(vm);
 
-        bool isExit = vm.count("help") || vm.count("version");
-#if KIWI_DEBUG
-        bool isVersion = vm.count("help") || vm.count("version");
-#else
-        bool isVersion = vm.count("help") || vm.count("version") || !vm.count("input-file");
-#endif
-        bool isHelp = vm.count("help");
-
         /// Output version if need
-        if (isVersion) {
+        if (vm.count("version")) {
             std::cout << KIWI_NAME << " " << KIWI_VERSION_STRING << "\n";
-        }
-        if (isHelp) {
-            std::cout << KIWI_VENDOR_NAME << ". Copyright (C) " << KIWI_COPYRIGHT_YEARS << ". " << KIWI_COPYRIGHT_LICENSE << ".\n\n"
-                      << desc;
-        }
-        if (isExit) {
             return EXIT_SUCCESS;
         }
+
+        /// Output version if need
+        if (vm.count("help")) {
+            std::cout << KIWI_NAME << " " << KIWI_VERSION_STRING << "\n"
+                      << KIWI_VENDOR_NAME << ". Copyright (C) " << KIWI_COPYRIGHT_YEARS << ". " << KIWI_COPYRIGHT_LICENSE << ".\n\n"
+                      << desc;
+            return EXIT_SUCCESS;
+        }
+        
+        #if KIWI_DEBUG
+            Driver::setDebugMode(vm.count("help"));
+        #endif
     }
 
     /// Create engine and start process
     {
         ConsoleHost host;
         Engine engine;
-//
+
+
 //        // Backend* backend = new vm::VmBackend();
 //        // Frontend* frontend = new console::ConsoleFrontend();
 //        // Engine engine(backend, frontend);
@@ -75,15 +76,15 @@ int main(int argc, char** argv)
 //        //test_primary_types(engine.getContext());
 //        engine.setDriverDebug(vm.count("debug-driver"));
 //#endif
-//
+
 //        try {
-//            if (vm.count("input-file")) {
-//                Path path = vm["input-file"].as< Path > ();
-//                return engine.requireFile(path) ? EXIT_SUCCESS : EXIT_FAILURE;
-//            } else {
-//                std::cerr << "Не задан файл для исполнения. Запустите приложение с параметром --help для получения информации о параметрах\n";
-//                return EXIT_FAILURE;
-//            }
+            if (vm.count("input-file")) {
+                Path path = vm["input-file"].as< Path > ();
+                return Driver::parseFile(&engine, path) ? EXIT_SUCCESS : EXIT_FAILURE;
+            } else {
+                std::cerr << "Do not specify input files. Run with --help for information about options\n";
+                return EXIT_FAILURE;
+            }
 //        } catch (Exception* ex) {
 //            ex->dump(std::cerr);
 //            return EXIT_FAILURE;

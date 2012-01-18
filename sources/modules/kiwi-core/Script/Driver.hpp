@@ -57,7 +57,6 @@ namespace kiwi {
             RootNode* parseStream(std::istream& in,
                               const String& sname = "stream input");
 
-
             /** General error handling. This can be modified to output the error
              * e.g. to a dialog box. */
 
@@ -65,10 +64,7 @@ namespace kiwi {
             // Driver debug & trace
             //===----------------------------------------------------------------===//
 
-            /// Driver in debug mode?
-            bool isDebug() const {
-                return KIWI_DEBUG;
-            }
+
 
             /// Get stream name
             String getStreamName() const {

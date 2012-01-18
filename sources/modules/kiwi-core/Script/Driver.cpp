@@ -19,6 +19,8 @@
 using namespace kiwi;
 using namespace kiwi::script;
 
+bool Driver::s_debug = false;
+
 DriverImpl::DriverImpl(Engine* engine) : m_lexer(0) {
 }
 
@@ -36,11 +38,11 @@ RootNode* DriverImpl::parseStream(std::istream& in, const String& sname) {
     m_streamName = sname;
 
     Lexer scanner(*this, &in);
-    scanner.set_debug(isDebug());
+    scanner.set_debug(Driver::isDebugMode());
     this->m_lexer = &scanner;
 
     Parser parser(*this, scanner);
-    parser.set_debug_level(isDebug());
+    parser.set_debug_level(Driver::isDebugMode());
     (parser.parse() == 0);
     return 0;
 }
@@ -53,7 +55,7 @@ RootNode* Driver::parseStream(Engine* engine, std::istream& in, const String& sn
 RootNode* Driver::parseFile(Engine* engine, const Path& filename) {
     const char* sname = filename.c_str();
     std::ifstream in(sname);
-    if (!in.good()) return false;
+    if (!in.good()) return 0;
     return parseStream(engine, in, sname);
 }
 

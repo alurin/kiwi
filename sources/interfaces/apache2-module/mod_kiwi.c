@@ -10,7 +10,7 @@
 
 static void kiwi_register_hooks(apr_pool_t *p)
 {
-    // ap_hook_handler(kiwi_handler, NULL, NULL, APR_HOOK_MIDDLE);
+    /** ap_hook_handler(kiwi_handler, NULL, NULL, APR_HOOK_MIDDLE); */
 }
 
 /* Dispatch list for API hooks */

@@ -44,6 +44,23 @@ namespace kiwi {
              */
             static RootNode* parseString(Engine* engine, const std::string& input,
                               const String& sname = "string stream");
+            
+            //===----------------------------------------------------------------===//
+            // Driver debug
+            //===----------------------------------------------------------------===//
+            
+            /// Driver in debug mode?
+            static bool isDebugMode() {
+                return s_debug;
+            }
+            
+            /// Set driver debug mode
+            static void setDebugMode(bool debug) {
+                s_debug = debug;
+            }
+        private:
+            /// Lexer and parser debug mode
+            static bool s_debug;
         };
     }
 }
