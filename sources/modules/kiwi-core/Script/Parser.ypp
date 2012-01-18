@@ -10,7 +10,7 @@
 // %verbose
 // %no-lines
 
-%parse-param    { Driver& driver             }
+%parse-param    { DriverImpl& driver         }
 %parse-param    { Lexer& lexer               }
 
 %code requires {
@@ -19,7 +19,7 @@
 
     namespace kiwi {
         namespace script {
-            class Driver;
+            class DriverImpl;
             class Lexer;
         }
     }

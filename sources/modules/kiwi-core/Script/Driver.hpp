@@ -12,6 +12,7 @@
 #define	KIWI_SCRIPT_DRIVER_HPP_INCLUDED
 
 #include "kiwi/String.hpp"
+#include "kiwi/Script/RootNode.hpp"
 #include <stack>
 #include <string>
 #include <vector>
@@ -28,38 +29,34 @@ namespace kiwi {
          * @since 0.1
          * @todo Error handling
          */
-        class KIWI_LOCAL Driver {
+        class DriverImpl {
         public:
-            /// Driver constructor
-            Driver(Engine* engine);
+            /**
+             * Driver constructor
+             */
+            DriverImpl(Engine* engine);
 
-            /// Destroy driver and clear all used symbols
-            ///
-            /// @todo Memory allocation and deallocation!!! Memory leak!!!!
-            virtual ~Driver();
+            /**
+             * Destroy driver and clear all used symbols
+             *
+             * @todo Memory allocation and deallocation!!! Memory leak!!!!
+             */
+            virtual ~DriverImpl();
 
             //===----------------------------------------------------------------===//
             // Driver debug & trace
             //===----------------------------------------------------------------===//
 
-            /// Parse file and return function for execute
-            bool parseFile(const Path& filename);
-
-            /** Invoke the scanner and parser for a stream.
+            /**
+             * Invoke the scanner and parser for a stream.
+             *
              * @param in        input stream
              * @param sname     stream name for error messages
              * @return          true if successfully parsed
              */
-            bool parseStream(std::istream& in,
+            RootNode* parseStream(std::istream& in,
                               const String& sname = "stream input");
 
-            /** Invoke the scanner and parser on an input string.
-             * @param input     input string
-             * @param sname     stream name for error messages
-             * @return          true if successfully parsed
-             */
-            bool parseString(const std::string& input,
-                              const String& sname = "string stream");
 
             /** General error handling. This can be modified to output the error
              * e.g. to a dialog box. */
@@ -83,7 +80,7 @@ namespace kiwi {
         protected:
             /// Stream name
             String m_streamName;
-            
+
             /// Cached stream name in utf-8 encoding
             mutable Path m_streamNameUTF8;
 

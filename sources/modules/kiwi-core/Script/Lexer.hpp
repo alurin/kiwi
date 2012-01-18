@@ -47,7 +47,7 @@ namespace kiwi {
              * Драйвер анализатора
              * @since 0.1
              */
-            Driver& driver;
+            DriverImpl& driver;
 
             /**
              * Поток для лексического анализа
@@ -60,7 +60,7 @@ namespace kiwi {
              * @todo Добавить документацию
              * @since 0.1
              */
-            Lexer(Driver& driver, std::istream* stream);
+            Lexer(DriverImpl& driver, std::istream* stream);
 
             Parser::token_type lex(
                                    Parser::semantic_type* yylval,

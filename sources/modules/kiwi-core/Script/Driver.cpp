@@ -11,6 +11,7 @@
 #include "Driver.hpp"
 #include "Lexer.hpp"
 #include "kiwi/Engine.hpp"
+#include "kiwi/Script/Driver.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -18,20 +19,20 @@
 using namespace kiwi;
 using namespace kiwi::script;
 
-Driver::Driver(Engine* engine) : m_lexer(0) {
+DriverImpl::DriverImpl(Engine* engine) : m_lexer(0) {
 }
 
-Driver::~Driver() {
+DriverImpl::~DriverImpl() {
 }
 
-Path Driver::getStreamNameUTF8() const {
+Path DriverImpl::getStreamNameUTF8() const {
     if (m_streamNameUTF8.size() == 0) {
         m_streamNameUTF8 = m_streamName.toUTF8String(m_streamNameUTF8);
     }
     return m_streamNameUTF8;
 }
 
-bool Driver::parseStream(std::istream& in, const String& sname) {
+RootNode* DriverImpl::parseStream(std::istream& in, const String& sname) {
     m_streamName = sname;
 
     Lexer scanner(*this, &in);
@@ -40,17 +41,23 @@ bool Driver::parseStream(std::istream& in, const String& sname) {
 
     Parser parser(*this, scanner);
     parser.set_debug_level(isDebug());
-    return (parser.parse() == 0);
+    (parser.parse() == 0);
+    return 0;
 }
 
-bool Driver::parseFile(const Path& filename) {
+RootNode* Driver::parseStream(Engine* engine, std::istream& in, const String& sname) {
+    DriverImpl impl(engine);
+    return impl.parseStream(in, sname);
+}
+
+RootNode* Driver::parseFile(Engine* engine, const Path& filename) {
     const char* sname = filename.c_str();
     std::ifstream in(sname);
     if (!in.good()) return false;
-    return parseStream(in, sname);
+    return parseStream(engine, in, sname);
 }
 
-bool Driver::parseString(const std::string &input, const String& sname) {
+RootNode* Driver::parseString(Engine* engine, const std::string &input, const String& sname) {
     std::istringstream iss(input);
-    return parseStream(iss, sname);
+    return parseStream(engine, iss, sname);
 }

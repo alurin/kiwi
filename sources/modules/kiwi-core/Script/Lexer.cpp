@@ -13,7 +13,7 @@
 using namespace kiwi;
 using namespace kiwi::script;
 
-Lexer::Lexer(Driver& driver, std::istream* stream)
+Lexer::Lexer(DriverImpl& driver, std::istream* stream)
 : KiwiFlexLexer(stream), driver(driver)
 {
 	
