@@ -35,6 +35,6 @@ distclean:
 ifeq ($(findstring distclean,$(MAKECMDGOALS)),)
 
     $(MAKECMDGOALS): ./build/Makefile
-	@ $(MAKE) -C build $(MAKECMDGOALS)
+	@ $(MAKE) -silent -C build $(MAKECMDGOALS)
 
 endif

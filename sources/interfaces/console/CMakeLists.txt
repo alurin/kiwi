@@ -7,3 +7,5 @@ file(GLOB_RECURSE SOURCE_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
 add_executable(kiwi-console ${SOURCE_CPP})
 target_link_libraries(kiwi-console kiwi-core ${Boost_LIBRARIES})
 set_target_properties(kiwi-console PROPERTIES OUTPUT_NAME kiwi)
+
+install(TARGETS kiwi-console RUNTIME DESTINATION bin)

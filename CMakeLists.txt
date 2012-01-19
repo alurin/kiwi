@@ -30,7 +30,6 @@ option( DEBUG "Enable debug build for source" ON )
 #option( WITH_CONSOLE "Enable build of console application " ON )
 #option( WITH_APACHE2 "Enable build of Apache 2 module" ON )
 
-
 #
 # Flags for builds
 #
@@ -50,6 +49,8 @@ else( ${DEBUG} )
     set( KIWI_RELEASE 1 )
     set( CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif( ${DEBUG} )
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 #
 # OS flags
@@ -148,8 +149,9 @@ add_subdirectory(tests)
 # Add Install Targets
 #
 if (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}")
-    install(DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}" DESTINATION "include")
+    install(DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}" DESTINATION "include" FILES_MATCHING PATTERN "*.hpp")
 endif (EXISTS "${MAINFOLDER}/include/${PROJECT_NAME}" AND IS_DIRECTORY "${MAINFOLDER}/include/${PROJECT_NAME}")
+include(UninstallTarget)
 
 #
 # Add Documentation Targets

@@ -97,3 +97,6 @@ if (CMAKE_COMPILER_IS_GNUCC)
         COMPILE_FLAGS -Wno-parentheses
     )
 endif (CMAKE_COMPILER_IS_GNUCC)
+
+# Install kiwi-core
+install(TARGETS kiwi-core LIBRARY DESTINATION lib)
