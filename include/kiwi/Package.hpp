@@ -8,7 +8,7 @@
 #ifndef KIWI_PACKAGE_HPP_INCLUDED
 #define KIWI_PACKAGE_HPP_INCLUDED
 
-#include "kiwi/String.hpp"
+#include "kiwi/Types.hpp"
 
 namespace kiwi {
     class Engine;

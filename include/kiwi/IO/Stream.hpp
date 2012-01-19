@@ -8,7 +8,7 @@
 #ifndef KIWI_IO_STREAM_HPP_INCLUDED
 #define KIWI_IO_STREAM_HPP_INCLUDED
 
-#include "kiwi/String.hpp"
+#include "kiwi/Types.hpp"
 #include <unicode/ustdio.h>
 
 namespace kiwi {

@@ -5,7 +5,7 @@
  *******************************************************************************
  */
 
-#include "kiwi/String.hpp"
+#include "kiwi/Types.hpp"
 #include "kiwi/Engine.hpp"
 #include "kiwi/Script/Driver.hpp"
 #include "ConsoleHost.hpp"

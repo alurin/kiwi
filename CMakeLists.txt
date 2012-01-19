@@ -119,6 +119,13 @@ include_directories(${UnitTestPlusPlus_INCLUDE_DIRS})
 link_directories(${UnitTestPlusPlus_LIBRARY_DIRS})
 
 #
+# Check files ane headers
+#
+INCLUDE (CheckIncludeFiles)
+check_include_files ("stdint.h" HAVE_STDINT_H)
+check_include_files ("string.h" HAVE_STRING_H)
+
+#
 # Configure Files
 #
 file (GLOB_RECURSE CONFIGINPUTS1 include/*.in.hpp.cmake)

@@ -8,7 +8,7 @@
 #ifndef KIWI_SCRIPT_DRIVER
 #define KIWI_SCRIPT_DRIVER
 
-#include "kiwi/String.hpp"
+#include "kiwi/Types.hpp"
 #include "kiwi/Engine.hpp"
 #include "kiwi/Script/RootNode.hpp"
 

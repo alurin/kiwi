@@ -5,11 +5,13 @@
  *******************************************************************************
  */
 
-#ifndef KIWI_STRING_HPP_INCLUDED
-#define KIWI_STRING_HPP_INCLUDED
+#ifndef KIWI_TYPES_HPP_INCLUDED
+#define KIWI_TYPES_HPP_INCLUDED
 
-#include "kiwi/Config.hpp"
+#include "kiwi/Machine.hpp"
+
 #include "string.h"
+#include "stdint.h"
 #include <unicode/unistr.h>
 
 namespace kiwi {

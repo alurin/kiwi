@@ -23,6 +23,8 @@
 %code requires {
     #include "Driver.hpp"
     #include "CompoundList.hpp"
+    #include "kiwi/Script/ExpressionNode.hpp"
+    #include "kiwi/Script/StatementNode.hpp"
 
     namespace kiwi {
         namespace script {
@@ -150,24 +152,24 @@
 %left		">>" "<<"
 %left		'-' '+'
 %left		'*' '/' '%'
-%right		UMINUS
+%right		UNARY '!'
 %right      PRE '.' '[' '('
 
 
 //===----------------------------------------------------------------------===//
-// Union type for terminal & non-terminal values
+// Union type for terminal & non-terminal values and its destuctors
 //===----------------------------------------------------------------------===//
 
 %union {
-    //===- Lexer values----------------------------------------------------===//
+    //===- Lexer values ---------------------------------------------------===//
     int64_t                                 ival;           ///< Integer constant
     UChar                                   cval;           ///< Text constant
     String*                                 sval;           ///< String constant or identifier
-}
 
-//===----------------------------------------------------------------------===//
-// Destructors
-//===----------------------------------------------------------------------===//
+    //===- AST nodes ------------------------------------------------------===//
+    StatementNode*                          stmt;           ///< Statement node
+    ExpressionNode*                         rexpr;          ///< Right expression node
+}
 
 %destructor {            } <ival> <cval>
 %destructor { delete $$; } <*>
@@ -202,12 +204,46 @@
 %%
 
 start
-    : namespace_declare start
-    | T_EOF
+    : namespace_declare T_EOF
+    | script_declare T_EOF
     ;
 
 namespace_declare
     : T_NAMESPACE qualified_identificator ';' { yyfree($2); }
+    ;
+
+script_declare
+    : statement script_declare { $1; }
+    |
+    ;
+
+%type <stmt> statement;
+statement
+    : expression ';'                { $$ = 0; yyfree($1); }
+    ;
+
+%type <rexpr> expression;
+expression
+    : '!' expression                { $$ = new UnaryExpressionNode($2, UnaryExpressionNode::OP_NOT, @$); }
+    | '+' expression  %prec UNARY   { $$ = new UnaryExpressionNode($2, UnaryExpressionNode::OP_POS, @$); }
+    | '-' expression  %prec UNARY   { $$ = new UnaryExpressionNode($2, UnaryExpressionNode::OP_NEG, @$); }
+
+    | expression '+' expression     { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_ADD, @$); }
+    | expression '-' expression     { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_SUB, @$); }
+    | expression '*' expression     { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_MUL, @$); }
+    | expression '/' expression     { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_DIV, @$); }
+
+    | right_value       { $$ = $1; }
+    ;
+
+%type <rexpr> right_value;
+right_value
+    : T_CONST_INTEGER   { $$ = new IntegerNode($1, @1);             }
+    | T_CONST_CHAR      { $$ = new CharNode($1, @1);                }
+    | T_CONST_STRING    { $$ = new StringNode(*$1, @1); yyfree($1); }
+    | T_NULL            { $$ = new NullableNode(@1);                }
+    | T_TRUE            { $$ = new BooleanNode(true, @1);           }
+    | T_FALSE           { $$ = new BooleanNode(false, @1);          }
     ;
 
 ///==--------------------------------------------------------------------------------------------------------------==///
@@ -244,7 +280,7 @@ String* combineIdentificator(String* s1, String* s2) {
 }
 
 /**
- * 
+ *
  * @todo Replace output to exception or e.g.
  */
 void Parser::error (const location_type& loc, const std::string& msg) {
@@ -261,8 +297,8 @@ void Parser::error (const location_type& loc, const std::string& msg) {
     //stre << msg << "\n";
 }
 
-/*Location::Location(const location& loc) {
-    Filename_ = *(loc.begin.filename);
-    Begin_    = Position(loc.begin.line, loc.begin.column);
-    End_      = Position(loc.end.line, loc.end.column);
-}*/
+Location::Location(const location& loc) {
+    m_streamName = loc.begin.filename->c_str();
+    //m_begin    = Position(loc.begin.line, loc.begin.column);
+    //m_end      = Position(loc.end.line, loc.end.column);
+}

@@ -1,10 +1,4 @@
 #!/usr/env kiwi
 
-# This example of Kiwi
-# This file is main experement of language syntax
-
-namespace kiwi::example
-    class Main
-
-    end;
-end;
+3 + 4;
+3 - 4;
