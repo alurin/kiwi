@@ -81,9 +81,15 @@ namespace kiwi {
 
             /// Pop statement scope node from stack
             ScopeStatementNode* popScope();
-            
+
+            /// Peak statement scope node from stack
+            ScopeStatementNode* peakScope();
+
             /// Get variable for current scope
             VariableNode* getVariable(const String& name);
+            
+            /// Declare variable in current scope
+            VariableNode* declareVariable(const String& name, const Location& location);
         protected:
             /// Owner engine
             Engine* m_engine;

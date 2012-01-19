@@ -36,13 +36,16 @@ namespace kiwi {
         Host* m_host;
     }; // class Engine
 
-    /// Startup Kiwi and related libraries
-    /// @todo Must renamed to good name
-    KIWI_API void startup();
+    /// Startup configuration Kiwi and related libraries
+    class GlobalConfiguration {
+    public:
+        /// Startup Kiwi and related libraries
+        GlobalConfiguration();
 
-    /// Shutdown Kiwi and related libraries
-    /// @todo Must renamed to good name
-    KIWI_API void shutdown();
+        /// Clean up Kiwi and related libraries
+        /// @todo Verify LLVM clean up, valgrind show this is not worked
+        ~GlobalConfiguration();
+    };
 } // namespace kiwi
 
 #endif

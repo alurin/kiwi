@@ -62,7 +62,7 @@ int main(int argc, char** argv)
                       << desc;
             return EXIT_SUCCESS;
         }
-        
+
         #if KIWI_DEBUG
             Driver::setDebugMode(vm.count("help"));
         #endif
@@ -70,31 +70,17 @@ int main(int argc, char** argv)
 
     /// Create engine and start process
     {
+        GlobalConfiguration config;
         ConsoleHost host;
         Engine engine(&host);
 
-//        // Backend* backend = new vm::VmBackend();
-//        // Frontend* frontend = new console::ConsoleFrontend();
-//        // Engine engine(backend, frontend);
-//
-//        /// Trace driver actions??
-//#ifdef KIWI_DEBUG
-//        //test_primary_types(engine.getContext());
-//        engine.setDriverDebug(vm.count("debug-driver"));
-//#endif
-
-//        try {
-            if (vm.count("input-file")) {
-                Path path = vm["input-file"].as< Path > ();
-                return Driver::parseFile(&engine, path) ? EXIT_SUCCESS : EXIT_FAILURE;
-            } else {
-                std::cerr << "Do not specify input files. Run with --help for information about options\n";
-                return EXIT_FAILURE;
-            }
-//        } catch (Exception* ex) {
-//            ex->dump(std::cerr);
-//            return EXIT_FAILURE;
-//        }
+        if (vm.count("input-file")) {
+            Path path = vm["input-file"].as< Path > ();
+            return Driver::parseFile(&engine, path) ? EXIT_SUCCESS : EXIT_FAILURE;
+        } else {
+            std::cerr << "Do not specify input files. Run with --help for information about options\n";
+            return EXIT_FAILURE;
+        }
     }
 }
 

@@ -13,9 +13,10 @@
 
 namespace kiwi {
     namespace script {
+        /**
+         *
+         */
         class StatementNode : public Node {
-        public:
-
         protected:
             StatementNode(const Location& location);
         };
@@ -40,11 +41,19 @@ namespace kiwi {
             ExpressionNode* m_node;
         };
 
+        class VariableNode;
+
         /**
          *  Variable scope statement node
          */
         class ScopeStatementNode : public StatementNode {
         public:
+            /// Varaibles map type
+            typedef std::map<String, VariableNode*> VariableMap;
+
+            /// Varaibles map iterator type
+            typedef VariableMap::iterator VariableIterator;
+
             /// Scope statement node constructor
             ScopeStatementNode(const Location& location);
 
@@ -53,9 +62,18 @@ namespace kiwi {
 
             /// Scope statement node destructor
             virtual ~ScopeStatementNode();
+
+            /// Get variable from scope
+            VariableNode* getVariable(const String& name);
+            
+            /// Declare variable in current scope
+            VariableNode* declareVariable(const String& name, const Location& location);
         protected:
             /// Parent scope statement node
             ScopeStatementNode* m_parentScope;
+
+            /// Varaibles map
+            VariableMap m_variablesMap;
         };
 
         /**

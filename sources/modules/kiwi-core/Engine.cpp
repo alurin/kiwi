@@ -18,21 +18,19 @@ Engine::Engine(Host* host) : m_host(host) {
     kiwi_assert(host && "Host must not be is null");
 }
 
-// Destruct engine 
+// Destruct engine
 Engine::~Engine() {
 }
 
-namespace kiwi {
-    // Startup Kiwi and related libraries
-    void startup() {
-        UErrorCode errorCode;
-        u_init(&errorCode);                 // ICU
-        llvm::InitializeNativeTarget();     // LLVM JIT
-    }
+// Startup Kiwi and related libraries
+GlobalConfiguration::GlobalConfiguration() {
+    UErrorCode errorCode;
+    u_init(&errorCode);                 // ICU
+    llvm::InitializeNativeTarget();     // LLVM JIT
+}
 
-    // Shutdown Kiwi and related libraries
-    void shutdown() {
-        llvm::llvm_shutdown();              // LLVM 
-        u_cleanup();                        // ICU
-    }
+// Clean up Kiwi and related libraries
+GlobalConfiguration::~GlobalConfiguration() {
+    llvm::llvm_shutdown();              // LLVM
+    u_cleanup();                        // ICU
 }

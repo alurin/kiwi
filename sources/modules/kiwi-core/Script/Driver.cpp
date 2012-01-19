@@ -77,8 +77,20 @@ ScopeStatementNode* DriverImpl::popScope() {
     m_scopeStack.pop();
     return scope;
 }
+// Peak statement scope node from stack
+ScopeStatementNode* DriverImpl::peakScope() {
+    kiwi_assert(!m_scopeStack.empty() && "Scope stack is empty");
+    return m_scopeStack.top();
+}
 
-///
+// Get variable from current scope
 VariableNode* DriverImpl::getVariable(const String& name) {
-    return 0;
+    ScopeStatementNode* scope = peakScope();
+    return scope->getVariable(name);
+}
+
+// Declare variable in current scope
+VariableNode* DriverImpl::declareVariable(const String& name, const Location& location) {
+    ScopeStatementNode* scope = peakScope();
+    return scope->declareVariable(name, location);
 }
