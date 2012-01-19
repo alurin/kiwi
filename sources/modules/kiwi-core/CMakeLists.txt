@@ -31,7 +31,6 @@ else (${KIWI_LIBRARY})
     add_library(kiwi-core ${SOURCE_CPP})
 endif (${KIWI_LIBRARY})
 
-
 set_target_properties(kiwi-core PROPERTIES OUTPUT_NAME kiwi)
 target_link_libraries(kiwi-core icuuc icuio)
 
@@ -99,4 +98,4 @@ if (CMAKE_COMPILER_IS_GNUCC)
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 # Install kiwi-core
-install(TARGETS kiwi-core LIBRARY DESTINATION lib)
+install(TARGETS kiwi-core LIBRARY DESTINATION lib ARCHIVE DESTINATION lib/static)

@@ -9,10 +9,18 @@ file(GLOB_RECURSE SOURCE_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
 add_library( kiwi-apache2-module SHARED ${SOURCE_C} ${SOURCE_CPP} )
 target_link_libraries( kiwi-apache2-module kiwi-core ${APR_LIBRARY} )
 include_directories( ${APACHE2_INCLUDE_DIR} ${APR_INCLUDE_DIR})
-
 set_target_properties(kiwi-apache2-module
     PROPERTIES
     OUTPUT_NAME mod_kiwi
+    PREFIX ""
     COMPILE_FLAGS "${APR_CFLAGS} ${APR_INCLUDES}"
     LINK_FLAGS "${APR_LDFLAGS} ${APR_INCLUDES}"
+)
+
+install(TARGETS kiwi-apache2-module LIBRARY DESTINATION lib/apache2/modules)
+install(
+    FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/configs/kiwi.load"
+        "${CMAKE_CURRENT_SOURCE_DIR}/configs/kiwi.conf"
+    DESTINATION /etc/apache2/mods-available
 )
