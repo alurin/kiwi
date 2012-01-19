@@ -12,7 +12,7 @@
 
 namespace kiwi {
     namespace script {
-        class ScriptNode : StatementNode {
+        class ScriptNode : public ScopeStatementNode {
         public:
 
         };

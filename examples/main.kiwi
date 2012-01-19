@@ -1,9 +1,11 @@
 #!/usr/env kiwi
 
-{
-    var $a;
-    var $b;
+var $a, $b, $c;
 
-    $a = 3 + 4 + $a;
-    $b = 3 - 4 - $a;
+if ($a) {
+    if ($b) {
+        if ($c) {
+
+        }
+    }
 }

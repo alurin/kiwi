@@ -219,21 +219,28 @@ script_declare
 
 %type <stmt> scope_statement;
 scope_statement
-    : '{'   { driver.pushScope( new ScopeStatementNode(@1) ); }
+    : '{'   { driver.pushScope( new ScopeStatementNode(driver.peakScope(), @1) ); }
             statements_list
-      '}'   { $$ = driver.popScope();                       }
+      '}'   { $$ = driver.popScope(); }
     ;
 
 statements_list
-    : statement statements_list     { yyfree($1); }
+    : statement statements_list     { driver.peakScope()->addStatement($1); }
     |
     ;
 
 %type <stmt> statement;
 statement
-    : scope_statement               { $$ = $1;                          }
+    : scope_statement               { $$ = $1;                              }
     | expression ';'                { $$ = new ExpressionStatementNode($1); }
-    | variable_declare ';'          { $$ = 0; }
+    | variable_declare ';'          { $$ = 0;                               }
+    | conditional_statement         { $$ = $1;                              }
+    ;
+
+%type <stmt> conditional_statement;
+conditional_statement
+    : T_IF '(' expression ')' statement                   { $$ = new ConditionalStatementNode($3, $5, @1);     }
+    | T_IF '(' expression ')' statement T_ELSE statement  { $$ = new ConditionalStatementNode($3, $5, $7, @1); }
     ;
 
 %type <rexpr> expression;
@@ -253,7 +260,22 @@ expression
     ;
 
 variable_declare
-    : T_VAR T_VARIABLE              { driver.declareVariable(*$2, @2); yyfree($2); }
+    : T_VAR variable_declare_list
+    ;
+
+variable_declare_list
+    : single_variable_declare ',' variable_declare_list
+    | single_variable_declare
+    ;
+
+single_variable_declare
+    : T_VARIABLE '=' expression     {
+                                        driver.declareVariable(*$1, @1);
+                                        StatementNode* node = new ExpressionStatementNode($3);
+                                        driver.peakScope()->addStatement(node);
+                                        yyfree($1);
+                                    }
+    | T_VARIABLE                    { driver.declareVariable(*$1, @1); yyfree($1); }
     ;
 
 %type <lexpr> left_expression;

@@ -87,8 +87,8 @@ namespace kiwi {
 
             /// Get variable for current scope
             VariableNode* getVariable(const String& name);
-            
-            /// Declare variable in current scope
+
+            /// Declare variable in current scope with default value
             VariableNode* declareVariable(const String& name, const Location& location);
         protected:
             /// Owner engine

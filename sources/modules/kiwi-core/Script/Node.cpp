@@ -10,10 +10,15 @@
 using namespace kiwi;
 using namespace kiwi::script;
 
-// constructor
+// Location constructor
+Location::Location(const String& streamName) : m_streamName(streamName) {
+
+}
+
+// Node constructor
 Node::Node(const Location& location) : m_location(location) {
 
 }
 
-// virtual destructor
+// Node virtual destructor
 Node::~Node() { }

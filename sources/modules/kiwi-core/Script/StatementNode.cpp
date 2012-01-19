@@ -36,10 +36,17 @@ ScopeStatementNode::ScopeStatementNode(ScopeStatementNode* parentScope, const Lo
 
 // ScopeStatementNode destructor
 ScopeStatementNode::~ScopeStatementNode() {
-    VariableIterator vi, ve = m_variablesMap.end();
-    for (vi = m_variablesMap.begin(); vi != ve; ++vi) {
+    int i, size = m_statements.size();
+    for (i = 0; i < size; ++i) {
+        StatementNode* statement = m_statements[i];
+        delete statement;
+    }
+
+    VariableIterator vi, ve = m_variables.end();
+    for (vi = m_variables.begin(); vi != ve; ++vi) {
         VariableNode* node = vi->second;
-        delete node;
+        if (node->getParentScope() == this)
+            delete node;
     }
 }
 
@@ -61,18 +68,51 @@ RightVariableNode::RightVariableNode(VariableNode* node, const Location& locatio
 
 }
 
+// ConditionalStatementNode constructor
+ConditionalStatementNode::ConditionalStatementNode(ExpressionNode* conditional, StatementNode* trueStatement,
+                                                    StatementNode* falseStatement, const Location& location)
+: StatementNode(location),  m_conditional(conditional), m_trueStatement(trueStatement), m_falseStatement(falseStatement) {
+
+}
+
+// ConditionalStatementNode constructor
+ConditionalStatementNode::ConditionalStatementNode(ExpressionNode* conditional, StatementNode* trueStatement,
+                                                    const Location& location)
+: StatementNode(location),  m_conditional(conditional), m_trueStatement(trueStatement), m_falseStatement(0) {
+
+}
+
+// ConditionalStatementNode destructor
+ConditionalStatementNode::~ConditionalStatementNode() {
+    delete m_conditional;
+    delete m_trueStatement;
+    delete m_falseStatement;
+}
+
 // Get variable from scope statement node
 VariableNode* ScopeStatementNode::getVariable(const String& name) {
-    VariableIterator result = m_variablesMap.find(name);
-    kiwi_assert(result != m_variablesMap.end() && "Variable not found in scope");
+    VariableIterator result = m_variables.find(name);
+    if (result == m_variables.end()) {
+        kiwi_assert(m_parentScope != 0 && "Variable not found in nearest scopes");
+        VariableNode* node = m_parentScope->getVariable(name);
+        m_variables.insert(std::make_pair(name, node));
+        return node;
+    }
     return result->second;
 }
 
 // Declare variable
 VariableNode* ScopeStatementNode::declareVariable(const String& name, const Location& location) {
-    VariableIterator result = m_variablesMap.find(name);
-    kiwi_assert(result == m_variablesMap.end() && "Variable found in scope");
+    VariableIterator result = m_variables.find(name);
+    kiwi_assert(result == m_variables.end() && "Variable found in scope");
     VariableNode* node = new VariableNode(name, this, location);
-    m_variablesMap.insert(std::make_pair(name, node));
+    m_variables.insert(std::make_pair(name, node));
     return node;
+}
+
+// Add statement
+void ScopeStatementNode::addStatement(StatementNode* statement) {
+    if (statement) {
+        m_statements.push_back(statement);
+    }
 }

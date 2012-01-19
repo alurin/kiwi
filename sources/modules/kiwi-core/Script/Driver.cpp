@@ -21,9 +21,16 @@ using namespace kiwi::script;
 bool Driver::s_debug = false;
 
 DriverImpl::DriverImpl(Engine* engine) : m_engine(engine), m_lexer(0) {
+
 }
 
 DriverImpl::~DriverImpl() {
+    // remove this after change parent AST for scope statement node
+    while(!m_scopeStack.empty()) {
+        ScopeStatementNode* scope = m_scopeStack.top();
+        m_scopeStack.pop();
+        delete scope;
+    }
 }
 
 Path DriverImpl::getStreamNameUTF8() const {
@@ -37,12 +44,21 @@ Path DriverImpl::getStreamNameUTF8() const {
 RootNode* DriverImpl::parseStream(std::istream& in, const String& sname) {
     m_streamName = sname;
 
+    // create root script node
+    Location location(sname);
+    ScopeStatementNode* rootScope = new ScopeStatementNode(location);
+    m_scopeStack.push(rootScope);
+
+    // create lexer
     Lexer scanner(*this, &in);
     scanner.set_debug(Driver::isDebugMode());
     this->m_lexer = &scanner;
 
+    // create parse
     Parser parser(*this, scanner);
     parser.set_debug_level(Driver::isDebugMode());
+
+    // parse
     (parser.parse() == 0);
     return 0;
 }

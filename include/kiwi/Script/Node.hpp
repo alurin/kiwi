@@ -20,6 +20,9 @@ namespace kiwi {
          */
         class KIWI_API Location {
         public:
+            /// Default constructor
+            Location(const String& streamName);
+
             /// Internal constructor
             KIWI_LOCAL Location(const location& loc);
 

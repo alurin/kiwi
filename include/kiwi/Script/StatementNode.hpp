@@ -10,6 +10,7 @@
 
 #include "kiwi/Script/ExpressionNode.hpp"
 #include <map>
+#include <vector>
 
 namespace kiwi {
     namespace script {
@@ -54,6 +55,9 @@ namespace kiwi {
             /// Varaibles map iterator type
             typedef VariableMap::iterator VariableIterator;
 
+            /// Statement type
+            typedef std::vector<StatementNode*> StatementList;
+
             /// Scope statement node constructor
             ScopeStatementNode(const Location& location);
 
@@ -65,30 +69,42 @@ namespace kiwi {
 
             /// Get variable from scope
             VariableNode* getVariable(const String& name);
-            
+
             /// Declare variable in current scope
             VariableNode* declareVariable(const String& name, const Location& location);
+
+            /// Add statement ownership in scope
+            void addStatement(StatementNode* statement);
         protected:
             /// Parent scope statement node
             ScopeStatementNode* m_parentScope;
 
             /// Varaibles map
-            VariableMap m_variablesMap;
+            VariableMap m_variables;
+
+            /// Statement list
+            StatementList m_statements;
         };
 
         /**
          * Statement variable node
          */
         class VariableNode : public Node {
+            friend VariableNode* ScopeStatementNode::declareVariable(const String&, const kiwi::script::Location&);
         public:
-            /// Variable node constructor
-            VariableNode(const String& name, ScopeStatementNode* parentScope, const Location& location);
+            /// Returns owner statement
+            ScopeStatementNode* getParentScope() const {
+                return m_parentScope;
+            }
         protected:
             /// Variable name
             UnicodeString m_name;
 
             /// Variable owner statement
             ScopeStatementNode* m_parentScope;
+
+            /// Variable node constructor
+            VariableNode(const String& name, ScopeStatementNode* parentScope, const Location& location);
         };
 
         /**
@@ -123,6 +139,52 @@ namespace kiwi {
         protected:
             /// Variable node
             VariableNode* m_node;
+        };
+
+        /**
+         * Logical statement node
+         */
+        class ConditionalStatementNode : public StatementNode {
+        public:
+            /// Logical statement node constructor
+            ConditionalStatementNode(
+                ExpressionNode* conditional,
+                StatementNode* trueStatement,
+                StatementNode* falseStatement,
+                const Location& location);
+
+            /// Logical statement node constructor
+            ConditionalStatementNode(
+                ExpressionNode* conditional,
+                StatementNode* trueStatement,
+                const Location& location);
+
+            /// Logical statement node destructor
+            ~ConditionalStatementNode();
+
+            /// Returns conditional node
+            ExpressionNode* getConditional() {
+                return m_conditional;
+            }
+
+            /// Returns true statement node
+            StatementNode* getTrueStatement() const {
+                return m_trueStatement;
+            }
+
+            /// Returns false statement node
+            StatementNode* getFalseStatement() const {
+                return m_falseStatement;
+            }
+        protected:
+            /// Conditional node
+            ExpressionNode* m_conditional;
+
+            /// Trus statement node
+            StatementNode* m_trueStatement;
+
+            /// False statement node
+            StatementNode* m_falseStatement;
         };
     }
 }
