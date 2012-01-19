@@ -19,6 +19,15 @@ namespace kiwi {
         };
 
         /**
+         * The LeftExpressionNode class is abstract base for all left expressions nodes
+         */
+        class LeftExpressionNode : public Node {
+        protected:
+            /// Protected constructor for expressions
+            LeftExpressionNode(const Location& location);
+        };
+
+        /**
          *
          */
         class UnaryExpressionNode : public ExpressionNode {
@@ -45,7 +54,6 @@ namespace kiwi {
             ExpressionNode* getNode() const {
                 return m_node;
             }
-
         protected:
             /// Unary opcode
             Opcode m_opcode;
@@ -93,6 +101,35 @@ namespace kiwi {
 
             /// Expression left node
             ExpressionNode* m_leftNode;
+
+            /// Expression right node
+            ExpressionNode* m_rightNode;
+        };
+
+        /**
+         *
+         */
+        class AssignmentExpressionNode : public ExpressionNode {
+        public:
+            /// BinaryExpressionNode constructor
+            AssignmentExpressionNode(LeftExpressionNode* leftNode, ExpressionNode* rightNode, const Location& location);
+
+            /// Virtual destructors
+            virtual ~AssignmentExpressionNode();
+
+            /// Returns left node
+            LeftExpressionNode* getLeftNode() const {
+                return m_leftNode;
+            }
+
+            /// Returns right node
+            ExpressionNode* getRightNode() const {
+                return m_rightNode;
+            }
+        protected:
+
+            /// Expression left node
+            LeftExpressionNode* m_leftNode;
 
             /// Expression right node
             ExpressionNode* m_rightNode;

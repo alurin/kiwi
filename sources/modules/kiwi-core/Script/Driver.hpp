@@ -10,6 +10,7 @@
 
 #include "kiwi/Types.hpp"
 #include "kiwi/Script/RootNode.hpp"
+#include "kiwi/Script/StatementNode.hpp"
 #include <stack>
 #include <string>
 #include <vector>
@@ -41,10 +42,10 @@ namespace kiwi {
             virtual ~DriverImpl();
 
             /// Returns owner engine
-            Engine* getEngine() const { 
+            Engine* getEngine() const {
                 return m_engine;
             }
-            
+
             //===----------------------------------------------------------------===//
             // Driver debug & trace
             //===----------------------------------------------------------------===//
@@ -70,6 +71,19 @@ namespace kiwi {
 
             /// Returns stream name in utf-8 encoding
             Path getStreamNameUTF8() const;
+
+            //===----------------------------------------------------------------===//
+            // Methods for work with statement scopes stack
+            //===----------------------------------------------------------------===//
+
+            /// Push statement scope node in stack
+            void pushScope( ScopeStatementNode* scopeStatement);
+
+            /// Pop statement scope node from stack
+            ScopeStatementNode* popScope();
+            
+            /// Get variable for current scope
+            VariableNode* getVariable(const String& name);
         protected:
             /// Owner engine
             Engine* m_engine;
@@ -82,6 +96,9 @@ namespace kiwi {
 
             /// Current lexer
             Lexer* m_lexer;
+
+            /// Statement scope stack
+            std::stack<ScopeStatementNode*> m_scopeStack;
         };
     }
 }

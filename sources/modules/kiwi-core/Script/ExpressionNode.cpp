@@ -8,6 +8,11 @@ ExpressionNode::ExpressionNode(const Location& location) : Node(location) {
 
 }
 
+/// Left expression node constructor
+LeftExpressionNode::LeftExpressionNode(const Location& location) : Node(location) {
+
+}
+
 // Unary expression node constructor
 UnaryExpressionNode::UnaryExpressionNode(ExpressionNode* node, Opcode opcode, const Location& location)
 : ExpressionNode(location), m_opcode(opcode), m_node(node) {
@@ -20,13 +25,27 @@ UnaryExpressionNode::~UnaryExpressionNode() {
 }
 
 // Binary expression node constructor
-BinaryExpressionNode::BinaryExpressionNode(ExpressionNode* leftNode, ExpressionNode* rightNode, Opcode opcode, const Location& location)
+BinaryExpressionNode::BinaryExpressionNode(ExpressionNode* leftNode, ExpressionNode* rightNode, Opcode opcode,
+                                            const Location& location)
 : ExpressionNode(location), m_opcode(opcode), m_leftNode(leftNode), m_rightNode(rightNode) {
 
 }
 
 // Binary expression node destructor
 BinaryExpressionNode::~BinaryExpressionNode() {
+    delete m_leftNode;
+    delete m_rightNode;
+}
+
+/// BinaryExpressionNode constructor
+AssignmentExpressionNode::AssignmentExpressionNode(LeftExpressionNode* leftNode, ExpressionNode* rightNode,
+                                                    const Location& location)
+: ExpressionNode(location), m_leftNode(leftNode), m_rightNode(rightNode) {
+
+}
+
+/// Virtual destructors
+AssignmentExpressionNode::~AssignmentExpressionNode() {
     delete m_leftNode;
     delete m_rightNode;
 }

@@ -24,7 +24,6 @@
     #include "Driver.hpp"
     #include "CompoundList.hpp"
     #include "kiwi/Script/ExpressionNode.hpp"
-    #include "kiwi/Script/StatementNode.hpp"
 
     namespace kiwi {
         namespace script {
@@ -168,6 +167,7 @@
 
     //===- AST nodes ------------------------------------------------------===//
     StatementNode*                          stmt;           ///< Statement node
+    LeftExpressionNode*                     lexpr;          ///< Left expression node
     ExpressionNode*                         rexpr;          ///< Right expression node
 }
 
@@ -213,27 +213,54 @@ namespace_declare
     ;
 
 script_declare
-    : statement script_declare { $1; }
+    : statements_list script_declare
+    |
+    ;
+
+%type <stmt> scope_statement;
+scope_statement
+    : '{'   { driver.pushScope( new ScopeStatementNode(@1) ); }
+            statements_list
+      '}'   { $$ = driver.popScope();                       }
+    ;
+
+statements_list
+    : statement statements_list
     |
     ;
 
 %type <stmt> statement;
 statement
-    : expression ';'                { $$ = 0; yyfree($1); }
+    : scope_statement               { $$ = $1;                          }
+    | expression ';'                { $$ = new ExpressionStatementNode($1); }
     ;
 
 %type <rexpr> expression;
 expression
-    : '!' expression                { $$ = new UnaryExpressionNode($2, UnaryExpressionNode::OP_NOT, @$); }
-    | '+' expression  %prec UNARY   { $$ = new UnaryExpressionNode($2, UnaryExpressionNode::OP_POS, @$); }
-    | '-' expression  %prec UNARY   { $$ = new UnaryExpressionNode($2, UnaryExpressionNode::OP_NEG, @$); }
+    : left_expression '=' expression { $$ = new AssignmentExpressionNode($1, $3, @$); }
 
-    | expression '+' expression     { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_ADD, @$); }
-    | expression '-' expression     { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_SUB, @$); }
-    | expression '*' expression     { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_MUL, @$); }
-    | expression '/' expression     { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_DIV, @$); }
+    | '!' expression                 { $$ = new UnaryExpressionNode($2, UnaryExpressionNode::OP_NOT, @$); }
+    | '+' expression  %prec UNARY    { $$ = new UnaryExpressionNode($2, UnaryExpressionNode::OP_POS, @$); }
+    | '-' expression  %prec UNARY    { $$ = new UnaryExpressionNode($2, UnaryExpressionNode::OP_NEG, @$); }
 
-    | right_value       { $$ = $1; }
+    | expression '+' expression      { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_ADD, @$); }
+    | expression '-' expression      { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_SUB, @$); }
+    | expression '*' expression      { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_MUL, @$); }
+    | expression '/' expression      { $$ = new BinaryExpressionNode($1, $3, BinaryExpressionNode::OP_DIV, @$); }
+
+    | right_expression               { $$ = $1; }
+    ;
+
+
+%type <lexpr> left_expression;
+left_expression
+    : T_VARIABLE                     { $$ = new LeftVariableNode(driver.getVariable(*$1), @1); yyfree($1); }
+    ;
+
+%type <rexpr> right_expression;
+right_expression
+    : T_VARIABLE                     { $$ = new RightVariableNode(driver.getVariable(*$1), @1); yyfree($1); }
+    | right_value                    { $$ = $1; }
     ;
 
 %type <rexpr> right_value;

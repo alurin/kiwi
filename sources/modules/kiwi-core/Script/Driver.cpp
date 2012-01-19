@@ -9,6 +9,8 @@
 #include "Lexer.hpp"
 #include "kiwi/Engine.hpp"
 #include "kiwi/Script/Driver.hpp"
+#include "kiwi/Script/StatementNode.hpp"
+#include "kiwi/Config.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -61,4 +63,22 @@ RootNode* Driver::parseFile(Engine* engine, const Path& filename) {
 RootNode* Driver::parseString(Engine* engine, const std::string &input, const String& sname) {
     std::istringstream iss(input);
     return parseStream(engine, iss, sname);
+}
+
+// Push statement scope node in stack
+void DriverImpl::pushScope( ScopeStatementNode* scopeStatement ) {
+    m_scopeStack.push(scopeStatement);
+}
+
+// Pop statement scope node from stack
+ScopeStatementNode* DriverImpl::popScope() {
+    kiwi_assert(!m_scopeStack.empty() && "Scope stack is empty");
+    ScopeStatementNode* scope = m_scopeStack.top();
+    m_scopeStack.pop();
+    return scope;
+}
+
+///
+VariableNode* DriverImpl::getVariable(const String& name) {
+    return 0;
 }
