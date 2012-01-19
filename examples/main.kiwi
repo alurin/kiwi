@@ -2,10 +2,8 @@
 
 var $a, $b, $c;
 
-if ($a) {
-    if ($b) {
-        if ($c) {
+repeat {
+    while ($b) {
 
-        }
     }
-}
+} while ($a)

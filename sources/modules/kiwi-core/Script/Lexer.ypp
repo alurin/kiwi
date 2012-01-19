@@ -179,6 +179,7 @@ comment "//"[^\r\n]*[\r\n]
     "for"           return token::T_FOR;
     "foreach"       return token::T_FOREACH;
     "while"         return token::T_WHILE;
+    "repeat"        return token::T_REPEAT;
     "break"         return token::T_BREAK;
     "continue"      return token::T_CONTINUE;
     "try"           return token::T_TRY;

@@ -76,20 +76,38 @@ namespace kiwi {
             // Methods for work with statement scopes stack
             //===----------------------------------------------------------------===//
 
-            /// Push statement scope node in stack
-            void pushScope( ScopeStatementNode* scopeStatement);
+            /// Push scope statement node in stack
+            void pushScope(ScopeStatementNode* scopeStatement);
 
-            /// Pop statement scope node from stack
+            /// Pop scope statement node from stack
             ScopeStatementNode* popScope();
 
-            /// Peak statement scope node from stack
+            /// Peak scope statement node from stack
             ScopeStatementNode* peakScope();
+
+            //===----------------------------------------------------------------===//
+            // Methods for work with variables
+            //===----------------------------------------------------------------===//
 
             /// Get variable for current scope
             VariableNode* getVariable(const String& name);
 
             /// Declare variable in current scope with default value
             VariableNode* declareVariable(const String& name, const Location& location);
+
+            //===----------------------------------------------------------------===//
+            // Methods for work with loops
+            //===----------------------------------------------------------------===//
+
+            /// Push loop statement node in stack
+            void pushLoop(LoopNode* loopStatement);
+
+            /// Pop loop statement node from stack
+            LoopNode* popLoop();
+
+            /// Peak loop statement node from stack
+            LoopNode* peakLoop();
+
         protected:
             /// Owner engine
             Engine* m_engine;
@@ -103,8 +121,12 @@ namespace kiwi {
             /// Current lexer
             Lexer* m_lexer;
 
-            /// Statement scope stack
+            /// Scope statement stack
             std::stack<ScopeStatementNode*> m_scopeStack;
+
+            /// Loop statement stack
+            /// @todo How check loops on nested functions?
+            std::stack<LoopNode*> m_loopStack;
         };
     }
 }

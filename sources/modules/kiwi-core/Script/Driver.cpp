@@ -81,19 +81,20 @@ RootNode* Driver::parseString(Engine* engine, const std::string &input, const St
     return parseStream(engine, iss, sname);
 }
 
-// Push statement scope node in stack
+// Push scope statement node in stack
 void DriverImpl::pushScope( ScopeStatementNode* scopeStatement ) {
     m_scopeStack.push(scopeStatement);
 }
 
-// Pop statement scope node from stack
+// Pop scope statement node from stack
 ScopeStatementNode* DriverImpl::popScope() {
     kiwi_assert(!m_scopeStack.empty() && "Scope stack is empty");
     ScopeStatementNode* scope = m_scopeStack.top();
     m_scopeStack.pop();
     return scope;
 }
-// Peak statement scope node from stack
+
+// Peak scope statement node from stack
 ScopeStatementNode* DriverImpl::peakScope() {
     kiwi_assert(!m_scopeStack.empty() && "Scope stack is empty");
     return m_scopeStack.top();
@@ -109,4 +110,25 @@ VariableNode* DriverImpl::getVariable(const String& name) {
 VariableNode* DriverImpl::declareVariable(const String& name, const Location& location) {
     ScopeStatementNode* scope = peakScope();
     return scope->declareVariable(name, location);
+}
+
+// Push loop statement node in stack
+void DriverImpl::pushLoop(LoopNode* loopStatement) {
+    m_loopStack.push(loopStatement);
+}
+
+// Pop loop statement node from stack
+LoopNode* DriverImpl::popLoop() {
+    kiwi_assert(!m_loopStack.empty() && "Scope stack is empty");
+    LoopNode* loop = m_loopStack.top();
+    m_loopStack.pop();
+    return loop;
+}
+
+// Peak loop statement node from stack
+LoopNode* DriverImpl::peakLoop() {
+    if (m_loopStack.empty()) {
+        return 0;
+    }
+    return m_loopStack.top();
 }

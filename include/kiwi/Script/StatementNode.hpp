@@ -186,6 +186,87 @@ namespace kiwi {
             /// False statement node
             StatementNode* m_falseStatement;
         };
+
+        /**
+         * Abstract class for all loop statement nodes
+         */
+        class LoopNode : public StatementNode {
+        public:
+            /// Curcle node destructor
+            virtual ~LoopNode();
+
+            /// Returns child statement
+            StatementNode* getStatement() const {
+                return m_statementNode;
+            }
+
+            /// Set child statement and request ownership
+            void setStatement(StatementNode* statement) {
+                m_statementNode = statement;
+            }
+
+            /// Returns parent loop
+            LoopNode* getParentLoop() const {
+                return m_parentLoop;
+            }
+
+            /// Returns loop level
+            int32_t getLevel() const {
+                return m_level;
+            }
+        protected:
+            /// Statement for loop
+            StatementNode* m_statementNode;
+
+            /// Parent loop
+            LoopNode* m_parentLoop;
+
+            /// Loop level
+            int32_t m_level;
+
+            /// Loop statement constructor
+            LoopNode(LoopNode* parentLoop, const Location& location);
+
+            /// Loop statement constructor
+            LoopNode(StatementNode* statementNode, LoopNode* parentLoop, const Location& location);
+        };
+
+        /**
+         *
+         */
+        class ConditionLoopNode : public LoopNode {
+        public:
+            /// Enumeration for position of conditional
+            enum CheckPosition {
+                PRE,
+                POST
+            };
+
+            /// Conditional loop node constructor
+            ConditionLoopNode(CheckPosition position, LoopNode* parentLoop, const Location& location);
+
+            /// Conditional loop node constructor
+            ConditionLoopNode(ExpressionNode* conditional, CheckPosition position, LoopNode* parentLoop, const Location& location);
+
+            /// Conditional loop node destructor
+            ~ConditionLoopNode();
+
+            /// Returns conditional node
+            ExpressionNode* getConditional() {
+                return m_conditional;
+            }
+            
+            /// Set conditional node
+            void setConditional(ExpressionNode* conditional) {
+                m_conditional = conditional;
+            }
+        protected:
+            /// Conditional node
+            ExpressionNode* m_conditional;
+
+            /// Position of conditional
+            CheckPosition m_position;
+        };
     }
 }
 

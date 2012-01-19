@@ -7,8 +7,40 @@ Engine related
 --------------
     * LLVM not clean up after shutdown
 
+Language
+--------
+    * Dynamic or static?
+    * Script or compile? Hybrid, as crack?
+    * Function Programming? Or not?
+    * Object programming:
+        - Prototype or normal inheritance?
+        - Multi inheritance with fields address map and methods virtual table.
+        - Attributes? If yes, than not only declorative, but add imperative
+        - Access level?
+        - Properties, constructors, events?
+        - Control for extends
+        - AOP?
+        - Closures and continuations?
+        - Dynamic override methods and extends classes?
+        - Structures and objects?
+    * Runtime library:
+        - Reflection
+        - Event system
+        - Memory management:
+            - Manual memory manager
+            - Simple references count and weak and strong references    (implement?)
+            - Complex garbage collector                                 (prefered)
+        - File system:
+            - Virtual FS (prefered)
+            - Normal FS
+    * What I must have in language?
+    * What I want to try?
+    * Why should I want this?
+
 Minor
 -----
     * Clean up all text files
     * Cool text for config script options
     * Enable options for module and interfaces buildings
+
+* English orphography!!!
