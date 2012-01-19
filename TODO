@@ -1,20 +1,14 @@
 Build configs
-----------------------------
+-------------
     * Enable debug build
-    * Treats all warning as errors
     * FindICU.cmake - fing ICU libraries and headers
 
-Documention
------------
-    * Update config for build API documentation from generated 'Doxygen' file
+Engine related
+--------------
+    * LLVM not clean up after shutdown
 
 Minor
 -----
     * Clean up all text files
     * Cool text for config script options
     * Enable options for module and interfaces buildings
-    * Add license and comment information to sources
-
-Idea!!!
--------
-    * Script execution, compelation and e.t.c must use language itself :\ Nda---
