@@ -14,10 +14,18 @@
 
 namespace kiwi {
     namespace script {
+        class StatementVisitor;
+
         /**
          *
          */
         class StatementNode : public Node {
+        public:
+            /// Accept method for visitor
+            virtual void accept(StatementVisitor& visitor) =0;
+
+            /// Accept visitor
+            void accept(NodeVisitor& visitor); // virtual
         protected:
             StatementNode(const Location& location);
         };
@@ -34,9 +42,12 @@ namespace kiwi {
             virtual ~ExpressionStatementNode();
 
             /// Returns expression node
-            ExpressionNode* getVariable() const {
+            ExpressionNode* getChildNode() const {
                 return m_node;
             }
+
+            /// Accept visitor
+            void accept(StatementVisitor& visitor); // virtual
         protected:
             /// Expression node
             ExpressionNode* m_node;
@@ -53,10 +64,13 @@ namespace kiwi {
             typedef std::map<String, VariableNode*> VariableMap;
 
             /// Varaibles map iterator type
-            typedef VariableMap::iterator VariableIterator;
+            typedef VariableMap::const_iterator VariableIterator;
 
-            /// Statement type
+            /// Statement list type
             typedef std::vector<StatementNode*> StatementList;
+
+            /// Statement list iterator type
+            typedef StatementList::const_iterator StatementIterator;
 
             /// Scope statement node constructor
             ScopeStatementNode(const Location& location);
@@ -75,6 +89,39 @@ namespace kiwi {
 
             /// Add statement ownership in scope
             void addStatement(StatementNode* statement);
+
+            /// Accept visitor
+            void accept(StatementVisitor& visitor); // virtual
+
+            /// Return iterator pointed to begin of variables map
+            VariableIterator var_begin() const {
+                return m_variables.begin();
+            }
+
+            /// Return iterator pointed to end of variables map
+            VariableIterator var_end() const {
+                return m_variables.end();
+            }
+
+            /// Returns count of variables
+            size_t var_size() const {
+                return m_variables.size();
+            }
+
+            /// Return iterator pointed to begin of statements list
+            StatementIterator stmt_begin() const {
+                return m_statements.begin();
+            }
+
+            /// Return iterator pointed to end of statements list
+            StatementIterator stmt_end() const {
+                return m_statements.end();
+            }
+
+            /// Returns count of statements
+            size_t stmt_size() const {
+                return m_statements.size();
+            }
         protected:
             /// Parent scope statement node
             ScopeStatementNode* m_parentScope;
@@ -92,13 +139,21 @@ namespace kiwi {
         class VariableNode : public Node {
             friend VariableNode* ScopeStatementNode::declareVariable(const String&, const kiwi::script::Location&);
         public:
+            /// Returns name
+            String getName() const {
+                return m_name;
+            }
+
             /// Returns owner statement
             ScopeStatementNode* getParentScope() const {
                 return m_parentScope;
             }
+
+            /// Accept visitor
+            void accept(NodeVisitor& visitor); // virtual
         protected:
             /// Variable name
-            UnicodeString m_name;
+            String m_name;
 
             /// Variable owner statement
             ScopeStatementNode* m_parentScope;
@@ -119,6 +174,9 @@ namespace kiwi {
             VariableNode* getVariable() const {
                 return m_node;
             }
+
+            /// Accept visitor
+            void accept(LeftExpressionVisitor& visitor); //virtual
         protected:
             /// Variable node
             VariableNode* m_node;
@@ -136,6 +194,9 @@ namespace kiwi {
             VariableNode* getVariable() const {
                 return m_node;
             }
+
+            /// Accept visitor
+            void accept(ExpressionVisitor& visitor); //virtual
         protected:
             /// Variable node
             VariableNode* m_node;
@@ -176,6 +237,9 @@ namespace kiwi {
             StatementNode* getFalseStatement() const {
                 return m_falseStatement;
             }
+
+            /// Accept visitor
+            void accept(StatementVisitor& visitor); // virtual
         protected:
             /// Conditional node
             ExpressionNode* m_conditional;
@@ -255,11 +319,14 @@ namespace kiwi {
             ExpressionNode* getConditional() {
                 return m_conditional;
             }
-            
+
             /// Set conditional node
             void setConditional(ExpressionNode* conditional) {
                 m_conditional = conditional;
             }
+
+            /// Accept visitor
+            void accept(StatementVisitor& visitor); // virtual
         protected:
             /// Conditional node
             ExpressionNode* m_conditional;

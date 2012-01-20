@@ -13,13 +13,19 @@
 
 namespace kiwi {
     namespace script {
+        class ExpressionVisitor;
+        class LeftExpressionVisitor;
 
         /**
          * The ExpressionNode class is abstract base for all right expressions nodes
          */
         class ExpressionNode : public Node {
         public:
-
+            /// Visit expression node
+            virtual void accept(ExpressionVisitor& visitor) =0;
+            
+            /// Accept visitor
+            void accept(NodeVisitor& visitor); // virtual
         protected:
             /// Protected constructor for expressions
             ExpressionNode(const Location& location);
@@ -29,6 +35,12 @@ namespace kiwi {
          * The LeftExpressionNode class is abstract base for all left expressions nodes
          */
         class LeftExpressionNode : public Node {
+        public:
+            /// Visit left expression node
+            virtual void accept(LeftExpressionVisitor& visitor) =0;
+            
+            /// Accept visitor
+            void accept(NodeVisitor& visitor); // virtual
         protected:
             /// Protected constructor for expressions
             LeftExpressionNode(const Location& location);
@@ -61,6 +73,9 @@ namespace kiwi {
             ExpressionNode* getNode() const {
                 return m_node;
             }
+
+            /// Accept visitor
+            void accept(ExpressionVisitor& visitor); // virtual
         protected:
             /// Unary opcode
             Opcode m_opcode;
@@ -102,6 +117,9 @@ namespace kiwi {
             ExpressionNode* getRightNode() const {
                 return m_rightNode;
             }
+
+            /// Accept visitor
+            void accept(ExpressionVisitor& visitor); // virtual
         protected:
             /// Binary opcode
             Opcode m_opcode;
@@ -133,6 +151,9 @@ namespace kiwi {
             ExpressionNode* getRightNode() const {
                 return m_rightNode;
             }
+
+            /// Accept visitor
+            void accept(ExpressionVisitor& visitor); // virtual
         protected:
 
             /// Expression left node
@@ -168,6 +189,9 @@ namespace kiwi {
             int64_t getValue() const {
                 return m_value;
             }
+
+            /// Accept visitor
+            void accept(ExpressionVisitor& visitor); // virtual
         protected:
             const int64_t m_value;
         };
@@ -186,6 +210,9 @@ namespace kiwi {
             bool getValue() const {
                 return m_value;
             }
+
+            /// Accept visitor
+            void accept(ExpressionVisitor& visitor); // virtual
         protected:
             const bool m_value;
         };
@@ -204,6 +231,9 @@ namespace kiwi {
             String getValue() const {
                 return m_value;
             }
+
+            /// Accept visitor
+            void accept(ExpressionVisitor& visitor); // virtual
         protected:
             const String m_value;
         };
@@ -222,6 +252,9 @@ namespace kiwi {
             UChar getValue() const {
                 return m_value;
             }
+
+            /// Accept visitor
+            void accept(ExpressionVisitor& visitor); // virtual
         protected:
             const UChar m_value;
         };
@@ -235,6 +268,9 @@ namespace kiwi {
         public:
             /// NullableNode constructor
             NullableNode(const Location& location);
+
+            /// Accept visitor
+            void accept(ExpressionVisitor& visitor); // virtual
         };
 
     }

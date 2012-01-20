@@ -11,7 +11,12 @@
 #include "kiwi/Types.hpp"
 
 namespace kiwi {
+    namespace io {
+        class OutputStream;
+    }
+
     namespace script {
+        class NodeVisitor;
         /// Internal location class
         class location;
 
@@ -39,9 +44,16 @@ namespace kiwi {
             /// Virtual node destructor
             virtual ~Node();
 
+            /// Returns node location
             Location getLocation() const {
                 return m_location;
             }
+            
+            /// Accept visitor
+            virtual void accept(NodeVisitor& visitor) =0;
+
+            /// Dump AST
+            static void dump(Node* node, io::OutputStream* stream);
         protected:
             /// Node location
             Location m_location;

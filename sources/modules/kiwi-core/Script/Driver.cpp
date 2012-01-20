@@ -11,6 +11,7 @@
 #include "kiwi/Script/Driver.hpp"
 #include "kiwi/Script/StatementNode.hpp"
 #include "kiwi/Config.hpp"
+#include "kiwi/Host.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -60,6 +61,11 @@ RootNode* DriverImpl::parseStream(std::istream& in, const String& sname) {
 
     // parse
     (parser.parse() == 0);
+    
+    // dump result
+    ScopeStatementNode* scope = popScope();
+    Node::dump(scope, m_engine->getHost()->getOutputStream());
+    
     return 0;
 }
 

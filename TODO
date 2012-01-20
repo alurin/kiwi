@@ -3,9 +3,13 @@ Build configs
     * Enable debug build
     * FindICU.cmake - fing ICU libraries and headers
 
-Engine related
+Engine
 --------------
     * LLVM not clean up after shutdown
+
+Parser
+------
+    * Node visitor for all or part of nodes?
 
 Language
 --------

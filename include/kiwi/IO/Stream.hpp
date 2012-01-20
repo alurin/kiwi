@@ -48,8 +48,24 @@ namespace kiwi {
             /// Create output stream from file
             static OutputStream* createFromFile(UFILE* file);
 
+            /// Write buffer of unicode chars in stream
             size_t write(const UChar* buffer, const size_t count);
-            
+
+            /// Write unicode char in stream
+            void write(const UChar chr);
+
+            /// Write string
+            void write(const String& string);
+
+            /// Write new line in stream
+            void writeln();
+
+            /// Write unicode char in stream wit end of line
+            void writeln(const UChar chr);
+
+            /// Write string with end of line
+            void writeln(const String& string);
+
             virtual ~OutputStream();
         protected:
             UFILE* m_file;

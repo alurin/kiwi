@@ -15,7 +15,7 @@ InputStream::InputStream(UFILE* file) : m_file(file) {
 }
 
 OutputStream::OutputStream(UFILE* file) : m_file(file) {
-    
+
 }
 
 InputStream::~InputStream() {
@@ -52,4 +52,33 @@ size_t InputStream::read(UChar* buffer, const size_t count) {
 
 size_t OutputStream::write(const UChar* buffer, const size_t count) {
     return u_file_write_44(buffer, count, m_file);
+}
+
+void OutputStream::write(const UChar chr) {
+    u_fputc(chr, m_file);
+}
+
+/// Write string
+void OutputStream::write(const String& string) {
+    size_t       count  = string.length();
+    const UChar* buffer = string.getBuffer();
+    u_file_write_44(buffer, count, m_file);
+    // string.releaseBuffer();
+}
+
+void OutputStream::writeln() {
+    u_fputc('\n', m_file);
+}
+void OutputStream::writeln(const UChar chr) {
+    u_fputc(chr, m_file);
+    u_fputc('\n', m_file);
+}
+
+/// Write string with end of line
+void OutputStream::writeln(const String& string) {
+    size_t       count  = string.length();
+    const UChar* buffer = string.getBuffer();
+    u_file_write_44(buffer, count, m_file);
+    // string.releaseBuffer();
+    u_fputc('\n', m_file);
 }

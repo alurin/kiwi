@@ -391,8 +391,7 @@ void Parser::error (const location_type& loc, const std::string& msg) {
     OutputStream* stream = host->getErrorStream();
 
     UnicodeString message(msg.c_str());
-    stream->write(message.getTerminatedBuffer(), message.length());
-    message.releaseBuffer();
+    stream->writeln(message);
 
     /* driver.error(support::SYNTAX_ERROR) << loc << String(msg.c_str());*/
     //OutputStream stre(driver.getEngine());
