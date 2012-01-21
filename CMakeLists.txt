@@ -149,7 +149,12 @@ endforeach (CONFIGINPUT ${CONFIGINPUTS})
 #
 # Add Build Targets
 #
-add_subdirectory(sources)
+add_subdirectory(sources/kiwi-core)
+add_subdirectory(sources/kiwi-engine)
+add_subdirectory(sources/kiwi-system)
+add_subdirectory(sources/kiwi-runtime)
+add_subdirectory(sources/kiwi-apache-host)
+add_subdirectory(sources/kiwi-console-host)
 add_subdirectory(tests)
 
 #
