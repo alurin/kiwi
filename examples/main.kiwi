@@ -1,10 +1,7 @@
 #!/usr/env kiwi
 
-var $a, $b, $c;
+var $a, $b;
 
-{
-    {
-        $b = $a - $c;
-        $c = $a;
-    }
-}
+repear {
+    $a = $b;
+} while ($a)

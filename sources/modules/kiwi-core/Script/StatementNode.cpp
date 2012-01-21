@@ -9,7 +9,6 @@
 
 #include "kiwi/Script/StatementNode.hpp"
 #include "kiwi/Config.hpp"
-#include "location.hh"
 
 using namespace kiwi;
 using namespace kiwi::script;

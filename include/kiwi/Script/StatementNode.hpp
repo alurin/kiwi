@@ -316,13 +316,18 @@ namespace kiwi {
             ~ConditionLoopNode();
 
             /// Returns conditional node
-            ExpressionNode* getConditional() {
+            ExpressionNode* getConditional() const {
                 return m_conditional;
             }
 
             /// Set conditional node
             void setConditional(ExpressionNode* conditional) {
                 m_conditional = conditional;
+            }
+
+            /// Returns position of conditional
+            CheckPosition getPosition() const {
+                return m_position;
             }
 
             /// Accept visitor

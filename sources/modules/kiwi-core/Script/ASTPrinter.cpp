@@ -19,39 +19,59 @@ namespace {
 
     class IdentRuler {
     public:
-        IdentRuler() { }
-        IdentRuler(const IdentRuler& identRuler) : m_idents(identRuler.m_idents) { }
+        IdentRuler() : m_count(1), m_index(0) { }
+        IdentRuler(const IdentRuler& identRuler) : m_idents(identRuler.m_idents), m_count(1), m_index(0)  { }
 
         void add(UChar rule) {
             m_idents.push_back(rule);
         }
 
-        void write(OutputStream* stream) const {
-            for (size_t i = 0; i < m_idents.size(); ++i) {
-                stream->write(m_idents[i]);
+        void write(OutputStream* stream) {
+            m_index++;
+
+            if (m_index != 1) {
+                for (size_t i = 0; i < m_idents.size(); ++i) {
+                    stream->write(m_idents[i]);
+                }
+            }
+
+            if (m_count == 1) {
+                stream->write(BOX_START);
+            } else if (m_index == 1) {
+                stream->write(BOX_BEGIN);
+            } else if (m_count == m_index) {
+                stream->write(BOX_END);
+            } else {
+                stream->write(BOX_CENTER);
             }
         }
 
-        IdentRuler begin() {
+        IdentRuler get() {
             IdentRuler ruler = *this;
-            ruler.add(' ');
+            if (m_index == m_count) {
+                ruler.add(' ');
+            } else {
+                ruler.add(BOX_LINE);
+            }
             return ruler;
         }
 
-        IdentRuler center() {
-            IdentRuler ruler = *this;
-            ruler.add(BOX_LINE);
-            return ruler;
+        void setCount(size_t count) {
+            m_count = count;
         }
 
-        IdentRuler end() {
-            IdentRuler ruler = *this;
-            ruler.add(' ');
-            return ruler;
+        size_t getCount() const {
+            return m_count;
         }
     protected:
-        ///
+        /// List of ident characters
         std::vector<UChar> m_idents;
+
+        /// Count
+        size_t m_count;
+
+        /// Index
+        size_t m_index;
     };
 
     class NodePrinter : public NodeVisitor {
@@ -209,13 +229,14 @@ void NodePrinter::visit(StatementNode* node) {
 
 /// Print statement node
 void NodePrinter::visit(VariableNode* node) {
-    m_stream->write("use ");
-    m_stream->write('$');
+    m_stream->write(BOX_LEAF);
+    m_stream->write(" use $");
     m_stream->writeln(node->getName());
 }
 
 /// Print unary expression  node
 void ExpressionPrinter::visit(UnaryExpressionNode* node) {
+    m_ruler.setCount(2);
     UChar chr;
     switch (node->getOpcode()) {
         case UnaryExpressionNode::OP_NOT:
@@ -229,30 +250,21 @@ void ExpressionPrinter::visit(UnaryExpressionNode* node) {
             break;
     }
 
-    // root node
-    m_stream->writeln(BOX_ENTER);
-
     // first node
     m_ruler.write(m_stream);
-    m_stream->write(BOX_CENTER);
     m_stream->write(BOX_LEAF);
     m_stream->write(' ');
     m_stream->writeln(chr);
 
     // second node
     m_ruler.write(m_stream);
-    m_stream->write(BOX_END);
-    IdentRuler ruler = m_ruler.end();
-    ExpressionPrinter printer(m_stream, ruler);
+    ExpressionPrinter printer(m_stream, m_ruler.get());
     node->getNode()->accept(printer);
 }
 
 /// Print binary expression  node
 void ExpressionPrinter::visit(BinaryExpressionNode* node) {
-    // first node
-    m_stream->write(BOX_BEGIN);
-    m_stream->write(BOX_LEAF);
-    m_stream->write(' ');
+    m_ruler.setCount(3);
 
     UChar chr;
     switch (node->getOpcode()) {
@@ -269,56 +281,49 @@ void ExpressionPrinter::visit(BinaryExpressionNode* node) {
             chr = '/';
             break;
     }
+
+    // first node
+    m_ruler.write(m_stream);
+    m_stream->write(BOX_LEAF);
+    m_stream->write(' ');
     m_stream->writeln(chr);
 
     // second node
-    m_ruler.write(m_stream);
-    m_stream->write(BOX_CENTER);
     {
-        IdentRuler ruler(m_ruler);
-        ruler.add(BOX_LINE);
-        ruler.add(' ');
-        ExpressionPrinter printer(m_stream, ruler);
+        m_ruler.write(m_stream);
+        ExpressionPrinter printer(m_stream, m_ruler.get());
         node->getLeftNode()->accept(printer);
     }
 
     // third node
-    m_ruler.write(m_stream);
-    m_stream->write(BOX_END);
     {
-        IdentRuler ruler(m_ruler);
-        ruler.add(' ');
-        ruler.add(' ');
-        ExpressionPrinter printer(m_stream, m_ruler);
+        m_ruler.write(m_stream);
+        ExpressionPrinter printer(m_stream, m_ruler.get());
         node->getRightNode()->accept(printer);
     }
 }
 
 /// Print assignment expression  node
 void ExpressionPrinter::visit(AssignmentExpressionNode* node) {
-    // root node
-    m_stream->writeln(BOX_ENTER);
+    m_ruler.setCount(3);
 
     // first node
+    //m_ruler.write(m_stream);
+    //m_stream->write(BOX_CENTER);
     m_ruler.write(m_stream);
-    m_stream->write(BOX_CENTER);
-    m_stream->write(BOX_LEAF);
-    m_stream->write(' ');
-    m_stream->writeln('=');
+    m_stream->writeln(" =");
 
     // second node
-    m_ruler.write(m_stream);
-    m_stream->write(BOX_CENTER);
     {
-        LeftExpressionPrinter printer(m_stream, m_ruler.center());
+        m_ruler.write(m_stream);
+        LeftExpressionPrinter printer(m_stream, m_ruler.get());
         node->getLeftNode()->accept(printer);
     }
 
     // third node
-    m_ruler.write(m_stream);
-    m_stream->write(BOX_END);
     {
-        ExpressionPrinter printer(m_stream, m_ruler.end());
+        m_ruler.write(m_stream);
+        ExpressionPrinter printer(m_stream, m_ruler.get());
         node->getRightNode()->accept(printer);
     }
 }
@@ -331,37 +336,44 @@ void ExpressionPrinter::visit(IntegerNode* node) {
 
 /// Print boolean node
 void ExpressionPrinter::visit(BooleanNode* node) {
-
+    m_stream->write(BOX_LEAF);
+    if (node->getValue())
+        m_stream->writeln(" true");
+    else
+        m_stream->writeln(" false");
 }
 
 /// Print string node
 void ExpressionPrinter::visit(StringNode* node) {
-
+    m_stream->write(BOX_LEAF);
+    m_stream->write(" ");
+    m_stream->writeln(node->getValue());
 }
 
 /// Print char node
 void ExpressionPrinter::visit(CharNode* node) {
-
+    m_stream->write(BOX_LEAF);
+    m_stream->write(" ");
+    m_stream->writeln(node->getValue());
 }
 
 /// Print nullable node
 void ExpressionPrinter::visit(NullableNode* node) {
-
+    m_stream->write(BOX_LEAF);
+    m_stream->writeln(" null");
 }
 
 /// Print variable node
 void ExpressionPrinter::visit(RightVariableNode* node) {
     m_stream->write(BOX_LEAF);
-    m_stream->write(' ');
-    m_stream->write('$');
+    m_stream->write(" $");
     m_stream->writeln(node->getVariable()->getName());
 }
 
 /// Print variable node
 void LeftExpressionPrinter::visit(LeftVariableNode* node) {
     m_stream->write(BOX_LEAF);
-    m_stream->write(' ');
-    m_stream->write('$');
+    m_stream->write(" $");
     m_stream->writeln(node->getVariable()->getName());
 }
 
@@ -373,17 +385,17 @@ void StatementPrinter::visit(ExpressionStatementNode* node) {
 
 /// Print scope statement node
 void StatementPrinter::visit(ScopeStatementNode* node) {
-    // first node
-    m_stream->writeln(BOX_ENTER);
+    m_ruler.setCount(node->var_size() + node->stmt_size());
 
     // dump variables in scope
     {
-        NodePrinter printer(m_stream, m_ruler);
         ScopeStatementNode::VariableIterator
             var = node->var_begin(),
             ve  = node->var_end();
         for (; var != ve; ++var) {
-            // (var->second)->accept(printer);
+            m_ruler.write(m_stream);
+            NodePrinter printer(m_stream, m_ruler.get());
+            (var->second)->accept(printer);
         }
     }
 
@@ -392,38 +404,10 @@ void StatementPrinter::visit(ScopeStatementNode* node) {
         ScopeStatementNode::StatementIterator
             stmt = node->stmt_begin(),
             se   = node->stmt_end();
-        size_t count = node->stmt_size();
-
-        IdentRuler center = m_ruler, normal = m_ruler, ruler = m_ruler;
-        normal.add(' ');
-        if (count > 1) {
-            center.add(BOX_LINE);
-        } else {
-            center.add(' ');
-        }
 
         for (size_t i = 0; stmt != se; ++stmt, ++i) {
-            // write ruler if not first
             m_ruler.write(m_stream);
-            if (i == 0) {
-                if (count > 1) {
-                    m_stream->write(BOX_CENTER);
-                    ruler = center;
-                } else {
-                    m_stream->write(BOX_END);
-                    ruler = normal;
-                }
-            } else {
-                if (i + 1 != count) {
-                    m_stream->write(BOX_CENTER);
-                    ruler = center;
-                } else {
-                    m_stream->write(BOX_END);
-                    ruler = normal;
-                }
-            }
-
-            StatementPrinter printer(m_stream, ruler);
+            StatementPrinter printer(m_stream, m_ruler.get());
             (*stmt)->accept(printer);
         }
     }
@@ -431,10 +415,62 @@ void StatementPrinter::visit(ScopeStatementNode* node) {
 
 /// Print conditional statement node
 void StatementPrinter::visit(ConditionalStatementNode* node) {
+    // first node
+    //m_stream->writeln(BOX_ENTER);
+    m_ruler.setCount(node->getFalseStatement() ? 4 : 3);
 
+    // second node: conditional
+    {
+        m_ruler.write(m_stream);
+        m_stream->writeln(" if");
+    }
+    // second node: conditional
+    {
+        m_ruler.write(m_stream);
+        ExpressionPrinter printer(m_stream, m_ruler.get());
+        node->getConditional()->accept(printer);
+    }
+
+    // 3th node: true statement
+    {
+        m_ruler.write(m_stream);
+        StatementPrinter printer(m_stream, m_ruler.get());
+        node->getTrueStatement()->accept(printer);
+    }
+
+    // 4 node: false statement
+    if (node->getFalseStatement()) {
+        m_ruler.write(m_stream);
+        StatementPrinter printer(m_stream,  m_ruler.get());
+        node->getFalseStatement()->accept(printer);
+    }
 }
 
 /// Print condition loop node
 void StatementPrinter::visit(ConditionLoopNode* node) {
+    m_ruler.setCount(3);
 
+    // first node:
+    {
+        //m_ruler.write(m_stream);
+        m_ruler.write(m_stream);
+        if (node->getPosition() == ConditionLoopNode::PRE) {
+            m_stream->writeln(" while");
+        } else {
+            m_stream->writeln(" repeat");
+        }
+    }
+    // second node: conditional
+    {
+        m_ruler.write(m_stream);
+        ExpressionPrinter printer(m_stream, m_ruler.get());
+        node->getConditional()->accept(printer);
+    }
+
+    // 3th node: true statement
+    {
+        m_ruler.write(m_stream);
+        StatementPrinter printer(m_stream, m_ruler.get());
+        node->getStatement()->accept(printer);
+    }
 }
