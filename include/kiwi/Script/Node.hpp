@@ -8,7 +8,7 @@
 #ifndef KIWI_SCRIPT_NODE_HPP_INCLUDED
 #define KIWI_SCRIPT_NODE_HPP_INCLUDED
 
-#include "kiwi/Types.hpp"
+#include "kiwi/Location.hpp"
 
 namespace kiwi {
     namespace io {
@@ -17,28 +17,10 @@ namespace kiwi {
 
     namespace script {
         class NodeVisitor;
-        /// Internal location class
-        class location;
 
-        /**
-         * The Location class represents node's location in source stream
-         */
-        class KIWI_API Location {
-        public:
-            /// Default constructor
-            Location(const String& streamName);
-
-            /// Internal constructor
-            KIWI_LOCAL Location(const location& loc);
-
-            String getStreamName() const {
-                return m_streamName;
-            }
-        protected:
-            String m_streamName;
-        };
-
-        /// The Node class is abstract root for all syntaxis nodes
+        /// The Node class is abstract root for all syntax nodes
+        /// Node must have references counter
+        ///
         class Node {
         public:
             /// Virtual node destructor
@@ -48,11 +30,11 @@ namespace kiwi {
             Location getLocation() const {
                 return m_location;
             }
-            
+
             /// Accept visitor
             virtual void accept(NodeVisitor& visitor) =0;
 
-            /// Dump AST
+            /// Dump tree for node
             static void dump(Node* node, io::OutputStream* stream);
         protected:
             /// Node location

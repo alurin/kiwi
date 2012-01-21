@@ -58,7 +58,7 @@ namespace kiwi {
              * @return          true if successfully parsed
              */
             RootNode* parseStream(std::istream& in,
-                              const String& sname = "stream input");
+                                    const String& sname = "stream input");
 
             //===----------------------------------------------------------------===//
             // Driver debug & trace

@@ -137,7 +137,7 @@ namespace kiwi {
          * Statement variable node
          */
         class VariableNode : public Node {
-            friend VariableNode* ScopeStatementNode::declareVariable(const String&, const kiwi::script::Location&);
+            friend VariableNode* ScopeStatementNode::declareVariable(const String&, const Location&);
         public:
             /// Returns name
             String getName() const {

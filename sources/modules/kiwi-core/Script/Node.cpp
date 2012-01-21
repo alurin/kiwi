@@ -21,4 +21,6 @@ Node::Node(const Location& location) : m_location(location) {
 }
 
 // Node virtual destructor
-Node::~Node() { }
+Node::~Node() {
+
+}

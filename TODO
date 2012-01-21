@@ -1,3 +1,9 @@
+Question
+--------
+    * What I must have in language?
+    * What I want to try?
+    * Why should I want this?
+
 Build configs
 -------------
     * Enable debug build
@@ -7,15 +13,11 @@ Engine
 --------------
     * LLVM not clean up after shutdown
 
-Parser
-------
-    * Node visitor for all or part of nodes?
-
 Language
 --------
     * Dynamic or static?
     * Script or compile? Hybrid, as crack?
-    * Function Programming? Or not?
+    * Function programming? Or not?
     * Object programming:
         - Prototype or normal inheritance?
         - Multi inheritance with fields address map and methods virtual table.
@@ -37,9 +39,6 @@ Language
         - File system:
             - Virtual FS (prefered)
             - Normal FS
-    * What I must have in language?
-    * What I want to try?
-    * Why should I want this?
 
 Minor
 -----
