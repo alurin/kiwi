@@ -1,3 +1,7 @@
 add_subdirectory(modules/kiwi-core)
+#add_subdirectory(modules/kiwi-engine)
+#add_subdirectory(modules/kiwi-system)
+#add_subdirectory(modules/kiwi-runtime)
+#add_subdirectory(modules/kiwi-reflection)
 add_subdirectory(hosts/console)
 add_subdirectory(hosts/apache2-module)

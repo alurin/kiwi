@@ -19,8 +19,6 @@ namespace kiwi {
         class NodeVisitor;
 
         /// The Node class is abstract root for all syntax nodes
-        /// Node must have references counter
-        ///
         class Node {
         public:
             /// Virtual node destructor

@@ -46,4 +46,13 @@ Minor
     * Cool text for config script options
     * Enable options for module and interfaces buildings
 
+Modules
+-------
+    * Change modules structure:
+        - kiwi-core             Core module
+        - kiwi-code-generator   Code generator based on LLVM backend
+        - kiwi-runtime          Runtime module
+        - kiwi-apache2-module   Apache host module
+        - kiwi-console          Console host application
+
 * English orphography!!!
