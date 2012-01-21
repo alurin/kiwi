@@ -1,7 +1,6 @@
 #!/usr/env kiwi
 
-var $a, $b;
+var $a, $b, $c, $n;
 
-repear {
-    $a = $b;
-} while ($a)
+$a = $b + $c;
+$n = $b - $c;

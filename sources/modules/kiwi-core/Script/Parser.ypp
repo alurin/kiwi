@@ -213,8 +213,7 @@ namespace_declare
     ;
 
 script_declare
-    : statements_list script_declare
-    |
+    : statements_list
     ;
 
 %type <stmt> scope_statement;
@@ -226,8 +225,12 @@ scope_statement
     ;
 
 statements_list
-    : statement statements_list     { driver.peakScope()->addStatement($1); }
+    : statement_insert_in_list statements_list
     |
+    ;
+
+statement_insert_in_list
+    : statement                     { driver.peakScope()->addStatement($1); }
     ;
 
 %type <stmt> statement;
@@ -265,7 +268,7 @@ repeat_loop
     : T_REPEAT
             {
                 LoopNode* loop = driver.peakLoop();
-                loop = new ConditionLoopNode(ConditionLoopNode::PRE, loop, @1);
+                loop = new ConditionLoopNode(ConditionLoopNode::POST, loop, @1);
                 driver.pushLoop(loop);
             }
         statement T_WHILE '(' expression ')'
