@@ -1,6 +1,6 @@
 ##############################################################
 #               CMake Project Wrapper Makefile               #
-############################################################## 
+##############################################################
 
 SHELL := /bin/bash
 RM    := rm -rf
@@ -15,7 +15,7 @@ distclean:
 	@- (cd build >/dev/null 2>&1 && cmake .. >/dev/null 2>&1)
 	@- $(MAKE) --silent -C build clean || true
 	@- $(RM) ./build/Makefile
-	@- $(RM) ./build/src
+	@- $(RM) ./build/source
 	@- $(RM) ./build/test
 	@- $(RM) ./build/CMake*
 	@- $(RM) ./build/cmake.*
