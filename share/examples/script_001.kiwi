@@ -1,4 +1,18 @@
-namespace Example;
+#!/bin/env kiwi
 
-imports system.console;
+import system;
 
+/// Write argument in input stream
+/// @param @argv First argument
+void writeArguments(string[] $argv) {
+    foreach ($argv as $param) {
+        cout.writeln($param);
+    }
+}
+
+/// Executable point for application
+/// @return Result of application execute
+int main(int $argc, string[] $argv) {
+    this.writeArguments($argv);
+    return 0;
+}

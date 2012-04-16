@@ -9,22 +9,24 @@
 #ifndef YY_DECL
 
 #define	YY_DECL						\
-    example::Parser::token_type				\
-    example::Scanner::lex(				\
-	example::Parser::semantic_type* yylval,		\
-	example::Parser::location_type* yylloc		\
+    kiwi::lang::Parser::token_type				\
+    kiwi::lang::Scanner::lex(				\
+	kiwi::lang::Parser::semantic_type* yylval,		\
+	kiwi::lang::Parser::location_type* yylloc		\
     )
 #endif
 
 #ifndef __FLEX_LEXER_H
 #define yyFlexLexer ExampleFlexLexer
+#undef yylex
 #include "FlexLexer.h"
 #undef yyFlexLexer
 #endif
 
 #include "parser.hpp"
 
-namespace example {
+namespace kiwi {
+namespace lang {
 
 /** Scanner is a derived class to add some extra function to the scanner
  * class. Flex itself creates a class named yyFlexLexer, which is renamed using
@@ -55,6 +57,7 @@ public:
     void set_debug(bool b);
 };
 
-} // namespace example
+} // namespace lang
+} // namespace kiwi
 
 #endif // EXAMPLE_SCANNER_H

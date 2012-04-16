@@ -47,7 +47,7 @@
 /* Line 35 of lalr1.cc  */
 #line 1 "[Bison:b4_percent_define_default]"
 
-namespace example {
+namespace kiwi { namespace lang {
 
 /* Line 35 of lalr1.cc  */
 #line 54 "lang/parser.hpp"
@@ -57,7 +57,7 @@ namespace example {
 /* Line 35 of lalr1.cc  */
 #line 1 "[Bison:b4_percent_define_default]"
 
-} // example
+} } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
 #line 64 "lang/parser.hpp"
@@ -105,7 +105,7 @@ do {							\
 /* Line 35 of lalr1.cc  */
 #line 1 "[Bison:b4_percent_define_default]"
 
-namespace example {
+namespace kiwi { namespace lang {
 
 /* Line 35 of lalr1.cc  */
 #line 112 "lang/parser.hpp"
@@ -120,17 +120,20 @@ namespace example {
     {
 
 /* Line 35 of lalr1.cc  */
-#line 56 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 58 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 
-    int  			integerVal;
-    double 			doubleVal;
+    int                 integerVal;
+    double              doubleVal;
     std::string*		stringVal;
-    class CalcNode*		calcnode;
+
+    class TypeNode*		typenode;
+    class LeftNode*     leftnode;
+    class RightNode*    rightnode;
 
 
 
 /* Line 35 of lalr1.cc  */
-#line 134 "lang/parser.hpp"
+#line 137 "lang/parser.hpp"
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -144,9 +147,34 @@ namespace example {
    enum yytokentype {
      END = 0,
      EOL = 258,
-     INTEGER = 259,
-     DOUBLE = 260,
-     STRING = 261
+     UNIX_SCRIPT = 259,
+     OP_LSH = 260,
+     OP_RSH = 261,
+     OP_OR = 262,
+     OP_AND = 263,
+     OP_EQ = 264,
+     OP_NE = 265,
+     OP_GE = 266,
+     OP_LE = 267,
+     OP_INC = 268,
+     OP_DEC = 269,
+     OP_AADD = 270,
+     OP_ASUB = 271,
+     OP_ADIV = 272,
+     OP_AMUL = 273,
+     OP_ASHL = 274,
+     OP_ASHR = 275,
+     OP_AAND = 276,
+     OP_AOR = 277,
+     IDENT = 278,
+     INTEGER = 279,
+     VAR_LOCAL = 280,
+     VAR_INSTANCE = 281,
+     TYPE_VOID = 282,
+     TYPE_INT = 283,
+     TYPE_STRING = 284,
+     UNARY = 285,
+     PRE = 286
    };
 
     };
@@ -224,7 +252,7 @@ namespace example {
     typedef unsigned char token_number_type;
     /* Tables.  */
     /// For a state, the index in \a yytable_ of its portion.
-    static const signed char yypact_[];
+    static const short int yypact_[];
     static const signed char yypact_ninf_;
 
     /// For a state, default rule to reduce.
@@ -232,7 +260,7 @@ namespace example {
     /// Zero means the default is an error.
     static const unsigned char yydefact_[];
 
-    static const signed char yypgoto_[];
+    static const short int yypgoto_[];
     static const signed char yydefgoto_[];
 
     /// What to do in a state.
@@ -240,10 +268,10 @@ namespace example {
     /// - if positive, shift that token.
     /// - if negative, reduce the rule which number is the opposite.
     /// - if zero, do what YYDEFACT says.
-    static const unsigned char yytable_[];
+    static const signed char yytable_[];
     static const signed char yytable_ninf_;
 
-    static const unsigned char yycheck_[];
+    static const signed char yycheck_[];
 
     /// For a state, its accessing symbol.
     static const unsigned char yystos_[];
@@ -320,10 +348,10 @@ namespace example {
 /* Line 35 of lalr1.cc  */
 #line 1 "[Bison:b4_percent_define_default]"
 
-} // example
+} } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 327 "lang/parser.hpp"
+#line 355 "lang/parser.hpp"
 
 
 

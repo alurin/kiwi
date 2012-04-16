@@ -8,8 +8,8 @@
 #include "scanner.h"
 
 /* import the parser's token type into a local typedef */
-typedef example::Parser::token token;
-typedef example::Parser::token_type token_type;
+typedef kiwi::lang::Parser::token token;
+typedef kiwi::lang::Parser::token_type token_type;
 
 /* By default yylex returns int, we use token_type. Unfortunately yyterminate
  * by default returns 0, which is not of token_type. */
@@ -37,7 +37,7 @@ typedef example::Parser::token_type token_type;
 %option debug
 
 /* no support for include files is planned */
-%option yywrap nounput 
+%option yywrap nounput
 
 /* enables the use of start condition stacks */
 %option stack
@@ -58,30 +58,55 @@ typedef example::Parser::token_type token_type;
 
  /*** BEGIN EXAMPLE - Change the example lexer rules below ***/
 
-[0-9]+ {
-    yylval->integerVal = atoi(yytext);
-    return token::INTEGER;
+"<<"     { return token::OP_LSH;      }
+">>"     { return token::OP_RSH;      }
+"||"     { return token::OP_OR;       }
+"&&"     { return token::OP_AND;      }
+"=="     { return token::OP_EQ;       }
+"!="     { return token::OP_NE;       }
+">="     { return token::OP_GE;       }
+"<="     { return token::OP_LE;       }
+"++"     { return token::OP_INC;      }
+"--"     { return token::OP_DEC;      }
+"+="     { return token::OP_AADD;     }
+"-="     { return token::OP_ASUB;     }
+"/="     { return token::OP_ADIV;     }
+"*="     { return token::OP_AMUL;     }
+"<<="    { return token::OP_ASHL;     }
+">>="    { return token::OP_ASHR;     }
+"&="     { return token::OP_AAND;     }
+"|="     { return token::OP_AOR;      }
+
+"void"   { return token::TYPE_VOID;   }
+"int"    { return token::TYPE_INT;    }
+"string" { return token::TYPE_STRING; }
+
+ /* Unix command */
+^#!.*$ {
+    return token::UNIX_SCRIPT;
 }
 
-[0-9]+"."[0-9]* {
-    yylval->doubleVal = atof(yytext);
-    return token::DOUBLE;
-}
-
-[A-Za-z][A-Za-z0-9_,.-]* {
+[A-Za-z][A-Za-z0-9]* {
     yylval->stringVal = new std::string(yytext, yyleng);
-    return token::STRING;
+    return token::IDENT;
+}
+
+\$[A-Za-z][A-Za-z0-9_]* {
+    yylval->stringVal = new std::string(yytext+1, yyleng-1);
+    return token::VAR_LOCAL;
+}
+
+\@[A-Za-z][A-Za-z0-9_]* {
+    yylval->stringVal = new std::string(yytext+1, yyleng-1);
+    return token::VAR_INSTANCE;
 }
 
  /* gobble up white-spaces */
-[ \t\r]+ {
+[ \t]+ {
     yylloc->step();
 }
-
- /* gobble up end-of-lines */
-\n {
-    yylloc->lines(yyleng); yylloc->step();
-    return token::EOL;
+[\n\r]+ {
+    yylloc->lines(yyleng);
 }
 
  /* pass all other characters up to bison */
@@ -93,7 +118,8 @@ typedef example::Parser::token_type token_type;
 
 %% /*** Additional Code ***/
 
-namespace example {
+namespace kiwi {
+namespace lang {
 
 Scanner::Scanner(std::istream* in,
 		 std::ostream* out)
@@ -110,7 +136,8 @@ void Scanner::set_debug(bool b)
     yy_flex_debug = b;
 }
 
-}
+} // namespace lang
+} // namespace kiwi
 
 /* This implementation of ExampleFlexLexer::yylex() is required to fill the
  * vtable of the class ExampleFlexLexer. We define the scanner's main yylex

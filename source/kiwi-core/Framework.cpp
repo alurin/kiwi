@@ -1,6 +1,5 @@
 #include "kiwi/Framework.hpp"
 #include "lang/Driver.hpp"
-#include "lang/Expression.hpp"
 
 using namespace kiwi;
 
@@ -17,7 +16,6 @@ FrameworkRef Framework::create()
 
 void Framework::includeFile(const Path& filename)
 {
-    CalcContext context;
-    example::Driver driver(context);
+    lang::Driver driver;
     driver.parseFile(filename);
 }

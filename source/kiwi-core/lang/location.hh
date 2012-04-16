@@ -33,7 +33,7 @@
 
 /**
  ** \file location.hh
- ** Define the example::location class.
+ ** Define the kiwi::lang::location class.
  */
 
 #ifndef BISON_LOCATION_HH
@@ -47,7 +47,7 @@
 /* Line 162 of location.cc  */
 #line 1 "[Bison:b4_percent_define_default]"
 
-namespace example {
+namespace kiwi { namespace lang {
 
 /* Line 162 of location.cc  */
 #line 54 "lang/location.hh"
@@ -163,7 +163,7 @@ namespace example {
 /* Line 271 of location.cc  */
 #line 1 "[Bison:b4_percent_define_default]"
 
-} // example
+} } // kiwi::lang
 
 /* Line 271 of location.cc  */
 #line 170 "lang/location.hh"

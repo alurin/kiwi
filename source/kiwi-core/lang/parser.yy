@@ -7,7 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "Expression.hpp"
+#include "ExpressionNode.hpp"
+#include "TypeNode.hpp"
+#include "FunctionNode.hpp"
 
 %}
 
@@ -30,7 +32,7 @@
 %skeleton "lalr1.cc"
 
 /* namespace to enclose parser in */
-%name-prefix="example"
+%name-prefix="kiwi::lang"
 
 /* set the parser's class identifier */
 %define "parser_class_name" "Parser"
@@ -54,24 +56,68 @@
  /*** BEGIN EXAMPLE - Change the example grammar's tokens below ***/
 
 %union {
-    int  			integerVal;
-    double 			doubleVal;
+    int                 integerVal;
+    double              doubleVal;
     std::string*		stringVal;
-    class CalcNode*		calcnode;
+
+    class TypeNode*		typenode;
+    class LeftNode*     leftnode;
+    class RightNode*    rightnode;
 }
 
-%token			END	     0	"end of file"
-%token			EOL		"end of line"
-%token <integerVal> 	INTEGER		"integer"
-%token <doubleVal> 	DOUBLE		"double"
-%token <stringVal> 	STRING		"string"
+%token                  END             0   "end of file"
+%token                  EOL                 "end of line"
+%token                  UNIX_SCRIPT         "unix script"
 
-%type <calcnode>	constant variable
-%type <calcnode>	atomexpr powexpr unaryexpr mulexpr addexpr expr
+%token                  OP_LSH              "<<"
+%token                  OP_RSH              ">>"
+%token                  OP_OR               "||"
+%token                  OP_AND              "&&"
+%token                  OP_EQ               "=="
+%token                  OP_NE               "!="
+%token                  OP_GE               ">="
+%token                  OP_LE               "<="
+%token                  OP_INC              "++"
+%token                  OP_DEC              "--"
+%token                  OP_AADD             "+="
+%token                  OP_ASUB             "-="
+%token                  OP_ADIV             "/="
+%token                  OP_AMUL             "*="
+%token                  OP_ASHL             "<<="
+%token                  OP_ASHR             ">>="
+%token                  OP_AAND             "&="
+%token                  OP_AOR              "|="
 
-%destructor { delete $$; } STRING
-%destructor { delete $$; } constant variable
-%destructor { delete $$; } atomexpr powexpr unaryexpr mulexpr addexpr expr
+%token  <stringVal>     IDENT               "identifier"
+
+%token  <integerVal>    INTEGER             "integer"
+%token  <stringVal>     VAR_LOCAL           "local variable"
+%token  <stringVal>     VAR_INSTANCE        "instance attribute"
+
+%token                  TYPE_VOID           "void"
+%token                  TYPE_INT            "int"
+%token                  TYPE_STRING         "string"
+
+%left       '=' "+=" "-=" "/=" "*=" "<<=" ">>=" "&=" "|="
+%left       "||"
+%left       "&&"
+%left       '|'
+//%left       '^'
+%left       '&'
+%nonassoc   "==" "!="
+%nonassoc   '<' '>' "<=" ">="
+%left       ">>" "<<"
+%left       '-' '+'
+%left       '*' '/' '%'
+%right      UNARY '!'
+%right      PRE '.' '[' '('
+
+%type   <typenode>      type type_complex type_primary
+%type   <rightnode>     expression right
+%type   <leftnode>      left
+
+%destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
+%destructor { delete $$; } type type_complex type_primary
 
  /*** END EXAMPLE - Change the example grammar's tokens above ***/
 
@@ -90,133 +136,115 @@
 
 %% /*** Grammar Rules ***/
 
- /*** BEGIN EXAMPLE - Change the example grammar rules below ***/
+ /*** BEGIN GRAMAR - Change the example grammar rules below ***/
 
-constant : INTEGER
-           {
-	       $$ = new CNConstant($1);
-	   }
-         | DOUBLE
-           {
-	       $$ = new CNConstant($1);
-	   }
+//==------------------------------------------------------------------------==//
+//      Functions
+//==------------------------------------------------------------------------==//
+function
+    : type IDENT                    { driver.func(*$2, $1); }
+      '(' function_arguments ')'
+      function_statement
+                                    { driver.funcEnd();     }
+    ;
 
-variable : STRING
-           {
-	       if (!driver.calc.existsVariable(*$1)) {
-		   error(yyloc, std::string("Unknown variable \"") + *$1 + "\"");
-		   delete $1;
-		   YYERROR;
-	       }
-	       else {
-		   $$ = new CNConstant( driver.calc.getVariable(*$1) );
-		   delete $1;
-	       }
-	   }
+function_arguments
+    : /* empty */
+    | function_arguments_required
+    ;
 
-atomexpr : constant
-           {
-	       $$ = $1;
-	   }
-         | variable
-           {
-	       $$ = $1;
-	   }
-         | '(' expr ')'
-           {
-	       $$ = $2;
-	   }
+function_arguments_required
+    : function_arguments_required ',' function_argument
+    | function_argument
+    ;
 
-powexpr	: atomexpr
-          {
-	      $$ = $1;
-	  }
-        | atomexpr '^' powexpr
-          {
-	      $$ = new CNPower($1, $3);
-	  }
+function_argument
+    : type VAR_LOCAL                { driver.func()->add(*$2, $1); }
+    ;
 
-unaryexpr : powexpr
-            {
-		$$ = $1;
-	    }
-          | '+' powexpr
-            {
-		$$ = $2;
-	    }
-          | '-' powexpr
-            {
-		$$ = new CNNegate($2);
-	    }
+function_statement
+    : '{' statements '}'
+    ;
 
-mulexpr : unaryexpr
-          {
-	      $$ = $1;
-	  }
-        | mulexpr '*' unaryexpr
-          {
-	      $$ = new CNMultiply($1, $3);
-	  }
-        | mulexpr '/' unaryexpr
-          {
-	      $$ = new CNDivide($1, $3);
-	  }
-        | mulexpr '%' unaryexpr
-          {
-	      $$ = new CNModulo($1, $3);
-	  }
+//==------------------------------------------------------------------------==//
+//      Statements and expressions
+//==------------------------------------------------------------------------==//
+statements
+    : expression ';' statements
+    | ';'
+    | /** empty */
+    ;
 
-addexpr : mulexpr
-          {
-	      $$ = $1;
-	  }
-        | addexpr '+' mulexpr
-          {
-	      $$ = new CNAdd($1, $3);
-	  }
-        | addexpr '-' mulexpr
-          {
-	      $$ = new CNSubtract($1, $3);
-	  }
+expression
+    : '-' expression %prec UNARY    { $$ = driver.expr()->getNeg($2); }
+    | '+' expression %prec UNARY    { $$ = driver.expr()->getAdd($2); }
+    | '!' expression %prec UNARY    { $$ = driver.expr()->getNot($2); }
 
-expr	: addexpr
-          {
-	      $$ = $1;
-	  }
 
-assignment : STRING '=' expr
-             {
-		 driver.calc.variables[*$1] = $3->evaluate();
-		 std::cout << "Setting variable " << *$1
-			   << " = " << driver.calc.variables[*$1] << "\n";
-		 delete $1;
-		 delete $3;
-	     }
+    | expression '+'   expression   { $$ = driver.expr()->getAdd($1, $3); }
+    | expression '-'   expression   { $$ = driver.expr()->getSub($1, $3); }
+    | expression '*'   expression   { $$ = driver.expr()->getMul($1, $3); }
+    | expression '/'   expression   { $$ = driver.expr()->getDiv($1, $3); }
+    | expression "<<"  expression   { $$ = driver.expr()->getLsh($1, $3); }
+    | expression ">>"  expression   { $$ = driver.expr()->getRsh($1, $3); }
 
-start	: /* empty */
-        | start ';'
-        | start EOL
-	| start assignment ';'
-	| start assignment EOL
-	| start assignment END
-        | start expr ';'
-          {
-	      driver.calc.expressions.push_back($2);
-	  }
-        | start expr EOL
-          {
-	      driver.calc.expressions.push_back($2);
-	  }
-        | start expr END
-          {
-	      driver.calc.expressions.push_back($2);
-	  }
+    | expression '|'   expression   { $$ = driver.expr()->getOr($1, $3); }
+    | expression "||"  expression   { $$ = driver.expr()->getOr($1, $3, true); }
+    | expression '&'   expression   { $$ = driver.expr()->getAnd($1, $3); }
+    | expression "&&"  expression   { $$ = driver.expr()->getAnd($1, $3, true); }
 
- /*** END EXAMPLE - Change the example grammar rules above ***/
+    | expression "=="  expression   { $$ = driver.expr()->getEq($1, $3); }
+    | expression "!="  expression   { $$ = driver.expr()->getNeq($1, $3); }
+    | expression ">="  expression   { $$ = driver.expr()->getGe($1, $3); }
+    | expression "<="  expression   { $$ = driver.expr()->getLe($1, $3); }
+    | expression ">"   expression   { $$ = driver.expr()->getGt($1, $3); }
+    | expression "<"   expression   { $$ = driver.expr()->getLt($1, $3); }
+
+    | left       '='   expression   { $$ = driver.expr()->getAssign($1, $3); }
+    | right
+    ;
+
+left
+    : VAR_LOCAL                     { $$ = driver.scope()->getLeftLocal(*$1); }
+    | VAR_INSTANCE                  { $$ = driver.scope()->getLeftInstance(*$1); }
+    ;
+
+right
+    : VAR_LOCAL                     { $$ = driver.scope()->getRightLocal(*$1); }
+    | VAR_INSTANCE                  { $$ = driver.scope()->getRightInstance(*$1); }
+    | '(' expression ')'            { $$ = $2; }
+    ;
+
+
+//==------------------------------------------------------------------------==//
+//      Types
+//==------------------------------------------------------------------------==//
+type
+    : type_complex
+    | type_primary
+    | TYPE_VOID             { $$ = driver.type()->getVoid();    }
+    ;
+
+type_complex
+    : type_primary '[' ']'  { $$ = driver.type()->getArray($1); }
+    ;
+
+type_primary
+    : TYPE_INT              { $$ = driver.type()->getInt();     }
+    | TYPE_STRING           { $$ = driver.type()->getString();  }
+    ;
+
+/** START POINT **/
+start
+    : /* empty */
+    | function start END
+    ;
+
+/*** END GRAMAR - Change the example grammar rules above ***/
 
 %% /*** Additional Code ***/
 
-void example::Parser::error(const Parser::location_type& l,
+void kiwi::lang::Parser::error(const Parser::location_type& l,
 			    const std::string& m)
 {
     driver.error(l, m);

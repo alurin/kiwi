@@ -5,14 +5,17 @@
 #include <sstream>
 
 #include "Driver.hpp"
+#include "FunctionNode.hpp"
+#include "TypeNode.hpp"
+#include "ExpressionNode.hpp"
 #include "scanner.h"
 
-namespace example {
+using namespace kiwi;
+using namespace kiwi::lang;
 
-Driver::Driver(class CalcContext& _calc)
+Driver::Driver()
     : trace_scanning(false),
-      trace_parsing(false),
-      calc(_calc)
+      trace_parsing(false)
 {
 }
 
@@ -53,4 +56,61 @@ void Driver::error(const std::string& m)
     std::cerr << m << std::endl;
 }
 
-} // namespace example
+TypeFactory* Driver::type()
+{
+    /// @todo Memoty leak
+    return new TypeFactory();
+}
+
+ExpressionFactory* Driver::expr()
+{
+    /// @todo Memoty leak
+    return new ExpressionFactory();
+}
+
+FunctionNode* Driver::func()
+{
+    //assert(!m_funcs.empty() && "Functions stack is empty");
+    return m_funcs.top();
+}
+
+FunctionNode* Driver::func(const Identifier& name, TypeNode* type)
+{
+    FunctionNode* func = new FunctionNode(name, type);
+    m_funcs.push(func);
+    m_scopes.push(func->getRoot());
+    return func;
+}
+
+FunctionNode* Driver::funcEnd()
+{
+    //assert(!m_funcs.empty() && "Functions stack is empty");
+    FunctionNode* func = m_funcs.top();
+    m_funcs.pop();
+    return func;
+}
+
+// returns current scope
+ScopeNode* Driver::scope()
+{
+    //assert(!m_scopes.empty() && "Scopes stack is empty");
+    return m_scopes.top();
+}
+
+// begin new scope
+ScopeNode* Driver::scopeBegin()
+{
+    ScopeNode* parent = scope();
+    ScopeNode* scope  = new ScopeNode(parent);
+    m_scopes.push(scope);
+    return scope;
+}
+
+// end current scope
+ScopeNode* Driver::scopeEnd()
+{
+    //assert(!m_scopes.empty() && "Scopes stack is empty");
+    ScopeNode* scope = m_scopes.top();
+    m_scopes.pop();
+    return scope;
+}

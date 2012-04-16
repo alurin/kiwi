@@ -1,18 +1,24 @@
 // $Id: driver.h 17 2007-08-19 18:51:39Z tb $
-/** \file driver.h Declaration of the example::Driver class. */
+/** \file driver.h Declaration of the kiwi::lang::Driver class. */
 
 #ifndef EXAMPLE_DRIVER_H
 #define EXAMPLE_DRIVER_H
 
+#include "kiwi/Config.hpp"
 #include <string>
 #include <vector>
-
-// forward declaration
-class CalcContext;
+#include <stack>
 
 /** The example namespace is used to encapsulate the three parser classes
  * example::Parser, example::Scanner and example::Driver */
-namespace example {
+namespace kiwi {
+namespace lang {
+
+class FunctionNode;
+class TypeFactory;
+class TypeNode;
+class ExpressionFactory;
+class ScopeNode;
 
 /** The Driver class brings together all components. It creates an instance of
  * the Parser and Scanner classes and connects them. Then the input stream is
@@ -23,9 +29,50 @@ namespace example {
 class Driver
 {
 public:
-    /// construct a new parser driver context
-    Driver(class CalcContext& calc);
+    enum Mode {
+        MODE_SCRIPT     = 0,
+        MODE_INLINE     = 1,
+        MODE_COMPONENT  = 2,
+    }; // enum Mode
 
+    /// construct a new parser driver context
+    Driver();
+
+    /// set mode
+    void setMode(Mode mode) {
+        m_mode = mode;
+    }
+
+    /// returns mode
+    Mode getMode() const {
+        return m_mode;
+    }
+
+    /// returns types factory
+    TypeFactory* type();
+
+    /// returns expressions factory
+    ExpressionFactory* expr();
+
+    /// returns current function
+    FunctionNode* func();
+
+    /// declare function
+    FunctionNode* func(const Identifier& name, TypeNode* type);
+
+    /// end current function
+    FunctionNode* funcEnd();
+
+    /// returns current scope
+    ScopeNode* scope();
+
+    /// begin new scope
+    ScopeNode* scopeBegin();
+
+    /// end current scope
+    ScopeNode* scopeEnd();
+
+public:
     /// enable debug output in the flex scanner
     bool trace_scanning;
 
@@ -58,6 +105,7 @@ public:
      */
     bool parseFile(const std::string& filename);
 
+public:
     // To demonstrate pure handling of parse errors, instead of
     // simply dumping them on the standard error output, we will pass
     // them to the driver using the following two member functions.
@@ -73,12 +121,13 @@ public:
     /** Pointer to the current lexer instance, this is used to connect the
      * parser to the scanner. It is used in the yylex macro. */
     class Scanner* lexer;
-
-    /** Reference to the calculator context filled during parsing of the
-     * expressions. */
-    class CalcContext& calc;
+protected:
+    std::stack<FunctionNode*>   m_funcs;
+    std::stack<ScopeNode*>      m_scopes;
+    Mode m_mode;
 };
 
-} // namespace example
+} // namespace lang
+} // namespace kiwi
 
 #endif // EXAMPLE_DRIVER_H

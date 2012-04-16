@@ -9,6 +9,7 @@ namespace kiwi
 {
     typedef UnicodeString   String;
     typedef std::string     Path;
+    typedef std::string     Identifier;
 }
 
 #endif

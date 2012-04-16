@@ -5,7 +5,7 @@ FIND_PACKAGE(BISON REQUIRED)
 FIND_PACKAGE(FLEX  REQUIRED)
 
 # PROJECT_BINARY_DIR
-BISON_TARGET(KiwiParser ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser.yy lang/parser.cpp)
+BISON_TARGET(KiwiParser ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser.yy lang/parser.cpp VERBOSE ${PROJECT_BINARY_DIR}/parser.log)
 FLEX_TARGET(KiwiScanner ${CMAKE_CURRENT_SOURCE_DIR}/lang/scanner.ll lang/scanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(KiwiScanner KiwiParser)
 
