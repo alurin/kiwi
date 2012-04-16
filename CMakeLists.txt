@@ -60,8 +60,6 @@ FIND_PACKAGE (ICU REQUIRED)
 INCLUDE_DIRECTORIES(${ICU_INCLUDE_DIRS})
 LINK_DIRECTORIES(${ICU_LIBRARIES} ${ICU_I18N_LIBRARIES})
 
-message("${ICU_INCLUDE_DIRS}")
-
 #
 # Special hack for switching to 32-bit mode on Snow
 # Leopard if Qt has been compiled for 32-bit, only.
