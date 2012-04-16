@@ -1,6 +1,6 @@
 FILE (GLOB_RECURSE project_SOURCES *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 
-SET (project_LIBS ${Boost_LIBRARIES} ${QT_LIBRARIES} ${Log4Cxx_LIBRARIES})
+SET (project_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${Log4Cxx_LIBRARIES} "lib${PROJECT_NAME}")
 SET (project_BIN ${PROJECT_NAME})
 
 ADD_EXECUTABLE(${project_BIN} ${project_SOURCES})

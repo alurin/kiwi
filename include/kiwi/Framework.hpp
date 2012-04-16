@@ -1,8 +1,14 @@
 #ifndef KIWI_FRAMEWORK_INCLUDED
 #define KIWI_FRAMEWORK_INCLUDED
 
+#include "kiwi/Config.hpp"
+#include <boost/shared_ptr.hpp>
+
 namespace kiwi
 {
+    class Framework;
+    typedef boost::shared_ptr<Framework> FrameworkRef;
+
     /**
      * General enter point for Kiwi compiler infrastructure
      *
@@ -12,10 +18,14 @@ namespace kiwi
     class Framework
     {
         Framework(const Framework&);    ///< NOT IMPLEMENT!!!
-        operator=(const Framework&);    ///< NOT IMPLEMENT!!!
+        Framework& operator=(const Framework&);    ///< NOT IMPLEMENT!!!
 
     public:
-        static Framework create();
+        /// Create new isntance and return smart reference for this instance
+        static FrameworkRef create();
+
+    private:
+        Framework();
     };
 }
 
