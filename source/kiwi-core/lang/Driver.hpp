@@ -1,4 +1,4 @@
-// $Id: driver.h 17 2007-08-19 18:51:39Z tb $ 	
+// $Id: driver.h 17 2007-08-19 18:51:39Z tb $
 /** \file driver.h Declaration of the example::Driver class. */
 
 #ifndef EXAMPLE_DRIVER_H
@@ -40,7 +40,7 @@ public:
      * @param sname	stream name for error messages
      * @return		true if successfully parsed
      */
-    bool parse_stream(std::istream& in,
+    bool parseStream(std::istream& in,
 		      const std::string& sname = "stream input");
 
     /** Invoke the scanner and parser on an input string.
@@ -48,7 +48,7 @@ public:
      * @param sname	stream name for error messages
      * @return		true if successfully parsed
      */
-    bool parse_string(const std::string& input,
+    bool parseString(const std::string& input,
 		      const std::string& sname = "string stream");
 
     /** Invoke the scanner and parser on a file. Use parse_stream with a
@@ -56,7 +56,7 @@ public:
      * @param filename	input file name
      * @return		true if successfully parsed
      */
-    bool parse_file(const std::string& filename);
+    bool parseFile(const std::string& filename);
 
     // To demonstrate pure handling of parse errors, instead of
     // simply dumping them on the standard error output, we will pass

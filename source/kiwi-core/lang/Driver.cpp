@@ -16,7 +16,7 @@ Driver::Driver(class CalcContext& _calc)
 {
 }
 
-bool Driver::parse_stream(std::istream& in, const std::string& sname)
+bool Driver::parseStream(std::istream& in, const std::string& sname)
 {
     streamname = sname;
 
@@ -29,17 +29,17 @@ bool Driver::parse_stream(std::istream& in, const std::string& sname)
     return (parser.parse() == 0);
 }
 
-bool Driver::parse_file(const std::string &filename)
+bool Driver::parseFile(const std::string &filename)
 {
     std::ifstream in(filename.c_str());
     if (!in.good()) return false;
-    return parse_stream(in, filename);
+    return parseStream(in, filename);
 }
 
-bool Driver::parse_string(const std::string &input, const std::string& sname)
+bool Driver::parseString(const std::string &input, const std::string& sname)
 {
     std::istringstream iss(input);
-    return parse_stream(iss, sname);
+    return parseStream(iss, sname);
 }
 
 void Driver::error(const class location& l,
