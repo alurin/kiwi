@@ -3,8 +3,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "driver.h"
-#include "expression.h"
+#include "Driver.hpp"
+#include "Expression.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     }
 
     if (readfile) return 0;
-    
+
     std::cout << "Reading expressions from stdin" << std::endl;
 
     std::string line;

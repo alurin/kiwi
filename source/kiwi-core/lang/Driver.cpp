@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "driver.h"
+#include "Driver.hpp"
 #include "scanner.h"
 
 namespace example {

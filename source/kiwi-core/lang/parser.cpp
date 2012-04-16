@@ -45,7 +45,7 @@
 #include <string>
 #include <vector>
 
-#include "expression.h"
+#include "Expression.hpp"
 
 
 
@@ -61,7 +61,7 @@
 #line 78 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 
 
-#include "driver.h"
+#include "Driver.hpp"
 #include "scanner.h"
 
 /* this "connects" the bison parser in the driver to the flex scanner class
