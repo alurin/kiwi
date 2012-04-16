@@ -6,6 +6,8 @@
 namespace kiwi {
 namespace lang {
 
+    class VariableNode;
+
     class ExpressionNode : public Node  { };
 
     class LeftNode : ExpressionNode    { };
@@ -67,6 +69,30 @@ namespace lang {
     protected:
         LeftNode*   m_left;
         RightNode*  m_right;
+    };
+
+    class VariableLeftNode : public LeftNode {
+    public:
+        VariableLeftNode(VariableNode* var);
+
+    protected:
+        VariableNode* o_var;
+    };
+    class VariableRightNode : public RightNode {
+    public:
+        VariableRightNode(VariableNode* var);
+
+    protected:
+        VariableNode* o_var;
+    };
+
+    class IntegerConstNode : public RightNode
+    {
+    public:
+        IntegerConstNode(int32_t value);
+
+    protected:
+        int32_t m_value;
     };
 
     class ExpressionFactory {
@@ -169,6 +195,11 @@ namespace lang {
         RightNode* getAssign(LeftNode* left, RightNode* right)
         {
             return new AssignNode(left, right);
+        }
+
+        RightNode* getInt(int32_t value)
+        {
+            return new IntegerConstNode(value);
         }
     };
 }}

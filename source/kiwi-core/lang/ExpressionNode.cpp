@@ -33,3 +33,12 @@ AssignNode::~AssignNode()
     delete m_left;
     delete m_right;
 }
+
+VariableLeftNode::VariableLeftNode(VariableNode* var)
+: o_var(var) { }
+
+VariableRightNode::VariableRightNode(VariableNode* var)
+: o_var(var) { }
+
+IntegerConstNode::IntegerConstNode(int32_t value)
+: m_value(value) { }

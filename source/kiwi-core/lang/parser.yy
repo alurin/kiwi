@@ -159,7 +159,7 @@ function_arguments_required
     ;
 
 function_argument
-    : type VAR_LOCAL                { driver.func()->add(*$2, $1); }
+    : type VAR_LOCAL                { driver.func()->declare(*$2, $1); }
     ;
 
 function_statement
@@ -167,18 +167,32 @@ function_statement
     ;
 
 //==------------------------------------------------------------------------==//
-//      Statements and expressions
+//      Statements
 //==------------------------------------------------------------------------==//
 statements
-    : expression ';' statements
-    //| variable_declare ';'
+    : /** empty */
+    | expression ';' statements
+    | variable_declare ';' statements
+    | scope statements
     | ';'
-    | /** empty */
     ;
 
-//variable_declare
-    //: type VAR_LOCAL                { /*$$ =*/ driver.scope()->declare(*$2, $1); }
-    //;
+scope
+    : '{'               { driver.scopeBegin(); }
+        scope_end
+    ;
+
+scope_end
+    : statements '}'    { driver.scopeEnd(); }
+    ;
+
+//==------------------------------------------------------------------------==//
+//      Expressions
+//==------------------------------------------------------------------------==//
+
+variable_declare
+    : type VAR_LOCAL                { driver.scope()->declare(*$2, $1); }
+    ;
 
 expression
     : '-' expression %prec UNARY    { $$ = driver.expr()->getNeg($2); }
@@ -210,13 +224,12 @@ expression
     ;
 
 left
-    : VAR_LOCAL                     { $$ = driver.scope()->getLeftLocal(*$1); }
-    | VAR_INSTANCE                  { $$ = driver.scope()->getLeftInstance(*$1); }
+    : VAR_LOCAL                     { $$ = driver.scope()->get(*$1)->getLeft(); }
     ;
 
 right
-    : VAR_LOCAL                     { $$ = driver.scope()->getRightLocal(*$1); }
-    | VAR_INSTANCE                  { $$ = driver.scope()->getRightInstance(*$1); }
+    : VAR_LOCAL                     { $$ = driver.scope()->get(*$1)->getRight(); }
+    | INTEGER                       { $$ = driver.expr()->getInt($1);            }
     | '(' expression ')'            { $$ = $2; }
     ;
 

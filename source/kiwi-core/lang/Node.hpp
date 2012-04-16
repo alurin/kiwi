@@ -1,6 +1,8 @@
 #ifndef KIWI_LANG_NODE_INTERNAL
 #define KIWI_LANG_NODE_INTERNAL
 
+#include "kiwi/Config.hpp"
+
 namespace kiwi { namespace lang {
 
     class Node

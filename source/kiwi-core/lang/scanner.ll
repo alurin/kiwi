@@ -101,6 +101,11 @@ typedef kiwi::lang::Parser::token_type token_type;
     return token::VAR_INSTANCE;
 }
 
+[0-9]+ {
+    yylval->integerVal = atoi(yytext);
+    return token::INTEGER;
+}
+
  /* gobble up white-spaces */
 [ \t]+ {
     yylloc->step();

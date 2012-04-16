@@ -10,6 +10,7 @@ namespace kiwi { namespace lang {
     class FunctionNode;
     class LeftNode;
     class RightNode;
+    class ScopeNode;
 
     class ArgumentNode
     {
@@ -17,9 +18,22 @@ namespace kiwi { namespace lang {
         ArgumentNode(FunctionNode* owner, const Identifier& name, TypeNode* type);
 
         virtual ~ArgumentNode();
-
     protected:
         FunctionNode* o_owner;
+        Identifier    m_name;
+        TypeNode*     m_type;
+    };
+
+    class VariableNode : public Node
+    {
+    public:
+        VariableNode(ScopeNode* owner, const Identifier& name, TypeNode* type);
+
+        virtual ~VariableNode();
+        LeftNode* getLeft();
+        RightNode* getRight();
+    protected:
+        ScopeNode*    o_owner;
         Identifier    m_name;
         TypeNode*     m_type;
     };
@@ -28,15 +42,16 @@ namespace kiwi { namespace lang {
     public:
         ScopeNode(FunctionNode* parent);
         ScopeNode(ScopeNode* parent);
+        virtual ~ScopeNode();
 
-        LeftNode* getLeftLocal(const Identifier& name);
+        /// declare scope variable
+        void declare(const Identifier& name, TypeNode* type);
 
-        LeftNode* getLeftInstance(const Identifier& name);
-
-        RightNode* getRightLocal(const Identifier& name);
-
-        RightNode* getRightInstance(const Identifier& name);
+        ///
+        VariableNode* get(const Identifier& name);
     protected:
+        std::map<Identifier, VariableNode*> m_vars;
+
         FunctionNode* o_owner;
         ScopeNode* o_parent;
     };
@@ -50,11 +65,8 @@ namespace kiwi { namespace lang {
         /// destructor
         virtual ~FunctionNode();
 
-        /// add function node argument
-        ArgumentNode* add(const Identifier& name, TypeNode* type);
-
-        /// Complete function
-        void end();
+        /// declare function argument
+        ArgumentNode* declare(const Identifier& name, TypeNode* type);
 
         /// Returns root scope
         ScopeNode* getRoot() const {
