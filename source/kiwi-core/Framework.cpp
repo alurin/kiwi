@@ -1,5 +1,7 @@
 #include "kiwi/Framework.hpp"
 #include "lang/Driver.hpp"
+#include <llvm/LLVMContext.h>
+#include <llvm/Module.h>
 
 using namespace kiwi;
 
@@ -18,4 +20,7 @@ void Framework::includeFile(const Path& filename)
 {
     lang::Driver driver;
     driver.parseFile(filename);
+
+    llvm::LLVMContext context;
+    llvm::Module* module = new llvm::Module("Test module", context);
 }
