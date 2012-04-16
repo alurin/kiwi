@@ -87,6 +87,8 @@ FunctionNode* Driver::funcEnd()
     //assert(!m_funcs.empty() && "Functions stack is empty");
     FunctionNode* func = m_funcs.top();
     m_funcs.pop();
+    m_scopes.pop();
+    func->dump();
     return func;
 }
 

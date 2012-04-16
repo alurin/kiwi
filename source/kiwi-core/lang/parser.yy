@@ -171,9 +171,14 @@ function_statement
 //==------------------------------------------------------------------------==//
 statements
     : expression ';' statements
+    //| variable_declare ';'
     | ';'
     | /** empty */
     ;
+
+//variable_declare
+    //: type VAR_LOCAL                { /*$$ =*/ driver.scope()->declare(*$2, $1); }
+    //;
 
 expression
     : '-' expression %prec UNARY    { $$ = driver.expr()->getNeg($2); }

@@ -170,7 +170,6 @@ namespace lang {
         {
             return new AssignNode(left, right);
         }
-
     };
 }}
 

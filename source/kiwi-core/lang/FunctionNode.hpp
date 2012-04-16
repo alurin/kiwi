@@ -28,10 +28,14 @@ namespace kiwi { namespace lang {
     public:
         ScopeNode(FunctionNode* parent);
         ScopeNode(ScopeNode* parent);
-        LeftNode* getLeftLocal(const Identifier& name) { return 0; }
-        LeftNode* getLeftInstance(const Identifier& name) { return 0; }
-        RightNode* getRightLocal(const Identifier& name) { return 0; }
-        RightNode* getRightInstance(const Identifier& name) { return 0; }
+
+        LeftNode* getLeftLocal(const Identifier& name);
+
+        LeftNode* getLeftInstance(const Identifier& name);
+
+        RightNode* getRightLocal(const Identifier& name);
+
+        RightNode* getRightInstance(const Identifier& name);
     protected:
         FunctionNode* o_owner;
         ScopeNode* o_parent;
@@ -56,12 +60,14 @@ namespace kiwi { namespace lang {
         ScopeNode* getRoot() const {
             return m_root;
         }
-    protected:
-        Identifier m_name;
-        TypeNode*  m_type;
-        ScopeNode* m_root;
 
-        //std::map<Identifier, ArgumentNode*> m_arguments;
+        void dump();
+    protected:
+        Identifier      m_name;
+        TypeNode*       m_type;
+        ScopeNode*      m_root;
+
+        std::map<Identifier, ArgumentNode*> m_args;
     };
 
 }}
