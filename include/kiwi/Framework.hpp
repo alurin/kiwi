@@ -24,6 +24,8 @@ namespace kiwi
         /// Create new isntance and return smart reference for this instance
         static FrameworkRef create();
 
+        /// Include and run file as script
+        void includeFile(const Path& filename);
     private:
         Framework();
     };
