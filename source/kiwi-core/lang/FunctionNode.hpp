@@ -22,7 +22,21 @@ namespace lang
     class RightNode;
     class ScopeNode;
 
-    class ArgumentNode
+    /// Named parameter syntax node
+    class NamedNode : public Node
+    {
+    public:
+        /// create left node for this named node
+        virtual LeftNode*  getLeft() =0;
+
+        /// create right node for this named node
+        virtual RightNode* getRight() =0;
+    protected:
+        NamedNode();
+    };
+
+    /// Argument syntax node
+    class ArgumentNode : public NamedNode
     {
     public:
         ArgumentNode(FunctionNode* owner, const Identifier& name, TypeNode* type);
@@ -36,20 +50,31 @@ namespace lang
         TypeNode* getType() const {
             return m_type;
         }
+
+        /// create left node for this named node
+        virtual LeftNode* getLeft();
+
+        /// create right node for this named node
+        virtual RightNode* getRight();
     protected:
         FunctionNode* o_owner;
         Identifier    m_name;
         TypeNode*     m_type;
     };
 
-    class VariableNode : public Node
+    /// Variable syntax node
+    class VariableNode : public NamedNode
     {
     public:
         VariableNode(ScopeNode* owner, const Identifier& name, TypeNode* type);
 
         virtual ~VariableNode();
-        LeftNode* getLeft();
-        RightNode* getRight();
+
+        /// create left node for this named node
+        virtual LeftNode* getLeft();
+
+        /// create right node for this named node
+        virtual RightNode* getRight();
     protected:
         ScopeNode*    o_owner;
         Identifier    m_name;
@@ -63,10 +88,10 @@ namespace lang
         virtual ~ScopeNode();
 
         /// declare scope variable
-        void declare(const Identifier& name, TypeNode* type);
+        VariableNode* declare(const Identifier& name, TypeNode* type);
 
-        ///
-        VariableNode* get(const Identifier& name);
+        /// returns named node from scope
+        NamedNode* get(const Identifier& name);
 
         void generate(ModuleRef module);
     protected:
@@ -87,6 +112,9 @@ namespace lang
 
         /// declare function argument
         ArgumentNode* declare(const Identifier& name, TypeNode* type);
+
+        /// get function arguments
+        ArgumentNode* get(const Identifier& name);
 
         /// Returns root scope
         ScopeNode* getRoot() const {

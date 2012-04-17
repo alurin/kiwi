@@ -14,6 +14,8 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
+NamedNode::NamedNode() { }
+
 ArgumentNode::ArgumentNode(FunctionNode* owner, const Identifier& name, TypeNode* type)
 : o_owner(owner), m_name(name), m_type(type) { }
 
@@ -62,20 +64,44 @@ ArgumentNode* FunctionNode::declare(const Identifier& name, TypeNode* type)
     return arg;
 }
 
-void ScopeNode::declare(const Identifier& name, TypeNode* type)
+ArgumentNode* FunctionNode::get(const Identifier& name)
+{
+    std::map<Identifier, ArgumentNode*>::iterator it = m_args.find(name);
+    if (it != m_args.end()) {
+        return it->second;
+    } else {
+        /// @todo Implement exception or error
+    }
+}
+
+VariableNode* ScopeNode::declare(const Identifier& name, TypeNode* type)
 {
     VariableNode* var = new VariableNode(this, name, type);
     m_vars.insert(std::make_pair(name, var));
+    return var;
 }
 
-VariableNode* ScopeNode::get(const Identifier& name)
+NamedNode* ScopeNode::get(const Identifier& name)
 {
     std::map<Identifier, VariableNode*>::iterator it = m_vars.find(name);
     if (it != m_vars.end()) {
         return it->second;
+    } else if (o_parent) {
+        /// @todo Replace for create proxy
+        return o_parent->get(name);
     } else {
-        return 0;
+        return o_owner->get(name);
     }
+}
+
+LeftNode* ArgumentNode::getLeft()
+{
+    return new ArgumentLeftNode(this);
+}
+
+RightNode* ArgumentNode::getRight()
+{
+    return new ArgumentRightNode(this);
 }
 
 LeftNode* VariableNode::getLeft()

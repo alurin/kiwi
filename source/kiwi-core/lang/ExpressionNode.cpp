@@ -40,5 +40,11 @@ VariableLeftNode::VariableLeftNode(VariableNode* var)
 VariableRightNode::VariableRightNode(VariableNode* var)
 : o_var(var) { }
 
+ArgumentLeftNode::ArgumentLeftNode(ArgumentNode* arg)
+: o_arg(arg) { }
+
+ArgumentRightNode::ArgumentRightNode(ArgumentNode* arg)
+: o_arg(arg) { }
+
 IntegerConstNode::IntegerConstNode(int32_t value)
 : m_value(value) { }

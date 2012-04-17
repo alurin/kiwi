@@ -5,8 +5,8 @@
 
 namespace kiwi {
 namespace lang {
-
     class VariableNode;
+    class ArgumentNode;
 
     class ExpressionNode : public Node  { };
 
@@ -69,6 +69,21 @@ namespace lang {
     protected:
         LeftNode*   m_left;
         RightNode*  m_right;
+    };
+
+    class ArgumentLeftNode : public LeftNode {
+    public:
+        ArgumentLeftNode(ArgumentNode* arg);
+
+    protected:
+        ArgumentNode* o_arg;
+    };
+    class ArgumentRightNode : public RightNode {
+    public:
+        ArgumentRightNode(ArgumentNode* arg);
+
+    protected:
+        ArgumentNode* o_arg;
     };
 
     class VariableLeftNode : public LeftNode {
