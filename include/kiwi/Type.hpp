@@ -13,11 +13,12 @@ namespace kiwi
         Type(const Type&);                  ///< NOT IMPLEMENT!!!
         Type& operator(const Type& type);   ///< NOT IMPLEMENT!!!
     public:
+        /// returns type owner module
         ModuleRef getModule() const {
-
+            return m_module.lock();
         }
     protected:
-        ModuleWeak module;
+        ModuleWeak m_module;
 
         Type(ModuleRef module);
     };
