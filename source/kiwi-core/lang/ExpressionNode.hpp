@@ -2,16 +2,26 @@
 #define KIWI_LANG_EXPRESSIONNODE_INTERNAL
 
 #include "Node.hpp"
+#include "kiwi/codegen/Expression.hpp"
+#include "kiwi/codegen/Variable.hpp"
 
 namespace kiwi {
 namespace lang {
     class VariableNode;
     class ArgumentNode;
 
-    class ExpressionNode : public Node  { };
+    using codegen::ExpressionGen;
+    using codegen::StatementGen;
+    using codegen::VariableGen;
 
-    class LeftNode : ExpressionNode    { };
-    class RightNode : ExpressionNode   { };
+    class LeftNode : Node {
+    public:
+        virtual ExpressionGen emit(const ExpressionGen& gen) =0;
+    };
+    class RightNode : Node {
+    public:
+        virtual ExpressionGen emit(const StatementGen& value) =0;
+    };
 
     class BinaryNode : public RightNode {
     public:
@@ -35,6 +45,9 @@ namespace lang {
         BinaryNode(OpCode opcode, RightNode* left, RightNode* right, bool logic = false);
 
         virtual ~BinaryNode();
+
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         OpCode      m_opcode;
         RightNode*  m_left;
@@ -55,6 +68,9 @@ namespace lang {
         UnaryNode(OpCode opcode, RightNode* value, bool post = false);
 
         virtual ~UnaryNode();
+
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         OpCode      m_opcode;
         RightNode*  m_value;
@@ -66,6 +82,9 @@ namespace lang {
         AssignNode(LeftNode* left, RightNode* right);
 
         virtual ~AssignNode();
+
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         LeftNode*   m_left;
         RightNode*  m_right;
@@ -75,13 +94,18 @@ namespace lang {
     public:
         ArgumentLeftNode(ArgumentNode* arg);
 
+        /// emit instructions
+        virtual ExpressionGen emit(const ExpressionGen& gen);
     protected:
         ArgumentNode* o_arg;
     };
+
     class ArgumentRightNode : public RightNode {
     public:
         ArgumentRightNode(ArgumentNode* arg);
 
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         ArgumentNode* o_arg;
     };
@@ -90,13 +114,18 @@ namespace lang {
     public:
         VariableLeftNode(VariableNode* var);
 
+        /// emit instructions
+        virtual ExpressionGen emit(const ExpressionGen& gen);
     protected:
         VariableNode* o_var;
     };
+
     class VariableRightNode : public RightNode {
     public:
         VariableRightNode(VariableNode* var);
 
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         VariableNode* o_var;
     };
@@ -106,6 +135,8 @@ namespace lang {
     public:
         IntegerConstNode(int32_t value);
 
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         int32_t m_value;
     };

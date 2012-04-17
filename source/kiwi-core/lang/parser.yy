@@ -56,13 +56,14 @@
  /*** BEGIN EXAMPLE - Change the example grammar's tokens below ***/
 
 %union {
-    int                 integerVal;
-    double              doubleVal;
-    std::string*		stringVal;
+    int                  integerVal;
+    double               doubleVal;
+    std::string*		 stringVal;
 
-    class TypeNode*		typenode;
-    class LeftNode*     leftnode;
-    class RightNode*    rightnode;
+    class TypeNode*		 typenode;
+    class LeftNode*      leftnode;
+    class RightNode*     rightnode;
+    class StatementNode* stmtnode;
 }
 
 %token                  END             0   "end of file"
@@ -115,9 +116,11 @@
 %type   <typenode>      type type_complex type_primary
 %type   <rightnode>     expression right
 %type   <leftnode>      left
+%type   <stmtnode>      scope
 
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
 %destructor { delete $$; } type type_complex type_primary
+%destructor { delete $$; } scope
 
  /*** END EXAMPLE - Change the example grammar's tokens above ***/
 
@@ -171,9 +174,10 @@ function_statement
 //==------------------------------------------------------------------------==//
 statements
     : /** empty */
-    | expression ';' statements
+    | expression ';'        { driver.scope()->append($1); } statements
+    | scope                 { driver.scope()->append($1); } statements
+
     | variable_declare ';' statements
-    | scope statements
     | ';'
     ;
 

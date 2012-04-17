@@ -122,18 +122,19 @@ namespace kiwi { namespace lang {
 /* Line 35 of lalr1.cc  */
 #line 58 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 
-    int                 integerVal;
-    double              doubleVal;
-    std::string*		stringVal;
+    int                  integerVal;
+    double               doubleVal;
+    std::string*		 stringVal;
 
-    class TypeNode*		typenode;
-    class LeftNode*     leftnode;
-    class RightNode*    rightnode;
+    class TypeNode*		 typenode;
+    class LeftNode*      leftnode;
+    class RightNode*     rightnode;
+    class StatementNode* stmtnode;
 
 
 
 /* Line 35 of lalr1.cc  */
-#line 137 "lang/parser.hpp"
+#line 138 "lang/parser.hpp"
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -351,7 +352,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 355 "lang/parser.hpp"
+#line 356 "lang/parser.hpp"
 
 
 

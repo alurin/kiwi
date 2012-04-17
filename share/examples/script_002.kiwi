@@ -1,4 +1,5 @@
-int main(int $a, int $b)
+int main()
 {
     int $c;
+    $c = 10;
 }

@@ -24,6 +24,22 @@ SET (KIWI_ID "${KIWI_VENDOR_ID}.${PROJECT_NAME}")
 #
 SET (CMAKE_VERBOSE_MAKEFILE 0) # Use 1 for debugging, 0 for release
 
+OPTION( DEBUG "Enable debug build for source" ON )
+IF( ${DEBUG} )
+    SET( KIWI_DEBUG 1 )
+    SET( KIWI_RELEASE 0 )
+    SET( CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+ELSE( ${DEBUG} )
+    SET( KIWI_DEBUG  0 )
+    SET( KIWI_RELEASE 1 )
+    SET( CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+ENDIF( ${DEBUG} )
+
+IF (CMAKE_COMPILER_IS_GNUCC AND KIWI_DEBUG)
+    SET(CMAKE_C_FLAGS           ${CMAKE_C_FLAGS}          "-g3 -gdwarf-2 -g -O0")
+    SET(CMAKE_CXX_FLAGS         ${CMAKE_CXX_FLAGS}        "-g3 -gdwarf-2 -g -O0")
+ENDIF (CMAKE_COMPILER_IS_GNUCC AND KIWI_DEBUG)
+
 #
 # Project Output Paths
 #

@@ -32,7 +32,7 @@ public:
     enum Mode {
         MODE_SCRIPT     = 0,
         MODE_INLINE     = 1,
-        MODE_COMPONENT  = 2,
+        MODE_COMPONENT  = 2
     }; // enum Mode
 
     /// construct a new parser driver context
