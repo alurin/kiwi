@@ -4,11 +4,22 @@
 #include "kiwi/Config.hpp"
 #include "Node.hpp"
 
-namespace kiwi { namespace lang {
+namespace llvm
+{
+    class Type;
+}
+
+namespace kiwi
+{
+    typedef boost::shared_ptr<class Module> ModuleRef;
+
+namespace lang
+{
 
     class TypeNode : public Node
     {
-
+    public:
+        llvm::Type* generate(ModuleRef module);
     };
 
     class TypeFactory

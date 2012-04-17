@@ -3,9 +3,19 @@
 
 #include "kiwi/Config.hpp"
 #include "Node.hpp"
+#include "boost/shared_ptr.hpp"
 #include <map>
 
-namespace kiwi { namespace lang {
+namespace llvm {
+    class Function;
+}
+
+namespace kiwi
+{
+    typedef boost::shared_ptr<class Module> ModuleRef;
+
+namespace lang
+{
     class TypeNode;
     class FunctionNode;
     class LeftNode;
@@ -18,6 +28,14 @@ namespace kiwi { namespace lang {
         ArgumentNode(FunctionNode* owner, const Identifier& name, TypeNode* type);
 
         virtual ~ArgumentNode();
+
+        Identifier getName() const {
+            return m_name;
+        }
+
+        TypeNode* getType() const {
+            return m_type;
+        }
     protected:
         FunctionNode* o_owner;
         Identifier    m_name;
@@ -49,6 +67,8 @@ namespace kiwi { namespace lang {
 
         ///
         VariableNode* get(const Identifier& name);
+
+        void generate(ModuleRef module);
     protected:
         std::map<Identifier, VariableNode*> m_vars;
 
@@ -56,7 +76,7 @@ namespace kiwi { namespace lang {
         ScopeNode* o_parent;
     };
 
-    class FunctionNode : public Node //, public VairableStorage
+    class FunctionNode : public Node
     {
     public:
         /// construct function node
@@ -73,11 +93,17 @@ namespace kiwi { namespace lang {
             return m_root;
         }
 
-        void dump();
+        void generate(ModuleRef module);
+
+        llvm::Function* getFunction() {
+            return m_func;
+        }
     protected:
         Identifier      m_name;
         TypeNode*       m_type;
         ScopeNode*      m_root;
+
+        llvm::Function* m_func;
 
         std::map<Identifier, ArgumentNode*> m_args;
     };

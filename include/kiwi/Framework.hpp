@@ -2,7 +2,13 @@
 #define KIWI_FRAMEWORK_INCLUDED
 
 #include "kiwi/Config.hpp"
-#include <boost/shared_ptr.hpp>
+#include "kiwi/Application.hpp"
+#include <log4cxx/logger.h>
+
+namespace llvm
+{
+    class LLVMContext;
+}
 
 namespace kiwi
 {
@@ -17,16 +23,29 @@ namespace kiwi
      */
     class Framework
     {
-        Framework(const Framework&);    ///< NOT IMPLEMENT!!!
-        Framework& operator=(const Framework&);    ///< NOT IMPLEMENT!!!
+        Framework(const Framework&);                ///< NOT IMPLEMENT!!!
+        Framework& operator=(const Framework&);     ///< NOT IMPLEMENT!!!
 
     public:
-        /// Create new isntance and return smart reference for this instance
+        /// create new instance and return smart reference for this instance
         static FrameworkRef create();
 
-        /// Include and run file as script
-        void includeFile(const Path& filename);
+        /// destructor
+        virtual ~Framework();
+
+        /// returns Log4c++ logger
+        log4cxx::LoggerPtr logger() const {
+            return m_logger;
+        }
+
+        /// Returns LLVM context
+        llvm::LLVMContext& getContext() const {
+            return *m_context;
+        }
     private:
+        log4cxx::LoggerPtr  m_logger;
+        llvm::LLVMContext*  m_context;
+
         Framework();
     };
 }

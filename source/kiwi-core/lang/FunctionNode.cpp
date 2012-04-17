@@ -1,5 +1,15 @@
-#include "FunctionNode.hpp"
 #include "ExpressionNode.hpp"
+#include "FunctionNode.hpp"
+#include "TypeNode.hpp"
+
+#include "kiwi/Module.hpp"
+
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/BasicBlock.h>
+#include <llvm/DerivedTypes.h>
+#include <llvm/Function.h>
+
+#include <vector>
 
 using namespace kiwi;
 using namespace kiwi::lang;
@@ -30,7 +40,7 @@ ScopeNode::~ScopeNode()
 }
 
 FunctionNode::FunctionNode(const Identifier& name, TypeNode* type)
-: m_name(name), m_type(type), m_root(new ScopeNode(this))
+: m_name(name), m_type(type), m_root(new ScopeNode(this)), m_func(0)
 {
 
 }
@@ -82,11 +92,35 @@ RightNode* VariableNode::getRight()
 ///=== DEBUG ===
 #include <iostream>
 
-void FunctionNode::dump()
+void FunctionNode::generate(ModuleRef module)
 {
-    std::cout << this->m_name << "\n";
+    llvm::Type* resultType = m_type->generate(module);
+    std::vector<llvm::Type*> argTypes;
+    std::vector<Identifier>  argNames;
+
     for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i)
     {
-        std::cout << "  $" << i->first << "\n";
+        ArgumentNode* arg = i->second;
+        llvm::Type* arg_type = arg->getType()->generate(module);
+
+        argTypes.push_back(arg_type);
+        argNames.push_back(arg->getName());
     }
+
+    llvm::FunctionType* type = llvm::FunctionType::get(resultType, llvm::makeArrayRef(argTypes), false);
+    m_func                   = llvm::Function::Create(type, llvm::GlobalValue::ExternalLinkage , "", module->getModule());
+
+    size_t j = 0;
+    for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j)
+    {
+        i->setName(argNames[j]);
+    }
+
+    m_root->generate(module);
+}
+
+void ScopeNode::generate(ModuleRef module)
+{
+    llvm::Function* func = o_owner->getFunction();
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(func->getContext(), "entry", func);
 }

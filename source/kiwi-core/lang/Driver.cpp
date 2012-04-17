@@ -88,7 +88,9 @@ FunctionNode* Driver::funcEnd()
     FunctionNode* func = m_funcs.top();
     m_funcs.pop();
     m_scopes.pop();
-    func->dump();
+    if (m_funcs.empty()) {
+        m_functions.push_back(func);
+    }
     return func;
 }
 

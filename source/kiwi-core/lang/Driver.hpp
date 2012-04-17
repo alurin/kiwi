@@ -72,6 +72,15 @@ public:
     /// end current scope
     ScopeNode* scopeEnd();
 
+    std::vector<FunctionNode*>::const_iterator func_begin() const
+    {
+        return m_functions.begin();
+    }
+
+    std::vector<FunctionNode*>::const_iterator func_end() const
+    {
+        return m_functions.end();
+    }
 public:
     /// enable debug output in the flex scanner
     bool trace_scanning;
@@ -124,6 +133,7 @@ public:
 protected:
     std::stack<FunctionNode*>   m_funcs;
     std::stack<ScopeNode*>      m_scopes;
+    std::vector<FunctionNode*>  m_functions;
     Mode m_mode;
 };
 

@@ -1,4 +1,5 @@
 #include "kiwi/Framework.hpp"
+#include "kiwi/Module.hpp"
 using namespace kiwi;
 
 #include <boost/program_options.hpp>
@@ -37,14 +38,15 @@ int main(int argc, char const *argv[])
           options(desc).positional(p).run(), vm);
     po::notify(vm);
 
-    FrameworkRef ref = Framework::create();
+    FrameworkRef frm = Framework::create();
     if (vm.count("input-file")) {
         vector<string> files = vm["input-file"].as< vector<string> >();
-        cout << "Input files are: "
-         << files << "\n";
+        cout << "Input files are: " << files << "\n";
+
+        ModuleRef module = Module::create("Kiwi::Script", frm);
 
         for (vector<string>::iterator i = files.begin(); i != files.end(); ++i) {
-            ref->includeFile(*i);
+            module->includeFile(*i);
         }
         return 1;
     } else if (vm.count("help")) {

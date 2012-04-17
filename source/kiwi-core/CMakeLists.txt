@@ -14,6 +14,10 @@ LIST(REMOVE_DUPLICATES project_SOURCES)
 SET (project_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${Log4Cxx_LIBRARIES} ${LLVM_LIBRARIES})
 SET (project_LIB "lib${PROJECT_NAME}")
 
+# Remove no exception from LLVM flags
+STRING(REPLACE "-fno-exceptions " "" LLVM_CXXFLAGS ${LLVM_CXXFLAGS})
+STRING(REPLACE " -fno-exceptions " "" LLVM_CXXFLAGS ${LLVM_CXXFLAGS})
+
 ADD_LIBRARY(${project_LIB} SHARED ${project_SOURCES})
 TARGET_LINK_LIBRARIES(${project_LIB} ${project_LIBS})
 SET_TARGET_PROPERTIES(
