@@ -95,10 +95,13 @@ ExpressionGen AssignNode::emit(const StatementGen& gen)
 
 ExpressionGen ArgumentLeftNode::emit(const ExpressionGen& gen)
 {
-    VariableGen var       = o_arg->getGenerator();
-    llvm::StoreInst* inst = new llvm::StoreInst(var.getValue(), gen.getValue(), gen.getBlock());
+    VariableGen var = o_arg->getGenerator();
+    if (var.getType() == gen.getType()) {
+        llvm::StoreInst* inst = new llvm::StoreInst(var.getValue(), gen.getValue(), gen.getBlock());
+        return gen;
+    }
 
-    return gen;
+    throw "unknown cast";
 }
 
 ExpressionGen ArgumentRightNode::emit(const StatementGen& gen)
@@ -110,9 +113,13 @@ ExpressionGen ArgumentRightNode::emit(const StatementGen& gen)
 
 ExpressionGen VariableLeftNode::emit(const ExpressionGen& gen)
 {
-    VariableGen var       = o_var->getGenerator();
-    llvm::StoreInst* inst = new llvm::StoreInst(var.getValue(), gen.getValue(), gen.getBlock());
-    return gen;
+    VariableGen var = o_var->getGenerator();
+    if (var.getType() == gen.getType()) {
+        llvm::StoreInst* inst = new llvm::StoreInst(var.getValue(), gen.getValue(), gen.getBlock());
+        return gen;
+    }
+
+    throw "unknown cast";
 }
 
 ExpressionGen VariableRightNode::emit(const StatementGen& gen)

@@ -1,6 +1,9 @@
-int main()
+bool main()
 {
-    bool $a;
-    bool $b;
-    $a == $b;
+    int  $a;
+    int  $b;
+    bool $c;
+    $c = $a == $b;
+
+    return $c;
 }

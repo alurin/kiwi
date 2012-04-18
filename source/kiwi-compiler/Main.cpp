@@ -46,7 +46,12 @@ int main(int argc, char const *argv[])
         ModuleRef module = Module::create("Kiwi::Script", frm);
 
         for (vector<string>::iterator i = files.begin(); i != files.end(); ++i) {
-            module->includeFile(*i);
+            try {
+                module->includeFile(*i);
+            } catch (const char* ex) {
+                std::cerr << ex << "\n";
+                return 0;
+            }
         }
         return 1;
     } else if (vm.count("help")) {
