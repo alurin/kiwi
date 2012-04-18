@@ -38,5 +38,6 @@ ContextRef Context::create()
 void Context::initializate()
 {
     ModuleRef module = Module::create("system", shared_from_this());
-    m_meta->int32Ty = IntType::create(module, 32);
+    m_meta->int32Ty = IntType::create(module, 32, false);
+    // m_meta->boolTy  =
 }

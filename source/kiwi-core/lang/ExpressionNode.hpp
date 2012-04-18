@@ -2,10 +2,13 @@
 #define KIWI_LANG_EXPRESSIONNODE_INTERNAL
 
 #include "Node.hpp"
+#include "kiwi/Type.hpp"
 #include "kiwi/codegen/Expression.hpp"
 #include "kiwi/codegen/Variable.hpp"
 
 namespace kiwi {
+    typedef boost::shared_ptr<class Context> ContextRef;
+
 namespace lang {
     class VariableNode;
     class ArgumentNode;
@@ -25,31 +28,16 @@ namespace lang {
 
     class BinaryNode : public RightNode {
     public:
-        enum OpCode {
-            ADD = 1,
-            SUB,
-            MUL,
-            DIV,
-            LSH,
-            RSH,
-            OR,
-            AND,
-            EQ,
-            NEQ,
-            GE,
-            LE,
-            GT,
-            LT
-        };
+        typedef BinaryOperator::Opcode Opcode;
 
-        BinaryNode(OpCode opcode, RightNode* left, RightNode* right, bool logic = false);
+        BinaryNode(Opcode opcode, RightNode* left, RightNode* right, bool logic = false);
 
         virtual ~BinaryNode();
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
-        OpCode      m_opcode;
+        Opcode      m_opcode;
         RightNode*  m_left;
         RightNode*  m_right;
         bool        m_logic;
@@ -133,16 +121,20 @@ namespace lang {
     class IntegerConstNode : public RightNode
     {
     public:
-        IntegerConstNode(int32_t value);
+        IntegerConstNode(ContextRef context, int32_t value);
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
-        int32_t m_value;
+        ContextRef  m_context;
+        int32_t     m_value;
     };
 
     class ExpressionFactory {
     public:
+        ExpressionFactory(ContextRef context)
+        : m_context(context) { }
+
         RightNode* getNeg(RightNode* value)
         {
             return new UnaryNode(UnaryNode::NEG, value);
@@ -170,72 +162,72 @@ namespace lang {
 
         RightNode* getAdd(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::ADD, left, right);
+            return new BinaryNode(BinaryOperator::ADD, left, right);
         }
 
         RightNode* getSub(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::SUB, left, right);
+            return new BinaryNode(BinaryOperator::SUB, left, right);
         }
 
         RightNode* getMul(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::MUL, left, right);
+            return new BinaryNode(BinaryOperator::MUL, left, right);
         }
 
         RightNode* getDiv(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::DIV, left, right);
+            return new BinaryNode(BinaryOperator::DIV, left, right);
         }
 
         RightNode* getLsh(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::LSH, left, right);
+            return new BinaryNode(BinaryOperator::LSH, left, right);
         }
 
         RightNode* getRsh(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::RSH, left, right);
+            return new BinaryNode(BinaryOperator::RSH, left, right);
         }
 
         RightNode* getOr(RightNode* left, RightNode* right, bool logic = false)
         {
-            return new BinaryNode(BinaryNode::OR, left, right, logic);
+            return new BinaryNode(BinaryOperator::OR, left, right, logic);
         }
 
         RightNode* getAnd(RightNode* left, RightNode* right, bool logic = false)
         {
-            return new BinaryNode(BinaryNode::AND, left, right, logic);
+            return new BinaryNode(BinaryOperator::AND, left, right, logic);
         }
 
         RightNode* getEq(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::EQ, left, right);
+            return new BinaryNode(BinaryOperator::EQ, left, right);
         }
 
         RightNode* getNeq(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::NEQ, left, right);
+            return new BinaryNode(BinaryOperator::NEQ, left, right);
         }
 
         RightNode* getGe(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::GE, left, right);
+            return new BinaryNode(BinaryOperator::GE, left, right);
         }
 
         RightNode* getLe(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::LE, left, right);
+            return new BinaryNode(BinaryOperator::LE, left, right);
         }
 
         RightNode* getGt(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::GT, left, right);
+            return new BinaryNode(BinaryOperator::GT, left, right);
         }
 
         RightNode* getLt(RightNode* left, RightNode* right)
         {
-            return new BinaryNode(BinaryNode::LT, left, right);
+            return new BinaryNode(BinaryOperator::LT, left, right);
         }
 
         RightNode* getAssign(LeftNode* left, RightNode* right)
@@ -245,8 +237,11 @@ namespace lang {
 
         RightNode* getInt(int32_t value)
         {
-            return new IntegerConstNode(value);
+            return new IntegerConstNode(m_context, value);
         }
+
+    protected:
+        ContextRef  m_context;
     };
 }}
 

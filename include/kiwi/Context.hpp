@@ -40,14 +40,19 @@ namespace kiwi
             return m_logger;
         }
 
-        /// Returns LLVM context
+        /// returns LLVM context
         llvm::LLVMContext& getContext() const {
             return *m_context;
+        }
+
+        /// returns internal context metadata
+        ContextMeta* getMetadata() const {
+            return m_meta;
         }
     protected:
         log4cxx::LoggerPtr  m_logger;
         llvm::LLVMContext*  m_context;
-        ContextMeta*      m_meta;
+        ContextMeta*        m_meta;
 
         /// constructor
         Context();

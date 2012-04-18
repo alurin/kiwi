@@ -11,6 +11,7 @@ namespace llvm
 
 namespace kiwi
 {
+    typedef boost::shared_ptr<class Context>            ContextRef;
     typedef boost::shared_ptr<class Module>             ModuleRef;
     typedef boost::weak_ptr<class Module>               ModuleWeak;
     typedef boost::shared_ptr<class Type>               TypeRef;
@@ -25,16 +26,51 @@ namespace kiwi
 
     /// Binary operator
     class BinaryOperator {
+        friend class Type;
     public:
         enum Opcode {
             ADD = 1,
             SUB,
             MUL,
-            DIV
+            DIV,
+            LSH,
+            RSH,
+            OR,
+            AND,
+            EQ,
+            NEQ,
+            GE,
+            LE,
+            GT,
+            LT
         };
+        BinaryOperator::Opcode getOpcode() const {
+            return m_opcode;
+        }
 
+        TypeRef getResultType() const {
+            return m_resultType;
+        }
+
+        TypeRef getOperatorType() const {
+            return m_operatorType;
+        }
+
+        codegen::BinaryEmitter* getEmitter() const {
+            return m_emitter;
+        }
     protected:
-        BinaryOperator();
+        BinaryOperator::Opcode  m_opcode;
+        TypeRef                 m_resultType;
+        TypeRef                 m_operatorType;
+        codegen::BinaryEmitter* m_emitter;
+
+        BinaryOperator(
+            BinaryOperator::Opcode opcode,
+            TypeRef resultType,
+            TypeRef operatorType,
+            codegen::BinaryEmitter* emitter
+        );
 
         /// create binary operator with binary emitter
         static BinaryRef create(TypeRef firstType, TypeRef secondType, class BinaryEmmiter* emitter);

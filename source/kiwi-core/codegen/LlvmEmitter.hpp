@@ -5,10 +5,11 @@
 #include <llvm/Instruction.h>
 
 namespace kiwi {
+    typedef boost::shared_ptr<class Type>               TypeRef;
 namespace codegen {
 
     /// LLVM unary operators emitter
-    class LlvmUnaryOperator : public UnaryEmmiter {
+    class LlvmUnaryOperator : public UnaryEmitter {
     public:
     }; // class LlvmUnaryOperator
 
@@ -16,12 +17,13 @@ namespace codegen {
     class LlvmBinaryOperator : public BinaryEmitter {
     public:
         /// constructor
-        LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode);
+        LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, TypeRef type);
 
         /// emit llvm operator
-        virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) =0;
+        virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right);
     protected:
-        llvm::Instruction::BinaryOps m_opcode;
+        llvm::Instruction::BinaryOps    m_opcode;
+        TypeRef                         m_type;
     }; /// classLlvmBinaryOperator
 
 } // namesapce codegen

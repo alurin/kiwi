@@ -8,10 +8,10 @@
 
 using namespace kiwi;
 
-Module::Module(const Identifier& name, const ContextRef& fw)
-: m_name(name), m_framework(fw), m_module(0)
+Module::Module(const Identifier& name, const ContextRef& context)
+: m_name(name), m_context(context), m_module(0)
 {
-    m_module = new llvm::Module(name, fw->getContext());
+    m_module = new llvm::Module(name, context->getContext());
 }
 
 ModuleRef Module::create(const Identifier& name, const ContextRef& ref)
@@ -22,7 +22,7 @@ ModuleRef Module::create(const Identifier& name, const ContextRef& ref)
 
 void Module::includeFile(const Path& filename)
 {
-    lang::Driver driver;
+    lang::Driver driver(m_context.lock());
     if (driver.parseFile(filename)) {
         /// @todo build examples
         for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i)

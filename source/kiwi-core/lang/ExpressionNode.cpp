@@ -1,3 +1,5 @@
+#include "kiwi/Type.hpp"
+#include "kiwi/codegen/Emitter.hpp"
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
 #include <llvm/Instructions.h>
@@ -6,7 +8,7 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
-BinaryNode::BinaryNode(OpCode opcode, RightNode* left, RightNode* right, bool logic)
+BinaryNode::BinaryNode(Opcode opcode, RightNode* left, RightNode* right, bool logic)
 : m_opcode(opcode), m_left(left), m_right(right), m_logic(logic)
 {}
 
@@ -49,17 +51,24 @@ ArgumentLeftNode::ArgumentLeftNode(ArgumentNode* arg)
 ArgumentRightNode::ArgumentRightNode(ArgumentNode* arg)
 : o_arg(arg) { }
 
-IntegerConstNode::IntegerConstNode(int32_t value)
-: m_value(value) { }
+IntegerConstNode::IntegerConstNode(ContextRef context, int32_t value)
+: m_context(context), m_value(value) { }
 
 ExpressionGen BinaryNode::emit(const StatementGen& gen)
 {
-    //  ExpressionGen left   = m_left->emit(gen);
-    //  ExpressionGen right  = m_right->emit(gen);
-    //  ExpressionGen ogen;
-//
-//          //ExpressionGen result = left;
-    //  throw "Not implemented";
+    // emit operands
+    ExpressionGen left  = m_left->emit(gen);
+    ExpressionGen right = m_right->emit(gen);
+
+    // find emitter
+    TypeRef type = left.getType();
+    BinaryRef op = type->find(m_opcode, right.getType());
+
+    // emit instruction
+    if (op) {
+        return op->getEmitter()->emit(right, left, right);
+    }
+    throw "not found biary operator";
 }
 
 ExpressionGen UnaryNode::emit(const StatementGen& gen)
@@ -89,7 +98,7 @@ ExpressionGen ArgumentRightNode::emit(const StatementGen& gen)
 {
     VariableGen var      = o_arg->getGenerator();
     llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), o_arg->getName(), gen.getBlock());
-    return ExpressionGen(gen, inst);
+    return ExpressionGen(gen, var.getType(), inst);
 }
 
 ExpressionGen VariableLeftNode::emit(const ExpressionGen& gen)
@@ -103,12 +112,12 @@ ExpressionGen VariableRightNode::emit(const StatementGen& gen)
 {
     VariableGen var      = o_var->getGenerator();
     llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), o_var->getName(), gen.getBlock());
-    return ExpressionGen(gen, inst);
+    return ExpressionGen(gen, var.getType(), inst);
 }
 
 ExpressionGen IntegerConstNode::emit(const StatementGen& gen)
 {
     llvm::APInt cst(32, m_value, false);
     llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
-    return ExpressionGen(gen, value);
+    return ExpressionGen(gen, IntType::get32(m_context), value);
 }

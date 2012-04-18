@@ -66,7 +66,7 @@ TypeFactory* Driver::type()
 ExpressionFactory* Driver::expr()
 {
     /// @todo Memoty leak
-    return new ExpressionFactory();
+    return new ExpressionFactory(m_context);
 }
 
 FunctionNode* Driver::func()
