@@ -3,10 +3,10 @@
 
 %{ /*** C/C++ Declarations ***/
 
+#include "kiwi/Config.hpp"
 #include <stdio.h>
 #include <string>
 #include <vector>
-
 #include "ExpressionNode.hpp"
 #include "TypeNode.hpp"
 #include "FunctionNode.hpp"
@@ -59,6 +59,7 @@
     int                  integerVal;
     double               doubleVal;
     std::string*		 stringVal;
+    String*              ustringVal;
 
     class TypeNode*		 typenode;
     class LeftNode*      leftnode;
@@ -91,14 +92,16 @@
 
 %token  <stringVal>     IDENT               "identifier"
 
-%token  <integerVal>    INTEGER             "integer"
+%token  <integerVal>    INTEGER             "integer constant"
+%token  <ustringVal>    STRING              "string constant"
 %token  <stringVal>     VAR_LOCAL           "local variable"
 %token  <stringVal>     VAR_INSTANCE        "instance attribute"
 
-%token                  TYPE_VOID           "void"
-%token                  TYPE_INT            "int"
-%token                  TYPE_BOOL           "bool"
-%token                  TYPE_STRING         "string"
+%token                  TYPE_VOID           "void type"
+%token                  TYPE_INT            "int type"
+%token                  TYPE_BOOL           "bool type"
+%token                  TYPE_CHAR           "char type"
+%token                  TYPE_STRING         "string type"
 
 %token                  RETURN              "return"
 %token                  IF                  "if"
@@ -127,6 +130,7 @@
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
 %destructor { delete $$; } type type_complex type_primary
 %destructor { delete $$; } scope return_statement
+%destructor { delete $$; } STRING
 
  /*** END EXAMPLE - Change the example grammar's tokens above ***/
 
@@ -250,6 +254,7 @@ left
 right
     : VAR_LOCAL                     { $$ = driver.right(*$1, @1); }
     | INTEGER                       { $$ = driver.createInt($1, @1);          }
+    | STRING                        { $$ = driver.createString(*$1, @1);       }
     | '(' expression ')'            { $$ = $2; }
     ;
 
@@ -271,6 +276,7 @@ type_primary
     : TYPE_INT              { $$ = driver.createIntTy(@1);     }
     | TYPE_BOOL             { $$ = driver.createBoolTy(@1);    }
     | TYPE_STRING           { $$ = driver.createStringTy(@1);  }
+    | TYPE_CHAR             { $$ = driver.createCharTy(@1);    }
     ;
 
 /** START POINT **/

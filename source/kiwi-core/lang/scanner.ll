@@ -3,8 +3,9 @@
 
 %{ /*** C/C++ Declarations ***/
 
+#include "kiwi/Config.hpp"
 #include <string>
-
+#include <sstream>
 #include "scanner.h"
 
 /* import the parser's token type into a local typedef */
@@ -48,12 +49,19 @@ typedef kiwi::lang::Parser::token_type token_type;
 #define YY_USER_ACTION  yylloc->columns(yyleng);
 %}
 
+/* States */
+%x comment
+%x line_comment
+%x string_state
+
 %% /*** Regular Expressions Part ***/
 
  /* code to place at the beginning of yylex() */
 %{
     // reset location
     yylloc->step();
+
+    std::stringstream string_buffer;
 %}
 
  /*** BEGIN EXAMPLE - Change the example lexer rules below ***/
@@ -81,6 +89,7 @@ typedef kiwi::lang::Parser::token_type token_type;
 "int"    { return token::TYPE_INT;    }
 "bool"   { return token::TYPE_BOOL;   }
 "string" { return token::TYPE_STRING; }
+"char"   { return token::TYPE_CHAR;   }
 
 "return" { return token::RETURN;      }
 "if"     { return token::IF;          }
@@ -118,6 +127,43 @@ typedef kiwi::lang::Parser::token_type token_type;
 }
 [\n\r]+ {
     yylloc->lines(yyleng);
+}
+
+ /* comments and strings */
+"/*"                    { BEGIN(comment);      }
+"//"                    { BEGIN(line_comment); }
+"#"                     { BEGIN(line_comment); }
+"\""                    { BEGIN(string_state); }
+
+<comment>{
+    [^*\n]*             { /* eat anything that's not a '*' */ }
+    "*"+[^*/\n]*        { /* eat up '*'s not followed by '/'s */ }
+    \n                  { yylloc->lines(yyleng);              }
+    "*"+"/"             { BEGIN(INITIAL);                     }
+}
+
+<line_comment>{
+    [\n\r]+             { yylloc->lines(yyleng); BEGIN(INITIAL); }
+    .                   { }
+}
+
+<string_state>{
+    "\""                {
+                            /* saw closing quote - all done */
+                             BEGIN(INITIAL);
+                             yylval->ustringVal = new String(string_buffer.str().c_str());
+                             string_buffer.str(std::string());
+                             return token::STRING;
+                        }
+
+    \\n                 { string_buffer << '\n';      }
+    \\t                 { string_buffer << '\t';      }
+    \\r                 { string_buffer << '\r';      }
+    \\b                 { string_buffer << '\b';      }
+    \\f                 { string_buffer << '\f';      }
+    \\(.|\n)            { string_buffer << yytext[1]; }
+
+    .                   { string_buffer << yytext[0]; }
 }
 
  /* pass all other characters up to bison */

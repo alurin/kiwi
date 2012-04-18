@@ -72,7 +72,15 @@ namespace lang {
         }
 
         TypeNode* createStringTy(const location& loc) {
-            throw "Not implemented";
+            TypeNode* node = new ConcreteTypeNode(StringType::get(m_context));
+            node->setLocation(loc);
+            return node;
+        }
+
+        TypeNode* createCharTy(const location& loc) {
+            TypeNode* node = new ConcreteTypeNode(CharType::get(m_context));
+            node->setLocation(loc);
+            return node;
         }
 
         TypeNode* createArrayTy(TypeNode* type, const location& loc) {
@@ -85,6 +93,13 @@ namespace lang {
         RightNode* createInt(int32_t value, const location& loc)
         {
             RightNode* node = new IntegerConstNode(m_context, value);
+            node->setLocation(loc);
+            return node;
+        }
+
+        RightNode* createString(const UnicodeString& value, const location& loc)
+        {
+            RightNode* node = new StringConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }

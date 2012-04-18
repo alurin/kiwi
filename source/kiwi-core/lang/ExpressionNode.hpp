@@ -123,6 +123,20 @@ namespace lang {
         ContextRef  m_context;
         int32_t     m_value;
     };
+
+
+
+    class StringConstNode : public RightNode
+    {
+    public:
+        StringConstNode(ContextRef context, const String& value);
+
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
+    protected:
+        ContextRef  m_context;
+        String     m_value;
+    };
 }}
 
 #endif

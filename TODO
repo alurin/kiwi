@@ -7,3 +7,19 @@ TODO
 
 * Threat all parse errors as exception
 * Clean up deletes for all classes
+
+* Char type
+    +
+    ==
+    !=
+    <
+    >
+    <=
+    >=
+
+* String type
+    +
+    ==
+    !=
+    []
+    read and write by index ([i])

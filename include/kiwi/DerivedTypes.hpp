@@ -52,6 +52,39 @@ namespace kiwi
         /// initializator
         void initializate();
     };
+
+    /// Character type metadata
+    class CharType : public Type {
+        friend class Context;
+    public:
+        static TypeRef get(ContextRef context);
+    protected:
+        /// constructor
+        CharType(ModuleRef module);
+
+        /// create module type
+        static TypeRef create(ModuleRef module);
+
+        /// initializator
+        void initializate();
+    };
+
+    /// String type metdata
+    class StringType : public Type {
+        friend class Context;
+    public:
+        static TypeRef get(ContextRef context);
+    protected:
+        /// constructor
+        StringType(ModuleRef module);
+
+        /// create module type
+        static TypeRef create(ModuleRef module);
+
+        /// initializator
+        void initializate();
+    };
+
 }
 
 #endif

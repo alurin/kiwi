@@ -5,14 +5,16 @@
 #include "codegen/LlvmEmitter.hpp"
 #include <llvm/DerivedTypes.h>
 #include <llvm/Instruction.h>
-
+#include <llvm/ADT/ArrayRef.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-typedef boost::shared_ptr<IntType>  IntTypeRef;
-typedef boost::shared_ptr<BoolType> BoolTypeRef;
-typedef boost::shared_ptr<VoidType> VoidTypeRef;
+typedef boost::shared_ptr<IntType>    IntTypeRef;
+typedef boost::shared_ptr<BoolType>   BoolTypeRef;
+typedef boost::shared_ptr<VoidType>   VoidTypeRef;
+typedef boost::shared_ptr<CharType>   CharTypeRef;
+typedef boost::shared_ptr<StringType> StringTypeRef;
 
 IntType::IntType(ModuleRef module, int32_t size, bool unsign)
 : Type(module) {
@@ -32,6 +34,25 @@ VoidType::VoidType(ModuleRef module)
     m_varType = llvm::Type::getVoidTy(context);
 }
 
+CharType::CharType(ModuleRef module)
+: Type(module) {
+    llvm::LLVMContext& context = module->getContext()->getContext();
+    m_varType = llvm::IntegerType::get(context, 16);
+}
+
+StringType::StringType(ModuleRef module)
+: Type(module) {
+    llvm::LLVMContext& context = module->getContext()->getContext();
+    llvm::Type* charType       = llvm::IntegerType::get(context, 16);
+    llvm::Type* sizeType       = llvm::IntegerType::get(context, 32);
+    llvm::Type* bufferType     = llvm::ArrayType::get(charType, 0);
+    std::vector<llvm::Type*> elements;
+    elements.push_back(sizeType);
+    elements.push_back(bufferType);
+    llvm::Type* stringType     = llvm::StructType::create(llvm::makeArrayRef(elements));
+    m_varType                  = stringType->getPointerTo(0);
+}
+
 TypeRef IntType::create(ModuleRef module, int32_t size, bool unsign)
 {
     IntTypeRef type = IntTypeRef(new IntType(module, size, unsign));
@@ -49,6 +70,20 @@ TypeRef BoolType::create(ModuleRef module)
 TypeRef VoidType::create(ModuleRef module)
 {
     VoidTypeRef type = VoidTypeRef(new VoidType(module));
+    return type;
+}
+
+TypeRef CharType::create(ModuleRef module)
+{
+    CharTypeRef type = CharTypeRef(new CharType(module));
+    type->initializate();
+    return type;
+}
+
+TypeRef StringType::create(ModuleRef module)
+{
+    StringTypeRef type = StringTypeRef(new StringType(module));
+    type->initializate();
     return type;
 }
 
@@ -82,6 +117,12 @@ void BoolType::initializate()
     add(BinaryOperator::NEQ, boolTy, boolTy, new LlvmICompareOperator(llvm::CmpInst::ICMP_NE, context));
 }
 
+
+void CharType::initializate()
+{ }
+void StringType::initializate()
+{ }
+
 TypeRef IntType::get32(ContextRef context)
 {
     ContextMeta* meta = context->getMetadata();
@@ -98,4 +139,16 @@ TypeRef VoidType::get(ContextRef context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->voidTy;
+}
+
+TypeRef CharType::get(ContextRef context)
+{
+    ContextMeta* meta = context->getMetadata();
+    return meta->charTy;
+}
+
+TypeRef StringType::get(ContextRef context)
+{
+    ContextMeta* meta = context->getMetadata();
+    return meta->stringTy;
 }

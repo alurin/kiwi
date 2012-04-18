@@ -125,6 +125,7 @@ namespace kiwi { namespace lang {
     int                  integerVal;
     double               doubleVal;
     std::string*		 stringVal;
+    String*              ustringVal;
 
     class TypeNode*		 typenode;
     class LeftNode*      leftnode;
@@ -134,7 +135,7 @@ namespace kiwi { namespace lang {
 
 
 /* Line 35 of lalr1.cc  */
-#line 138 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 139 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -169,18 +170,20 @@ namespace kiwi { namespace lang {
      OP_AOR = 277,
      IDENT = 278,
      INTEGER = 279,
-     VAR_LOCAL = 280,
-     VAR_INSTANCE = 281,
-     TYPE_VOID = 282,
-     TYPE_INT = 283,
-     TYPE_BOOL = 284,
-     TYPE_STRING = 285,
-     RETURN = 286,
-     IF = 287,
-     ELSE = 288,
-     IFELSE = 289,
-     UNARY = 290,
-     PRE = 291
+     STRING = 280,
+     VAR_LOCAL = 281,
+     VAR_INSTANCE = 282,
+     TYPE_VOID = 283,
+     TYPE_INT = 284,
+     TYPE_BOOL = 285,
+     TYPE_CHAR = 286,
+     TYPE_STRING = 287,
+     RETURN = 288,
+     IF = 289,
+     ELSE = 290,
+     IFELSE = 291,
+     UNARY = 292,
+     PRE = 293
    };
 
     };
@@ -357,7 +360,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 361 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 364 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
 
 
 
