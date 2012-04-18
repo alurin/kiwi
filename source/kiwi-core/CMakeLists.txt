@@ -4,14 +4,14 @@ FILE (GLOB_RECURSE project_SOURCES *.cpp *.hpp)
 FIND_PACKAGE(BISON REQUIRED)
 FIND_PACKAGE(FLEX  REQUIRED)
 
-BISON_TARGET(KiwiParser ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser.yy  lang/parser.cpp VERBOSE ${PROJECT_BINARY_DIR}/parser.log)
-FLEX_TARGET(KiwiScanner ${CMAKE_CURRENT_SOURCE_DIR}/lang/scanner.ll lang/scanner.cpp)
+BISON_TARGET(KiwiParser ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser.yy  ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser.cpp VERBOSE ${PROJECT_BINARY_DIR}/parser.log)
+FLEX_TARGET(KiwiScanner ${CMAKE_CURRENT_SOURCE_DIR}/lang/scanner.ll ${CMAKE_CURRENT_SOURCE_DIR}/lang/scanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(KiwiScanner KiwiParser)
 
-SET (project_SOURCES ${project_SOURCES} ${BISON_KiwiParser_OUTPUTS} ${FLEX_KiwiScanner_OUTPUTS})
 LIST(REMOVE_ITEM project_SOURCES "lang/scanner.cpp")
 LIST(REMOVE_ITEM project_SOURCES "lang/parser.cpp")
 LIST(REMOVE_ITEM project_SOURCES "lang/parser.hpp")
+SET (project_SOURCES ${project_SOURCES} ${BISON_KiwiParser_OUTPUTS} ${FLEX_KiwiScanner_OUTPUTS})
 
 SET (project_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${Log4Cxx_LIBRARIES} ${LLVM_LIBRARIES})
 SET (project_LIB "lib${PROJECT_NAME}")

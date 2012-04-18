@@ -1,5 +1,6 @@
-int main(int $a, int $b)
+int main()
 {
-    int $c;
-    $c = - $b;
+    bool $a;
+    bool $b;
+    $a == $b;
 }

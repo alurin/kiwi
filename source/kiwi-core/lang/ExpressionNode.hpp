@@ -45,22 +45,16 @@ namespace lang {
 
     class UnaryNode : public RightNode {
     public:
-        enum OpCode {
-            NEG = 1,
-            ADD,
-            NOT,
-            DEC,
-            INC
-        };
+        typedef UnaryOperator::Opcode Opcode;
 
-        UnaryNode(OpCode opcode, RightNode* value, bool post = false);
+        UnaryNode(Opcode opcode, RightNode* value, bool post = false);
 
         virtual ~UnaryNode();
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
-        OpCode      m_opcode;
+        Opcode      m_opcode;
         RightNode*  m_value;
         bool        m_post;
     };
@@ -137,27 +131,27 @@ namespace lang {
 
         RightNode* getNeg(RightNode* value)
         {
-            return new UnaryNode(UnaryNode::NEG, value);
+            return new UnaryNode(UnaryOperator::NEG, value);
         }
 
-        RightNode* getAdd(RightNode* value)
+        RightNode* getPos(RightNode* value)
         {
-            return new UnaryNode(UnaryNode::ADD, value);
+            return new UnaryNode(UnaryOperator::POS, value);
         }
 
         RightNode* getNot(RightNode* value)
         {
-            return new UnaryNode(UnaryNode::NOT, value);
+            return new UnaryNode(UnaryOperator::NOT, value);
         }
 
         RightNode* getDec(RightNode* value, bool post = false)
         {
-            return new UnaryNode(UnaryNode::DEC, value, post);
+            return new UnaryNode(UnaryOperator::DEC, value, post);
         }
 
         RightNode* getInc(RightNode* value, bool post = false)
         {
-            return new UnaryNode(UnaryNode::INC, value, post);
+            return new UnaryNode(UnaryOperator::INC, value, post);
         }
 
         RightNode* getAdd(RightNode* left, RightNode* right)

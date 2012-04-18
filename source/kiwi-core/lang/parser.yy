@@ -97,6 +97,7 @@
 
 %token                  TYPE_VOID           "void"
 %token                  TYPE_INT            "int"
+%token                  TYPE_BOOL           "bool"
 %token                  TYPE_STRING         "string"
 
 %left       '=' "+=" "-=" "/=" "*=" "<<=" ">>=" "&=" "|="
@@ -200,7 +201,7 @@ variable_declare
 
 expression
     : '-' expression %prec UNARY    { $$ = driver.expr()->getNeg($2); }
-    | '+' expression %prec UNARY    { $$ = driver.expr()->getAdd($2); }
+    | '+' expression %prec UNARY    { $$ = driver.expr()->getPos($2); }
     | '!' expression %prec UNARY    { $$ = driver.expr()->getNot($2); }
 
 
@@ -253,6 +254,7 @@ type_complex
 
 type_primary
     : TYPE_INT              { $$ = driver.type()->getInt();     }
+    | TYPE_BOOL             { $$ = driver.type()->getBool();  }
     | TYPE_STRING           { $$ = driver.type()->getString();  }
     ;
 

@@ -50,6 +50,8 @@ namespace lang
 
         TypeNode* getInt();
 
+        TypeNode* getBool();
+
         TypeNode* getString();
 
         TypeNode* getArray(TypeNode* type);

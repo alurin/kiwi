@@ -18,7 +18,7 @@ BinaryNode::~BinaryNode()
     delete m_right;
 }
 
-UnaryNode::UnaryNode(OpCode opcode, RightNode* value, bool post)
+UnaryNode::UnaryNode(Opcode opcode, RightNode* value, bool post)
 : m_opcode(opcode), m_value(value), m_post(post)
 {}
 
@@ -68,16 +68,23 @@ ExpressionGen BinaryNode::emit(const StatementGen& gen)
     if (op) {
         return op->getEmitter()->emit(right, left, right);
     }
-    throw "not found biary operator";
+    throw "not found binary operator";
 }
 
 ExpressionGen UnaryNode::emit(const StatementGen& gen)
 {
+    // emit operand
     ExpressionGen value  = m_value->emit(gen);
 
+    // find emitter
+    TypeRef type = value.getType();
+    UnaryRef op  = type->find(m_opcode);
 
-
-    throw "Not implemented";
+    // emit instruction
+    if (op) {
+        return op->getEmitter()->emit(value, value);
+    }
+    throw "not found unary operator";
 }
 
 ExpressionGen AssignNode::emit(const StatementGen& gen)
@@ -97,7 +104,7 @@ ExpressionGen ArgumentLeftNode::emit(const ExpressionGen& gen)
 ExpressionGen ArgumentRightNode::emit(const StatementGen& gen)
 {
     VariableGen var      = o_arg->getGenerator();
-    llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), o_arg->getName(), gen.getBlock());
+    llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, var.getType(), inst);
 }
 
@@ -111,7 +118,7 @@ ExpressionGen VariableLeftNode::emit(const ExpressionGen& gen)
 ExpressionGen VariableRightNode::emit(const StatementGen& gen)
 {
     VariableGen var      = o_var->getGenerator();
-    llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), o_var->getName(), gen.getBlock());
+    llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, var.getType(), inst);
 }
 

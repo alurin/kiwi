@@ -79,6 +79,7 @@ typedef kiwi::lang::Parser::token_type token_type;
 
 "void"   { return token::TYPE_VOID;   }
 "int"    { return token::TYPE_INT;    }
+"bool"   { return token::TYPE_BOOL;   }
 "string" { return token::TYPE_STRING; }
 
  /* Unix command */

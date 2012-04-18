@@ -24,6 +24,43 @@ namespace kiwi
         class BinaryEmitter;
     };
 
+    /// Unary operator
+    class UnaryOperator
+    {
+        friend class Type;
+    public:
+        enum Opcode {
+            POS = 1,
+            NEG,
+            NOT,
+            DEC,
+            INC
+        };
+
+        Opcode getOpcode() const {
+            return m_opcode;
+        }
+
+        TypeRef getResultType() const {
+            return m_resultType;
+        }
+
+        codegen::UnaryEmitter* getEmitter() const {
+            return m_emitter;
+        }
+    protected:
+        Opcode                  m_opcode;
+        TypeRef                 m_resultType;
+        codegen::UnaryEmitter*  m_emitter;
+
+        /// constructor
+        UnaryOperator(
+            Opcode opcode,
+            TypeRef resultType,
+            codegen::UnaryEmitter* emitter
+        );
+    };
+
     /// Binary operator
     class BinaryOperator {
         friend class Type;
@@ -44,7 +81,8 @@ namespace kiwi
             GT,
             LT
         };
-        BinaryOperator::Opcode getOpcode() const {
+
+        Opcode getOpcode() const {
             return m_opcode;
         }
 
@@ -60,34 +98,18 @@ namespace kiwi
             return m_emitter;
         }
     protected:
-        BinaryOperator::Opcode  m_opcode;
+        Opcode                  m_opcode;
         TypeRef                 m_resultType;
         TypeRef                 m_operatorType;
         codegen::BinaryEmitter* m_emitter;
 
+        /// constructor
         BinaryOperator(
-            BinaryOperator::Opcode opcode,
+            Opcode opcode,
             TypeRef resultType,
             TypeRef operatorType,
             codegen::BinaryEmitter* emitter
         );
-
-        /// create binary operator with binary emitter
-        static BinaryRef create(TypeRef firstType, TypeRef secondType, class BinaryEmmiter* emitter);
-
-        /// create binary operator with callable emitter
-        BinaryRef create(TypeRef firstType, TypeRef secondType);
-    };
-
-    /// Unary operator
-    class UnaryOperator
-    {
-    public:
-        enum Opcode {
-            POS = 1,
-            NEG,
-            NOT
-        };
     };
 
     /// Type metadata
@@ -124,6 +146,9 @@ namespace kiwi
             codegen::BinaryEmitter* emitter
         );
 
+        /// find unary operator
+        UnaryRef find(UnaryOperator::Opcode opcode);
+
         /// find binary operator
         BinaryRef find(BinaryOperator::Opcode opcode, TypeRef operatorType);
     protected:
@@ -156,6 +181,7 @@ namespace kiwi
     /// Boolean type metadata
     class BoolType : public Type
     {
+        friend class Context;
     public:
         static TypeRef get(ContextRef context);
     protected:

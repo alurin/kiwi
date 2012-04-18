@@ -50,7 +50,7 @@
 namespace kiwi { namespace lang {
 
 /* Line 162 of location.cc  */
-#line 54 "lang/location.hh"
+#line 54 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/location.hh"
 
   /// Abstract a location.
   class location
@@ -166,6 +166,6 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 271 of location.cc  */
-#line 170 "lang/location.hh"
+#line 170 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/location.hh"
 
 #endif // not BISON_LOCATION_HH

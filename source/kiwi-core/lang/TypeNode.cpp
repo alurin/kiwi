@@ -27,6 +27,11 @@ TypeNode* TypeFactory::getInt()
     return new ConcreteTypeNode(IntType::get32(m_context));
 }
 
+TypeNode* TypeFactory::getBool()
+{
+    return new ConcreteTypeNode(BoolType::get(m_context));
+}
+
 TypeNode* TypeFactory::getString()
 {
     /// @todo Not implemented

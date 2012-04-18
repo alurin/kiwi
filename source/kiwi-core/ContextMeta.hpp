@@ -10,6 +10,7 @@ namespace kiwi
     class ContextMeta {
     public:
         TypeRef int32Ty;
+        TypeRef boolTy;
     };
 }
 
