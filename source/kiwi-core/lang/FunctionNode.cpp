@@ -1,15 +1,13 @@
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
 #include "TypeNode.hpp"
-
+#include "kiwi/Type.hpp"
 #include "kiwi/Module.hpp"
-
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/BasicBlock.h>
 #include <llvm/DerivedTypes.h>
 #include <llvm/Function.h>
 #include <llvm/Instructions.h>
-
 #include <vector>
 
 using namespace kiwi;
@@ -152,14 +150,21 @@ RightNode* VariableNode::getRight()
 void FunctionNode::generate(ModuleRef module)
 {
     // prepare arguments
-    llvm::Type* resultType = m_type->generate(module);
-    std::vector<llvm::Type*>   argTypes;
-    std::vector<ArgumentNode*> argLists;
+    llvm::Type*                 resultType = 0;
+    std::vector<llvm::Type*>    argTypes;
+    std::vector<ArgumentNode*>  argLists;
+
+    {
+        TypeRef type = m_type->get();
+        resultType   = type->getVarType();
+    }
+
 
     for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i)
     {
         ArgumentNode* arg = i->second;
-        llvm::Type* arg_type = arg->getType()->generate(module);
+        TypeRef       type_ref = arg->getType()->get();
+        llvm::Type*   arg_type = type_ref->getVarType();
 
         argTypes.push_back(arg_type);
         argLists.push_back(arg);
@@ -181,7 +186,7 @@ void FunctionNode::generate(ModuleRef module)
             llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
             llvm::StoreInst*  store = new llvm::StoreInst(value, i, entry);
 
-            VariableGen vargen(value);
+            VariableGen vargen(arg->getType()->get(), value);
             arg->setGenerator(vargen);
         }
     }
@@ -197,10 +202,11 @@ StatementGen ScopeNode::emit(ModuleRef module, const StatementGen& gen)
     {
         VariableNode* var = i->second;
 
-        llvm::Type* var_type     = var->getType()->generate(module);
+        TypeRef type            = var->getType()->get();
+        llvm::Type* var_type    = type->getVarType();
         llvm::AllocaInst* value = new llvm::AllocaInst(var_type, i->first, gen.getBlock());
 
-        VariableGen vargen(value);
+        VariableGen vargen(type, value);
         var->setGenerator(vargen);
     }
 

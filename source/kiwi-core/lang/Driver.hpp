@@ -12,6 +12,9 @@
 /** The example namespace is used to encapsulate the three parser classes
  * example::Parser, example::Scanner and example::Driver */
 namespace kiwi {
+
+typedef boost::shared_ptr<class Context> ContextRef;
+
 namespace lang {
 
 class FunctionNode;
@@ -36,7 +39,7 @@ public:
     }; // enum Mode
 
     /// construct a new parser driver context
-    Driver();
+    Driver(ContextRef context);
 
     /// set mode
     void setMode(Mode mode) {
@@ -131,10 +134,11 @@ public:
      * parser to the scanner. It is used in the yylex macro. */
     class Scanner* lexer;
 protected:
+    ContextRef                  m_context;
     std::stack<FunctionNode*>   m_funcs;
     std::stack<ScopeNode*>      m_scopes;
     std::vector<FunctionNode*>  m_functions;
-    Mode m_mode;
+    Mode                        m_mode;
 };
 
 } // namespace lang

@@ -1,5 +1,5 @@
-#ifndef KIWI_FRAMEWORK_INCLUDED
-#define KIWI_FRAMEWORK_INCLUDED
+#ifndef KIWI_CONTEXT_INCLUDED
+#define KIWI_CONTEXT_INCLUDED
 
 #include "kiwi/Config.hpp"
 #include "kiwi/Application.hpp"
@@ -12,8 +12,10 @@ namespace llvm
 
 namespace kiwi
 {
-    class Framework;
-    typedef boost::shared_ptr<Framework> FrameworkRef;
+    /// Internal framework metadata
+    class ContextMeta;
+    class Context;
+    typedef boost::shared_ptr<Context> ContextRef;
 
     /**
      * General enter point for Kiwi compiler infrastructure
@@ -21,17 +23,17 @@ namespace kiwi
      * @author Vasiliy Sheredeko
      * @since 2012-04-15
      */
-    class Framework
+    class Context : public boost::enable_shared_from_this<Context>
     {
-        Framework(const Framework&);                ///< NOT IMPLEMENT!!!
-        Framework& operator=(const Framework&);     ///< NOT IMPLEMENT!!!
+        Context(const Context&);                ///< NOT IMPLEMENT!!!
+        Context& operator=(const Context&);     ///< NOT IMPLEMENT!!!
 
     public:
         /// create new instance and return smart reference for this instance
-        static FrameworkRef create();
+        static ContextRef create();
 
         /// destructor
-        virtual ~Framework();
+        virtual ~Context();
 
         /// returns Log4c++ logger
         log4cxx::LoggerPtr logger() const {
@@ -42,11 +44,16 @@ namespace kiwi
         llvm::LLVMContext& getContext() const {
             return *m_context;
         }
-    private:
+    protected:
         log4cxx::LoggerPtr  m_logger;
         llvm::LLVMContext*  m_context;
+        ContextMeta*      m_meta;
 
-        Framework();
+        /// constructor
+        Context();
+
+        /// initilizator
+        void initializate();
     };
 }
 

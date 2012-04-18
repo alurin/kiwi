@@ -54,10 +54,12 @@ IntegerConstNode::IntegerConstNode(int32_t value)
 
 ExpressionGen BinaryNode::emit(const StatementGen& gen)
 {
-    ExpressionGen left   = m_left->emit(gen);
-    ExpressionGen right  = m_right->emit(gen);
-    ExpressionGen result = left;
-    throw "Not implemented";
+    //  ExpressionGen left   = m_left->emit(gen);
+    //  ExpressionGen right  = m_right->emit(gen);
+    //  ExpressionGen ogen;
+//
+//          //ExpressionGen result = left;
+    //  throw "Not implemented";
 }
 
 ExpressionGen UnaryNode::emit(const StatementGen& gen)

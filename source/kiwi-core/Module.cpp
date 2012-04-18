@@ -1,4 +1,4 @@
-#include "kiwi/Framework.hpp"
+#include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 
 #include "lang/Driver.hpp"
@@ -8,13 +8,13 @@
 
 using namespace kiwi;
 
-Module::Module(const Identifier& name, const FrameworkRef& fw)
+Module::Module(const Identifier& name, const ContextRef& fw)
 : m_name(name), m_framework(fw), m_module(0)
 {
     m_module = new llvm::Module(name, fw->getContext());
 }
 
-ModuleRef Module::create(const Identifier& name, const FrameworkRef& ref)
+ModuleRef Module::create(const Identifier& name, const ContextRef& ref)
 {
     ModuleRef module = ModuleRef(new Module(name, ref));
     return module;

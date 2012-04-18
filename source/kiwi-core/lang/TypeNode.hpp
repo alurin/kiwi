@@ -4,42 +4,58 @@
 #include "kiwi/Config.hpp"
 #include "Node.hpp"
 
-namespace llvm
-{
-    class Type;
-}
-
 namespace kiwi
 {
-    typedef boost::shared_ptr<class Module> ModuleRef;
+    typedef boost::shared_ptr<class Type>    TypeRef;
+    typedef boost::shared_ptr<class Context> ContextRef;
 
 namespace lang
 {
-
+    /// Type node
     class TypeNode : public Node
     {
     public:
-        llvm::Type* generate(ModuleRef module);
+        /// destructor
+        virtual ~TypeNode();
+
+        /// get type
+        virtual TypeRef get() =0;
+
+    protected:
+        TypeNode();
     };
 
+    /// Type node for internal types
+    class ConcreteTypeNode : public TypeNode {
+    public:
+        /// constructor
+        ConcreteTypeNode(TypeRef type);
+
+        /// get type
+        virtual TypeRef get()
+        {
+            return m_type;
+        }
+    protected:
+        TypeRef m_type;
+    };
+
+    /// Type factory for parser
     class TypeFactory
     {
     public:
-        TypeNode* getVoid() {
-            return 0;
-        }
+        TypeFactory(ContextRef context);
 
-        TypeNode* getInt() {
-            return 0;
-        }
+        TypeNode* getVoid();
 
-        TypeNode* getString() {
-            return 0;
-        }
+        TypeNode* getInt();
 
-        TypeNode* getArray(TypeNode* type) {
-            return 0;
-        }
+        TypeNode* getString();
+
+        TypeNode* getArray(TypeNode* type);
+
+    protected:
+        ContextRef m_context;
     };
 
 }}

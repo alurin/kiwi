@@ -13,9 +13,10 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
-Driver::Driver()
+Driver::Driver(ContextRef context)
     : trace_scanning(false),
-      trace_parsing(false)
+      trace_parsing(false),
+      m_context(context)
 {
 }
 
@@ -59,7 +60,7 @@ void Driver::error(const std::string& m)
 TypeFactory* Driver::type()
 {
     /// @todo Memoty leak
-    return new TypeFactory();
+    return new TypeFactory(m_context);
 }
 
 ExpressionFactory* Driver::expr()

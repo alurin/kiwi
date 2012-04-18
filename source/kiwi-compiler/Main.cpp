@@ -1,4 +1,4 @@
-#include "kiwi/Framework.hpp"
+#include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 using namespace kiwi;
 
@@ -38,7 +38,7 @@ int main(int argc, char const *argv[])
           options(desc).positional(p).run(), vm);
     po::notify(vm);
 
-    FrameworkRef frm = Framework::create();
+    ContextRef frm = Context::create();
     if (vm.count("input-file")) {
         vector<string> files = vm["input-file"].as< vector<string> >();
         cout << "Input files are: " << files << "\n";
