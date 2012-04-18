@@ -5,22 +5,16 @@
 #define EXAMPLE_DRIVER_H
 
 #include "kiwi/Config.hpp"
+#include "Factory.hpp"
 #include <string>
-#include <vector>
-#include <stack>
 
 /** The example namespace is used to encapsulate the three parser classes
  * example::Parser, example::Scanner and example::Driver */
 namespace kiwi {
 
-typedef boost::shared_ptr<class Context> ContextRef;
-
 namespace lang {
 
 class FunctionNode;
-class TypeFactory;
-class TypeNode;
-class ExpressionFactory;
 class ScopeNode;
 
 /** The Driver class brings together all components. It creates an instance of
@@ -29,61 +23,12 @@ class ScopeNode;
  * sequence. Furthermore the driver object is available in the grammar rules as
  * a parameter. Therefore the driver class contains a reference to the
  * structure into which the parsed data is saved. */
-class Driver
+class Driver : public NodeFactory
 {
 public:
-    enum Mode {
-        MODE_SCRIPT     = 0,
-        MODE_INLINE     = 1,
-        MODE_COMPONENT  = 2
-    }; // enum Mode
-
     /// construct a new parser driver context
     Driver(ContextRef context);
 
-    /// set mode
-    void setMode(Mode mode) {
-        m_mode = mode;
-    }
-
-    /// returns mode
-    Mode getMode() const {
-        return m_mode;
-    }
-
-    /// returns types factory
-    TypeFactory* type();
-
-    /// returns expressions factory
-    ExpressionFactory* expr();
-
-    /// returns current function
-    FunctionNode* func();
-
-    /// declare function
-    FunctionNode* func(const Identifier& name, TypeNode* type);
-
-    /// end current function
-    FunctionNode* funcEnd();
-
-    /// returns current scope
-    ScopeNode* scope();
-
-    /// begin new scope
-    ScopeNode* scopeBegin();
-
-    /// end current scope
-    ScopeNode* scopeEnd();
-
-    std::vector<FunctionNode*>::const_iterator func_begin() const
-    {
-        return m_functions.begin();
-    }
-
-    std::vector<FunctionNode*>::const_iterator func_end() const
-    {
-        return m_functions.end();
-    }
 public:
     /// enable debug output in the flex scanner
     bool trace_scanning;
@@ -133,12 +78,6 @@ public:
     /** Pointer to the current lexer instance, this is used to connect the
      * parser to the scanner. It is used in the yylex macro. */
     class Scanner* lexer;
-protected:
-    ContextRef                  m_context;
-    std::stack<FunctionNode*>   m_funcs;
-    std::stack<ScopeNode*>      m_scopes;
-    std::vector<FunctionNode*>  m_functions;
-    Mode                        m_mode;
 };
 
 } // namespace lang

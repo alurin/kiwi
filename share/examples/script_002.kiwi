@@ -1,9 +1,7 @@
-bool main()
+void main()
 {
-    int  $a;
-    int  $b;
-    bool $c;
-    $c = $a == $b;
-
-    return $c;
+    int $a;
+    int $b;
+    $a = 10;
+    return $a == $b;
 }

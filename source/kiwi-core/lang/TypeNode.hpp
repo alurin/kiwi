@@ -40,26 +40,6 @@ namespace lang
         TypeRef m_type;
     };
 
-    /// Type factory for parser
-    class TypeFactory
-    {
-    public:
-        TypeFactory(ContextRef context);
-
-        TypeNode* getVoid();
-
-        TypeNode* getInt();
-
-        TypeNode* getBool();
-
-        TypeNode* getString();
-
-        TypeNode* getArray(TypeNode* type);
-
-    protected:
-        ContextRef m_context;
-    };
-
 }}
 
 #endif

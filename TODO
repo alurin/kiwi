@@ -4,3 +4,6 @@ TODO
     * Script:  insert/wrap as method of current object
     * Inplace: insert/wrap as members of current object
     * Object:  insert/wrap as member of current module
+
+* Threat all parse errors as exception
+* Clean up deletes for all classes

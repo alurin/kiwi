@@ -82,6 +82,11 @@ typedef kiwi::lang::Parser::token_type token_type;
 "bool"   { return token::TYPE_BOOL;   }
 "string" { return token::TYPE_STRING; }
 
+"return" { return token::RETURN;      }
+"if"     { return token::IF;          }
+"else"   { return token::ELSE;        }
+"ifelse" { return token::IFELSE;      }
+
  /* Unix command */
 ^#!.*$ {
     return token::UNIX_SCRIPT;

@@ -17,11 +17,11 @@ namespace lang {
     using codegen::StatementGen;
     using codegen::VariableGen;
 
-    class LeftNode : Node {
+    class LeftNode : public Node {
     public:
         virtual ExpressionGen emit(const ExpressionGen& gen) =0;
     };
-    class RightNode : Node {
+    class RightNode : public Node {
     public:
         virtual ExpressionGen emit(const StatementGen& value) =0;
     };
@@ -122,120 +122,6 @@ namespace lang {
     protected:
         ContextRef  m_context;
         int32_t     m_value;
-    };
-
-    class ExpressionFactory {
-    public:
-        ExpressionFactory(ContextRef context)
-        : m_context(context) { }
-
-        RightNode* getNeg(RightNode* value)
-        {
-            return new UnaryNode(UnaryOperator::NEG, value);
-        }
-
-        RightNode* getPos(RightNode* value)
-        {
-            return new UnaryNode(UnaryOperator::POS, value);
-        }
-
-        RightNode* getNot(RightNode* value)
-        {
-            return new UnaryNode(UnaryOperator::NOT, value);
-        }
-
-        RightNode* getDec(RightNode* value, bool post = false)
-        {
-            return new UnaryNode(UnaryOperator::DEC, value, post);
-        }
-
-        RightNode* getInc(RightNode* value, bool post = false)
-        {
-            return new UnaryNode(UnaryOperator::INC, value, post);
-        }
-
-        RightNode* getAdd(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::ADD, left, right);
-        }
-
-        RightNode* getSub(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::SUB, left, right);
-        }
-
-        RightNode* getMul(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::MUL, left, right);
-        }
-
-        RightNode* getDiv(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::DIV, left, right);
-        }
-
-        RightNode* getLsh(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::LSH, left, right);
-        }
-
-        RightNode* getRsh(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::RSH, left, right);
-        }
-
-        RightNode* getOr(RightNode* left, RightNode* right, bool logic = false)
-        {
-            return new BinaryNode(BinaryOperator::OR, left, right, logic);
-        }
-
-        RightNode* getAnd(RightNode* left, RightNode* right, bool logic = false)
-        {
-            return new BinaryNode(BinaryOperator::AND, left, right, logic);
-        }
-
-        RightNode* getEq(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::EQ, left, right);
-        }
-
-        RightNode* getNeq(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::NEQ, left, right);
-        }
-
-        RightNode* getGe(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::GE, left, right);
-        }
-
-        RightNode* getLe(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::LE, left, right);
-        }
-
-        RightNode* getGt(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::GT, left, right);
-        }
-
-        RightNode* getLt(RightNode* left, RightNode* right)
-        {
-            return new BinaryNode(BinaryOperator::LT, left, right);
-        }
-
-        RightNode* getAssign(LeftNode* left, RightNode* right)
-        {
-            return new AssignNode(left, right);
-        }
-
-        RightNode* getInt(int32_t value)
-        {
-            return new IntegerConstNode(m_context, value);
-        }
-
-    protected:
-        ContextRef  m_context;
     };
 }}
 

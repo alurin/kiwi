@@ -11,6 +11,7 @@ namespace kiwi
     public:
         TypeRef int32Ty;
         TypeRef boolTy;
+        TypeRef voidTy;
     };
 }
 

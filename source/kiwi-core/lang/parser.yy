@@ -100,6 +100,11 @@
 %token                  TYPE_BOOL           "bool"
 %token                  TYPE_STRING         "string"
 
+%token                  RETURN              "return"
+%token                  IF                  "if"
+%token                  ELSE                "else"
+%token                  IFELSE              "ifelse"
+
 %left       '=' "+=" "-=" "/=" "*=" "<<=" ">>=" "&=" "|="
 %left       "||"
 %left       "&&"
@@ -117,11 +122,11 @@
 %type   <typenode>      type type_complex type_primary
 %type   <rightnode>     expression right
 %type   <leftnode>      left
-%type   <stmtnode>      scope
+%type   <stmtnode>      scope return_statement
 
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
 %destructor { delete $$; } type type_complex type_primary
-%destructor { delete $$; } scope
+%destructor { delete $$; } scope return_statement
 
  /*** END EXAMPLE - Change the example grammar's tokens above ***/
 
@@ -177,6 +182,7 @@ statements
     : /** empty */
     | expression ';'        { driver.scope()->append($1); } statements
     | scope                 { driver.scope()->append($1); } statements
+    | return_statement      { driver.scope()->append($1); } statements
 
     | variable_declare ';' statements
     | ';'
@@ -191,6 +197,15 @@ scope_end
     : statements '}'    { driver.scopeEnd(); }
     ;
 
+return_statement
+    : RETURN ';'                    { $$ = driver.createReturn(@1);     }
+    | RETURN expression ';'         { $$ = driver.createReturn($2, @1); }
+    ;
+
+conditional
+    : IF '(' expression ')' scope
+    ;
+
 //==------------------------------------------------------------------------==//
 //      Expressions
 //==------------------------------------------------------------------------==//
@@ -200,41 +215,41 @@ variable_declare
     ;
 
 expression
-    : '-' expression %prec UNARY    { $$ = driver.expr()->getNeg($2); }
-    | '+' expression %prec UNARY    { $$ = driver.expr()->getPos($2); }
-    | '!' expression %prec UNARY    { $$ = driver.expr()->getNot($2); }
+    : '-' expression %prec UNARY    { $$ = driver.createNeg($2, @1); }
+    | '+' expression %prec UNARY    { $$ = driver.createPos($2, @1); }
+    | '!' expression %prec UNARY    { $$ = driver.createNot($2, @1); }
 
 
-    | expression '+'   expression   { $$ = driver.expr()->getAdd($1, $3); }
-    | expression '-'   expression   { $$ = driver.expr()->getSub($1, $3); }
-    | expression '*'   expression   { $$ = driver.expr()->getMul($1, $3); }
-    | expression '/'   expression   { $$ = driver.expr()->getDiv($1, $3); }
-    | expression "<<"  expression   { $$ = driver.expr()->getLsh($1, $3); }
-    | expression ">>"  expression   { $$ = driver.expr()->getRsh($1, $3); }
+    | expression '+'   expression   { $$ = driver.createAdd($1, $3, @2); }
+    | expression '-'   expression   { $$ = driver.createSub($1, $3, @2); }
+    | expression '*'   expression   { $$ = driver.createMul($1, $3, @2); }
+    | expression '/'   expression   { $$ = driver.createDiv($1, $3, @2); }
+    | expression "<<"  expression   { $$ = driver.createLsh($1, $3, @2); }
+    | expression ">>"  expression   { $$ = driver.createRsh($1, $3, @2); }
 
-    | expression '|'   expression   { $$ = driver.expr()->getOr($1, $3); }
-    | expression "||"  expression   { $$ = driver.expr()->getOr($1, $3, true); }
-    | expression '&'   expression   { $$ = driver.expr()->getAnd($1, $3); }
-    | expression "&&"  expression   { $$ = driver.expr()->getAnd($1, $3, true); }
+    | expression '|'   expression   { $$ = driver.createOr ($1, $3, false, @2); }
+    | expression "||"  expression   { $$ = driver.createOr ($1, $3, true,  @2); }
+    | expression '&'   expression   { $$ = driver.createAnd($1, $3, false, @2); }
+    | expression "&&"  expression   { $$ = driver.createAnd($1, $3, true,  @2); }
 
-    | expression "=="  expression   { $$ = driver.expr()->getEq($1, $3); }
-    | expression "!="  expression   { $$ = driver.expr()->getNeq($1, $3); }
-    | expression ">="  expression   { $$ = driver.expr()->getGe($1, $3); }
-    | expression "<="  expression   { $$ = driver.expr()->getLe($1, $3); }
-    | expression ">"   expression   { $$ = driver.expr()->getGt($1, $3); }
-    | expression "<"   expression   { $$ = driver.expr()->getLt($1, $3); }
+    | expression "=="  expression   { $$ = driver.createEq ($1, $3, @2); }
+    | expression "!="  expression   { $$ = driver.createNeq($1, $3, @2); }
+    | expression ">="  expression   { $$ = driver.createGe ($1, $3, @2); }
+    | expression "<="  expression   { $$ = driver.createLe ($1, $3, @2); }
+    | expression ">"   expression   { $$ = driver.createGt ($1, $3, @2); }
+    | expression "<"   expression   { $$ = driver.createLt ($1, $3, @2); }
 
-    | left       '='   expression   { $$ = driver.expr()->getAssign($1, $3); }
+    | left       '='   expression   { $$ = driver.createAssign($1, $3, @2); }
     | right
     ;
 
 left
-    : VAR_LOCAL                     { $$ = driver.scope()->get(*$1)->getLeft(); }
+    : VAR_LOCAL                     { $$ = driver.left(*$1, @1); }
     ;
 
 right
-    : VAR_LOCAL                     { $$ = driver.scope()->get(*$1)->getRight(); }
-    | INTEGER                       { $$ = driver.expr()->getInt($1);            }
+    : VAR_LOCAL                     { $$ = driver.right(*$1, @1); }
+    | INTEGER                       { $$ = driver.createInt($1, @1);          }
     | '(' expression ')'            { $$ = $2; }
     ;
 
@@ -245,17 +260,17 @@ right
 type
     : type_complex
     | type_primary
-    | TYPE_VOID             { $$ = driver.type()->getVoid();    }
+    | TYPE_VOID             { $$ = driver.createVoidTy(@1);    }
     ;
 
 type_complex
-    : type_primary '[' ']'  { $$ = driver.type()->getArray($1); }
+    : type_primary '[' ']'  { $$ = driver.createArrayTy($1, @2 + @3); }
     ;
 
 type_primary
-    : TYPE_INT              { $$ = driver.type()->getInt();     }
-    | TYPE_BOOL             { $$ = driver.type()->getBool();  }
-    | TYPE_STRING           { $$ = driver.type()->getString();  }
+    : TYPE_INT              { $$ = driver.createIntTy(@1);     }
+    | TYPE_BOOL             { $$ = driver.createBoolTy(@1);    }
+    | TYPE_STRING           { $$ = driver.createStringTy(@1);  }
     ;
 
 /** START POINT **/

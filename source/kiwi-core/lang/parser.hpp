@@ -175,8 +175,12 @@ namespace kiwi { namespace lang {
      TYPE_INT = 283,
      TYPE_BOOL = 284,
      TYPE_STRING = 285,
-     UNARY = 286,
-     PRE = 287
+     RETURN = 286,
+     IF = 287,
+     ELSE = 288,
+     IFELSE = 289,
+     UNARY = 290,
+     PRE = 291
    };
 
     };
@@ -353,7 +357,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 357 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 361 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
 
 
 

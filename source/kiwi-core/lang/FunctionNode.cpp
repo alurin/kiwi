@@ -8,16 +8,11 @@
 #include <llvm/DerivedTypes.h>
 #include <llvm/Function.h>
 #include <llvm/Instructions.h>
+#include <llvm/Constant.h>
 #include <vector>
 
 using namespace kiwi;
 using namespace kiwi::lang;
-
-StatementNode::StatementNode(ScopeNode* parent)
-: o_owner(parent->o_owner), o_parent(parent) { }
-
-StatementNode::StatementNode(FunctionNode* parent)
-: o_owner(parent), o_parent(0) { }
 
 NamedNode::NamedNode(FunctionNode* owner, TypeNode* type)
 : o_owner(owner), m_type(type) { }
@@ -143,13 +138,9 @@ RightNode* VariableNode::getRight()
     return new VariableRightNode(this);
 }
 
-
-///=== DEBUG ===
-#include <iostream>
-
 void FunctionNode::generate(ModuleRef module)
 {
-    // prepare arguments
+    // prepare result
     llvm::Type*                 resultType = 0;
     std::vector<llvm::Type*>    argTypes;
     std::vector<ArgumentNode*>  argLists;
@@ -159,7 +150,7 @@ void FunctionNode::generate(ModuleRef module)
         resultType   = type->getVarType();
     }
 
-
+    // perpare arguments
     for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i)
     {
         ArgumentNode* arg = i->second;
@@ -191,20 +182,33 @@ void FunctionNode::generate(ModuleRef module)
         }
     }
 
+    // emit instructions
     StatementGen gen(entry);
-    m_root->emit(module, gen);
+    gen = m_root->emit(gen);
+
+    /// emit terminator for last block
+    if (!gen.getBlock()->getTerminator()) {
+        if (resultType->isVoidTy()) {
+            llvm::ReturnInst::Create(gen.getContext(), gen.getBlock());
+        } else {
+            llvm::Value* result = llvm::Constant::getNullValue(resultType);
+            llvm::ReturnInst::Create(gen.getContext(), result, gen.getBlock());
+        }
+    }
 }
 
-StatementGen ScopeNode::emit(ModuleRef module, const StatementGen& gen)
+StatementGen ScopeNode::emit(const StatementGen& gen)
 {
     // emit mutable variables
     for (std::map<Identifier, VariableNode*>::iterator i = m_vars.begin(); i != m_vars.end(); ++i)
     {
         VariableNode* var = i->second;
 
-        TypeRef type            = var->getType()->get();
-        llvm::Type* var_type    = type->getVarType();
-        llvm::AllocaInst* value = new llvm::AllocaInst(var_type, i->first, gen.getBlock());
+        TypeRef type             = var->getType()->get();
+        llvm::Type* var_type     = type->getVarType();
+        llvm::Value* var_default = llvm::Constant::getNullValue(var_type);
+        llvm::AllocaInst* value  = new llvm::AllocaInst(var_type, i->first, gen.getBlock());
+        new llvm::StoreInst(value, var_default, gen.getBlock());
 
         VariableGen vargen(type, value);
         var->setGenerator(vargen);
@@ -215,12 +219,12 @@ StatementGen ScopeNode::emit(ModuleRef module, const StatementGen& gen)
     for (std::vector<StatementNode*>::iterator i = m_stmts.begin(); i != m_stmts.end(); ++i)
     {
         StatementNode* stmt = *i;
-        result = stmt->emit(module, result);
+        result = stmt->emit(result);
     }
     return result;
 }
 
-StatementGen ExpressionNode::emit(ModuleRef module, const StatementGen& gen)
+StatementGen ExpressionNode::emit(const StatementGen& gen)
 {
     return m_expr->emit(gen);
 }

@@ -60,7 +60,7 @@
 /* User implementation prologue.  */
 
 /* Line 317 of lalr1.cc  */
-#line 128 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 133 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 
 
 #include "Driver.hpp"
@@ -247,7 +247,7 @@ namespace kiwi { namespace lang {
         case 23: /* "\"identifier\"" */
 
 /* Line 480 of lalr1.cc  */
-#line 122 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 127 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 	{ delete (yyvaluep->stringVal); };
 
 /* Line 480 of lalr1.cc  */
@@ -256,7 +256,7 @@ namespace kiwi { namespace lang {
       case 25: /* "\"local variable\"" */
 
 /* Line 480 of lalr1.cc  */
-#line 122 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 127 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 	{ delete (yyvaluep->stringVal); };
 
 /* Line 480 of lalr1.cc  */
@@ -265,47 +265,56 @@ namespace kiwi { namespace lang {
       case 26: /* "\"instance attribute\"" */
 
 /* Line 480 of lalr1.cc  */
-#line 122 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 127 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 	{ delete (yyvaluep->stringVal); };
 
 /* Line 480 of lalr1.cc  */
 #line 273 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
 	break;
-      case 65: /* "scope" */
+      case 70: /* "scope" */
 
 /* Line 480 of lalr1.cc  */
-#line 124 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 129 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 	{ delete (yyvaluep->stmtnode); };
 
 /* Line 480 of lalr1.cc  */
 #line 282 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
 	break;
-      case 72: /* "type" */
+      case 73: /* "return_statement" */
 
 /* Line 480 of lalr1.cc  */
-#line 123 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-	{ delete (yyvaluep->typenode); };
+#line 129 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+	{ delete (yyvaluep->stmtnode); };
 
 /* Line 480 of lalr1.cc  */
 #line 291 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
 	break;
-      case 73: /* "type_complex" */
+      case 78: /* "type" */
 
 /* Line 480 of lalr1.cc  */
-#line 123 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 128 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 	{ delete (yyvaluep->typenode); };
 
 /* Line 480 of lalr1.cc  */
 #line 300 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
 	break;
-      case 74: /* "type_primary" */
+      case 79: /* "type_complex" */
 
 /* Line 480 of lalr1.cc  */
-#line 123 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 128 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
 	{ delete (yyvaluep->typenode); };
 
 /* Line 480 of lalr1.cc  */
 #line 309 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+	break;
+      case 80: /* "type_primary" */
+
+/* Line 480 of lalr1.cc  */
+#line 128 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+	{ delete (yyvaluep->typenode); };
+
+/* Line 480 of lalr1.cc  */
+#line 318 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
 	break;
 
 	default:
@@ -391,7 +400,7 @@ namespace kiwi { namespace lang {
 }
 
 /* Line 553 of lalr1.cc  */
-#line 395 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 404 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
 
     /* Initialize the stacks.  The initial state will be pushed in
        yynewstate, since the latter expects the semantical and the
@@ -510,266 +519,287 @@ namespace kiwi { namespace lang {
 	  case 2:
 
 /* Line 678 of lalr1.cc  */
-#line 149 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 154 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
     { driver.func(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode)); }
     break;
 
   case 3:
 
 /* Line 678 of lalr1.cc  */
-#line 152 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 157 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
     { driver.funcEnd();     }
     break;
 
   case 8:
 
 /* Line 678 of lalr1.cc  */
-#line 166 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 171 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
     { driver.func()->declare(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode)); }
     break;
 
   case 11:
 
 /* Line 678 of lalr1.cc  */
-#line 178 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 183 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
     { driver.scope()->append((yysemantic_stack_[(2) - (1)].rightnode)); }
     break;
 
   case 13:
 
 /* Line 678 of lalr1.cc  */
-#line 179 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 184 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
     { driver.scope()->append((yysemantic_stack_[(1) - (1)].stmtnode)); }
     break;
 
-  case 17:
+  case 15:
 
 /* Line 678 of lalr1.cc  */
-#line 186 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { driver.scopeBegin(); }
+#line 185 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { driver.scope()->append((yysemantic_stack_[(1) - (1)].stmtnode)); }
     break;
 
   case 19:
 
 /* Line 678 of lalr1.cc  */
-#line 191 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { driver.scopeEnd(); }
-    break;
-
-  case 20:
-
-/* Line 678 of lalr1.cc  */
-#line 199 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { driver.scope()->declare(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode)); }
+#line 192 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { driver.scopeBegin(); }
     break;
 
   case 21:
 
 /* Line 678 of lalr1.cc  */
-#line 203 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getNeg((yysemantic_stack_[(2) - (2)].rightnode)); }
+#line 197 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { driver.scopeEnd(); }
     break;
 
   case 22:
 
 /* Line 678 of lalr1.cc  */
-#line 204 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getPos((yysemantic_stack_[(2) - (2)].rightnode)); }
+#line 201 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.stmtnode) = driver.createReturn((yylocation_stack_[(2) - (1)]));     }
     break;
 
   case 23:
 
 /* Line 678 of lalr1.cc  */
-#line 205 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getNot((yysemantic_stack_[(2) - (2)].rightnode)); }
+#line 202 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.stmtnode) = driver.createReturn((yysemantic_stack_[(3) - (2)].rightnode), (yylocation_stack_[(3) - (1)])); }
     break;
 
   case 24:
 
 /* Line 678 of lalr1.cc  */
-#line 208 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getAdd((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 214 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { driver.scope()->declare(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode)); }
     break;
 
   case 25:
 
 /* Line 678 of lalr1.cc  */
-#line 209 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getSub((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 218 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createNeg((yysemantic_stack_[(2) - (2)].rightnode), (yylocation_stack_[(2) - (1)])); }
     break;
 
   case 26:
 
 /* Line 678 of lalr1.cc  */
-#line 210 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getMul((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 219 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createPos((yysemantic_stack_[(2) - (2)].rightnode), (yylocation_stack_[(2) - (1)])); }
     break;
 
   case 27:
 
 /* Line 678 of lalr1.cc  */
-#line 211 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getDiv((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 220 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createNot((yysemantic_stack_[(2) - (2)].rightnode), (yylocation_stack_[(2) - (1)])); }
     break;
 
   case 28:
 
 /* Line 678 of lalr1.cc  */
-#line 212 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getLsh((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 223 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createAdd((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 29:
 
 /* Line 678 of lalr1.cc  */
-#line 213 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getRsh((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 224 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createSub((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 30:
 
 /* Line 678 of lalr1.cc  */
-#line 215 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getOr((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 225 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createMul((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 31:
 
 /* Line 678 of lalr1.cc  */
-#line 216 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getOr((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), true); }
+#line 226 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createDiv((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 32:
 
 /* Line 678 of lalr1.cc  */
-#line 217 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getAnd((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 227 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createLsh((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 33:
 
 /* Line 678 of lalr1.cc  */
-#line 218 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getAnd((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), true); }
+#line 228 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createRsh((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 34:
 
 /* Line 678 of lalr1.cc  */
-#line 220 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getEq((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 230 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createOr ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), false, (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 35:
 
 /* Line 678 of lalr1.cc  */
-#line 221 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getNeq((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 231 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createOr ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), true,  (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 36:
 
 /* Line 678 of lalr1.cc  */
-#line 222 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getGe((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 232 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createAnd((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), false, (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 37:
 
 /* Line 678 of lalr1.cc  */
-#line 223 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getLe((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 233 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createAnd((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), true,  (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 38:
 
 /* Line 678 of lalr1.cc  */
-#line 224 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getGt((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 235 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createEq ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 39:
 
 /* Line 678 of lalr1.cc  */
-#line 225 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getLt((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 236 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createNeq((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 40:
 
 /* Line 678 of lalr1.cc  */
-#line 227 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getAssign((yysemantic_stack_[(3) - (1)].leftnode), (yysemantic_stack_[(3) - (3)].rightnode)); }
+#line 237 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createGe ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
+    break;
+
+  case 41:
+
+/* Line 678 of lalr1.cc  */
+#line 238 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createLe ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 42:
 
 /* Line 678 of lalr1.cc  */
-#line 232 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.leftnode) = driver.scope()->get(*(yysemantic_stack_[(1) - (1)].stringVal))->getLeft(); }
+#line 239 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createGt ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 43:
 
 /* Line 678 of lalr1.cc  */
-#line 236 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.scope()->get(*(yysemantic_stack_[(1) - (1)].stringVal))->getRight(); }
+#line 240 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createLt ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 44:
 
 /* Line 678 of lalr1.cc  */
-#line 237 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = driver.expr()->getInt((yysemantic_stack_[(1) - (1)].integerVal));            }
+#line 242 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createAssign((yysemantic_stack_[(3) - (1)].leftnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
-  case 45:
+  case 46:
 
 /* Line 678 of lalr1.cc  */
-#line 238 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.rightnode) = (yysemantic_stack_[(3) - (2)].rightnode); }
+#line 247 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.leftnode) = driver.left(*(yysemantic_stack_[(1) - (1)].stringVal), (yylocation_stack_[(1) - (1)])); }
+    break;
+
+  case 47:
+
+/* Line 678 of lalr1.cc  */
+#line 251 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.right(*(yysemantic_stack_[(1) - (1)].stringVal), (yylocation_stack_[(1) - (1)])); }
     break;
 
   case 48:
 
 /* Line 678 of lalr1.cc  */
-#line 248 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.typenode) = driver.type()->getVoid();    }
+#line 252 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = driver.createInt((yysemantic_stack_[(1) - (1)].integerVal), (yylocation_stack_[(1) - (1)]));          }
     break;
 
   case 49:
 
 /* Line 678 of lalr1.cc  */
-#line 252 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.typenode) = driver.type()->getArray((yysemantic_stack_[(3) - (1)].typenode)); }
-    break;
-
-  case 50:
-
-/* Line 678 of lalr1.cc  */
-#line 256 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.typenode) = driver.type()->getInt();     }
-    break;
-
-  case 51:
-
-/* Line 678 of lalr1.cc  */
-#line 257 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.typenode) = driver.type()->getBool();  }
+#line 253 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.rightnode) = (yysemantic_stack_[(3) - (2)].rightnode); }
     break;
 
   case 52:
 
 /* Line 678 of lalr1.cc  */
-#line 258 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { (yyval.typenode) = driver.type()->getString();  }
+#line 263 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.typenode) = driver.createVoidTy((yylocation_stack_[(1) - (1)]));    }
+    break;
+
+  case 53:
+
+/* Line 678 of lalr1.cc  */
+#line 267 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.typenode) = driver.createArrayTy((yysemantic_stack_[(3) - (1)].typenode), (yylocation_stack_[(3) - (2)]) + (yylocation_stack_[(3) - (3)])); }
+    break;
+
+  case 54:
+
+/* Line 678 of lalr1.cc  */
+#line 271 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.typenode) = driver.createIntTy((yylocation_stack_[(1) - (1)]));     }
+    break;
+
+  case 55:
+
+/* Line 678 of lalr1.cc  */
+#line 272 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.typenode) = driver.createBoolTy((yylocation_stack_[(1) - (1)]));    }
+    break;
+
+  case 56:
+
+/* Line 678 of lalr1.cc  */
+#line 273 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+    { (yyval.typenode) = driver.createStringTy((yylocation_stack_[(1) - (1)]));  }
     break;
 
 
 
 /* Line 678 of lalr1.cc  */
-#line 773 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 803 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
 	default:
           break;
       }
@@ -974,20 +1004,21 @@ namespace kiwi { namespace lang {
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-  const signed char Parser::yypact_ninf_ = -32;
+  const signed char Parser::yypact_ninf_ = -41;
   const short int
   Parser::yypact_[] =
   {
-       -11,   -32,   -32,   -32,   -32,   -11,     0,   -32,   -20,    26,
-      29,   -32,   -24,   -32,   -32,    -7,   -32,   -11,    -3,     1,
-     -32,    27,    -4,   -11,   -32,   192,   -32,   -32,   -32,    22,
-     199,   199,   199,   199,   -32,   -32,     4,   -32,    16,    -5,
-      42,   -32,    49,   -31,   -31,   -31,     3,   192,   -32,   192,
-     192,   199,   199,   199,   199,   199,   199,   199,   199,   199,
-     199,   199,   199,   199,   199,   -32,   199,   199,   199,   -32,
-     -32,    28,   -32,   -32,   -32,   209,   209,    60,    70,   115,
-     115,   134,   134,   105,   123,    48,    48,   -31,   -31,   192,
-      52,    52,    52,   -32,   -32
+       121,   -41,   -41,   -41,   -41,   121,    -3,   -41,   -27,    27,
+      41,   -41,   -16,   -41,   -41,     0,   -41,   121,     6,    20,
+     -41,    57,    28,   121,   -41,   213,   -41,   -41,   -41,    50,
+     224,   164,   164,   164,   164,   -41,   -41,    37,   -41,   -41,
+      39,    -5,    71,   -41,    70,   -41,     3,   -40,   -40,   -40,
+      56,   213,   -41,   213,   213,   213,   164,   164,   164,   164,
+     164,   164,   164,   164,   164,   164,   164,   164,   164,   164,
+     -41,   164,   164,   164,   -41,   -41,   -41,    76,   -41,   -41,
+     -41,   -41,    60,    60,    78,   117,    13,    13,   160,   160,
+     127,   135,    -9,    -9,   -40,   -40,   213,    68,    68,    68,
+     -41,   -41
   };
 
   /* YYDEFACT[S] -- default rule to reduce with in state S when YYTABLE
@@ -996,70 +1027,72 @@ namespace kiwi { namespace lang {
   const unsigned char
   Parser::yydefact_[] =
   {
-        53,    48,    50,    51,    52,    53,     0,    46,    47,     0,
-       0,     2,     0,     1,    54,     0,    49,     4,     0,     5,
-       7,     0,     0,     0,     8,    10,     3,     6,    44,    43,
-       0,     0,     0,     0,    17,    16,     0,    13,     0,     0,
-       0,    41,     0,    21,    22,    23,     0,    10,     9,    10,
-      10,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    11,     0,     0,     0,    20,
-      45,     0,    18,    14,    15,    28,    29,    31,    33,    34,
-      35,    36,    37,    30,    32,    25,    24,    26,    27,    10,
-      38,    39,    40,    19,    12
+        57,    52,    54,    55,    56,    57,     0,    50,    51,     0,
+       0,     2,     0,     1,    58,     0,    53,     4,     0,     5,
+       7,     0,     0,     0,     8,    10,     3,     6,    48,    47,
+       0,     0,     0,     0,     0,    19,    18,     0,    13,    15,
+       0,     0,     0,    45,     0,    22,     0,    25,    26,    27,
+       0,    10,     9,    10,    10,    10,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+      11,     0,     0,     0,    24,    23,    49,     0,    20,    14,
+      16,    17,    32,    33,    35,    37,    38,    39,    40,    41,
+      34,    36,    29,    28,    30,    31,    10,    42,    43,    44,
+      21,    12
   };
 
   /* YYPGOTO[NTERM-NUM].  */
   const short int
   Parser::yypgoto_[] =
   {
-       -32,   -32,   -32,   -32,   -32,    54,   -32,   100,   -32,   -32,
-     -32,   -32,   -32,   -32,   147,   -32,   -32,    20,   -32,   -32,
-      46
+       -41,   -41,   -41,   -41,   -41,   108,   -41,   -25,   -41,   -41,
+     -41,   -41,   -41,   -41,   -41,   -41,   163,   -41,   -41,   255,
+     -41,   -41,   137
   };
 
   /* YYDEFGOTO[NTERM-NUM].  */
   const signed char
   Parser::yydefgoto_[] =
   {
-        -1,     5,    15,    18,    19,    20,    26,    36,    89,    49,
-      37,    47,    72,    38,    39,    40,    41,    42,     7,     8,
-       9
+        -1,     5,    15,    18,    19,    20,    26,    37,    96,    53,
+      54,    38,    51,    78,    39,    40,    41,    42,    43,    44,
+       7,     8,     9
   };
 
   /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
      positive, shift that token.  If negative, reduce the rule which
      number is the opposite.  If zero, do what YYDEFACT says.  */
-  const signed char Parser::yytable_ninf_ = -43;
+  const signed char Parser::yytable_ninf_ = -47;
   const signed char
   Parser::yytable_[] =
   {
-        51,    52,    53,    54,    55,    56,    57,    58,    51,    52,
-      53,    54,    55,    56,    57,    58,     1,     2,     3,     4,
-       6,    66,    67,    11,    12,     6,    13,    59,    60,    14,
-      16,    61,    62,    63,    64,    59,    60,    21,    17,    61,
-      62,    63,    64,    21,    22,    25,    65,    66,    67,    23,
-      70,    10,    24,   -42,    48,    66,    67,    51,    52,    53,
-      54,    55,    56,    57,    58,    51,    52,    50,    54,    55,
-      56,    57,    58,    68,    69,    51,    52,    27,    93,    55,
-      56,    57,    58,     0,    59,    60,    63,    64,    61,    62,
-      63,    64,    59,    60,     0,     0,    61,    62,    63,    64,
-      66,    67,    59,    60,    66,    67,    61,    62,    63,    64,
-      51,    52,    66,    67,    55,    56,    57,    58,     0,     0,
-      51,    52,    66,    67,   -43,   -43,    57,    58,    51,    52,
-       0,     0,    55,    56,    57,    58,     0,     0,    60,    51,
-      52,    61,    62,    63,    64,   -43,   -43,    71,     0,    73,
-      74,    61,    62,    63,    64,     0,     0,    66,    67,    61,
-      62,    63,    64,     0,     0,     0,     0,    66,    67,     0,
-      61,    62,    63,    64,     0,    66,    67,    43,    44,    45,
-      46,     0,     0,     0,     0,     0,    66,    67,     0,    94,
-       0,     0,     0,     0,     0,     0,     0,     0,    75,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,    88,     0,    90,    91,    92,    28,    29,     0,     1,
-       2,     3,     4,    28,    29,     0,     0,     0,    30,    31,
-       0,     0,     0,    32,     0,    30,    31,    33,     0,     0,
-      32,    34,     0,    35,    33,    61,    62,    63,    64,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,    66,    67
+        56,    57,    58,    59,    60,    61,    62,    63,    56,    57,
+      58,    59,    60,    61,    62,    63,    71,    72,    56,    57,
+      11,    12,   -47,   -47,    62,    63,    77,    13,    79,    80,
+      81,    64,    65,    68,    69,    66,    67,    68,    69,    64,
+      65,    14,    16,    66,    67,    68,    69,    71,    72,    17,
+      70,    71,    72,    66,    67,    68,    69,    22,    75,    71,
+      72,    56,    57,    58,    59,    60,    61,    62,    63,    71,
+      72,   101,    23,    56,    57,    58,    59,    60,    61,    62,
+      63,    25,    24,    56,    57,   -46,    59,    60,    61,    62,
+      63,    52,    64,    65,    55,    74,    66,    67,    68,    69,
+      66,    67,    68,    69,    64,    65,    73,    76,    66,    67,
+      68,    69,    71,    72,    64,    65,    71,    72,    66,    67,
+      68,    69,    56,    57,    71,    72,    60,    61,    62,    63,
+     100,    27,    56,    57,    71,    72,    60,    61,    62,    63,
+      56,    57,    10,     0,    60,    61,    62,    63,     1,     2,
+       3,     4,     0,    64,    65,     0,     0,    66,    67,    68,
+      69,     0,     0,     0,    65,    56,    57,    66,    67,    68,
+      69,   -47,   -47,    71,    72,    66,    67,    68,    69,     0,
+       0,     0,     0,    71,    72,     0,     0,     0,    28,    29,
+       0,    71,    72,    46,    47,    48,    49,    50,     0,     0,
+      66,    67,    68,    69,    31,    32,     0,     0,     0,    33,
+       0,     0,     0,    34,     0,     0,    71,    72,     0,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,     0,    97,    98,    99,    28,    29,     0,
+       1,     2,     3,     4,    30,     0,     0,     0,    28,    29,
+       0,     0,     0,    31,    32,     6,     0,     0,    33,     0,
+       6,     0,    34,     0,    31,    32,    35,     0,    36,    33,
+       0,     0,    21,    34,     0,     0,     0,     0,    21,    45
   };
 
   /* YYCHECK.  */
@@ -1067,32 +1100,33 @@ namespace kiwi { namespace lang {
   Parser::yycheck_[] =
   {
          5,     6,     7,     8,     9,    10,    11,    12,     5,     6,
-       7,     8,     9,    10,    11,    12,    27,    28,    29,    30,
-       0,    52,    53,    23,    44,     5,     0,    32,    33,     0,
-      54,    36,    37,    38,    39,    32,    33,    17,    45,    36,
-      37,    38,    39,    23,    47,    49,    51,    52,    53,    48,
-      47,     5,    25,    31,    50,    52,    53,     5,     6,     7,
-       8,     9,    10,    11,    12,     5,     6,    51,     8,     9,
-      10,    11,    12,    31,    25,     5,     6,    23,    50,     9,
-      10,    11,    12,    -1,    32,    33,    38,    39,    36,    37,
-      38,    39,    32,    33,    -1,    -1,    36,    37,    38,    39,
-      52,    53,    32,    33,    52,    53,    36,    37,    38,    39,
-       5,     6,    52,    53,     9,    10,    11,    12,    -1,    -1,
-       5,     6,    52,    53,     9,    10,    11,    12,     5,     6,
-      -1,    -1,     9,    10,    11,    12,    -1,    -1,    33,     5,
-       6,    36,    37,    38,    39,    11,    12,    47,    -1,    49,
-      50,    36,    37,    38,    39,    -1,    -1,    52,    53,    36,
-      37,    38,    39,    -1,    -1,    -1,    -1,    52,    53,    -1,
-      36,    37,    38,    39,    -1,    52,    53,    30,    31,    32,
-      33,    -1,    -1,    -1,    -1,    -1,    52,    53,    -1,    89,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    51,    52,
-      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
-      63,    64,    -1,    66,    67,    68,    24,    25,    -1,    27,
-      28,    29,    30,    24,    25,    -1,    -1,    -1,    36,    37,
-      -1,    -1,    -1,    41,    -1,    36,    37,    45,    -1,    -1,
-      41,    49,    -1,    51,    45,    36,    37,    38,    39,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    52,    53
+       7,     8,     9,    10,    11,    12,    56,    57,     5,     6,
+      23,    48,     9,    10,    11,    12,    51,     0,    53,    54,
+      55,    36,    37,    42,    43,    40,    41,    42,    43,    36,
+      37,     0,    58,    40,    41,    42,    43,    56,    57,    49,
+      55,    56,    57,    40,    41,    42,    43,    51,    55,    56,
+      57,     5,     6,     7,     8,     9,    10,    11,    12,    56,
+      57,    96,    52,     5,     6,     7,     8,     9,    10,    11,
+      12,    53,    25,     5,     6,    35,     8,     9,    10,    11,
+      12,    54,    36,    37,    55,    25,    40,    41,    42,    43,
+      40,    41,    42,    43,    36,    37,    35,    51,    40,    41,
+      42,    43,    56,    57,    36,    37,    56,    57,    40,    41,
+      42,    43,     5,     6,    56,    57,     9,    10,    11,    12,
+      54,    23,     5,     6,    56,    57,     9,    10,    11,    12,
+       5,     6,     5,    -1,     9,    10,    11,    12,    27,    28,
+      29,    30,    -1,    36,    37,    -1,    -1,    40,    41,    42,
+      43,    -1,    -1,    -1,    37,     5,     6,    40,    41,    42,
+      43,    11,    12,    56,    57,    40,    41,    42,    43,    -1,
+      -1,    -1,    -1,    56,    57,    -1,    -1,    -1,    24,    25,
+      -1,    56,    57,    30,    31,    32,    33,    34,    -1,    -1,
+      40,    41,    42,    43,    40,    41,    -1,    -1,    -1,    45,
+      -1,    -1,    -1,    49,    -1,    -1,    56,    57,    -1,    56,
+      57,    58,    59,    60,    61,    62,    63,    64,    65,    66,
+      67,    68,    69,    -1,    71,    72,    73,    24,    25,    -1,
+      27,    28,    29,    30,    31,    -1,    -1,    -1,    24,    25,
+      -1,    -1,    -1,    40,    41,     0,    -1,    -1,    45,    -1,
+       5,    -1,    49,    -1,    40,    41,    53,    -1,    55,    45,
+      -1,    -1,    17,    49,    -1,    -1,    -1,    -1,    23,    55
   };
 
   /* STOS_[STATE-NUM] -- The (internal number of the) accessing
@@ -1100,16 +1134,17 @@ namespace kiwi { namespace lang {
   const unsigned char
   Parser::yystos_[] =
   {
-         0,    27,    28,    29,    30,    56,    72,    73,    74,    75,
-      75,    23,    44,     0,     0,    57,    54,    45,    58,    59,
-      60,    72,    47,    48,    25,    49,    61,    60,    24,    25,
-      36,    37,    41,    45,    49,    51,    62,    65,    68,    69,
-      70,    71,    72,    69,    69,    69,    69,    66,    50,    64,
-      51,     5,     6,     7,     8,     9,    10,    11,    12,    32,
-      33,    36,    37,    38,    39,    51,    52,    53,    31,    25,
-      47,    62,    67,    62,    62,    69,    69,    69,    69,    69,
-      69,    69,    69,    69,    69,    69,    69,    69,    69,    63,
-      69,    69,    69,    50,    62
+         0,    27,    28,    29,    30,    60,    78,    79,    80,    81,
+      81,    23,    48,     0,     0,    61,    58,    49,    62,    63,
+      64,    78,    51,    52,    25,    53,    65,    64,    24,    25,
+      31,    40,    41,    45,    49,    53,    55,    66,    70,    73,
+      74,    75,    76,    77,    78,    55,    75,    75,    75,    75,
+      75,    71,    54,    68,    69,    55,     5,     6,     7,     8,
+       9,    10,    11,    12,    36,    37,    40,    41,    42,    43,
+      55,    56,    57,    35,    25,    55,    51,    66,    72,    66,
+      66,    66,    75,    75,    75,    75,    75,    75,    75,    75,
+      75,    75,    75,    75,    75,    75,    67,    75,    75,    75,
+      54,    66
   };
 
 #if YYDEBUG
@@ -1121,9 +1156,9 @@ namespace kiwi { namespace lang {
          0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,    61,   124,    38,    60,    62,    45,    43,    42,    47,
-      37,    33,   286,    46,    91,    40,   287,    41,    44,   123,
-     125,    59,   288,   289,    93
+     285,   286,   287,   288,   289,    61,   124,    38,    60,    62,
+      45,    43,    42,    47,    37,    33,   290,    46,    91,    40,
+     291,    41,    44,   123,   125,    59,   292,   293,    93
   };
 #endif
 
@@ -1131,12 +1166,12 @@ namespace kiwi { namespace lang {
   const unsigned char
   Parser::yyr1_[] =
   {
-         0,    55,    57,    56,    58,    58,    59,    59,    60,    61,
-      62,    63,    62,    64,    62,    62,    62,    66,    65,    67,
-      68,    69,    69,    69,    69,    69,    69,    69,    69,    69,
-      69,    69,    69,    69,    69,    69,    69,    69,    69,    69,
-      69,    69,    70,    71,    71,    71,    72,    72,    72,    73,
-      74,    74,    74,    75,    75
+         0,    59,    61,    60,    62,    62,    63,    63,    64,    65,
+      66,    67,    66,    68,    66,    69,    66,    66,    66,    71,
+      70,    72,    73,    73,    74,    75,    75,    75,    75,    75,
+      75,    75,    75,    75,    75,    75,    75,    75,    75,    75,
+      75,    75,    75,    75,    75,    75,    76,    77,    77,    77,
+      78,    78,    78,    79,    80,    80,    80,    81,    81
   };
 
   /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
@@ -1144,11 +1179,11 @@ namespace kiwi { namespace lang {
   Parser::yyr2_[] =
   {
          0,     2,     0,     7,     0,     1,     3,     1,     2,     3,
-       0,     0,     4,     0,     3,     3,     1,     0,     3,     2,
-       2,     2,     2,     2,     3,     3,     3,     3,     3,     3,
+       0,     0,     4,     0,     3,     0,     3,     3,     1,     0,
+       3,     2,     2,     3,     2,     2,     2,     2,     3,     3,
        3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     1,     1,     1,     1,     3,     1,     1,     1,     3,
-       1,     1,     1,     0,     3
+       3,     3,     3,     3,     3,     1,     1,     1,     1,     3,
+       1,     1,     1,     3,     1,     1,     1,     0,     3
   };
 
 #if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
@@ -1163,13 +1198,14 @@ namespace kiwi { namespace lang {
   "\"/=\"", "\"*=\"", "\"<<=\"", "\">>=\"", "\"&=\"", "\"|=\"",
   "\"identifier\"", "\"integer\"", "\"local variable\"",
   "\"instance attribute\"", "\"void\"", "\"int\"", "\"bool\"",
-  "\"string\"", "'='", "'|'", "'&'", "'<'", "'>'", "'-'", "'+'", "'*'",
-  "'/'", "'%'", "'!'", "UNARY", "'.'", "'['", "'('", "PRE", "')'", "','",
-  "'{'", "'}'", "';'", "\">\"", "\"<\"", "']'", "$accept", "function",
-  "$@1", "function_arguments", "function_arguments_required",
-  "function_argument", "function_statement", "statements", "$@2", "$@3",
-  "scope", "$@4", "scope_end", "variable_declare", "expression", "left",
-  "right", "type", "type_complex", "type_primary", "start", 0
+  "\"string\"", "\"return\"", "\"if\"", "\"else\"", "\"ifelse\"", "'='",
+  "'|'", "'&'", "'<'", "'>'", "'-'", "'+'", "'*'", "'/'", "'%'", "'!'",
+  "UNARY", "'.'", "'['", "'('", "PRE", "')'", "','", "'{'", "'}'", "';'",
+  "\">\"", "\"<\"", "']'", "$accept", "function", "$@1",
+  "function_arguments", "function_arguments_required", "function_argument",
+  "function_statement", "statements", "$@2", "$@3", "$@4", "scope", "$@5",
+  "scope_end", "return_statement", "variable_declare", "expression",
+  "left", "right", "type", "type_complex", "type_primary", "start", 0
   };
 #endif
 
@@ -1178,23 +1214,24 @@ namespace kiwi { namespace lang {
   const Parser::rhs_number_type
   Parser::yyrhs_[] =
   {
-        75,     0,    -1,    -1,    72,    23,    57,    45,    58,    47,
-      61,    -1,    -1,    59,    -1,    59,    48,    60,    -1,    60,
-      -1,    72,    25,    -1,    49,    62,    50,    -1,    -1,    -1,
-      69,    51,    63,    62,    -1,    -1,    65,    64,    62,    -1,
-      68,    51,    62,    -1,    51,    -1,    -1,    49,    66,    67,
-      -1,    62,    50,    -1,    72,    25,    -1,    36,    69,    -1,
-      37,    69,    -1,    41,    69,    -1,    69,    37,    69,    -1,
-      69,    36,    69,    -1,    69,    38,    69,    -1,    69,    39,
-      69,    -1,    69,     5,    69,    -1,    69,     6,    69,    -1,
-      69,    32,    69,    -1,    69,     7,    69,    -1,    69,    33,
-      69,    -1,    69,     8,    69,    -1,    69,     9,    69,    -1,
-      69,    10,    69,    -1,    69,    11,    69,    -1,    69,    12,
-      69,    -1,    69,    52,    69,    -1,    69,    53,    69,    -1,
-      70,    31,    69,    -1,    71,    -1,    25,    -1,    25,    -1,
-      24,    -1,    45,    69,    47,    -1,    73,    -1,    74,    -1,
-      27,    -1,    74,    44,    54,    -1,    28,    -1,    29,    -1,
-      30,    -1,    -1,    56,    75,     0,    -1
+        81,     0,    -1,    -1,    78,    23,    61,    49,    62,    51,
+      65,    -1,    -1,    63,    -1,    63,    52,    64,    -1,    64,
+      -1,    78,    25,    -1,    53,    66,    54,    -1,    -1,    -1,
+      75,    55,    67,    66,    -1,    -1,    70,    68,    66,    -1,
+      -1,    73,    69,    66,    -1,    74,    55,    66,    -1,    55,
+      -1,    -1,    53,    71,    72,    -1,    66,    54,    -1,    31,
+      55,    -1,    31,    75,    55,    -1,    78,    25,    -1,    40,
+      75,    -1,    41,    75,    -1,    45,    75,    -1,    75,    41,
+      75,    -1,    75,    40,    75,    -1,    75,    42,    75,    -1,
+      75,    43,    75,    -1,    75,     5,    75,    -1,    75,     6,
+      75,    -1,    75,    36,    75,    -1,    75,     7,    75,    -1,
+      75,    37,    75,    -1,    75,     8,    75,    -1,    75,     9,
+      75,    -1,    75,    10,    75,    -1,    75,    11,    75,    -1,
+      75,    12,    75,    -1,    75,    56,    75,    -1,    75,    57,
+      75,    -1,    76,    35,    75,    -1,    77,    -1,    25,    -1,
+      25,    -1,    24,    -1,    49,    75,    51,    -1,    79,    -1,
+      80,    -1,    27,    -1,    80,    48,    58,    -1,    28,    -1,
+      29,    -1,    30,    -1,    -1,    60,    81,     0,    -1
   };
 
   /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
@@ -1203,23 +1240,23 @@ namespace kiwi { namespace lang {
   Parser::yyprhs_[] =
   {
          0,     0,     3,     4,    12,    13,    15,    19,    21,    24,
-      28,    29,    30,    35,    36,    40,    44,    46,    47,    51,
-      54,    57,    60,    63,    66,    70,    74,    78,    82,    86,
-      90,    94,    98,   102,   106,   110,   114,   118,   122,   126,
-     130,   134,   136,   138,   140,   142,   146,   148,   150,   152,
-     156,   158,   160,   162,   163
+      28,    29,    30,    35,    36,    40,    41,    45,    49,    51,
+      52,    56,    59,    62,    66,    69,    72,    75,    78,    82,
+      86,    90,    94,    98,   102,   106,   110,   114,   118,   122,
+     126,   130,   134,   138,   142,   146,   148,   150,   152,   154,
+     158,   160,   162,   164,   168,   170,   172,   174,   175
   };
 
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
   const unsigned short int
   Parser::yyrline_[] =
   {
-         0,   149,   149,   149,   155,   157,   161,   162,   166,   170,
-     176,   178,   178,   179,   179,   181,   182,   186,   186,   191,
-     199,   203,   204,   205,   208,   209,   210,   211,   212,   213,
-     215,   216,   217,   218,   220,   221,   222,   223,   224,   225,
-     227,   228,   232,   236,   237,   238,   246,   247,   248,   252,
-     256,   257,   258,   262,   264
+         0,   154,   154,   154,   160,   162,   166,   167,   171,   175,
+     181,   183,   183,   184,   184,   185,   185,   187,   188,   192,
+     192,   197,   201,   202,   214,   218,   219,   220,   223,   224,
+     225,   226,   227,   228,   230,   231,   232,   233,   235,   236,
+     237,   238,   239,   240,   242,   243,   247,   251,   252,   253,
+     261,   262,   263,   267,   271,   272,   273,   277,   279
   };
 
   // Print the state stack on the debug stream.
@@ -1262,16 +1299,16 @@ namespace kiwi { namespace lang {
            0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    41,     2,     2,     2,    40,    33,     2,
-      45,    47,    38,    37,    48,    36,    43,    39,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    51,
-      34,    31,    35,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    45,     2,     2,     2,    44,    37,     2,
+      49,    51,    42,    41,    52,    40,    47,    43,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    55,
+      38,    35,    39,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,    44,     2,    54,     2,     2,     2,     2,     2,     2,
+       2,    48,     2,    58,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    49,    32,    50,     2,     2,     2,     2,
+       2,     2,     2,    53,    36,    54,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -1287,7 +1324,8 @@ namespace kiwi { namespace lang {
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    42,    46,    52,    53
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      46,    50,    56,    57
     };
     if ((unsigned int) t <= yyuser_token_number_max_)
       return translate_table[t];
@@ -1296,15 +1334,15 @@ namespace kiwi { namespace lang {
   }
 
   const int Parser::yyeof_ = 0;
-  const int Parser::yylast_ = 262;
-  const int Parser::yynnts_ = 21;
+  const int Parser::yylast_ = 279;
+  const int Parser::yynnts_ = 23;
   const int Parser::yyempty_ = -2;
   const int Parser::yyfinal_ = 13;
   const int Parser::yyterror_ = 1;
   const int Parser::yyerrcode_ = 256;
-  const int Parser::yyntokens_ = 55;
+  const int Parser::yyntokens_ = 59;
 
-  const unsigned int Parser::yyuser_token_number_max_ = 289;
+  const unsigned int Parser::yyuser_token_number_max_ = 293;
   const Parser::token_number_type Parser::yyundef_token_ = 2;
 
 
@@ -1314,11 +1352,11 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 1054 of lalr1.cc  */
-#line 1318 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 1356 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
 
 
 /* Line 1056 of lalr1.cc  */
-#line 269 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 284 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
  /*** Additional Code ***/
 
 void kiwi::lang::Parser::error(const Parser::location_type& l,

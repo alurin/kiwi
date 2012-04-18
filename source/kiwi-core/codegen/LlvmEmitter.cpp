@@ -1,5 +1,5 @@
 #include "LlvmEmitter.hpp"
-#include "kiwi/Type.hpp"
+#include "kiwi/DerivedTypes.hpp"
 #include <llvm/InstrTypes.h>
 #include <llvm/Instructions.h>
 #include <llvm/Constants.h>

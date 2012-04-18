@@ -1,9 +1,8 @@
 #ifndef KIWI_LANG_FUNCTIONNODE_INTERNAL
 #define KIWI_LANG_FUNCTIONNODE_INTERNAL
 
-#include "kiwi/codegen/Statement.hpp"
 #include "kiwi/codegen/Variable.hpp"
-#include "Node.hpp"
+#include "StatementNode.hpp"
 #include "boost/shared_ptr.hpp"
 #include <map>
 #include <vector>
@@ -24,35 +23,8 @@ namespace lang
     class RightNode;
     class ScopeNode;
 
-    using codegen::StatementGen;
     using codegen::VariableGen;
 
-    /// Statement syntax node
-    class StatementNode : public Node
-    {
-    public:
-        /// Emit instructions for statement
-        virtual StatementGen emit(ModuleRef module, const StatementGen& gen) =0;
-
-        /// returns parent function node
-        FunctionNode* getOwner() const {
-            return o_owner;
-        }
-
-        /// returns parent scope
-        ScopeNode* getParent() const {
-            return o_parent;
-        }
-    protected:
-        FunctionNode*   o_owner;
-        ScopeNode*      o_parent;
-
-        /// Create root statement
-        StatementNode(FunctionNode* parent);
-
-        /// Create paret
-        StatementNode(ScopeNode* parent);
-    };
 
     /// Named parameter syntax node
     class NamedNode : public Node
@@ -136,7 +108,7 @@ namespace lang
         ~ExpressionNode();
 
         /// Emit instructions for expression
-        virtual StatementGen emit(ModuleRef module, const StatementGen& gen);
+        virtual StatementGen emit(const StatementGen& gen);
     protected:
         RightNode* m_expr;
     };
@@ -161,7 +133,7 @@ namespace lang
         void append(RightNode* expr);
 
         /// Emit instructions for scope statement
-        virtual StatementGen emit(ModuleRef module, const StatementGen& gen);
+        virtual StatementGen emit(const StatementGen& gen);
     protected:
         std::map<Identifier, VariableNode*> m_vars;
         std::vector<StatementNode*>         m_stmts;
