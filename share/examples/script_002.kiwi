@@ -1,4 +1,6 @@
-string main()
+void main()
 {
-    return "User namespaces";
+    print "Integer: ";
+    print 10234533;
+    print "\n";
 }

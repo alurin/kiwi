@@ -60,6 +60,7 @@
     double               doubleVal;
     std::string*		 stringVal;
     String*              ustringVal;
+    UChar                charVal;
 
     class TypeNode*		 typenode;
     class LeftNode*      leftnode;
@@ -94,6 +95,7 @@
 
 %token  <integerVal>    INTEGER             "integer constant"
 %token  <ustringVal>    STRING              "string constant"
+%token  <charVal>       CHAR                "char constant"
 %token  <stringVal>     VAR_LOCAL           "local variable"
 %token  <stringVal>     VAR_INSTANCE        "instance attribute"
 
@@ -107,6 +109,7 @@
 %token                  IF                  "if"
 %token                  ELSE                "else"
 %token                  IFELSE              "ifelse"
+%token                  PRINT               "print"
 
 %left       '=' "+=" "-=" "/=" "*=" "<<=" ">>=" "&=" "|="
 %left       "||"
@@ -125,11 +128,11 @@
 %type   <typenode>      type type_complex type_primary
 %type   <rightnode>     expression right
 %type   <leftnode>      left
-%type   <stmtnode>      scope return_statement
+%type   <stmtnode>      scope return_statement print_statement
 
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
 %destructor { delete $$; } type type_complex type_primary
-%destructor { delete $$; } scope return_statement
+%destructor { delete $$; } scope return_statement print_statement
 %destructor { delete $$; } STRING
 
  /*** END EXAMPLE - Change the example grammar's tokens above ***/
@@ -187,7 +190,7 @@ statements
     | expression ';'        { driver.scope()->append($1); } statements
     | scope                 { driver.scope()->append($1); } statements
     | return_statement      { driver.scope()->append($1); } statements
-
+    | print_statement       { driver.scope()->append($1); } statements
     | variable_declare ';' statements
     | ';'
     ;
@@ -204,6 +207,10 @@ scope_end
 return_statement
     : RETURN ';'                    { $$ = driver.createReturn(@1);     }
     | RETURN expression ';'         { $$ = driver.createReturn($2, @1); }
+    ;
+
+print_statement
+    : PRINT expression  ';'         { $$ = driver.createPrint($2, @1);  }
     ;
 
 conditional
@@ -252,10 +259,11 @@ left
     ;
 
 right
-    : VAR_LOCAL                     { $$ = driver.right(*$1, @1); }
-    | INTEGER                       { $$ = driver.createInt($1, @1);          }
-    | STRING                        { $$ = driver.createString(*$1, @1);       }
-    | '(' expression ')'            { $$ = $2; }
+    : VAR_LOCAL                     { $$ = driver.right(*$1, @1);           }
+    | INTEGER                       { $$ = driver.createInt($1, @1);        }
+    | STRING                        { $$ = driver.createString(*$1, @1);    }
+    | CHAR                          { $$ = driver.createChar($1, @1);       }
+    | '(' expression ')'            { $$ = $2;                              }
     ;
 
 

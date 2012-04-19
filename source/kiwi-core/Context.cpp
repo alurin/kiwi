@@ -4,14 +4,16 @@
 #include <log4cxx/logger.h>
 #include <log4cxx/level.h>
 #include <log4cxx/consoleappender.h>
-#include <log4cxx/patternlayout.h>
-#include <llvm/LLVMContext.h>
 #include "ContextMeta.hpp"
+#include "llvm/Support/TargetSelect.h"
+#include "RuntimeModule.hpp"
+#include <llvm/LLVMContext.h>
+#include <log4cxx/patternlayout.h>
 
 using namespace kiwi;
 
 Context::Context()
-: m_context(new llvm::LLVMContext()), m_meta(new ContextMeta())
+: m_context(0), m_meta(new ContextMeta())
 {
     // Configure the logging mechanism
     log4cxx::LoggerPtr rootlogger = log4cxx::Logger::getRootLogger();
@@ -34,10 +36,15 @@ ContextRef Context::create()
 
 void Context::initializate()
 {
+    llvm::InitializeNativeTarget();
+    m_context = new llvm::LLVMContext();
+
     ModuleRef module = Module::create("system", shared_from_this());
     m_meta->boolTy   = BoolType::create(module);
     m_meta->int32Ty  = IntType::create(module, 32, false);
     m_meta->voidTy   = VoidType::create(module);
     m_meta->charTy   = CharType::create(module);
     m_meta->stringTy = StringType::create(module);
+
+    initRuntimeModule(module);
 }

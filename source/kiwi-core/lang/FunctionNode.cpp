@@ -17,6 +17,10 @@ using namespace kiwi::lang;
 NamedNode::NamedNode(FunctionNode* owner, TypeNode* type)
 : o_owner(owner), m_type(type) { }
 
+NamedNode::~NamedNode() {
+    delete m_type;
+}
+
 ArgumentNode::ArgumentNode(FunctionNode* owner, const Identifier& name, TypeNode* type)
 : NamedNode(owner, type), m_name(name) { }
 
@@ -56,6 +60,7 @@ FunctionNode::FunctionNode(const Identifier& name, TypeNode* type)
 FunctionNode::~FunctionNode()
 {
     delete m_root;
+    delete m_type;
     for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i)
     {
         ArgumentNode* arg = i->second;
@@ -163,7 +168,7 @@ void FunctionNode::generate(ModuleRef module)
 
     // emit function ant her type
     llvm::FunctionType* type = llvm::FunctionType::get(resultType, llvm::makeArrayRef(argTypes), false);
-    m_func                   = llvm::Function::Create(type, llvm::GlobalValue::ExternalLinkage , "", module->getModule());
+    m_func                   = llvm::Function::Create(type, llvm::GlobalValue::ExternalLinkage , m_name, module->getModule());
     llvm::BasicBlock* entry  = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
 
     // emit mutable variables for arguments
@@ -175,7 +180,7 @@ void FunctionNode::generate(ModuleRef module)
 
         if (!i->getType()->isPointerTy()) {
             llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
-            llvm::StoreInst*  store = new llvm::StoreInst(value, i, entry);
+            llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
 
             VariableGen vargen(arg->getType()->get(), value);
             arg->setGenerator(vargen);
@@ -208,7 +213,7 @@ StatementGen ScopeNode::emit(const StatementGen& gen)
         llvm::Type* var_type     = type->getVarType();
         llvm::Value* var_default = llvm::Constant::getNullValue(var_type);
         llvm::AllocaInst* value  = new llvm::AllocaInst(var_type, i->first, gen.getBlock());
-        new llvm::StoreInst(value, var_default, gen.getBlock());
+        new llvm::StoreInst(var_default, value, gen.getBlock());
 
         VariableGen vargen(type, value);
         var->setGenerator(vargen);

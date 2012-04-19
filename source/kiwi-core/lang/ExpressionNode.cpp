@@ -58,6 +58,9 @@ IntegerConstNode::IntegerConstNode(ContextRef context, int32_t value)
 StringConstNode::StringConstNode(ContextRef context, const String& value)
 : m_context(context), m_value(value) { }
 
+CharConstNode::CharConstNode(ContextRef context, const UChar& value)
+: m_context(context), m_value(value) { }
+
 ExpressionGen BinaryNode::emit(const StatementGen& gen)
 {
     // emit operands
@@ -101,7 +104,7 @@ ExpressionGen ArgumentLeftNode::emit(const ExpressionGen& gen)
 {
     VariableGen var = o_arg->getGenerator();
     if (var.getType() == gen.getType()) {
-        llvm::StoreInst* inst = new llvm::StoreInst(var.getValue(), gen.getValue(), gen.getBlock());
+        llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
         return gen;
     }
 
@@ -119,7 +122,7 @@ ExpressionGen VariableLeftNode::emit(const ExpressionGen& gen)
 {
     VariableGen var = o_var->getGenerator();
     if (var.getType() == gen.getType()) {
-        llvm::StoreInst* inst = new llvm::StoreInst(var.getValue(), gen.getValue(), gen.getBlock());
+        llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
         return gen;
     }
 
@@ -146,16 +149,14 @@ ExpressionGen StringConstNode::emit(const StatementGen& gen)
     llvm::LLVMContext& context   = gen.getContext();
     llvm::Type* charType         = llvm::IntegerType::get(context, 16);
     llvm::Type* sizeType         = llvm::IntegerType::get(context, 32);
-    llvm::ArrayType* bufferType  = llvm::ArrayType::get(charType, 0);
-    llvm::StructType* stringType = 0;
+    llvm::ArrayType* bufferType  = llvm::ArrayType::get(charType, m_value.length());
+    TypeRef                 type = StringType::get(m_context);
 
     // generate string type
-    {
-        std::vector<llvm::Type*> elements;
-        elements.push_back(sizeType);
-        elements.push_back(bufferType);
-        stringType = llvm::StructType::create(context, llvm::makeArrayRef(elements));
-    }
+    std::vector<llvm::Type*> elements;
+    elements.push_back(sizeType);
+    elements.push_back(bufferType);
+    llvm::StructType* stringType = llvm::StructType::create(context, llvm::makeArrayRef(elements), "string", false);
 
     // generate size
     llvm::Constant* size = 0;
@@ -170,8 +171,7 @@ ExpressionGen StringConstNode::emit(const StatementGen& gen)
         std::vector<llvm::Constant*> bufferConst;
         for (int i = 0; i < m_value.length(); ++i)
         {
-            UChar uchr = m_value.charAt(i);
-            llvm::APInt cst(16, uchr, true);
+            llvm::APInt cst(16, m_value[i], false);
             llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
             bufferConst.push_back(value);
         }
@@ -180,7 +180,7 @@ ExpressionGen StringConstNode::emit(const StatementGen& gen)
 
     // generate string
     llvm::Constant* string = llvm::ConstantStruct::get(stringType, size, buffer, NULL);
-    llvm::Constant* value  = new llvm::GlobalVariable(
+    llvm::GlobalVariable* value  = new llvm::GlobalVariable(
         *(gen.getModule()),
         stringType,
         true,
@@ -188,5 +188,13 @@ ExpressionGen StringConstNode::emit(const StatementGen& gen)
         string,
         "string"
      );
+    value->setUnnamedAddr(true); // Binary equal strings must be merged
     return ExpressionGen(gen, StringType::get(m_context), value);
+}
+
+ExpressionGen CharConstNode::emit(const StatementGen& gen)
+{
+    llvm::APInt cst(16, m_value, true);
+    llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
+    return ExpressionGen(gen, CharType::get(m_context), value);
 }

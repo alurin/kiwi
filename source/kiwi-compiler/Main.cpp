@@ -43,17 +43,16 @@ int main(int argc, char const *argv[])
         vector<string> files = vm["input-file"].as< vector<string> >();
         cout << "Input files are: " << files << "\n";
 
-        ModuleRef module = Module::create("Kiwi::Script", frm);
-
-        for (vector<string>::iterator i = files.begin(); i != files.end(); ++i) {
-            try {
+        try {
+            ModuleRef module = Module::create("Kiwi::Script", frm);
+            for (vector<string>::iterator i = files.begin(); i != files.end(); ++i) {
                 module->includeFile(*i);
-            } catch (const char* ex) {
-                std::cerr << ex << "\n";
-                return 0;
             }
+            return module->run();
+        } catch (const char* ex) {
+            std::cerr << ex << "\n";
+            return 1;
         }
-        return 1;
     } else if (vm.count("help")) {
         cout << desc << "\n";
         return 1;

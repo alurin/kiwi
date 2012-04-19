@@ -49,7 +49,7 @@ StringType::StringType(ModuleRef module)
     std::vector<llvm::Type*> elements;
     elements.push_back(sizeType);
     elements.push_back(bufferType);
-    llvm::Type* stringType     = llvm::StructType::create(llvm::makeArrayRef(elements));
+    llvm::Type* stringType     = llvm::StructType::create(context, llvm::makeArrayRef(elements), "string", false);
     m_varType                  = stringType->getPointerTo(0);
 }
 
@@ -90,8 +90,9 @@ TypeRef StringType::create(ModuleRef module)
 void IntType::initializate()
 {
     ContextRef context = m_module.lock()->getContext();
-    TypeRef     intTy  = shared_from_this();
     TypeRef     boolTy = BoolType::get(context);
+    TypeRef     voidTy = VoidType::get(context);
+    TypeRef     intTy  = shared_from_this();
 
     add(UnaryOperator::POS,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Add, intTy));
     add(UnaryOperator::NEG,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Sub, intTy));
@@ -100,28 +101,56 @@ void IntType::initializate()
     add(BinaryOperator::SUB, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Sub, intTy));
     add(BinaryOperator::MUL, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Mul, intTy));
 
-    add(BinaryOperator::EQ,  boolTy, intTy, new LlvmICompareOperator(llvm::CmpInst::ICMP_EQ, context));
-    add(BinaryOperator::NEQ, boolTy, intTy, new LlvmICompareOperator(llvm::CmpInst::ICMP_NE, context));
-    add(BinaryOperator::GT,  boolTy, intTy, new LlvmICompareOperator(llvm::CmpInst::ICMP_SGT, context));
-    add(BinaryOperator::GE,  boolTy, intTy, new LlvmICompareOperator(llvm::CmpInst::ICMP_SGE, context));
-    add(BinaryOperator::LE,  boolTy, intTy, new LlvmICompareOperator(llvm::CmpInst::ICMP_SLT, context));
-    add(BinaryOperator::LT,  boolTy, intTy, new LlvmICompareOperator(llvm::CmpInst::ICMP_SLE, context));
+    add(BinaryOperator::EQ,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
+    add(BinaryOperator::NEQ, boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
+    add(BinaryOperator::GT,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGT, context));
+    add(BinaryOperator::GE,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGE, context));
+    add(BinaryOperator::LE,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLT, context));
+    add(BinaryOperator::LT,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLE, context));
+
+    add(UnaryOperator::PRINT, voidTy, new LlvmIntegerPrintOperator());
 }
 
 void BoolType::initializate()
 {
     ContextRef context = m_module.lock()->getContext();
+    TypeRef     voidTy = VoidType::get(context);
     TypeRef     boolTy = shared_from_this();
 
-    add(BinaryOperator::EQ,  boolTy, boolTy, new LlvmICompareOperator(llvm::CmpInst::ICMP_EQ, context));
-    add(BinaryOperator::NEQ, boolTy, boolTy, new LlvmICompareOperator(llvm::CmpInst::ICMP_NE, context));
+    add(BinaryOperator::EQ,  boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
+    add(BinaryOperator::NEQ, boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
+
+    add(UnaryOperator::PRINT, voidTy, new LlvmBoolPrintOperator());
 }
 
 
 void CharType::initializate()
-{ }
+{
+    ContextRef context = m_module.lock()->getContext();
+    TypeRef     boolTy = BoolType::get(context);
+    TypeRef     voidTy = VoidType::get(context);
+    TypeRef     charTy = shared_from_this();
+
+    add(UnaryOperator::PRINT, voidTy, new LlvmCharPrintOperator());
+}
+
 void StringType::initializate()
-{ }
+{
+    ContextRef context = m_module.lock()->getContext();
+    TypeRef     charTy = CharType::get(context);
+    TypeRef     boolTy = BoolType::get(context);
+    TypeRef     voidTy = VoidType::get(context);
+    TypeRef   stringTy = shared_from_this();
+
+    add(BinaryOperator::EQ,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_EQ, context));
+    add(BinaryOperator::NEQ, boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_NE, context));
+    add(BinaryOperator::GT,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGT, context));
+    add(BinaryOperator::GE,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGE, context));
+    add(BinaryOperator::LE,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLT, context));
+    add(BinaryOperator::LT,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLE, context));
+
+    add(UnaryOperator::PRINT, voidTy, new LlvmStringPrintOperator());
+}
 
 TypeRef IntType::get32(ContextRef context)
 {

@@ -11,9 +11,12 @@
 *.la
 *.a
 
-$ CMake files
+# CMake files
 CMakeCache.txt
 CMakeFiles
 Makefile
 cmake_install.cmake
 install_manifest.txt
+
+# Sublime text editor
+*.sublime-*

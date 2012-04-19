@@ -105,6 +105,7 @@ ENDFOREACH (CONFIGINPUT ${CONFIGINPUTS})
 # Add Build Targets
 #
 ADD_SUBDIRECTORY(source/kiwi-core)
+ADD_SUBDIRECTORY(source/kiwi-runtime)
 ADD_SUBDIRECTORY(source/kiwi-compiler)
 ADD_SUBDIRECTORY(test)
 

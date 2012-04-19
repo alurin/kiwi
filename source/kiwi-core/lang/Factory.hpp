@@ -97,9 +97,16 @@ namespace lang {
             return node;
         }
 
-        RightNode* createString(const UnicodeString& value, const location& loc)
+        RightNode* createString(const String& value, const location& loc)
         {
             RightNode* node = new StringConstNode(m_context, value);
+            node->setLocation(loc);
+            return node;
+        }
+
+        RightNode* createChar(const UChar& value, const location& loc)
+        {
+            RightNode* node = new CharConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }
@@ -260,6 +267,13 @@ namespace lang {
         StatementNode* createReturn(RightNode* result, const location& loc)
         {
             StatementNode* node = new ReturnStatement(scope(), result);
+            node->setLocation(loc);
+            return node;
+        }
+
+        StatementNode* createPrint(RightNode* result, const location& loc)
+        {
+            StatementNode* node = new PrintStatement(scope(), result);
             node->setLocation(loc);
             return node;
         }

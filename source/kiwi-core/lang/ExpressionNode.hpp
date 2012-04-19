@@ -21,6 +21,7 @@ namespace lang {
     public:
         virtual ExpressionGen emit(const ExpressionGen& gen) =0;
     };
+
     class RightNode : public Node {
     public:
         virtual ExpressionGen emit(const StatementGen& value) =0;
@@ -124,8 +125,6 @@ namespace lang {
         int32_t     m_value;
     };
 
-
-
     class StringConstNode : public RightNode
     {
     public:
@@ -135,7 +134,19 @@ namespace lang {
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         ContextRef  m_context;
-        String     m_value;
+        String      m_value;
+    };
+
+    class CharConstNode : public RightNode
+    {
+    public:
+        CharConstNode(ContextRef context, const UChar& value);
+
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
+    protected:
+        ContextRef  m_context;
+        UChar     m_value;
     };
 }}
 

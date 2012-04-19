@@ -34,7 +34,8 @@ namespace kiwi
             NEG,
             NOT,
             DEC,
-            INC
+            INC,
+            PRINT
         };
 
         Opcode getOpcode() const {

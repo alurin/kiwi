@@ -6,7 +6,7 @@ SHELL := /bin/bash
 RM    := rm -rf
 
 all: ./build/Makefile
-	@ $(MAKE) -C build
+	@ $(MAKE) --silent -C build
 
 ./build/Makefile:
 	@ (cd build >/dev/null 2>&1 && cmake ..)
@@ -35,6 +35,6 @@ distclean:
 ifeq ($(findstring distclean,$(MAKECMDGOALS)),)
 
     $(MAKECMDGOALS): ./build/Makefile
-	@ $(MAKE) -C build $(MAKECMDGOALS)
+	@ $(MAKE) --silent -C build $(MAKECMDGOALS)
 
 endif

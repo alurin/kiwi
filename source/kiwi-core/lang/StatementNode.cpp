@@ -1,6 +1,7 @@
 #include "StatementNode.hpp"
 #include "FunctionNode.hpp"
 #include "ExpressionNode.hpp"
+#include "kiwi/codegen/Emitter.hpp"
 #include "kiwi/codegen/Expression.hpp"
 #include "kiwi/codegen/Variable.hpp"
 #include <llvm/Instructions.h>
@@ -15,15 +16,29 @@ StatementNode::StatementNode(ScopeNode* parent)
 StatementNode::StatementNode(FunctionNode* parent)
 : o_owner(parent), o_parent(0) { }
 
-/// constructor
+// constructor
 ReturnStatement::ReturnStatement(ScopeNode* parent)
 : StatementNode(parent), m_result(0) {}
 
-/// constructor
+// constructor
 ReturnStatement::ReturnStatement(ScopeNode* parent, RightNode* result)
 : StatementNode(parent), m_result(result) {}
 
-/// emit instructions for statement
+// destructor
+ReturnStatement::~ReturnStatement()
+{
+    delete m_result;
+}
+// constructor
+PrintStatement::PrintStatement(ScopeNode* parent, RightNode* result)
+: StatementNode(parent), m_result(result) {}
+
+// destructor
+PrintStatement::~PrintStatement()
+{
+    delete m_result;
+}
+// emit instructions for return statement
 StatementGen ReturnStatement::emit(const StatementGen& gen)
 {
     if (m_result) {
@@ -36,4 +51,21 @@ StatementGen ReturnStatement::emit(const StatementGen& gen)
         llvm::ReturnInst::Create(gen.getContext(), gen.getBlock());
     }
     return gen;
+}
+
+// emit instructions for print statement
+StatementGen PrintStatement::emit(const StatementGen& gen)
+{
+    // emit operand
+    ExpressionGen result = m_result->emit(gen);
+
+    // find emitter
+    TypeRef type = result.getType();
+    UnaryRef op  = type->find(UnaryOperator::PRINT);
+
+    // emit instruction
+    if (op) {
+        return op->getEmitter()->emit(result, result);
+    }
+    throw "not found unary operator";
 }

@@ -50,12 +50,29 @@ namespace lang
         /// constructor
         ReturnStatement(ScopeNode* parent, RightNode* result);
 
+        /// destructor
+        ~ReturnStatement();
+
         /// emit instructions for statement
         virtual StatementGen emit(const StatementGen& gen);
     protected:
         RightNode* m_result;
     };
 
+    /// Print statement syntax node
+    class PrintStatement : public StatementNode {
+    public:
+        /// constructor
+        PrintStatement(ScopeNode* parent, RightNode* result);
+
+        /// destructor
+        ~PrintStatement();
+
+        /// emit instructions for statement
+        virtual StatementGen emit(const StatementGen& gen);
+    protected:
+        RightNode* m_result;
+    };
 }}
 
 #endif

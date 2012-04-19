@@ -36,6 +36,9 @@ namespace kiwi
         llvm::Module* getModule() const {
             return m_module;
         }
+
+        /// Run main function in module
+        int32_t run();
     protected:
         Identifier      m_name;
         ContextWeak     m_context;

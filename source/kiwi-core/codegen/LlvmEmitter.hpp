@@ -42,20 +42,80 @@ namespace codegen {
         TypeRef                         m_type;
     }; /// class LlvmBinaryOperator
 
-
-    /// LLVM binary operators emitter
-    class LlvmICompareOperator : public BinaryEmitter {
+    /// LLVM binary operators emitter for compare integers
+    class LlvmIntegerCompareOperator : public BinaryEmitter {
     public:
         /// constructor
-        LlvmICompareOperator(llvm::CmpInst::Predicate predicate, ContextRef context);
+        LlvmIntegerCompareOperator(llvm::CmpInst::Predicate predicate, ContextRef context);
 
         /// emit llvm operator
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right);
     protected:
         llvm::CmpInst::Predicate    m_predicate;
         ContextRef                  m_context;
-    }; /// class LlvmICompareOperator
+    }; /// class LlvmIntegerCompareOperator
 
+    /// LLVM binary operators emitter for compare strings
+    class LlvmStringCompareOperator : public BinaryEmitter {
+    public:
+        /// constructor
+        LlvmStringCompareOperator(llvm::CmpInst::Predicate predicate, ContextRef context);
+
+        /// emit llvm operator
+        virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right);
+    protected:
+        llvm::CmpInst::Predicate    m_predicate;
+        ContextRef                  m_context;
+    }; /// class LlvmStringCompareOperator
+
+    class LlvmIntegerPrintOperator : public UnaryEmitter {
+    public:
+        /// emit llvm operator
+        virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& value);
+
+    protected:
+    }; // class LlvmIntegerPrintOperator
+
+    class LlvmBoolPrintOperator : public UnaryEmitter {
+    public:
+        /// emit llvm operator
+        virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& value);
+
+    protected:
+    }; // class LlvmBoolPrintOperator
+
+    class LlvmCharPrintOperator : public UnaryEmitter {
+    public:
+        /// emit llvm operator
+        virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& value);
+
+    protected:
+    }; // class LlvmCharPrintOperator
+
+    class LlvmStringPrintOperator : public UnaryEmitter {
+    public:
+        /// emit llvm operator
+        virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& value);
+
+    protected:
+    }; // class LlvmStringPrintOperator
+
+    class LlvmStringEmitter {
+    public:
+        /// emit llvm operator
+        StatementGen emit(const StatementGen& gen, const ExpressionGen& value);
+
+        llvm::Value* getLengthValue() const {
+            return m_lengthValue;
+        }
+
+        llvm::Value* getBufferValue() const {
+            return m_bufferValue;
+        }
+    protected:
+        llvm::Value* m_lengthValue;
+        llvm::Value* m_bufferValue;
+    }; /// class LlvmStringEmitter
 } // namesapce codegen
 } // namesapce  kiwi
 

@@ -53,6 +53,7 @@ typedef kiwi::lang::Parser::token_type token_type;
 %x comment
 %x line_comment
 %x string_state
+%x char_state
 
 %% /*** Regular Expressions Part ***/
 
@@ -61,7 +62,7 @@ typedef kiwi::lang::Parser::token_type token_type;
     // reset location
     yylloc->step();
 
-    std::stringstream string_buffer;
+    std::stringstream stringBuffer;
 %}
 
  /*** BEGIN EXAMPLE - Change the example lexer rules below ***/
@@ -96,6 +97,8 @@ typedef kiwi::lang::Parser::token_type token_type;
 "else"   { return token::ELSE;        }
 "ifelse" { return token::IFELSE;      }
 
+"print"  { return token::PRINT;       }
+
  /* Unix command */
 ^#!.*$ {
     return token::UNIX_SCRIPT;
@@ -116,7 +119,7 @@ typedef kiwi::lang::Parser::token_type token_type;
     return token::VAR_INSTANCE;
 }
 
-[0-9]+ {
+[+-]?[0-9]+ {
     yylval->integerVal = atoi(yytext);
     return token::INTEGER;
 }
@@ -130,10 +133,11 @@ typedef kiwi::lang::Parser::token_type token_type;
 }
 
  /* comments and strings */
-"/*"                    { BEGIN(comment);      }
-"//"                    { BEGIN(line_comment); }
-"#"                     { BEGIN(line_comment); }
-"\""                    { BEGIN(string_state); }
+"/*"                    { BEGIN(comment);       }
+"//"                    { BEGIN(line_comment);  }
+"#"                     { BEGIN(line_comment);  }
+"\""                    { BEGIN(string_state);  }
+"\'"                    { BEGIN(char_state);    }
 
 <comment>{
     [^*\n]*             { /* eat anything that's not a '*' */ }
@@ -151,19 +155,27 @@ typedef kiwi::lang::Parser::token_type token_type;
     "\""                {
                             /* saw closing quote - all done */
                              BEGIN(INITIAL);
-                             yylval->ustringVal = new String(string_buffer.str().c_str());
-                             string_buffer.str(std::string());
+                             yylval->ustringVal = new UnicodeString(stringBuffer.str().c_str());;
+                             stringBuffer.str(std::string());
                              return token::STRING;
                         }
 
-    \\n                 { string_buffer << '\n';      }
-    \\t                 { string_buffer << '\t';      }
-    \\r                 { string_buffer << '\r';      }
-    \\b                 { string_buffer << '\b';      }
-    \\f                 { string_buffer << '\f';      }
-    \\(.|\n)            { string_buffer << yytext[1]; }
+    \\n                 { stringBuffer << '\n';      }
+    \\t                 { stringBuffer << '\t';      }
+    \\r                 { stringBuffer << '\r';      }
+    \\b                 { stringBuffer << '\b';      }
+    \\f                 { stringBuffer << '\f';      }
+    \\.                 { stringBuffer << yytext[1]; }
+    .                   { stringBuffer << yytext[0]; }
+}
 
-    .                   { string_buffer << yytext[0]; }
+<char_state>{
+    \\n"'"              { yylval->charVal = '\n'; BEGIN(INITIAL); return token::CHAR;      }
+    \\t"'"              { yylval->charVal = '\t'; BEGIN(INITIAL); return token::CHAR;      }
+    \\r"'"              { yylval->charVal = '\r'; BEGIN(INITIAL); return token::CHAR;      }
+    \\b"'"              { yylval->charVal = '\b'; BEGIN(INITIAL); return token::CHAR;      }
+    \\f"'"              { yylval->charVal = '\f'; BEGIN(INITIAL); return token::CHAR;      }
+    ."'"                { yylval->charVal = yytext[0]; BEGIN(INITIAL); return token::CHAR; }
 }
 
  /* pass all other characters up to bison */

@@ -30,6 +30,9 @@ namespace lang
     class NamedNode : public Node
     {
     public:
+        // destructor
+        virtual ~NamedNode();
+
         /// returns type node for this named node
         TypeNode* getType() const {
             return m_type;
@@ -105,7 +108,7 @@ namespace lang
     public:
         ExpressionNode(ScopeNode* parent, RightNode* expr);
 
-        ~ExpressionNode();
+        virtual ~ExpressionNode();
 
         /// Emit instructions for expression
         virtual StatementGen emit(const StatementGen& gen);

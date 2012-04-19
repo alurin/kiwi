@@ -1,4 +1,4 @@
-FILE (GLOB_RECURSE project_SOURCES *.cpp *.hpp)
+FILE (GLOB_RECURSE core_SOURCES *.cpp *.hpp)
 
 # Include bison and flex
 FIND_PACKAGE(BISON REQUIRED)
@@ -8,26 +8,26 @@ BISON_TARGET(KiwiParser ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser.yy  ${CMAKE_CURR
 FLEX_TARGET(KiwiScanner ${CMAKE_CURRENT_SOURCE_DIR}/lang/scanner.ll ${CMAKE_CURRENT_SOURCE_DIR}/lang/scanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(KiwiScanner KiwiParser)
 
-LIST(REMOVE_ITEM project_SOURCES "lang/scanner.cpp")
-LIST(REMOVE_ITEM project_SOURCES "lang/parser.cpp")
-LIST(REMOVE_ITEM project_SOURCES "lang/parser.hpp")
-SET (project_SOURCES ${project_SOURCES} ${BISON_KiwiParser_OUTPUTS} ${FLEX_KiwiScanner_OUTPUTS})
+LIST(REMOVE_ITEM core_SOURCES "lang/scanner.cpp")
+LIST(REMOVE_ITEM core_SOURCES "lang/parser.cpp")
+LIST(REMOVE_ITEM core_SOURCES "lang/parser.hpp")
+SET (core_SOURCES ${core_SOURCES} ${BISON_KiwiParser_OUTPUTS} ${FLEX_KiwiScanner_OUTPUTS})
 
-SET (project_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${Log4Cxx_LIBRARIES} ${LLVM_LIBRARIES})
-SET (project_LIB "lib${PROJECT_NAME}")
+SET (core_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${Log4Cxx_LIBRARIES} ${LLVM_LIBRARIES} "${PROJECT_NAME}-runtime")
+SET (core_LIB "lib${PROJECT_NAME}")
 
 # Remove no exception from LLVM flags
 STRING(REPLACE "-fno-exceptions" "" LLVM_CXXFLAGS ${LLVM_CXXFLAGS})
 
-ADD_LIBRARY(${project_LIB} SHARED ${project_SOURCES})
-TARGET_LINK_LIBRARIES(${project_LIB} ${project_LIBS})
+ADD_LIBRARY(${core_LIB} SHARED ${core_SOURCES})
+TARGET_LINK_LIBRARIES(${core_LIB} ${core_LIBS})
 SET_TARGET_PROPERTIES(
-    ${project_LIB} PROPERTIES
-    VERSION             "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}"
-    OUTPUT_NAME         ${project_LIB}
+    ${core_LIB} PROPERTIES
+    VERSION             "${KIWI_VERSION_MAJOR}.${KIWI_VERSION_MINOR}"
+    OUTPUT_NAME         ${PROJECT_NAME}
     CLEAN_DIRECT_OUTPUT 1
     COMPILE_FLAGS       ${LLVM_CXXFLAGS}
     LINK_FLAGS          ${LLVM_CXXFLAGS}
 )
 
-INSTALL(TARGETS ${project_LIB} DESTINATION lib)
+INSTALL(TARGETS ${core_LIB} DESTINATION lib)
