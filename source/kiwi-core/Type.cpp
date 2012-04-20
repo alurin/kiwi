@@ -33,7 +33,7 @@ BinaryOperator::BinaryOperator(
 
 // constructor
 Method::Method(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments)
-: m_name(name), m_ownerType(ownerType), m_resultType(resultType), m_arguments(arguments)
+: m_name(name), m_ownerType(ownerType), m_resultType(resultType), m_arguments(arguments), m_func(0)
 {}
 
 // constructor
@@ -117,4 +117,26 @@ BinaryRef Type::find(BinaryOperator::Opcode opcode, TypeRef operatorType)
         }
     }
     return BinaryRef();
+}
+
+// find method
+MethodRef Type::find(const Identifier& name, std::vector<TypeRef> arguments)
+{
+    for (std::vector<MethodRef>::iterator i = m_methods.begin(); i != m_methods.end(); ++i) {
+        MethodRef method = *i;
+        if (method->getName() == name) {
+            bool isAccept = true;
+            int j         = 0;
+            for (Method::const_iterator i = method->begin(); i != method->end(); ++i, ++j) {
+                ArgumentRef arg = *i;
+                if (arg->getType() != arguments[j]) {
+                    isAccept = false;
+                    break;
+                }
+            }
+
+            if (isAccept) return method;
+        }
+    }
+    return MethodRef();
 }

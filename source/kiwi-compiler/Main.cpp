@@ -21,10 +21,15 @@ ostream& operator<<(ostream& os, const vector<T>& v)
 
 int main(int argc, char const *argv[])
 {
+    int  opt     = 0;
+
     // Declare the supported options.
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help", "produce help message")
+        ("optimization,O", po::value<int>(&opt)->default_value(0), "optimization level [0-3]")
+        ("debug", "debug parser and scanner")
+        ("ir-dump", "dump generated LLVM module")
         ("input-file", po::value< vector<string> >(), "input file")
     ;
 
@@ -38,17 +43,27 @@ int main(int argc, char const *argv[])
           options(desc).positional(p).run(), vm);
     po::notify(vm);
 
-    ContextRef frm = Context::create();
+    ContextRef context = Context::create();
+    context->setOptimizationLevel(opt);
+    context->setDebug(vm.count("debug"));
+
     if (vm.count("input-file")) {
         vector<string> files = vm["input-file"].as< vector<string> >();
-        cout << "Input files are: " << files << "\n";
 
         try {
-            ModuleRef module = Module::create("Kiwi::Script", frm);
+            // create script module
+            ModuleRef module = Module::create("Kiwi::Script", context);
             for (vector<string>::iterator i = files.begin(); i != files.end(); ++i) {
                 module->includeFile(*i);
             }
-            return module->run();
+
+            // build module and dump or execute
+            module->build();
+            if (vm.count("ir-dump")) {
+                module->dump();
+            } else {
+                return module->run();
+            }
         } catch (const char* ex) {
             std::cerr << ex << "\n";
             return 1;

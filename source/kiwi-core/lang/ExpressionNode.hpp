@@ -169,8 +169,9 @@ namespace lang {
             Identifier  Name;
         };
     protected:
-        Identifier                 m_method;
-        std::vector<CallArgument>  m_arguments;
+        Identifier                  m_method;
+        std::vector<CallArgument>   m_arguments;
+        bool                        m_hasNamed;
     };
 }}
 

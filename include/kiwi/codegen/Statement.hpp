@@ -13,19 +13,25 @@ namespace llvm {
 }
 
 namespace kiwi {
+    typedef boost::shared_ptr<class Type> TypeRef;
 namespace codegen {
     /// Structure for store information about instructions emit process
     class StatementGen
     {
     public:
         /// constructor
-        StatementGen(llvm::BasicBlock* block);
+        StatementGen(TypeRef owner, llvm::BasicBlock* block);
 
         /// copy constructor
         StatementGen(const StatementGen& gen);
 
         /// assigment operator
         StatementGen& operator=(const StatementGen& gen);
+
+        /// returns owner
+        TypeRef getOwner() const {
+            return m_owner;
+        }
 
         /// returns LLVM context
         llvm::LLVMContext& getContext() const
@@ -51,6 +57,8 @@ namespace codegen {
             return m_block;
         }
     protected:
+        TypeRef             m_owner;
+
         llvm::LLVMContext*  m_context;
         llvm::Module*       m_module;
         llvm::Function*     m_function;

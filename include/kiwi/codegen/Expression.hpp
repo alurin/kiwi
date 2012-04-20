@@ -17,9 +17,6 @@ namespace codegen {
     class ExpressionGen : public StatementGen
     {
     public:
-        /// constructor
-        ExpressionGen(llvm::BasicBlock* block, TypeRef type, llvm::Value* value);
-
         /// copy constructor
         ExpressionGen(const ExpressionGen& gen);
 

@@ -1,10 +1,6 @@
-void test_method(int $a, string $b)
-{
-    print "Integer argument: "; print $a; print "\n";
-    print "String argument"; print $b; print "\n";
-}
+#!/usr/bin/env kiwi
 
 void main()
 {
-    test_method(10, "This is string");
+    print "Hello word!\n";
 }

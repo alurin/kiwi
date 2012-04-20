@@ -217,7 +217,7 @@ print_statement
 //      Calls
 //==------------------------------------------------------------------------==//
 call_expression
-    : IDENT                         { driver.call();                }
+    : IDENT                         { driver.call(*$1);             }
         '(' call_arguments ')'      { $$ = driver.callEnd();        }
     ;
 

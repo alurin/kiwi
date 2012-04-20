@@ -1,10 +1,11 @@
-#include "kiwi/DerivedTypes.hpp"
-#include "kiwi/codegen/Emitter.hpp"
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
-#include <llvm/Instructions.h>
+#include "kiwi/codegen/Emitter.hpp"
+#include "kiwi/DerivedTypes.hpp"
 #include <llvm/Constants.h>
+#include <llvm/Function.h>
 #include <llvm/GlobalVariable.h>
+#include <llvm/Instructions.h>
 
 using namespace kiwi;
 using namespace kiwi::lang;
@@ -62,7 +63,7 @@ CharConstNode::CharConstNode(ContextRef context, const UChar& value)
 : m_context(context), m_value(value) { }
 
 CallNode::CallNode(const Identifier& method)
-: m_method(method) {}
+: m_method(method), m_hasNamed(false) {}
 
 void CallNode::append(const Identifier& name, RightNode* value)
 {
@@ -71,6 +72,7 @@ void CallNode::append(const Identifier& name, RightNode* value)
     arg.Position = m_arguments.size();
     arg.Value    = value;
     m_arguments.push_back(arg);
+    m_hasNamed = true;
 }
 
 void CallNode::append(RightNode* value)
@@ -222,5 +224,36 @@ ExpressionGen CharConstNode::emit(const StatementGen& gen)
 
 ExpressionGen CallNode::emit(const StatementGen& gen)
 {
-    throw "Not implement call node";
+    std::vector<TypeRef>        types;
+    std::vector<llvm::Value*>   args;
+
+    if (m_hasNamed) {
+        throw "Not implement call by named arguments";
+    }
+
+    StatementGen current = gen;
+    for (std::vector<CallArgument>::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
+        // emit code for argument
+        ExpressionGen expr = i->Value->emit(current);
+        current            = expr;
+
+        // store info
+        types.push_back(expr.getType());
+        args.push_back(expr.getValue());
+    }
+
+    TypeRef owner    = gen.getOwner();
+    MethodRef method = owner->find(m_method, types);
+    if (method) {
+        llvm::Function* func = method->getFunction();
+        if (!func) {
+            throw "Function implementation not found";
+        }
+
+        // return result of call
+        llvm::Value* result = llvm::CallInst::Create(func, makeArrayRef(args), "", current.getBlock());
+        return ExpressionGen(current, method->getResultType(), result);
+    } else {
+        throw "Method not found";
+    }
 }

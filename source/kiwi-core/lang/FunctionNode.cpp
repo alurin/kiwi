@@ -143,72 +143,76 @@ RightNode* VariableNode::getRight()
     return new VariableRightNode(this);
 }
 
-void FunctionNode::emit(TypeRef ownerType)
+void FunctionNode::generate(TypeRef ownerType)
 {
-    // prepare result
-    ModuleRef                   module = ownerType->getModule();
-    llvm::Type*                 resultType = 0;
-    std::vector<llvm::Type*>    argTypes;
-    std::vector<ArgumentNode*>  argLists;
+    ModuleRef module = ownerType->getModule();
 
-    // generate result type
-    {
-        TypeRef type = m_type->get();
-        resultType   = type->getVarType();
-    }
+    // collect nodes
+    TypeRef     frontendResultType = m_type->get();
+    llvm::Type* backendResultType  = frontendResultType->getVarType();
 
-    // perpare arguments
+    // collect arguments
+    std::vector<llvm::Type*>    backendArgs;
+    std::vector<ArgumentRef>    frontendArgs;
     for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i)
     {
         ArgumentNode* arg = i->second;
-        TypeRef       type_ref = arg->getType()->get();
-        llvm::Type*   arg_type = type_ref->getVarType();
+        TypeRef       frontend_type = arg->getType()->get();
+        ArgumentRef   frontend_arg  = Argument::create(i->first, frontend_type);
+        llvm::Type*   backend_type  = frontend_type->getVarType();
 
-        argTypes.push_back(arg_type);
-        argLists.push_back(arg);
+        backendArgs.push_back(backend_type);
+        frontendArgs.push_back(frontend_arg);
+        m_positions.push_back(arg);
     }
 
-    // generate method
+
+    llvm::FunctionType* backendType = llvm::FunctionType::get(backendResultType, llvm::makeArrayRef(backendArgs), false);
+    m_method = ownerType->add(m_name, frontendResultType, frontendArgs);
+    m_func   = llvm::Function::Create(backendType, llvm::GlobalValue::ExternalLinkage , m_name, module->getModule());
+    m_method->setFunction(m_func);
+
+    // emit mutable variables for arguments
+    size_t j = 0;
+    for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j)
     {
-        TypeRef type = m_type->get();
-        std::vector<ArgumentRef> args;
-        for (std::vector<ArgumentNode*>::iterator i = argLists.begin(); i != argLists.end(); ++i)
-        {
-            ArgumentNode* argn = *i;
-            ArgumentRef arg = Argument::create(argn->getName(), argn->getType()->get());
-            args.push_back(arg);
-        }
-
-        ownerType->add(m_name, type, args);
+        ArgumentNode* arg = m_positions[j];
+        i->setName(arg->getName());
     }
+}
 
-    // emit function ant her type
-    llvm::FunctionType* type = llvm::FunctionType::get(resultType, llvm::makeArrayRef(argTypes), false);
-    m_func                   = llvm::Function::Create(type, llvm::GlobalValue::ExternalLinkage , m_name, module->getModule());
+void FunctionNode::emit(TypeRef ownerType)
+{
     llvm::BasicBlock* entry  = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
 
     // emit mutable variables for arguments
     size_t j = 0;
     for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j)
     {
-        ArgumentNode* arg = argLists[j];
-        i->setName(arg->getName());
-
-        if (!i->getType()->isPointerTy()) {
+        ArgumentNode* arg = m_positions[j];
+        //if (!i->getType()->isPointerTy()) {
             llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
             llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
 
             VariableGen vargen(arg->getType()->get(), value);
             arg->setGenerator(vargen);
-        }
+        // } else {
+        //     llvm::PointerType* pointer = llvm::cast<llvm::PointerType>(i->getType());
+        //     llvm::AllocaInst*  value   = new llvm::AllocaInst(pointer->getElementType(), arg->getName(), entry);
+        //     llvm::StoreInst*   store   = new llvm::StoreInst(i, value, entry);
+
+        //     VariableGen vargen(arg->getType()->get(), value);
+        //     arg->setGenerator(vargen);
+        // }
     }
 
     // emit instructions
-    StatementGen gen(entry);
+    StatementGen gen(ownerType, entry);
     gen = m_root->emit(gen);
 
     /// emit terminator for last block
     if (!gen.getBlock()->getTerminator()) {
+        llvm::Type* resultType = llvm::cast<llvm::FunctionType>(m_func->getType())->getReturnType();
         if (resultType->isVoidTy()) {
             llvm::ReturnInst::Create(gen.getContext(), gen.getBlock());
         } else {

@@ -406,8 +406,8 @@ typedef unsigned char YY_CHAR;
 	(yy_c_buf_p) = yy_cp;
 
 /* %% [4.0] data tables for the DFA and the user's section 1 definitions go here */
-#define YY_NUM_RULES 62
-#define YY_END_OF_BUFFER 63
+#define YY_NUM_RULES 61
+#define YY_END_OF_BUFFER 62
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -415,23 +415,23 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[141] =
+static yyconst flex_int16_t yy_accept[137] =
     {   0,
-        0,    0,   41,   41,    0,    0,    0,    0,    0,    0,
-       63,   61,   34,   35,   35,   61,   39,   38,   61,   61,
-       40,   61,   61,   61,   61,   33,   61,   61,   61,   61,
-       30,   30,   30,   30,   30,   30,   30,   30,   30,   61,
-       38,   41,   43,   42,   46,   45,   45,   54,   62,   47,
-       54,   62,   62,   34,   35,    6,   31,    4,   17,   14,
-        9,   33,   11,   10,   12,   36,   37,   13,    1,    8,
-        5,    7,    2,   32,   30,   30,   30,   30,   25,   30,
-       30,   30,   30,   30,   18,    3,    0,   41,   42,   42,
-       44,   45,   53,   51,   52,   48,   50,   49,   60,    0,
+        0,    0,   40,   40,    0,    0,    0,    0,    0,    0,
+       62,   60,   33,   34,   34,   60,   38,   37,   60,   60,
+       39,   60,   60,   60,   60,   32,   60,   60,   60,   60,
+       29,   29,   29,   29,   29,   29,   29,   29,   29,   60,
+       40,   42,   41,   45,   44,   44,   53,   61,   46,   53,
+       61,   61,   33,   34,    6,   30,    4,   17,   14,    9,
+       32,   11,   10,   12,   35,   36,   13,    1,    8,    5,
+        7,    2,   31,   29,   29,   29,   29,   25,   29,   29,
+       29,   29,   29,   18,    3,   40,   41,   41,   43,   44,
+       52,   50,   51,   47,   49,   48,   59,    0,    0,    0,
 
-        0,    0,    0,    0,   31,   15,   16,   32,   30,   30,
-       30,   30,   20,   30,   30,   30,   30,    0,   29,   58,
-       59,   55,   57,   56,   21,   23,   26,   30,   30,   30,
-       30,   19,   30,   28,   30,   30,   27,   24,   22,    0
+        0,    0,   30,   15,   16,   31,   29,   29,   29,   29,
+       20,   29,   29,   29,   29,   57,   58,   54,   56,   55,
+       21,   23,   26,   29,   29,   29,   29,   19,   29,   28,
+       29,   29,   27,   24,   22,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -475,81 +475,78 @@ static yyconst flex_int32_t yy_meta[42] =
         1
     } ;
 
-static yyconst flex_int16_t yy_base[154] =
+static yyconst flex_int16_t yy_base[149] =
     {   0,
-        0,  205,   39,   40,   41,   43,   46,   50,   45,   51,
-      211,  213,  208,   54,   56,  192,  213,  213,    0,   46,
-      213,  191,   53,   60,   65,  192,   45,  189,   63,    0,
-        0,  171,  174,  171,   36,  166,  174,  162,  165,   57,
-      193,    0,  213,   72,  213,   81,   84,  213,  213,  213,
-       66,  187,   79,  194,   88,  213,    0,  213,  213,  213,
-      213,  180,  213,  213,  213,  213,  213,  213,  177,  213,
-      213,  213,  176,    0,    0,  158,  168,  153,  162,  150,
-      156,  148,  149,  153,  213,  213,  180,    0,   82,   86,
-      213,  102,  213,  213,  213,  213,  213,  213,  213,  172,
+        0,    0,   39,   40,   41,   43,   46,   50,   45,   51,
+      202,  203,  199,   54,   56,  183,  203,  203,    0,   46,
+      203,  182,   53,   60,   65,  183,   45,  180,   63,    0,
+        0,  162,  165,  162,   36,  157,  165,  153,  156,   57,
+        0,  203,   72,  203,   81,   84,  203,  203,  203,   66,
+      179,   79,  186,   88,  203,    0,  203,  203,  203,  203,
+      172,  203,  203,  203,  203,  203,  203,  169,  203,  203,
+      203,  168,    0,    0,  150,  160,  145,  154,  142,  148,
+      140,  141,  145,  203,  203,    0,   82,   86,  203,  102,
+      203,  203,  203,  203,  203,  203,  203,  165,  164,  163,
 
-      171,  170,  169,  168,    0,  213,  213,    0,  145,  140,
-      148,  142,    0,  124,  112,  115,  119,  113,  213,  213,
-      213,  213,  213,  213,    0,    0,    0,   77,   75,   75,
-       77,    0,   82,    0,   75,   72,    0,    0,    0,  213,
-      117,  123,  129,  135,   90,   73,  138,  143,  149,  155,
-      158,  161,  167
+      162,  161,    0,  203,  203,    0,  138,  133,  141,  125,
+        0,  118,  107,  114,   90,  203,  203,  203,  203,  203,
+        0,    0,    0,   77,   75,   75,   77,    0,   82,    0,
+       75,   72,    0,    0,    0,  203,  117,  123,  129,  135,
+       90,   73,  138,  143,  149,  155,  158,  161
     } ;
 
-static yyconst flex_int16_t yy_def[154] =
+static yyconst flex_int16_t yy_def[149] =
     {   0,
-      140,    1,  141,  141,  142,  142,  143,  143,  144,  144,
-      140,  140,  140,  140,  140,  140,  140,  140,  145,  140,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  146,
-      147,  147,  147,  147,  147,  147,  147,  147,  147,  140,
-      140,  148,  140,  149,  140,  140,  140,  140,  140,  140,
-      150,  140,  140,  140,  140,  140,  151,  140,  140,  140,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140,  152,  147,  147,  147,  147,  147,  147,
-      147,  147,  147,  147,  140,  140,  153,  148,  149,  149,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  140,
+      136,    1,  137,  137,  138,  138,  139,  139,  140,  140,
+      136,  136,  136,  136,  136,  136,  136,  136,  141,  136,
+      136,  136,  136,  136,  136,  136,  136,  136,  136,  142,
+      143,  143,  143,  143,  143,  143,  143,  143,  143,  136,
+      144,  136,  145,  136,  136,  136,  136,  136,  136,  146,
+      136,  136,  136,  136,  136,  147,  136,  136,  136,  136,
+      136,  136,  136,  136,  136,  136,  136,  136,  136,  136,
+      136,  136,  148,  143,  143,  143,  143,  143,  143,  143,
+      143,  143,  143,  136,  136,  144,  145,  145,  136,  136,
+      136,  136,  136,  136,  136,  136,  136,  136,  136,  136,
 
-      140,  140,  140,  140,  151,  140,  140,  152,  147,  147,
-      147,  147,  147,  147,  147,  147,  147,  153,  140,  140,
-      140,  140,  140,  140,  147,  147,  147,  147,  147,  147,
-      147,  147,  147,  147,  147,  147,  147,  147,  147,    0,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140
+      136,  136,  147,  136,  136,  148,  143,  143,  143,  143,
+      143,  143,  143,  143,  143,  136,  136,  136,  136,  136,
+      143,  143,  143,  143,  143,  143,  143,  143,  143,  143,
+      143,  143,  143,  143,  143,    0,  136,  136,  136,  136,
+      136,  136,  136,  136,  136,  136,  136,  136
     } ;
 
-static yyconst flex_int16_t yy_nxt[255] =
+static yyconst flex_int16_t yy_nxt[245] =
     {   0,
        12,   13,   14,   15,   16,   17,   18,   19,   20,   21,
        22,   23,   24,   25,   26,   27,   28,   29,   30,   31,
        12,   12,   31,   32,   33,   31,   34,   31,   31,   31,
        35,   31,   31,   31,   36,   37,   38,   31,   31,   39,
-       40,   43,   43,   46,   47,   46,   47,   49,   49,   44,
-       44,   50,   49,   49,   58,   50,   55,   55,   55,   55,
-       69,   70,   59,   79,   61,   53,   51,   62,   80,   63,
-       51,   53,   64,   85,   62,   66,   65,   74,   67,   72,
-       73,   68,   90,   92,   92,   91,   92,   92,   99,   94,
-       55,   55,  140,   95,   57,  140,   90,   86,   96,   91,
+       40,   42,   42,   45,   46,   45,   46,   48,   48,   43,
+       43,   49,   48,   48,   57,   49,   54,   54,   54,   54,
+       68,   69,   58,   78,   60,   52,   50,   61,   79,   62,
+       50,   52,   63,   84,   61,   65,   64,   73,   66,   71,
+       72,   67,   88,   90,   90,   89,   90,   90,   97,   92,
+       54,   54,  136,   93,   56,  136,   88,   85,   94,   89,
 
-      139,   97,  100,   98,   92,   92,  101,  138,  137,  136,
-      135,  102,  134,  133,  103,  119,  104,   42,   42,   42,
-       42,   42,   42,   45,   45,   45,   45,   45,   45,   48,
-       48,   48,   48,   48,   48,   52,   52,   52,   52,   52,
-       52,   75,   75,   88,  132,  131,   88,   88,   88,   89,
-      130,   89,   89,   89,   89,   93,  129,   93,   93,   93,
-       93,  105,  105,  105,  108,  108,  108,  118,  118,  118,
-      118,  118,  118,  128,  127,  126,  125,  124,  123,  122,
-      121,  120,  119,  117,  116,  115,  114,  113,  112,  111,
-      110,  109,  107,  106,   62,   54,   99,   87,   84,   83,
+      135,   95,   98,   96,   90,   90,   99,  134,  133,  132,
+      131,  100,  130,  129,  101,  128,  102,   41,   41,   41,
+       41,   41,   41,   44,   44,   44,   44,   44,   44,   47,
+       47,   47,   47,   47,   47,   51,   51,   51,   51,   51,
+       51,   74,   74,   86,  127,  126,   86,   86,   86,   87,
+      125,   87,   87,   87,   87,   91,  124,   91,   91,   91,
+       91,  103,  103,  103,  106,  106,  106,  123,  122,  121,
+      120,  119,  118,  117,  116,  115,  114,  113,  112,  111,
+      110,  109,  108,  107,  105,  104,   61,   53,   97,   83,
+       82,   81,   80,   77,   76,   75,   70,   61,   59,   55,
 
-       82,   81,   78,   77,   76,   71,   62,   60,   56,   54,
-      140,   41,   11,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140,  140
+       53,  136,   11,  136,  136,  136,  136,  136,  136,  136,
+      136,  136,  136,  136,  136,  136,  136,  136,  136,  136,
+      136,  136,  136,  136,  136,  136,  136,  136,  136,  136,
+      136,  136,  136,  136,  136,  136,  136,  136,  136,  136,
+      136,  136,  136,  136
     } ;
 
-static yyconst flex_int16_t yy_chk[255] =
+static yyconst flex_int16_t yy_chk[245] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -558,38 +555,36 @@ static yyconst flex_int16_t yy_chk[255] =
         1,    3,    4,    5,    5,    6,    6,    9,    7,    3,
         4,    7,    8,   10,   20,    8,   14,   14,   15,   15,
        27,   27,   20,   35,   23,    9,    7,   23,   35,   23,
-        8,   10,   24,   40,   24,   25,   24,  146,   25,   29,
-       29,   25,   44,   46,   46,   44,   47,   47,   53,   51,
-       55,   55,   89,   51,  145,   89,   90,   40,   51,   90,
+        8,   10,   24,   40,   24,   25,   24,  142,   25,   29,
+       29,   25,   43,   45,   45,   43,   46,   46,   52,   50,
+       54,   54,   87,   50,  141,   87,   88,   40,   50,   88,
 
-      136,   51,   53,   51,   92,   92,   53,  135,  133,  131,
-      130,   53,  129,  128,   53,  118,   53,  141,  141,  141,
-      141,  141,  141,  142,  142,  142,  142,  142,  142,  143,
-      143,  143,  143,  143,  143,  144,  144,  144,  144,  144,
-      144,  147,  147,  148,  117,  116,  148,  148,  148,  149,
-      115,  149,  149,  149,  149,  150,  114,  150,  150,  150,
-      150,  151,  151,  151,  152,  152,  152,  153,  153,  153,
-      153,  153,  153,  112,  111,  110,  109,  104,  103,  102,
-      101,  100,   87,   84,   83,   82,   81,   80,   79,   78,
-       77,   76,   73,   69,   62,   54,   52,   41,   39,   38,
+      132,   50,   52,   50,   90,   90,   52,  131,  129,  127,
+      126,   52,  125,  124,   52,  115,   52,  137,  137,  137,
+      137,  137,  137,  138,  138,  138,  138,  138,  138,  139,
+      139,  139,  139,  139,  139,  140,  140,  140,  140,  140,
+      140,  143,  143,  144,  114,  113,  144,  144,  144,  145,
+      112,  145,  145,  145,  145,  146,  110,  146,  146,  146,
+      146,  147,  147,  147,  148,  148,  148,  109,  108,  107,
+      102,  101,  100,   99,   98,   83,   82,   81,   80,   79,
+       78,   77,   76,   75,   72,   68,   61,   53,   51,   39,
+       38,   37,   36,   34,   33,   32,   28,   26,   22,   16,
 
-       37,   36,   34,   33,   32,   28,   26,   22,   16,   13,
-       11,    2,  140,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140,  140,  140,  140,  140,  140,  140,  140,
-      140,  140,  140,  140
+       13,   11,  136,  136,  136,  136,  136,  136,  136,  136,
+      136,  136,  136,  136,  136,  136,  136,  136,  136,  136,
+      136,  136,  136,  136,  136,  136,  136,  136,  136,  136,
+      136,  136,  136,  136,  136,  136,  136,  136,  136,  136,
+      136,  136,  136,  136
     } ;
 
-static yyconst flex_int16_t yy_rule_linenum[62] =
+static yyconst flex_int16_t yy_rule_linenum[61] =
     {   0,
        70,   71,   72,   73,   74,   75,   76,   77,   78,   79,
        80,   81,   82,   83,   84,   85,   86,   87,   89,   90,
-       91,   92,   93,   95,   96,   97,   98,  100,  103,  107,
-      112,  117,  122,  128,  131,  136,  137,  138,  139,  140,
-      143,  144,  145,  146,  150,  151,  155,  163,  164,  165,
-      166,  167,  168,  169,  173,  174,  175,  176,  177,  178,
-      182
+       91,   92,   93,   95,   96,   97,   98,  100,  102,  107,
+      112,  117,  123,  126,  131,  132,  133,  134,  135,  138,
+      139,  140,  141,  145,  146,  150,  158,  159,  160,  161,
+      162,  163,  164,  168,  169,  170,  171,  172,  173,  177
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -638,7 +633,7 @@ typedef kiwi::lang::Parser::token_type token_type;
 
 
 
-#line 642 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.cpp"
+#line 637 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.cpp"
 
 #define INITIAL 0
 #define comment 1
@@ -791,9 +786,6 @@ static int yy_flex_strlen (yyconst char * );
 
 /* %% [6.0] YY_RULE_SETUP definition goes here */
 #define YY_RULE_SETUP \
-	if ( yyleng > 0 ) \
-		YY_CURRENT_BUFFER_LVALUE->yy_at_bol = \
-				(yytext[yyleng - 1] == '\n'); \
 	YY_USER_ACTION
 
 /* %not-for-header */
@@ -820,7 +812,7 @@ YY_DECL
 
  /*** BEGIN EXAMPLE - Change the example lexer rules below ***/
 
-#line 824 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.cpp"
+#line 816 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -871,7 +863,6 @@ YY_DECL
 
 /* %% [9.0] code to set up and find next match goes here */
 		yy_current_state = (yy_start);
-		yy_current_state += YY_AT_BOL();
 yy_match:
 		do
 			{
@@ -884,13 +875,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 141 )
+				if ( yy_current_state >= 137 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_current_state != 140 );
+		while ( yy_current_state != 136 );
 		yy_cp = (yy_last_accepting_cpos);
 		yy_current_state = (yy_last_accepting_state);
 
@@ -909,12 +900,12 @@ do_action:	/* This label is used only to access EOF actions. */
 			{
 			if ( yy_act == 0 )
 				std::cerr << "--scanner backing up\n";
-			else if ( yy_act < 62 )
+			else if ( yy_act < 61 )
 				std::cerr << "--accepting rule at line " << yy_rule_linenum[yy_act] <<
 				         "(\"" << yytext << "\")\n";
-			else if ( yy_act == 62 )
+			else if ( yy_act == 61 )
 				std::cerr << "--accepting default rule (\"" << yytext << "\")\n";
-			else if ( yy_act == 63 )
+			else if ( yy_act == 62 )
 				std::cerr << "--(end of buffer or a NUL)\n";
 			else
 				std::cerr << "--EOF (start condition " << YY_START << ")\n";
@@ -1070,23 +1061,20 @@ YY_RULE_SETUP
 #line 100 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { return token::PRINT;       }
 	YY_BREAK
-/* Unix command */
 case 29:
-*yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
-(yy_c_buf_p) = yy_cp -= 1;
-YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 103 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 102 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 {
-    return token::UNIX_SCRIPT;
+    yylval->stringVal = new std::string(yytext, yyleng);
+    return token::IDENT;
 }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 107 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 {
-    yylval->stringVal = new std::string(yytext, yyleng);
-    return token::IDENT;
+    yylval->stringVal = new std::string(yytext+1, yyleng-1);
+    return token::VAR_LOCAL;
 }
 	YY_BREAK
 case 31:
@@ -1094,107 +1082,99 @@ YY_RULE_SETUP
 #line 112 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 {
     yylval->stringVal = new std::string(yytext+1, yyleng-1);
-    return token::VAR_LOCAL;
+    return token::VAR_INSTANCE;
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 117 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 {
-    yylval->stringVal = new std::string(yytext+1, yyleng-1);
-    return token::VAR_INSTANCE;
-}
-	YY_BREAK
-case 33:
-YY_RULE_SETUP
-#line 122 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{
     yylval->integerVal = atoi(yytext);
     return token::INTEGER;
 }
 	YY_BREAK
 /* gobble up white-spaces */
-case 34:
+case 33:
 YY_RULE_SETUP
-#line 128 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 123 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 {
     yylloc->step();
 }
 	YY_BREAK
-case 35:
-/* rule 35 can match eol */
+case 34:
+/* rule 34 can match eol */
 YY_RULE_SETUP
-#line 131 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 126 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 {
     yylloc->lines(yyleng);
 }
 	YY_BREAK
 /* comments and strings */
+case 35:
+YY_RULE_SETUP
+#line 131 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ BEGIN(comment);       }
+	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 136 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ BEGIN(comment);       }
+#line 132 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ BEGIN(line_comment);  }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 137 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 133 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { BEGIN(line_comment);  }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 138 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ BEGIN(line_comment);  }
+#line 134 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ BEGIN(string_state);  }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 139 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ BEGIN(string_state);  }
-	YY_BREAK
-case 40:
-YY_RULE_SETUP
-#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 135 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { BEGIN(char_state);    }
 	YY_BREAK
 
-case 41:
+case 40:
 YY_RULE_SETUP
-#line 143 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 138 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { /* eat anything that's not a '*' */ }
 	YY_BREAK
-case 42:
+case 41:
 YY_RULE_SETUP
-#line 144 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 139 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { /* eat up '*'s not followed by '/'s */ }
 	YY_BREAK
-case 43:
-/* rule 43 can match eol */
+case 42:
+/* rule 42 can match eol */
 YY_RULE_SETUP
-#line 145 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { yylloc->lines(yyleng);              }
 	YY_BREAK
-case 44:
+case 43:
 YY_RULE_SETUP
-#line 146 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 141 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { BEGIN(INITIAL);                     }
 	YY_BREAK
 
 
-case 45:
-/* rule 45 can match eol */
+case 44:
+/* rule 44 can match eol */
 YY_RULE_SETUP
-#line 150 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 145 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { yylloc->lines(yyleng); BEGIN(INITIAL); }
 	YY_BREAK
-case 46:
+case 45:
 YY_RULE_SETUP
-#line 151 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 146 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { }
 	YY_BREAK
 
 
-case 47:
+case 46:
 YY_RULE_SETUP
-#line 155 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 150 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 {
                             /* saw closing quote - all done */
                              BEGIN(INITIAL);
@@ -1203,89 +1183,89 @@ YY_RULE_SETUP
                              return token::STRING;
                         }
 	YY_BREAK
+case 47:
+YY_RULE_SETUP
+#line 158 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ stringBuffer << '\n';      }
+	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 163 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ stringBuffer << '\n';      }
+#line 159 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ stringBuffer << '\t';      }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 164 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ stringBuffer << '\t';      }
+#line 160 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ stringBuffer << '\r';      }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 165 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ stringBuffer << '\r';      }
+#line 161 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ stringBuffer << '\b';      }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 166 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ stringBuffer << '\b';      }
+#line 162 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ stringBuffer << '\f';      }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 167 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ stringBuffer << '\f';      }
+#line 163 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ stringBuffer << yytext[1]; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 168 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ stringBuffer << yytext[1]; }
-	YY_BREAK
-case 54:
-YY_RULE_SETUP
-#line 169 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 164 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { stringBuffer << yytext[0]; }
 	YY_BREAK
 
 
+case 54:
+YY_RULE_SETUP
+#line 168 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ yylval->charVal = '\n'; BEGIN(INITIAL); return token::CHAR;      }
+	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 173 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ yylval->charVal = '\n'; BEGIN(INITIAL); return token::CHAR;      }
+#line 169 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ yylval->charVal = '\t'; BEGIN(INITIAL); return token::CHAR;      }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 174 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ yylval->charVal = '\t'; BEGIN(INITIAL); return token::CHAR;      }
+#line 170 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ yylval->charVal = '\r'; BEGIN(INITIAL); return token::CHAR;      }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 175 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ yylval->charVal = '\r'; BEGIN(INITIAL); return token::CHAR;      }
+#line 171 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ yylval->charVal = '\b'; BEGIN(INITIAL); return token::CHAR;      }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 176 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ yylval->charVal = '\b'; BEGIN(INITIAL); return token::CHAR;      }
+#line 172 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+{ yylval->charVal = '\f'; BEGIN(INITIAL); return token::CHAR;      }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 177 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
-{ yylval->charVal = '\f'; BEGIN(INITIAL); return token::CHAR;      }
-	YY_BREAK
-case 60:
-YY_RULE_SETUP
-#line 178 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 173 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 { yylval->charVal = yytext[0]; BEGIN(INITIAL); return token::CHAR; }
 	YY_BREAK
 
 /* pass all other characters up to bison */
-case 61:
+case 60:
 YY_RULE_SETUP
-#line 182 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 177 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 {
     return static_cast<token_type>(*yytext);
 }
 	YY_BREAK
 /*** END EXAMPLE - Change the example lexer rules above ***/
-case 62:
+case 61:
 YY_RULE_SETUP
-#line 188 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 183 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 ECHO;
 	YY_BREAK
-#line 1289 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.cpp"
+#line 1269 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comment):
 case YY_STATE_EOF(line_comment):
@@ -1678,7 +1658,6 @@ int yyFlexLexer::yy_get_next_buffer()
     
 /* %% [15.0] code to get the start state into yy_current_state goes here */
 	yy_current_state = (yy_start);
-	yy_current_state += YY_AT_BOL();
 
 	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
 		{
@@ -1692,7 +1671,7 @@ int yyFlexLexer::yy_get_next_buffer()
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 141 )
+			if ( yy_current_state >= 137 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1725,11 +1704,11 @@ int yyFlexLexer::yy_get_next_buffer()
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 141 )
+		if ( yy_current_state >= 137 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 140);
+	yy_is_jam = (yy_current_state == 136);
 
 	return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1848,7 +1827,6 @@ int yyFlexLexer::yy_get_next_buffer()
 	(yy_hold_char) = *++(yy_c_buf_p);
 
 /* %% [19.0] update BOL and yylineno */
-	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (c == '\n');
 
 	return c;
 }
@@ -2340,7 +2318,7 @@ void Examplefree (void * ptr )
 
 /* %ok-for-header */
 
-#line 188 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
+#line 183 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 
 
 

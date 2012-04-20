@@ -14,6 +14,7 @@ namespace llvm {
 namespace kiwi
 {
     typedef boost::shared_ptr<class Module> ModuleRef;
+    typedef boost::shared_ptr<class Method> MethodRef;
 
 namespace lang
 {
@@ -162,6 +163,9 @@ namespace lang
             return m_root;
         }
 
+        /// Generate metadata
+        void generate(TypeRef owner);
+
         /// Emit function code and instruction
         void emit(TypeRef owner);
 
@@ -169,11 +173,15 @@ namespace lang
             return m_func;
         }
     protected:
-        Identifier      m_name;
-        TypeNode*       m_type;
-        ScopeNode*      m_root;
+        // store fields
+        Identifier                  m_name;
+        TypeNode*                   m_type;
+        ScopeNode*                  m_root;
 
-        llvm::Function* m_func;
+        // generated fields
+        MethodRef                   m_method;
+        llvm::Function*             m_func;
+        std::vector<ArgumentNode*>  m_positions;
 
         std::map<Identifier, ArgumentNode*> m_args;
     };

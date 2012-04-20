@@ -13,7 +13,7 @@
 using namespace kiwi;
 
 Context::Context()
-: m_context(0), m_meta(new ContextMeta())
+: m_context(0), m_meta(new ContextMeta()), m_optimizationLevel(1), m_debug(false)
 {
     // Configure the logging mechanism
     log4cxx::LoggerPtr rootlogger = log4cxx::Logger::getRootLogger();

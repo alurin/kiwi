@@ -49,10 +49,33 @@ namespace kiwi
         ContextMeta* getMetadata() const {
             return m_meta;
         }
+
+        /// Is scanner and parser debug mode
+        bool isDebug() const {
+            return m_debug;
+        }
+
+        /// Set scanner and parser debug mode
+        void setDebug(bool debug) {
+            m_debug = debug;
+        }
+
+        /// Returns optimization level
+        int8_t getOptimizationLevel() {
+            return m_optimizationLevel;
+        }
+
+        /// Set optimization level
+        void setOptimizationLevel(int8_t level) {
+            m_optimizationLevel = level;
+        }
     protected:
         log4cxx::LoggerPtr  m_logger;
         llvm::LLVMContext*  m_context;
         ContextMeta*        m_meta;
+
+        int8_t              m_optimizationLevel;
+        bool                m_debug;
 
         /// constructor
         Context();

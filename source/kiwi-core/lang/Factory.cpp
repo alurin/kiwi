@@ -78,7 +78,6 @@ CallNode* NodeFactory::call()
 CallNode* NodeFactory::call(const Identifier& name)
 {
     //assert(!m_calls.empty() && "Calls stack is empty");
-    return m_calls.top();
     CallNode* call = new CallNode(name);
     m_calls.push(call);
     return call;

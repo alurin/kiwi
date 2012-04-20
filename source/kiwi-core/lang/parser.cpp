@@ -649,7 +649,7 @@ namespace kiwi { namespace lang {
 
 /* Line 678 of lalr1.cc  */
 #line 220 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
-    { driver.call();                }
+    { driver.call(*(yysemantic_stack_[(1) - (1)].stringVal));             }
     break;
 
   case 28:

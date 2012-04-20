@@ -1,22 +1,22 @@
 // $Id: driver.cc 39 2008-08-03 10:07:15Z tb $
 /** \file driver.cc Implementation of the example::Driver class. */
 
+#include "Driver.hpp"
+#include "ExpressionNode.hpp"
+#include "FunctionNode.hpp"
+#include "kiwi/Context.hpp"
+#include "scanner.h"
+#include "TypeNode.hpp"
 #include <fstream>
 #include <sstream>
-
-#include "Driver.hpp"
-#include "FunctionNode.hpp"
-#include "TypeNode.hpp"
-#include "ExpressionNode.hpp"
-#include "scanner.h"
 
 using namespace kiwi;
 using namespace kiwi::lang;
 
 Driver::Driver(ContextRef context)
     : NodeFactory(context),
-      trace_scanning(false),
-      trace_parsing(false)
+      trace_scanning(context->isDebug()),
+      trace_parsing(context->isDebug())
 {
 }
 

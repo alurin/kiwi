@@ -7,19 +7,21 @@
 namespace llvm
 {
     class Type;
+    class Function;
 }
 
 namespace kiwi
 {
     typedef boost::shared_ptr<class Context>            ContextRef;
     typedef boost::shared_ptr<class Module>             ModuleRef;
-    typedef boost::weak_ptr<class Module>               ModuleWeak;
     typedef boost::shared_ptr<class Type>               TypeRef;
     typedef boost::shared_ptr<class BinaryOperator>     BinaryRef;
     typedef boost::shared_ptr<class UnaryOperator>      UnaryRef;
     typedef boost::shared_ptr<class Method>             MethodRef;
     typedef boost::shared_ptr<class Field>              FieldRef;
     typedef boost::shared_ptr<class Argument>           ArgumentRef;
+
+    typedef boost::weak_ptr<class Module>               ModuleWeak;
 
     namespace codegen
     {
@@ -119,6 +121,14 @@ namespace kiwi
     class Argument {
     public:
         static ArgumentRef create(const Identifier& name, const TypeRef& type);
+
+        Identifier getName() const {
+            return m_name;
+        }
+
+        TypeRef getType () const {
+            return m_type;
+        }
     protected:
         Identifier  m_name;
         TypeRef     m_type;
@@ -130,12 +140,36 @@ namespace kiwi
     class Method {
         friend class Type;
     public:
+        typedef std::vector<ArgumentRef>::const_iterator const_iterator;
 
+        Identifier getName() const {
+            return m_name;
+        }
+
+        TypeRef getOwnerType() const {
+            return m_ownerType;
+        }
+
+        TypeRef getResultType() const {
+            return m_resultType;
+        }
+
+        llvm::Function* getFunction() const {
+            return m_func;
+        }
+
+        void setFunction(llvm::Function* func) {
+            m_func = func;
+        }
+
+        const_iterator begin() const { return m_arguments.begin(); }
+        const_iterator end()   const { return m_arguments.end();   }
     protected:
         Identifier                  m_name;
         TypeRef                     m_ownerType;
         TypeRef                     m_resultType;
         std::vector<ArgumentRef>    m_arguments;
+        llvm::Function*             m_func;
 
         Method(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments);
 
@@ -203,6 +237,9 @@ namespace kiwi
 
         /// find binary operator
         BinaryRef find(BinaryOperator::Opcode opcode, TypeRef operatorType);
+
+        /// find method
+        MethodRef find(const Identifier& name, std::vector<TypeRef> arguments);
     protected:
         ModuleWeak              m_module;
         std::vector<UnaryRef>   m_unary;

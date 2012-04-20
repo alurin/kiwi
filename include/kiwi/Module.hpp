@@ -5,6 +5,7 @@
 
 namespace llvm {
     class Module;
+    class ExecutionEngine;
 }
 
 namespace kiwi
@@ -37,12 +38,19 @@ namespace kiwi
             return m_module;
         }
 
+        /// Build module
+        void build();
+
+        /// Dump module
+        void dump();
+
         /// Run main function in module
         int32_t run();
     protected:
-        Identifier      m_name;
-        ContextWeak     m_context;
-        llvm::Module*   m_module;
+        Identifier              m_name;
+        ContextWeak             m_context;
+        llvm::Module*           m_module;
+        llvm::ExecutionEngine*  m_engine;
 
         /// module constructor
         Module(const Identifier& name, const ContextRef& ref);

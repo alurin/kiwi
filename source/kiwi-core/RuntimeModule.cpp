@@ -29,8 +29,7 @@ void kiwi::initRuntimeModule(ModuleRef mod)
     llvm::Function* printChar   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_char", voidType, charType, NULL));
     llvm::Function* printString = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_string", voidType, bufferType, intType, NULL));
 
-    module->dump();
-
+    /// Bug with link for LLVM
     kiwi_print_string(0, 0);
 }
 

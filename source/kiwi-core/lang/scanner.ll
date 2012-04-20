@@ -99,11 +99,6 @@ typedef kiwi::lang::Parser::token_type token_type;
 
 "print"  { return token::PRINT;       }
 
- /* Unix command */
-^#!.*$ {
-    return token::UNIX_SCRIPT;
-}
-
 [A-Za-z][A-Za-z0-9]* {
     yylval->stringVal = new std::string(yytext, yyleng);
     return token::IDENT;

@@ -3,11 +3,6 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-ExpressionGen::ExpressionGen(llvm::BasicBlock* block, TypeRef type, llvm::Value* value)
-: StatementGen(block), m_type(type), m_value(value)
-{
-}
-
 ExpressionGen::ExpressionGen(const ExpressionGen& gen)
 : StatementGen(gen),  m_type(gen.m_type), m_value(gen.m_value)
 {
