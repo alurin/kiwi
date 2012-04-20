@@ -143,13 +143,15 @@ RightNode* VariableNode::getRight()
     return new VariableRightNode(this);
 }
 
-void FunctionNode::generate(ModuleRef module)
+void FunctionNode::emit(TypeRef ownerType)
 {
     // prepare result
+    ModuleRef                   module = ownerType->getModule();
     llvm::Type*                 resultType = 0;
     std::vector<llvm::Type*>    argTypes;
     std::vector<ArgumentNode*>  argLists;
 
+    // generate result type
     {
         TypeRef type = m_type->get();
         resultType   = type->getVarType();
@@ -164,6 +166,20 @@ void FunctionNode::generate(ModuleRef module)
 
         argTypes.push_back(arg_type);
         argLists.push_back(arg);
+    }
+
+    // generate method
+    {
+        TypeRef type = m_type->get();
+        std::vector<ArgumentRef> args;
+        for (std::vector<ArgumentNode*>::iterator i = argLists.begin(); i != argLists.end(); ++i)
+        {
+            ArgumentNode* argn = *i;
+            ArgumentRef arg = Argument::create(argn->getName(), argn->getType()->get());
+            args.push_back(arg);
+        }
+
+        ownerType->add(m_name, type, args);
     }
 
     // emit function ant her type

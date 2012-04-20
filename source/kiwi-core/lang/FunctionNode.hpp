@@ -162,7 +162,8 @@ namespace lang
             return m_root;
         }
 
-        void generate(ModuleRef module);
+        /// Emit function code and instruction
+        void emit(TypeRef owner);
 
         llvm::Function* getFunction() {
             return m_func;

@@ -61,6 +61,27 @@ StringConstNode::StringConstNode(ContextRef context, const String& value)
 CharConstNode::CharConstNode(ContextRef context, const UChar& value)
 : m_context(context), m_value(value) { }
 
+CallNode::CallNode(const Identifier& method)
+: m_method(method) {}
+
+void CallNode::append(const Identifier& name, RightNode* value)
+{
+    CallArgument arg;
+    arg.Name     = name;
+    arg.Position = m_arguments.size();
+    arg.Value    = value;
+    m_arguments.push_back(arg);
+}
+
+void CallNode::append(RightNode* value)
+{
+    CallArgument arg;
+    arg.Name     = "";
+    arg.Position = m_arguments.size();
+    arg.Value    = value;
+    m_arguments.push_back(arg);
+}
+
 ExpressionGen BinaryNode::emit(const StatementGen& gen)
 {
     // emit operands
@@ -197,4 +218,9 @@ ExpressionGen CharConstNode::emit(const StatementGen& gen)
     llvm::APInt cst(16, m_value, true);
     llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
     return ExpressionGen(gen, CharType::get(m_context), value);
+}
+
+ExpressionGen CallNode::emit(const StatementGen& gen)
+{
+    throw "Not implement call node";
 }

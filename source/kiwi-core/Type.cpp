@@ -31,6 +31,37 @@ BinaryOperator::BinaryOperator(
 ) : m_opcode(opcode), m_resultType(resultType), m_operatorType(operatorType), m_emitter(emitter)
 { }
 
+// constructor
+Method::Method(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments)
+: m_name(name), m_ownerType(ownerType), m_resultType(resultType), m_arguments(arguments)
+{}
+
+// constructor
+Argument::Argument(const Identifier& name, const TypeRef& type)
+: m_name(name), m_type(type) { }
+
+// crate type
+TypeRef Type::create(ModuleRef module)
+{
+    TypeRef type               = TypeRef(new Type(module));
+    llvm::LLVMContext& context = module->getContext()->getContext();
+    type->m_varType            = llvm::StructType::create(context);
+    return type;
+}
+
+// create method
+MethodRef Method::create(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments)
+{
+    MethodRef method = MethodRef(new Method(name, ownerType, resultType, arguments));
+    return method;
+}
+
+ArgumentRef Argument::create(const Identifier& name, const TypeRef& type)
+{
+    ArgumentRef arg = ArgumentRef(new Argument(name, type));
+    return arg;
+}
+
 // add binary operator
 UnaryRef Type::add(
     UnaryOperator::Opcode opcode,
@@ -52,6 +83,14 @@ BinaryRef Type::add(
     BinaryRef op = BinaryRef(new BinaryOperator(opcode, resultType, operatorType, emitter));
     m_binary.push_back(op);
     return op;
+}
+
+// add method
+MethodRef Type::add(const Identifier& name, TypeRef resultType, std::vector<ArgumentRef> arguments)
+{
+    MethodRef method = Method::create(name, shared_from_this(), resultType, arguments);
+    m_methods.push_back(method);
+    return method;
 }
 
 // find unary operator

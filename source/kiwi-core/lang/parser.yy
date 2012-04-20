@@ -126,11 +126,12 @@
 %right      PRE '.' '[' '('
 
 %type   <typenode>      type type_complex type_primary
-%type   <rightnode>     expression right
+%type   <rightnode>     expression right call_expression
 %type   <leftnode>      left
 %type   <stmtnode>      scope return_statement print_statement
 
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
+%destructor { delete $$; } expression right call_expression
 %destructor { delete $$; } type type_complex type_primary
 %destructor { delete $$; } scope return_statement print_statement
 %destructor { delete $$; } STRING
@@ -211,10 +212,28 @@ return_statement
 
 print_statement
     : PRINT expression  ';'         { $$ = driver.createPrint($2, @1);  }
+
+//==------------------------------------------------------------------------==//
+//      Calls
+//==------------------------------------------------------------------------==//
+call_expression
+    : IDENT                         { driver.call();                }
+        '(' call_arguments ')'      { $$ = driver.callEnd();        }
     ;
 
-conditional
-    : IF '(' expression ')' scope
+call_arguments
+    : /* empty */
+    | call_arguments_required
+    ;
+
+call_arguments_required
+    : call_argument ',' call_arguments_required
+    | call_argument
+    ;
+
+call_argument
+    : IDENT ':' expression          { driver.call()->append(*$1, $3); }
+    | expression                    { driver.call()->append($1);      }
     ;
 
 //==------------------------------------------------------------------------==//
@@ -264,6 +283,7 @@ right
     | STRING                        { $$ = driver.createString(*$1, @1);    }
     | CHAR                          { $$ = driver.createChar($1, @1);       }
     | '(' expression ')'            { $$ = $2;                              }
+    | call_expression               { $$ = $1;                              }
     ;
 
 

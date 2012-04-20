@@ -272,7 +272,7 @@ namespace kiwi { namespace lang {
     /// Zero means the default is an error.
     static const unsigned char yydefact_[];
 
-    static const short int yypgoto_[];
+    static const signed char yypgoto_[];
     static const signed char yydefgoto_[];
 
     /// What to do in a state.

@@ -36,10 +36,13 @@ void Module::includeFile(const Path& filename)
 {
     lang::Driver driver(m_context.lock());
     if (driver.parseFile(filename)) {
+
+        TypeRef type = Type::create(shared_from_this());
+
         /// @todo build examples
         for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i)
         {
-            (*i)->generate(shared_from_this());
+            (*i)->emit(type);
         }
     }
 }

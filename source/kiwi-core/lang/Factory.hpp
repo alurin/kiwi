@@ -279,6 +279,19 @@ namespace lang {
         }
 
         //===--------------------------------------------------------------===//
+        //    Calls
+        //===--------------------------------------------------------------===//
+
+        /// returns current call
+        CallNode* call();
+
+        /// declare call
+        CallNode* call(const Identifier& name);
+
+        /// end current call
+        CallNode* callEnd();
+
+        //===--------------------------------------------------------------===//
         //    Other staff
         //===--------------------------------------------------------------===//
 
@@ -301,6 +314,7 @@ namespace lang {
         ContextRef                  m_context;
         std::stack<FunctionNode*>   m_funcs;
         std::stack<ScopeNode*>      m_scopes;
+        std::stack<CallNode*>       m_calls;
         std::vector<FunctionNode*>  m_functions;
     };
 

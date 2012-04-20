@@ -17,6 +17,9 @@ namespace kiwi
     typedef boost::shared_ptr<class Type>               TypeRef;
     typedef boost::shared_ptr<class BinaryOperator>     BinaryRef;
     typedef boost::shared_ptr<class UnaryOperator>      UnaryRef;
+    typedef boost::shared_ptr<class Method>             MethodRef;
+    typedef boost::shared_ptr<class Field>              FieldRef;
+    typedef boost::shared_ptr<class Argument>           ArgumentRef;
 
     namespace codegen
     {
@@ -113,14 +116,56 @@ namespace kiwi
         );
     };
 
+    class Argument {
+    public:
+        static ArgumentRef create(const Identifier& name, const TypeRef& type);
+    protected:
+        Identifier  m_name;
+        TypeRef     m_type;
+
+        Argument(const Identifier& name, const TypeRef& type);
+    };
+
+    /// Methods
+    class Method {
+        friend class Type;
+    public:
+
+    protected:
+        Identifier                  m_name;
+        TypeRef                     m_ownerType;
+        TypeRef                     m_resultType;
+        std::vector<ArgumentRef>    m_arguments;
+
+        Method(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments);
+
+        static MethodRef create(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments);
+    };
+
+    /// Fields. Not implemented
+    class Field {
+        friend class Type;
+    protected:
+        Identifier  m_name;
+        TypeRef     m_type;
+
+        Field(const Identifier& name, TypeRef type);
+
+        static FieldRef create(const Identifier& name, TypeRef type);
+
+        // FieldRef* create(const Identifier& name);
+    };
+
     /// Type metadata
     class Type : public boost::enable_shared_from_this<Type>
     {
-        Type(const Type&);                  ///< NOT IMPLEMENT!!!
+        Type(const Type&);                   ///< NOT IMPLEMENT!!!
         Type& operator=(const Type& type);   ///< NOT IMPLEMENT!!!
     public:
         /// destructor
         virtual ~Type();
+
+        static TypeRef create(ModuleRef module);
 
         /// returns type owner module
         ModuleRef getModule() const {
@@ -147,6 +192,12 @@ namespace kiwi
             codegen::BinaryEmitter* emitter
         );
 
+        /// add field
+        FieldRef add(const Identifier& name, TypeRef type);
+
+        /// add method
+        MethodRef add(const Identifier& name, TypeRef resultType, std::vector<ArgumentRef> arguments);
+
         /// find unary operator
         UnaryRef find(UnaryOperator::Opcode opcode);
 
@@ -156,7 +207,8 @@ namespace kiwi
         ModuleWeak              m_module;
         std::vector<UnaryRef>   m_unary;
         std::vector<BinaryRef>  m_binary;
-
+        std::vector<MethodRef>  m_methods;
+        std::vector<FieldRef>   m_fields;
         llvm::Type*             m_varType;
 
         Type(ModuleRef module);

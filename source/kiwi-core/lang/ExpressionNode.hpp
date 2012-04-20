@@ -148,6 +148,30 @@ namespace lang {
         ContextRef  m_context;
         UChar     m_value;
     };
+
+    class CallNode : public RightNode {
+    public:
+        CallNode(const Identifier& method);
+
+        /// Add named argument
+        void append(const Identifier& name, RightNode* value);
+
+        /// Add positior argument
+        void append(RightNode* value);
+
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
+    protected:
+        class CallArgument {
+        public:
+            RightNode*  Value;
+            int32_t     Position;
+            Identifier  Name;
+        };
+    protected:
+        Identifier                 m_method;
+        std::vector<CallArgument>  m_arguments;
+    };
 }}
 
 #endif

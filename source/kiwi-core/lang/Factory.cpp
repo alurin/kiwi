@@ -66,3 +66,29 @@ RightNode* NodeFactory::right(const Identifier& name, const location& loc)
     node->setLocation(loc);
     return node;
 }
+
+/// returns current call
+CallNode* NodeFactory::call()
+{
+    //assert(!m_calls.empty() && "Calls stack is empty");
+    return m_calls.top();
+}
+
+/// declare call
+CallNode* NodeFactory::call(const Identifier& name)
+{
+    //assert(!m_calls.empty() && "Calls stack is empty");
+    return m_calls.top();
+    CallNode* call = new CallNode(name);
+    m_calls.push(call);
+    return call;
+}
+
+/// end current call
+CallNode* NodeFactory::callEnd()
+{
+    //assert(!m_calls.empty() && "Calls stack is empty");
+    CallNode* call = m_calls.top();
+    m_calls.pop();
+    return call;
+}
