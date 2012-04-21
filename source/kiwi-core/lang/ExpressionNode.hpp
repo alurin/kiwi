@@ -149,6 +149,18 @@ namespace lang {
         UChar     m_value;
     };
 
+    class BoolConstNode : public RightNode
+    {
+    public:
+        BoolConstNode(ContextRef context, bool value);
+
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
+    protected:
+        ContextRef  m_context;
+        bool        m_value;
+    };
+
     class CallNode : public RightNode {
     public:
         CallNode(const Identifier& method);

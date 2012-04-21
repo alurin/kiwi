@@ -1,6 +1,11 @@
 #!/usr/bin/env kiwi
 
-void main()
+void printHelloWord()
 {
     print "Hello word!\n";
+}
+
+void main()
+{
+    printHelloWord();
 }

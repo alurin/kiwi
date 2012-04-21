@@ -1,9 +1,6 @@
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/DerivedTypes.hpp"
-#include <log4cxx/logger.h>
-#include <log4cxx/level.h>
-#include <log4cxx/consoleappender.h>
 #include "ContextMeta.hpp"
 #include "llvm/Support/TargetSelect.h"
 #include "RuntimeModule.hpp"
@@ -15,11 +12,7 @@ using namespace kiwi;
 Context::Context()
 : m_context(0), m_meta(new ContextMeta()), m_optimizationLevel(1), m_debug(false)
 {
-    // Configure the logging mechanism
-    log4cxx::LoggerPtr rootlogger = log4cxx::Logger::getRootLogger();
-    rootlogger->addAppender(new log4cxx::ConsoleAppender(new log4cxx::PatternLayout("[%-5p] %m%n")));
 
-    m_logger = rootlogger;
 }
 
 Context::~Context() {

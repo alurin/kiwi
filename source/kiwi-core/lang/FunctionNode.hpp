@@ -26,7 +26,6 @@ namespace lang
 
     using codegen::VariableGen;
 
-
     /// Named parameter syntax node
     class NamedNode : public Node
     {
@@ -143,6 +142,22 @@ namespace lang
         std::vector<StatementNode*>         m_stmts;
     };
 
+    /// Field syntax node
+    class FieldNode : public Node {
+    public:
+        FieldNode(const Identifier& name, TypeNode* type);
+
+        virtual ~FieldNode();
+
+        /// Generate metadata
+        virtual void generate(TypeRef owner);
+    protected:
+        // store fields
+        Identifier                  m_name;
+        TypeNode*                   m_type;
+    };
+
+    /// Function syntx node
     class FunctionNode : public Node
     {
     public:
@@ -164,7 +179,7 @@ namespace lang
         }
 
         /// Generate metadata
-        void generate(TypeRef owner);
+        virtual void generate(TypeRef owner);
 
         /// Emit function code and instruction
         void emit(TypeRef owner);

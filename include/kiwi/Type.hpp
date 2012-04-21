@@ -171,9 +171,7 @@ namespace kiwi
         std::vector<ArgumentRef>    m_arguments;
         llvm::Function*             m_func;
 
-        Method(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments);
-
-        static MethodRef create(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments);
+        Method(const Identifier& name, const TypeRef& ownerType, const TypeRef& resultType, std::vector<ArgumentRef> arguments);
     };
 
     /// Fields. Not implemented
@@ -181,13 +179,9 @@ namespace kiwi
         friend class Type;
     protected:
         Identifier  m_name;
-        TypeRef     m_type;
+        TypeRef     m_fieldType;
 
-        Field(const Identifier& name, TypeRef type);
-
-        static FieldRef create(const Identifier& name, TypeRef type);
-
-        // FieldRef* create(const Identifier& name);
+        Field(const Identifier& name, const TypeRef& fieldType);
     };
 
     /// Type metadata
@@ -227,19 +221,22 @@ namespace kiwi
         );
 
         /// add field
-        FieldRef add(const Identifier& name, TypeRef type);
+        FieldRef add(const Identifier& name, const TypeRef& type);
 
         /// add method
-        MethodRef add(const Identifier& name, TypeRef resultType, std::vector<ArgumentRef> arguments);
+        MethodRef add(const Identifier& name, const TypeRef& resultType, std::vector<ArgumentRef> arguments);
 
         /// find unary operator
         UnaryRef find(UnaryOperator::Opcode opcode);
 
         /// find binary operator
-        BinaryRef find(BinaryOperator::Opcode opcode, TypeRef operatorType);
+        BinaryRef find(BinaryOperator::Opcode opcode, const TypeRef& operatorType);
 
         /// find method
         MethodRef find(const Identifier& name, std::vector<TypeRef> arguments);
+
+        /// emit type metadata and structure
+        void emit();
     protected:
         ModuleWeak              m_module;
         std::vector<UnaryRef>   m_unary;

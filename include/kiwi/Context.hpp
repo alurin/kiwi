@@ -35,11 +35,6 @@ namespace kiwi
         /// destructor
         virtual ~Context();
 
-        /// returns Log4c++ logger
-        log4cxx::LoggerPtr logger() const {
-            return m_logger;
-        }
-
         /// returns LLVM context
         llvm::LLVMContext& getContext() const {
             return *m_context;
@@ -70,7 +65,6 @@ namespace kiwi
             m_optimizationLevel = level;
         }
     protected:
-        log4cxx::LoggerPtr  m_logger;
         llvm::LLVMContext*  m_context;
         ContextMeta*        m_meta;
 

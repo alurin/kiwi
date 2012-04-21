@@ -5,7 +5,6 @@
 
 void kiwi_print_integer(int32_t value)
 {
-    // UFILE *uout = u_finit(stdout, NULL, NULL);
     fprintf(stdout, "%d", value);
 }
 
@@ -17,8 +16,14 @@ void kiwi_print_char(UChar value)
 
 void kiwi_print_bool(int8_t value)
 {
-    UFILE *uout = u_finit(stdout, NULL, NULL);
-    u_fputc(value, uout);
+    // UFILE *uout = u_finit(stdout, NULL, NULL);
+    // u_fputc(value, uout);
+
+    if (value) {
+        fprintf(stdout, "true");
+    } else {
+        fprintf(stdout, "false");
+    }
 }
 
 void kiwi_print_string(UChar* buffer, int32_t lenght)

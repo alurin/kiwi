@@ -96,6 +96,8 @@
 %token  <integerVal>    INTEGER             "integer constant"
 %token  <ustringVal>    STRING              "string constant"
 %token  <charVal>       CHAR                "char constant"
+%token                  BOOL_TRUE           "true"
+%token                  BOOL_FALSE          "false"
 %token  <stringVal>     VAR_LOCAL           "local variable"
 %token  <stringVal>     VAR_INSTANCE        "instance attribute"
 
@@ -104,6 +106,7 @@
 %token                  TYPE_BOOL           "bool type"
 %token                  TYPE_CHAR           "char type"
 %token                  TYPE_STRING         "string type"
+
 
 %token                  RETURN              "return"
 %token                  IF                  "if"
@@ -149,6 +152,8 @@
 #undef yylex
 #define yylex driver.lexer->lex
 
+#define yyfree(__px1) delete __px1; __px1 = 0;
+
 %}
 
 %% /*** Grammar Rules ***/
@@ -158,8 +163,16 @@
 //==------------------------------------------------------------------------==//
 //      Functions
 //==------------------------------------------------------------------------==//
+
+field
+    : type VAR_INSTANCE ';'         { driver.field(*$2, $1); yyfree($2); }
+    ;
+
+//==------------------------------------------------------------------------==//
+//      Functions
+//==------------------------------------------------------------------------==//
 function
-    : type IDENT                    { driver.func(*$2, $1); }
+    : type IDENT                    { driver.func(*$2, $1); yyfree($2); }
       '(' function_arguments ')'
       function_statement
                                     { driver.funcEnd();     }
@@ -197,12 +210,12 @@ statements
     ;
 
 scope
-    : '{'               { driver.scopeBegin(); }
+    : '{'                   { driver.scopeBegin(); }
         scope_end
     ;
 
 scope_end
-    : statements '}'    { driver.scopeEnd(); }
+    : statements '}'        { driver.scopeEnd(); }
     ;
 
 return_statement
@@ -217,7 +230,7 @@ print_statement
 //      Calls
 //==------------------------------------------------------------------------==//
 call_expression
-    : IDENT                         { driver.call(*$1);             }
+    : IDENT                         { driver.call(*$1); yyfree($1); }
         '(' call_arguments ')'      { $$ = driver.callEnd();        }
     ;
 
@@ -232,7 +245,7 @@ call_arguments_required
     ;
 
 call_argument
-    : IDENT ':' expression          { driver.call()->append(*$1, $3); }
+    : IDENT ':' expression          { driver.call()->append(*$1, $3); yyfree($1); }
     | expression                    { driver.call()->append($1);      }
     ;
 
@@ -241,7 +254,7 @@ call_argument
 //==------------------------------------------------------------------------==//
 
 variable_declare
-    : type VAR_LOCAL                { driver.scope()->declare(*$2, $1); }
+    : type VAR_LOCAL                { driver.scope()->declare(*$2, $1); yyfree($2); }
     ;
 
 expression
@@ -266,24 +279,26 @@ expression
     | expression "!="  expression   { $$ = driver.createNeq($1, $3, @2); }
     | expression ">="  expression   { $$ = driver.createGe ($1, $3, @2); }
     | expression "<="  expression   { $$ = driver.createLe ($1, $3, @2); }
-    | expression ">"   expression   { $$ = driver.createGt ($1, $3, @2); }
-    | expression "<"   expression   { $$ = driver.createLt ($1, $3, @2); }
+    | expression '>'   expression   { $$ = driver.createGt ($1, $3, @2); }
+    | expression '<'   expression   { $$ = driver.createLt ($1, $3, @2); }
 
     | left       '='   expression   { $$ = driver.createAssign($1, $3, @2); }
     | right
     ;
 
 left
-    : VAR_LOCAL                     { $$ = driver.left(*$1, @1); }
+    : VAR_LOCAL                     { $$ = driver.left(*$1, @1); yyfree($1); }
     ;
 
 right
-    : VAR_LOCAL                     { $$ = driver.right(*$1, @1);           }
-    | INTEGER                       { $$ = driver.createInt($1, @1);        }
-    | STRING                        { $$ = driver.createString(*$1, @1);    }
-    | CHAR                          { $$ = driver.createChar($1, @1);       }
-    | '(' expression ')'            { $$ = $2;                              }
-    | call_expression               { $$ = $1;                              }
+    : VAR_LOCAL                     { $$ = driver.right(*$1, @1); yyfree($1);        }
+    | INTEGER                       { $$ = driver.createInt($1, @1);                 }
+    | STRING                        { $$ = driver.createString(*$1, @1); yyfree($1); }
+    | BOOL_TRUE                     { $$ = driver.createBool(true, @1);              }
+    | BOOL_FALSE                    { $$ = driver.createBool(false, @1);             }
+    | CHAR                          { $$ = driver.createChar($1, @1);                }
+    | '(' expression ')'            { $$ = $2;                                       }
+    | call_expression               { $$ = $1;                                       }
     ;
 
 
@@ -307,10 +322,15 @@ type_primary
     | TYPE_CHAR             { $$ = driver.createCharTy(@1);    }
     ;
 
+elements
+    : function
+    | field
+    ;
+
 /** START POINT **/
 start
     : /* empty */
-    | function start END
+    | elements start END
     ;
 
 /*** END GRAMAR - Change the example grammar rules above ***/

@@ -1,6 +1,8 @@
 #!/usr/bin/env kiwi
 
+int @a;
+
 void main()
 {
-    print "Hello word!\n";
+    // @a = 10;
 }

@@ -68,6 +68,15 @@ FunctionNode::~FunctionNode()
     }
 }
 
+FieldNode::FieldNode(const Identifier& name, TypeNode* type)
+: m_name(name), m_type(type)
+{}
+
+FieldNode::~FieldNode()
+{
+    delete m_type;
+}
+
 ExpressionNode::ExpressionNode(ScopeNode* parent, RightNode* expr)
 : StatementNode(parent), m_expr(expr) { }
 
@@ -141,6 +150,12 @@ LeftNode* VariableNode::getLeft()
 RightNode* VariableNode::getRight()
 {
     return new VariableRightNode(this);
+}
+
+void FieldNode::generate(TypeRef ownerType)
+{
+    TypeRef resultType = m_type->get();
+    ownerType->add(m_name, resultType);
 }
 
 void FunctionNode::generate(TypeRef ownerType)

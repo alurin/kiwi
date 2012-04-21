@@ -1,4 +1,3 @@
-
 TODO
 ====
 * 3 modes:
@@ -18,9 +17,11 @@ TODO
     <=
     >=
 
+int[i, j] = 10;
+
 * String type
     +
     ==
     !=
     []
-    read and write by index ([i])
+    read and write by index ([i, j])

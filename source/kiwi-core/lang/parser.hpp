@@ -173,20 +173,22 @@ namespace kiwi { namespace lang {
      INTEGER = 279,
      STRING = 280,
      CHAR = 281,
-     VAR_LOCAL = 282,
-     VAR_INSTANCE = 283,
-     TYPE_VOID = 284,
-     TYPE_INT = 285,
-     TYPE_BOOL = 286,
-     TYPE_CHAR = 287,
-     TYPE_STRING = 288,
-     RETURN = 289,
-     IF = 290,
-     ELSE = 291,
-     IFELSE = 292,
-     PRINT = 293,
-     UNARY = 294,
-     PRE = 295
+     BOOL_TRUE = 282,
+     BOOL_FALSE = 283,
+     VAR_LOCAL = 284,
+     VAR_INSTANCE = 285,
+     TYPE_VOID = 286,
+     TYPE_INT = 287,
+     TYPE_BOOL = 288,
+     TYPE_CHAR = 289,
+     TYPE_STRING = 290,
+     RETURN = 291,
+     IF = 292,
+     ELSE = 293,
+     IFELSE = 294,
+     PRINT = 295,
+     UNARY = 296,
+     PRE = 297
    };
 
     };
@@ -272,7 +274,7 @@ namespace kiwi { namespace lang {
     /// Zero means the default is an error.
     static const unsigned char yydefact_[];
 
-    static const signed char yypgoto_[];
+    static const short int yypgoto_[];
     static const signed char yydefgoto_[];
 
     /// What to do in a state.
@@ -280,10 +282,10 @@ namespace kiwi { namespace lang {
     /// - if positive, shift that token.
     /// - if negative, reduce the rule which number is the opposite.
     /// - if zero, do what YYDEFACT says.
-    static const signed char yytable_[];
+    static const short int yytable_[];
     static const signed char yytable_ninf_;
 
-    static const signed char yycheck_[];
+    static const short int yycheck_[];
 
     /// For a state, its accessing symbol.
     static const unsigned char yystos_[];
@@ -363,7 +365,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 367 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 369 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
 
 
 

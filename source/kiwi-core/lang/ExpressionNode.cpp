@@ -56,6 +56,9 @@ ArgumentRightNode::ArgumentRightNode(ArgumentNode* arg)
 IntegerConstNode::IntegerConstNode(ContextRef context, int32_t value)
 : m_context(context), m_value(value) { }
 
+BoolConstNode::BoolConstNode(ContextRef context, bool value)
+: m_context(context), m_value(value) { }
+
 StringConstNode::StringConstNode(ContextRef context, const String& value)
 : m_context(context), m_value(value) { }
 
@@ -164,6 +167,13 @@ ExpressionGen IntegerConstNode::emit(const StatementGen& gen)
     llvm::APInt cst(32, m_value, false);
     llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
     return ExpressionGen(gen, IntType::get32(m_context), value);
+}
+
+ExpressionGen BoolConstNode::emit(const StatementGen& gen)
+{
+    llvm::APInt cst(1, m_value, false);
+    llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
+    return ExpressionGen(gen, BoolType::get(m_context), value);
 }
 
 ExpressionGen StringConstNode::emit(const StatementGen& gen)

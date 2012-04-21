@@ -29,6 +29,13 @@ FunctionNode* NodeFactory::funcEnd()
     return func;
 }
 
+FieldNode* NodeFactory::field(const Identifier& name, TypeNode* type)
+{
+    FieldNode* field = new FieldNode(name, type);
+    m_fields.push_back(field);
+    return field;
+}
+
 // returns current scope
 ScopeNode* NodeFactory::scope()
 {

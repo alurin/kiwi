@@ -44,15 +44,19 @@ void Module::includeFile(const Path& filename)
 
         TypeRef type = Type::create(shared_from_this());
 
-        /// @todo build examples
-        for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i)
-        {
+        for (std::vector<lang::FieldNode*>::const_iterator i = driver.field_begin(); i != driver.field_end(); ++i) {
+            (*i)->generate(type);
+        }
+
+        /// Emit type structure
+        type->emit();
+
+        for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i) {
             (*i)->generate(type);
         }
 
         /// @todo build examples
-        for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i)
-        {
+        for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i) {
             (*i)->emit(type);
         }
     }

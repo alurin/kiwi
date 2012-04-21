@@ -30,6 +30,11 @@ namespace lang {
         FunctionNode* funcEnd();
 
         //===--------------------------------------------------------------===//
+        //    Functions
+        //===--------------------------------------------------------------===//
+        FieldNode* field(const Identifier& name, TypeNode* type);
+
+        //===--------------------------------------------------------------===//
         //    Scopes
         //===--------------------------------------------------------------===//
         /// returns current scope
@@ -107,6 +112,13 @@ namespace lang {
         RightNode* createChar(const UChar& value, const location& loc)
         {
             RightNode* node = new CharConstNode(m_context, value);
+            node->setLocation(loc);
+            return node;
+        }
+
+        RightNode* createBool(bool value, const location& loc)
+        {
+            RightNode* node = new BoolConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }
@@ -310,12 +322,25 @@ namespace lang {
         {
             return m_functions.end();
         }
+
+        // returns begin of fields vector
+        std::vector<FieldNode*>::const_iterator field_begin() const
+        {
+            return m_fields.begin();
+        }
+
+        // returns end of fields vector
+        std::vector<FieldNode*>::const_iterator field_end() const
+        {
+            return m_fields.end();
+        }
     protected:
         ContextRef                  m_context;
         std::stack<FunctionNode*>   m_funcs;
         std::stack<ScopeNode*>      m_scopes;
         std::stack<CallNode*>       m_calls;
         std::vector<FunctionNode*>  m_functions;
+        std::vector<FieldNode*>     m_fields;
     };
 
 }}

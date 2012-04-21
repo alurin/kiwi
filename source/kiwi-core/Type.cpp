@@ -32,7 +32,12 @@ BinaryOperator::BinaryOperator(
 { }
 
 // constructor
-Method::Method(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments)
+Field::Field(const Identifier& name, const TypeRef& fieldType)
+: m_name(name), m_fieldType(fieldType) {
+
+}
+// constructor
+Method::Method(const Identifier& name, const TypeRef& ownerType, const TypeRef& resultType, std::vector<ArgumentRef> arguments)
 : m_name(name), m_ownerType(ownerType), m_resultType(resultType), m_arguments(arguments), m_func(0)
 {}
 
@@ -43,17 +48,8 @@ Argument::Argument(const Identifier& name, const TypeRef& type)
 // crate type
 TypeRef Type::create(ModuleRef module)
 {
-    TypeRef type               = TypeRef(new Type(module));
-    llvm::LLVMContext& context = module->getContext()->getContext();
-    type->m_varType            = llvm::StructType::create(context);
+    TypeRef type = TypeRef(new Type(module));
     return type;
-}
-
-// create method
-MethodRef Method::create(const Identifier& name, TypeRef ownerType, TypeRef resultType, std::vector<ArgumentRef> arguments)
-{
-    MethodRef method = MethodRef(new Method(name, ownerType, resultType, arguments));
-    return method;
 }
 
 ArgumentRef Argument::create(const Identifier& name, const TypeRef& type)
@@ -85,10 +81,18 @@ BinaryRef Type::add(
     return op;
 }
 
-// add method
-MethodRef Type::add(const Identifier& name, TypeRef resultType, std::vector<ArgumentRef> arguments)
+// add field
+FieldRef Type::add(const Identifier& name, const TypeRef& fieldType)
 {
-    MethodRef method = Method::create(name, shared_from_this(), resultType, arguments);
+    FieldRef field = FieldRef(new Field(name, fieldType));
+    m_fields.push_back(field);
+    return field;
+}
+
+// add method
+MethodRef Type::add(const Identifier& name, const TypeRef& resultType, std::vector<ArgumentRef> arguments)
+{
+    MethodRef method = MethodRef(new Method(name, shared_from_this(), resultType, arguments));
     m_methods.push_back(method);
     return method;
 }
@@ -107,7 +111,7 @@ UnaryRef Type::find(UnaryOperator::Opcode opcode)
 }
 
 // find binary operator
-BinaryRef Type::find(BinaryOperator::Opcode opcode, TypeRef operatorType)
+BinaryRef Type::find(BinaryOperator::Opcode opcode, const TypeRef& operatorType)
 {
     for (std::vector<BinaryRef>::iterator i = m_binary.begin(); i != m_binary.end(); ++i)
     {
@@ -139,4 +143,17 @@ MethodRef Type::find(const Identifier& name, std::vector<TypeRef> arguments)
         }
     }
     return MethodRef();
+}
+
+// Emit type structure
+void Type::emit()
+{
+    /// Structure type
+
+    /// Field type
+
+    /// Simple type
+
+    llvm::LLVMContext& context = m_module.lock()->getContext()->getContext();
+    m_varType            = llvm::StructType::create(context);
 }
