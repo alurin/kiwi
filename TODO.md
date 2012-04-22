@@ -5,9 +5,9 @@ Source code clean up
 --------------------
 * Types
     * Devide types to:
-        * Value types: `integer`, `char` and `float`
-        * Structure types: `string`, `structure`, `arrays`
-        * Object types: `objects`
+        * Value types: `integer`, `char`, `float` and `structures`
+        * Small object types: `string`, `arrays`
+        * Full object types: `objects`
 * Move all LLVM code from syntax nodes and metadata
 * Warning and errors
 

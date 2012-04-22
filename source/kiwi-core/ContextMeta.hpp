@@ -2,18 +2,17 @@
 #define KIWI_CONTEXTMETA_INTERNAL
 
 #include "kiwi/Config.hpp"
+#include "kiwi/DerivedTypes.hpp"
 
 namespace kiwi
 {
-    typedef boost::shared_ptr<class Type> TypeRef;
-
     class ContextMeta {
     public:
-        TypeRef int32Ty;
-        TypeRef boolTy;
-        TypeRef voidTy;
-        TypeRef charTy;
-        TypeRef stringTy;
+        IntTy       int32Ty;
+        BoolTy      boolTy;
+        VoidTy      voidTy;
+        CharTy      charTy;
+        StringTy    stringTy;
     };
 }
 

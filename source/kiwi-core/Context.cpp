@@ -1,6 +1,5 @@
 #include "ContextMeta.hpp"
 #include "kiwi/Context.hpp"
-#include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Module.hpp"
 #include "RuntimeModule.hpp"
 #include <llvm/LLVMContext.h>

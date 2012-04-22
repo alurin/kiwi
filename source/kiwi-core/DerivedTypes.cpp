@@ -11,12 +11,6 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-typedef boost::shared_ptr<IntType>    IntTypeRef;
-typedef boost::shared_ptr<BoolType>   BoolTypeRef;
-typedef boost::shared_ptr<VoidType>   VoidTypeRef;
-typedef boost::shared_ptr<CharType>   CharTypeRef;
-typedef boost::shared_ptr<StringType> StringTypeRef;
-
 IntType::IntType(ModuleRef module, int32_t size, bool unsign)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
@@ -54,36 +48,36 @@ StringType::StringType(ModuleRef module)
     m_varType                  = stringType->getPointerTo(0);
 }
 
-TypeRef IntType::create(ModuleRef module, int32_t size, bool unsign)
+IntTy IntType::create(ModuleRef module, int32_t size, bool unsign)
 {
-    IntTypeRef type = IntTypeRef(new IntType(module, size, unsign));
+    IntTy type = IntTy(new IntType(module, size, unsign));
     type->initializate();
     return type;
 }
 
-TypeRef BoolType::create(ModuleRef module)
+BoolTy BoolType::create(ModuleRef module)
 {
-    BoolTypeRef type = BoolTypeRef(new BoolType(module));
+    BoolTy type = BoolTy(new BoolType(module));
     type->initializate();
     return type;
 }
 
-TypeRef VoidType::create(ModuleRef module)
+VoidTy VoidType::create(ModuleRef module)
 {
-    VoidTypeRef type = VoidTypeRef(new VoidType(module));
+    VoidTy type = VoidTy(new VoidType(module));
     return type;
 }
 
-TypeRef CharType::create(ModuleRef module)
+CharTy CharType::create(ModuleRef module)
 {
-    CharTypeRef type = CharTypeRef(new CharType(module));
+    CharTy type = CharTy(new CharType(module));
     type->initializate();
     return type;
 }
 
-TypeRef StringType::create(ModuleRef module)
+StringTy StringType::create(ModuleRef module)
 {
-    StringTypeRef type = StringTypeRef(new StringType(module));
+    StringTy type = StringTy(new StringType(module));
     type->initializate();
     return type;
 }
@@ -153,31 +147,31 @@ void StringType::initializate()
     add(UnaryOperator::PRINT, voidTy, new LlvmStringPrintOperator());
 }
 
-TypeRef IntType::get32(ContextRef context)
+IntTy IntType::get32(ContextRef context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->int32Ty;
 }
 
-TypeRef BoolType::get(ContextRef context)
+BoolTy BoolType::get(ContextRef context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->boolTy;
 }
 
-TypeRef VoidType::get(ContextRef context)
+VoidTy VoidType::get(ContextRef context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->voidTy;
 }
 
-TypeRef CharType::get(ContextRef context)
+CharTy CharType::get(ContextRef context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->charTy;
 }
 
-TypeRef StringType::get(ContextRef context)
+StringTy StringType::get(ContextRef context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->stringTy;

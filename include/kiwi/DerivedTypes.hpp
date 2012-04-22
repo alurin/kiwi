@@ -5,86 +5,116 @@
 
 namespace kiwi
 {
+    typedef boost::shared_ptr<class VoidType>      VoidTy;
+    typedef boost::shared_ptr<class IntType>       IntTy;
+    typedef boost::shared_ptr<class BoolType>      BoolTy;
+    typedef boost::shared_ptr<class CharType>      CharTy;
+    typedef boost::shared_ptr<class StringType>    StringTy;
+    typedef boost::shared_ptr<class InterfaceType> InterfaceTy;
+    typedef boost::shared_ptr<class ObjectType>    ObjectTy;
+
+
+    //==--------------------------------------------------------------------==//
     /// Void types metadata
     class VoidType : public Type {
         friend class Context;
     public:
-        static TypeRef get(ContextRef context);
-
+        static VoidTy get(ContextRef context);
     private:
         /// constructor
         VoidType(ModuleRef module);
 
         /// create integer type
-        static TypeRef create(ModuleRef module);
+        static VoidTy create(ModuleRef module);
     };
 
+    //==--------------------------------------------------------------------==//
     /// Integers types metadata
     class IntType : public Type
     {
         friend class Context;
     public:
-        static TypeRef get32(ContextRef context);
+        static IntTy get32(ContextRef context);
     private:
         /// constructor
         IntType(ModuleRef module, int32_t size, bool unsign);
 
         /// create integer type
-        static TypeRef create(ModuleRef module, int32_t size, bool unsign);
+        static IntTy create(ModuleRef module, int32_t size, bool unsign);
 
         /// initializator
         void initializate();
     };
 
+    //==--------------------------------------------------------------------==//
     /// Boolean type metadata
     class BoolType : public Type
     {
         friend class Context;
     public:
-        static TypeRef get(ContextRef context);
+        static BoolTy get(ContextRef context);
     protected:
         /// constructor
         BoolType(ModuleRef module);
 
         /// create module type
-        static TypeRef create(ModuleRef module);
+        static BoolTy create(ModuleRef module);
 
         /// initializator
         void initializate();
     };
 
+    //==--------------------------------------------------------------------==//
     /// Character type metadata
     class CharType : public Type {
         friend class Context;
     public:
-        static TypeRef get(ContextRef context);
+        static CharTy get(ContextRef context);
     protected:
         /// constructor
         CharType(ModuleRef module);
 
         /// create module type
-        static TypeRef create(ModuleRef module);
+        static CharTy create(ModuleRef module);
 
         /// initializator
         void initializate();
     };
 
+    //==--------------------------------------------------------------------==//
     /// String type metdata
     class StringType : public Type {
         friend class Context;
     public:
-        static TypeRef get(ContextRef context);
+        static StringTy get(ContextRef context);
     protected:
         /// constructor
         StringType(ModuleRef module);
 
         /// create module type
-        static TypeRef create(ModuleRef module);
+        static StringTy create(ModuleRef module);
 
         /// initializator
         void initializate();
     };
 
+    //==--------------------------------------------------------------------==//
+    class InterfaceType : public Type {
+
+    };
+
+    //==--------------------------------------------------------------------==//
+    /// Object type
+    class ObjectType : public Type {
+    public:
+        /// Create object type
+        static ObjectTy create(const ModuleRef& module, const Identifier& name);
+
+        // void inherit(ObjectTy type);
+        // AddressMap      getAddressMap() const;
+        // VirtualTable    getVirtualTable() const;
+    protected:
+    };
 }
 
 #endif
