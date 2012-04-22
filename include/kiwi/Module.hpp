@@ -11,11 +11,8 @@ namespace llvm {
 namespace kiwi
 {
     typedef boost::shared_ptr<class Module>     ModuleRef;
-    typedef boost::shared_ptr<class Context>  ContextRef;
-    typedef boost::weak_ptr<class Context>    ContextWeak;
-
-    #define FILE_SOURCE = 1; ///< File with source code
-    #define FILE_VIEW   = 2; ///< File with view code
+    typedef boost::shared_ptr<class Context>    ContextRef;
+    typedef boost::weak_ptr<class Context>      ContextWeak;
 
     class Module : public boost::enable_shared_from_this<Module>
     {

@@ -15,7 +15,7 @@ using namespace kiwi;
 using namespace kiwi::codegen;
 
 Type::Type(ModuleRef module)
-: m_module(module), m_varType(0), m_addressMap(0), m_virtualTable(0) { }
+: m_typeID((TypeID) 0), m_module(module), m_varType(0), m_addressMap(0), m_virtualTable(0) { }
 
 Type::~Type() { }
 

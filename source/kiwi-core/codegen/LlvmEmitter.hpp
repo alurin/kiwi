@@ -7,7 +7,9 @@
 
 namespace kiwi {
     typedef boost::shared_ptr<class Type>    TypeRef;
+    typedef boost::weak_ptr<class Type>      TypeWeak;
     typedef boost::shared_ptr<class Context> ContextRef;
+    typedef boost::weak_ptr<class Context>   ContextWeak;
 namespace codegen {
 
     /// LLVM unary operators emitter
@@ -26,7 +28,7 @@ namespace codegen {
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& value);
     protected:
         llvm::Instruction::BinaryOps    m_opcode;
-        TypeRef                         m_type;
+        TypeWeak                        m_type;
     }; /// class LlvmZeroUnaryOperator
 
     /// LLVM binary operators emitter
@@ -39,7 +41,7 @@ namespace codegen {
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right);
     protected:
         llvm::Instruction::BinaryOps    m_opcode;
-        TypeRef                         m_type;
+        TypeWeak                        m_type;
     }; /// class LlvmBinaryOperator
 
     /// LLVM binary operators emitter for compare integers
@@ -52,7 +54,7 @@ namespace codegen {
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right);
     protected:
         llvm::CmpInst::Predicate    m_predicate;
-        ContextRef                  m_context;
+        ContextWeak                 m_context;
     }; /// class LlvmIntegerCompareOperator
 
     /// LLVM binary operators emitter for compare strings
@@ -65,7 +67,7 @@ namespace codegen {
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right);
     protected:
         llvm::CmpInst::Predicate    m_predicate;
-        ContextRef                  m_context;
+        ContextWeak                 m_context;
     }; /// class LlvmStringCompareOperator
 
     class LlvmIntegerPrintOperator : public UnaryEmitter {

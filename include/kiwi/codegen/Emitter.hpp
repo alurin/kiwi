@@ -10,15 +10,21 @@ namespace codegen {
     class UnaryEmitter
     {
     public:
+        /// virtual destructor
+        virtual ~UnaryEmitter();
+
+        /// emit IR instruction for unary operation
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& value) =0;
     }; // class UnaryEmitter
 
     /// Abstract emitter for binary operators
     class BinaryEmitter {
     public:
-        virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) =0;
-
+        /// virtual destructor
         virtual ~BinaryEmitter();
+
+        /// emit IR instruction for binary operation
+        virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) =0;
     }; // class BinaryEmitter
 
 } // namespace codegen

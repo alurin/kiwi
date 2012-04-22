@@ -19,6 +19,9 @@ namespace kiwi
     {
         friend class Type;
     public:
+        /// virtual destructor
+        virtual ~UnaryOperator();
+
         /// returns binary operator opcode
         UnaryOpcode getOpcode() const {
             return m_opcode;
@@ -32,6 +35,16 @@ namespace kiwi
         /// returns IR code emitter
         codegen::UnaryEmitter* getEmitter() const {
             return m_emitter;
+        }
+
+        /// classof check
+        static bool classof(const MemberRef& type) {
+            return type->getMemberID() == UnaryOperatorID;
+        }
+
+        /// classof check
+        static bool classof(const UnaryRef&) {
+            return true;
         }
     protected:
         UnaryOpcode             m_opcode;
@@ -51,6 +64,9 @@ namespace kiwi
     class BinaryOperator : public Member {
         friend class Type;
     public:
+        /// virtual destructor
+        virtual ~BinaryOperator();
+
         /// returns binary opcode
         BinaryOpcode getOpcode() const {
             return m_opcode;
@@ -71,6 +87,16 @@ namespace kiwi
         /// return IR code emitter
         codegen::BinaryEmitter* getEmitter() const {
             return m_emitter;
+        }
+
+        /// classof check
+        static bool classof(const MemberRef& type) {
+            return type->getMemberID() == BinaryOperatorID;
+        }
+
+        /// classof check
+        static bool classof(const BinaryRef&) {
+            return true;
         }
     protected:
         BinaryOpcode             m_opcode;
@@ -113,6 +139,9 @@ namespace kiwi
     public:
         typedef std::vector<ArgumentRef>::const_iterator const_iterator;
 
+        /// virtual destructor
+        virtual ~Method();
+
         /// Returns method name
         Identifier getName() const {
             return m_name;
@@ -137,6 +166,16 @@ namespace kiwi
         const_iterator begin() const { return m_arguments.begin(); }
         /// returns last argument (iterator)
         const_iterator end()   const { return m_arguments.end();   }
+
+        /// classof check
+        static bool classof(const MemberRef& type) {
+            return type->getMemberID() == MethodID;
+        }
+
+        /// classof check
+        static bool classof(const MethodRef&) {
+            return true;
+        }
     protected:
         Identifier                  m_name;
         TypeWeak                    m_ownerType;
@@ -151,6 +190,9 @@ namespace kiwi
     class Field : public Member {
         friend class Type;
     public:
+        /// virtual destructor
+        virtual ~Field();
+
         /// returns field name
         Identifier getName() const {
             return m_name;
@@ -164,6 +206,16 @@ namespace kiwi
         /// returns position in address map
         int32_t getPosition() const {
             return m_position;
+        }
+
+        /// classof check
+        static bool classof(const MemberRef& type) {
+            return type->getMemberID() == FieldID;
+        }
+
+        /// classof check
+        static bool classof(const FieldRef&) {
+            return true;
         }
     protected:
         Identifier  m_name;

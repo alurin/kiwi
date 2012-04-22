@@ -16,13 +16,16 @@ namespace kiwi
     typedef boost::shared_ptr<class Context>            ContextRef;
     typedef boost::shared_ptr<class Module>             ModuleRef;
     typedef boost::shared_ptr<class Type>               TypeRef;
-    typedef boost::shared_ptr<class BinaryOperator>     BinaryRef;
-    typedef boost::shared_ptr<class UnaryOperator>      UnaryRef;
-    typedef boost::shared_ptr<class Method>             MethodRef;
-    typedef boost::shared_ptr<class Field>              FieldRef;
     typedef boost::shared_ptr<class Argument>           ArgumentRef;
     typedef boost::weak_ptr<class Module>               ModuleWeak;
     typedef boost::weak_ptr<class Type>                 TypeWeak;
+    typedef boost::shared_ptr<class VoidType>           VoidTy;
+    typedef boost::shared_ptr<class IntType>            IntTy;
+    typedef boost::shared_ptr<class BoolType>           BoolTy;
+    typedef boost::shared_ptr<class CharType>           CharTy;
+    typedef boost::shared_ptr<class StringType>         StringTy;
+    typedef boost::shared_ptr<class InterfaceType>      InterfaceTy;
+    typedef boost::shared_ptr<class ObjectType>         ObjectTy;
 
     namespace codegen
     {
@@ -36,8 +39,23 @@ namespace kiwi
         Type(const Type&);                   ///< NOT IMPLEMENT!!!
         Type& operator=(const Type& type);   ///< NOT IMPLEMENT!!!
     public:
+        /// Type identifier
+        enum TypeID {
+            VoidID = 1,
+            IntID,
+            BoolID,
+            CharID,
+            StringID,
+            ObjectID
+        };
+
         /// destructor
         virtual ~Type();
+
+        /// returns type identifier
+        TypeID getTypeID() const {
+            return m_typeID;
+        }
 
         /// returns type owner module
         ModuleRef getModule() const {
@@ -95,6 +113,8 @@ namespace kiwi
         /// emit type metadata and structure
         void emit();
     protected:
+        /// Class uniqual identifier
+        TypeID                  m_typeID;
         ModuleWeak              m_module;
         std::vector<UnaryRef>   m_unary;
         std::vector<BinaryRef>  m_binary;

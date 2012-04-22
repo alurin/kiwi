@@ -12,7 +12,7 @@ using namespace kiwi::codegen;
 
 // cosntructor
 Member::Member(const TypeRef& type)
-: m_ownerType(type) { }
+: m_memberID((MemberID) 0), m_ownerType(type) { }
 
 // destructor
 Member::~Member() { }

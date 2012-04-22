@@ -5,21 +5,23 @@
 
 namespace kiwi
 {
-    typedef boost::shared_ptr<class VoidType>      VoidTy;
-    typedef boost::shared_ptr<class IntType>       IntTy;
-    typedef boost::shared_ptr<class BoolType>      BoolTy;
-    typedef boost::shared_ptr<class CharType>      CharTy;
-    typedef boost::shared_ptr<class StringType>    StringTy;
-    typedef boost::shared_ptr<class InterfaceType> InterfaceTy;
-    typedef boost::shared_ptr<class ObjectType>    ObjectTy;
-
-
     //==--------------------------------------------------------------------==//
     /// Void types metadata
     class VoidType : public Type {
         friend class Context;
     public:
-        static VoidTy get(ContextRef context);
+        /// returns void type from context
+        static VoidTy get(const ContextRef& context);
+
+        /// classof check
+        static bool classof(const TypeRef& type) {
+            return type->getTypeID() == VoidID;
+        }
+
+        /// classof check
+        static bool classof(const VoidTy&) {
+            return true;
+        }
     private:
         /// constructor
         VoidType(const ModuleRef& module);
@@ -34,7 +36,18 @@ namespace kiwi
     {
         friend class Context;
     public:
-        static IntTy get32(ContextRef context);
+        /// returns 32-bit signed integer type for context
+        static IntTy get32(const ContextRef& context);
+
+        /// classof check
+        static bool classof(const TypeRef& type) {
+            return type->getTypeID() == IntID;
+        }
+
+        /// classof check
+        static bool classof(const IntTy&) {
+            return true;
+        }
     private:
         /// constructor
         IntType(const ModuleRef& module, int32_t size, bool unsign);
@@ -52,7 +65,18 @@ namespace kiwi
     {
         friend class Context;
     public:
-        static BoolTy get(ContextRef context);
+        /// returns boolean type from context
+        static BoolTy get(const ContextRef& context);
+
+        /// classof check
+        static bool classof(const TypeRef& type) {
+            return type->getTypeID() == BoolID;
+        }
+
+        /// classof check
+        static bool classof(const BoolTy&) {
+            return true;
+        }
     protected:
         /// constructor
         BoolType(const ModuleRef& module);
@@ -69,7 +93,18 @@ namespace kiwi
     class CharType : public Type {
         friend class Context;
     public:
-        static CharTy get(ContextRef context);
+        /// return unicode character type from context
+        static CharTy get(const ContextRef& context);
+
+        /// classof check
+        static bool classof(const TypeRef& type) {
+            return type->getTypeID() == CharID;
+        }
+
+        /// classof check
+        static bool classof(const CharTy&) {
+            return true;
+        }
     protected:
         /// constructor
         CharType(const ModuleRef& module);
@@ -86,7 +121,18 @@ namespace kiwi
     class StringType : public Type {
         friend class Context;
     public:
-        static StringTy get(ContextRef context);
+        /// returns unicode string type from context
+        static StringTy get(const ContextRef& context);
+
+        /// classof check
+        static bool classof(const TypeRef& type) {
+            return type->getTypeID() == StringID;
+        }
+
+        /// classof check
+        static bool classof(const StringTy&) {
+            return true;
+        }
     protected:
         /// constructor
         StringType(const ModuleRef& module);
@@ -107,11 +153,21 @@ namespace kiwi
     /// Object type
     class ObjectType : public Type {
     public:
-        /// Create anonym object type
+        /// Create anonym object type in module
         static ObjectTy create(const ModuleRef& module);
 
-        /// Create object type
+        /// Create object type in module
         static ObjectTy create(const ModuleRef& module, const Identifier& name);
+
+        /// classof check
+        static bool classof(const TypeRef& type) {
+            return type->getTypeID() == ObjectID;
+        }
+
+        /// classof check
+        static bool classof(const ObjectTy&) {
+            return true;
+        }
 
         // void inherit(ObjectTy type);
         // AddressMap      getAddressMap() const;

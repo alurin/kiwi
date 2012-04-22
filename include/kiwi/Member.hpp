@@ -5,8 +5,13 @@
 
 namespace kiwi
 {
+    typedef boost::shared_ptr<class Member>             MemberRef;
     typedef boost::shared_ptr<class Type>               TypeRef;
     typedef boost::weak_ptr<class Type>                 TypeWeak;
+    typedef boost::shared_ptr<class BinaryOperator>     BinaryRef;
+    typedef boost::shared_ptr<class UnaryOperator>      UnaryRef;
+    typedef boost::shared_ptr<class Method>             MethodRef;
+    typedef boost::shared_ptr<class Field>              FieldRef;
 
     /// Type member
     class Member {

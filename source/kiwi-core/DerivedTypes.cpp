@@ -15,29 +15,33 @@ IntType::IntType(const ModuleRef& module, int32_t size, bool unsign)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, size);
+    m_typeID  = IntID;
 }
 
 BoolType::BoolType(const ModuleRef& module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, 1);
+    m_typeID  = BoolID;
 }
 
 VoidType::VoidType(const ModuleRef& module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::Type::getVoidTy(context);
+    m_typeID  = VoidID;
 }
 
 CharType::CharType(const ModuleRef& module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, 16);
+    m_typeID  = CharID;
 }
 
 ObjectType::ObjectType(const ModuleRef& module)
 : Type(module) {
-
+    m_typeID  = ObjectID;
 }
 
 StringType::StringType(const ModuleRef& module)
@@ -51,6 +55,7 @@ StringType::StringType(const ModuleRef& module)
     elements.push_back(bufferType);
     llvm::Type* stringType     = llvm::StructType::create(context, llvm::makeArrayRef(elements), "string", false);
     m_varType                  = stringType->getPointerTo(0);
+    m_typeID                   = StringID;
 }
 
 IntTy IntType::create(const ModuleRef& module, int32_t size, bool unsign)
@@ -164,31 +169,31 @@ void StringType::initializate()
     add(UnaryOperator::PRINT, voidTy, new LlvmStringPrintOperator());
 }
 
-IntTy IntType::get32(ContextRef context)
+IntTy IntType::get32(const ContextRef& context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->int32Ty;
 }
 
-BoolTy BoolType::get(ContextRef context)
+BoolTy BoolType::get(const ContextRef& context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->boolTy;
 }
 
-VoidTy VoidType::get(ContextRef context)
+VoidTy VoidType::get(const ContextRef& context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->voidTy;
 }
 
-CharTy CharType::get(ContextRef context)
+CharTy CharType::get(const ContextRef& context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->charTy;
 }
 
-StringTy StringType::get(ContextRef context)
+StringTy StringType::get(const ContextRef& context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->stringTy;
