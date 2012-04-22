@@ -1,6 +1,8 @@
 #include "StatementNode.hpp"
 #include "FunctionNode.hpp"
 #include "ExpressionNode.hpp"
+#include "kiwi/Type.hpp"
+#include "kiwi/Members.hpp"
 #include "kiwi/codegen/Emitter.hpp"
 #include "kiwi/codegen/Expression.hpp"
 #include "kiwi/codegen/Variable.hpp"

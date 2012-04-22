@@ -287,18 +287,20 @@ expression
     ;
 
 left
-    : VAR_LOCAL                     { $$ = driver.left(*$1, @1); yyfree($1); }
+    : VAR_LOCAL                     { $$ = driver.left(*$1, @1); yyfree($1);          }
+    | VAR_INSTANCE                  { $$ = driver.instanceLeft(*$1, @1); yyfree($1);  }
     ;
 
 right
-    : VAR_LOCAL                     { $$ = driver.right(*$1, @1); yyfree($1);        }
-    | INTEGER                       { $$ = driver.createInt($1, @1);                 }
-    | STRING                        { $$ = driver.createString(*$1, @1); yyfree($1); }
-    | BOOL_TRUE                     { $$ = driver.createBool(true, @1);              }
-    | BOOL_FALSE                    { $$ = driver.createBool(false, @1);             }
-    | CHAR                          { $$ = driver.createChar($1, @1);                }
-    | '(' expression ')'            { $$ = $2;                                       }
-    | call_expression               { $$ = $1;                                       }
+    : VAR_LOCAL                     { $$ = driver.right(*$1, @1); yyfree($1);         }
+    | VAR_INSTANCE                  { $$ = driver.instanceRight(*$1, @1); yyfree($1); }
+    | INTEGER                       { $$ = driver.createInt($1, @1);                  }
+    | STRING                        { $$ = driver.createString(*$1, @1); yyfree($1);  }
+    | BOOL_TRUE                     { $$ = driver.createBool(true, @1);               }
+    | BOOL_FALSE                    { $$ = driver.createBool(false, @1);              }
+    | CHAR                          { $$ = driver.createChar($1, @1);                 }
+    | '(' expression ')'            { $$ = $2;                                        }
+    | call_expression               { $$ = $1;                                        }
     ;
 
 

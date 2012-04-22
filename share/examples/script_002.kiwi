@@ -1,8 +1,9 @@
 #!/usr/bin/env kiwi
 
 int @a;
+string @b;
 
 void main()
 {
-    // @a = 10;
+
 }

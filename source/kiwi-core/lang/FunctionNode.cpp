@@ -1,14 +1,15 @@
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
 #include "TypeNode.hpp"
-#include "kiwi/Type.hpp"
+#include "kiwi/Members.hpp"
 #include "kiwi/Module.hpp"
+#include "kiwi/Type.hpp"
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/BasicBlock.h>
+#include <llvm/Constant.h>
 #include <llvm/DerivedTypes.h>
 #include <llvm/Function.h>
 #include <llvm/Instructions.h>
-#include <llvm/Constant.h>
 #include <vector>
 
 using namespace kiwi;
@@ -181,7 +182,6 @@ void FunctionNode::generate(TypeRef ownerType)
         m_positions.push_back(arg);
     }
 
-
     llvm::FunctionType* backendType = llvm::FunctionType::get(backendResultType, llvm::makeArrayRef(backendArgs), false);
     m_method = ownerType->add(m_name, frontendResultType, frontendArgs);
     m_func   = llvm::Function::Create(backendType, llvm::GlobalValue::ExternalLinkage , m_name, module->getModule());
@@ -205,24 +205,18 @@ void FunctionNode::emit(TypeRef ownerType)
     for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j)
     {
         ArgumentNode* arg = m_positions[j];
-        //if (!i->getType()->isPointerTy()) {
-            llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
-            llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
+        llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
+        llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
 
-            VariableGen vargen(arg->getType()->get(), value);
-            arg->setGenerator(vargen);
-        // } else {
-        //     llvm::PointerType* pointer = llvm::cast<llvm::PointerType>(i->getType());
-        //     llvm::AllocaInst*  value   = new llvm::AllocaInst(pointer->getElementType(), arg->getName(), entry);
-        //     llvm::StoreInst*   store   = new llvm::StoreInst(i, value, entry);
-
-        //     VariableGen vargen(arg->getType()->get(), value);
-        //     arg->setGenerator(vargen);
-        // }
+        VariableGen vargen(arg->getType()->get(), value);
+        arg->setGenerator(vargen);
     }
 
+    /// @todo remove
+    llvm::Value* thisValue = new llvm::AllocaInst(ownerType->getVarType(), "this", entry);
+
     // emit instructions
-    StatementGen gen(ownerType, entry);
+    StatementGen gen(ownerType, entry, thisValue, thisValue);
     gen = m_root->emit(gen);
 
     /// emit terminator for last block

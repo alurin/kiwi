@@ -2,48 +2,22 @@
 #include "kiwi/Type.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Context.hpp"
+#include "kiwi/Members.hpp"
 #include "codegen/LlvmEmitter.hpp"
+#include <llvm/Constants.h>
 #include <llvm/DerivedTypes.h>
+#include <llvm/GlobalVariable.h>
 #include <llvm/Instruction.h>
+#include <llvm/Module.h>
+#include <llvm/ADT/ArrayRef.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;
 
 Type::Type(ModuleRef module)
-: m_module(module), m_varType(0) { }
+: m_module(module), m_varType(0), m_addressMap(0), m_virtualTable(0) { }
 
 Type::~Type() { }
-
-// constructor
-UnaryOperator::UnaryOperator(
-    UnaryOperator::Opcode opcode,
-    TypeRef resultType,
-    codegen::UnaryEmitter* emitter
-) : m_opcode(opcode), m_resultType(resultType), m_emitter(emitter)
-{ }
-
-// constructor
-BinaryOperator::BinaryOperator(
-    BinaryOperator::Opcode opcode,
-    TypeRef resultType,
-    TypeRef operatorType,
-    codegen::BinaryEmitter* emitter
-) : m_opcode(opcode), m_resultType(resultType), m_operatorType(operatorType), m_emitter(emitter)
-{ }
-
-// constructor
-Field::Field(const Identifier& name, const TypeRef& fieldType)
-: m_name(name), m_fieldType(fieldType) {
-
-}
-// constructor
-Method::Method(const Identifier& name, const TypeRef& ownerType, const TypeRef& resultType, std::vector<ArgumentRef> arguments)
-: m_name(name), m_ownerType(ownerType), m_resultType(resultType), m_arguments(arguments), m_func(0)
-{}
-
-// constructor
-Argument::Argument(const Identifier& name, const TypeRef& type)
-: m_name(name), m_type(type) { }
 
 // crate type
 TypeRef Type::create(ModuleRef module)
@@ -52,31 +26,25 @@ TypeRef Type::create(ModuleRef module)
     return type;
 }
 
-ArgumentRef Argument::create(const Identifier& name, const TypeRef& type)
-{
-    ArgumentRef arg = ArgumentRef(new Argument(name, type));
-    return arg;
-}
-
 // add binary operator
 UnaryRef Type::add(
-    UnaryOperator::Opcode opcode,
+    Member::UnaryOpcode opcode,
     TypeRef resultType,
     codegen::UnaryEmitter* emitter
 ) {
-    UnaryRef op = UnaryRef(new UnaryOperator(opcode, resultType, emitter));
+    UnaryRef op = UnaryRef(new UnaryOperator(opcode, shared_from_this(), resultType, emitter));
     m_unary.push_back(op);
     return op;
 }
 
 // add binary operator
 BinaryRef Type::add(
-    BinaryOperator::Opcode opcode,
+    Member::BinaryOpcode opcode,
     TypeRef resultType,
-    TypeRef operatorType,
+    TypeRef operandType,
     codegen::BinaryEmitter* emitter
 ) {
-    BinaryRef op = BinaryRef(new BinaryOperator(opcode, resultType, operatorType, emitter));
+    BinaryRef op = BinaryRef(new BinaryOperator(opcode, shared_from_this(), resultType, operandType, emitter));
     m_binary.push_back(op);
     return op;
 }
@@ -84,7 +52,7 @@ BinaryRef Type::add(
 // add field
 FieldRef Type::add(const Identifier& name, const TypeRef& fieldType)
 {
-    FieldRef field = FieldRef(new Field(name, fieldType));
+    FieldRef field = FieldRef(new Field(name, shared_from_this(), fieldType));
     m_fields.push_back(field);
     return field;
 }
@@ -98,7 +66,7 @@ MethodRef Type::add(const Identifier& name, const TypeRef& resultType, std::vect
 }
 
 // find unary operator
-UnaryRef Type::find(UnaryOperator::Opcode opcode)
+UnaryRef Type::find(Member::UnaryOpcode opcode)
 {
     for (std::vector<UnaryRef>::iterator i = m_unary.begin(); i != m_unary.end(); ++i)
     {
@@ -111,16 +79,28 @@ UnaryRef Type::find(UnaryOperator::Opcode opcode)
 }
 
 // find binary operator
-BinaryRef Type::find(BinaryOperator::Opcode opcode, const TypeRef& operatorType)
+BinaryRef Type::find(Member::BinaryOpcode opcode, const TypeRef& operandType)
 {
     for (std::vector<BinaryRef>::iterator i = m_binary.begin(); i != m_binary.end(); ++i)
     {
         BinaryRef op = *i;
-        if (op->getOpcode() == opcode && operatorType == op->getOperatorType()) {
+        if (op->getOpcode() == opcode && operandType == op->getOperandType()) {
             return op;
         }
     }
     return BinaryRef();
+}
+
+// find field
+FieldRef Type::find(const Identifier& name)
+{
+    for (std::vector<FieldRef>::iterator i = m_fields.begin(); i != m_fields.end(); ++i) {
+        FieldRef field = *i;
+        if (field->getName() == name) {
+            return field;
+        }
+    }
+    return FieldRef();
 }
 
 // find method
@@ -148,12 +128,62 @@ MethodRef Type::find(const Identifier& name, std::vector<TypeRef> arguments)
 // Emit type structure
 void Type::emit()
 {
-    /// Structure type
+    if (m_varType != 0) {
+        return;
+    }
 
-    /// Field type
+    // collect fields
+    std::vector<llvm::Type*> types;
+    int j = 0;
+    for (std::vector<FieldRef>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
+        FieldRef field = *i;
 
-    /// Simple type
+        TypeRef type = field->getFieldType();
+        types.push_back(type->getVarType());
 
+        field->setPosition(j);
+    }
+
+    // emit llvm type analog
     llvm::LLVMContext& context = m_module.lock()->getContext()->getContext();
-    m_varType            = llvm::StructType::create(context);
+    llvm::Module* module       = m_module.lock()->getModule();
+    if (types.size()) {
+        m_varType = llvm::StructType::create(types);
+    } else {
+        m_varType = llvm::StructType::create(context);
+    }
+
+    // emit address map
+    std::vector<llvm::Constant*> addresses;
+    std::vector<llvm::Constant*> buffer;
+    llvm::Constant* nullCst = llvm::Constant::getNullValue(m_varType->getPointerTo());
+    llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(32, 0, false));
+    j = 0;
+    for (std::vector<FieldRef>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
+        // create variable for compare
+        llvm::APInt idxV(32, j, false);
+        llvm::ConstantInt* idx = llvm::ConstantInt::get(context, idxV);
+
+        // buffer
+        buffer.clear();
+        buffer.push_back(zero);
+        buffer.push_back(idx);
+
+        llvm::Constant* cst = llvm::ConstantExpr::getGetElementPtr(nullCst, makeArrayRef(buffer));
+        addresses.push_back(cst);
+    }
+
+    llvm::Type* sizeType            = llvm::IntegerType::get(context, 8)->getPointerTo();
+    llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, m_fields.size());
+    llvm::Constant* addressMapValue = llvm::ConstantArray::get(addressMapType, makeArrayRef(addresses));
+
+    // generate string
+    m_addressMap  = new llvm::GlobalVariable(
+        *module,
+        addressMapType,
+        true,
+        llvm::GlobalValue::PrivateLinkage,
+        addressMapValue,
+        "amap"
+    );
 }

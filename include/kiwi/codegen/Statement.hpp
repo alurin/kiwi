@@ -20,7 +20,7 @@ namespace codegen {
     {
     public:
         /// constructor
-        StatementGen(TypeRef owner, llvm::BasicBlock* block);
+        StatementGen(TypeRef owner, llvm::BasicBlock* block, llvm::Value* thisValue, llvm::Value* selfValue);
 
         /// copy constructor
         StatementGen(const StatementGen& gen);
@@ -56,6 +56,17 @@ namespace codegen {
         {
             return m_block;
         }
+
+        /// returns this value
+        llvm::Value* getThisValue() const {
+            return m_thisValue;
+        }
+
+        /// returns self value
+        llvm::Value* getSelfValue() const {
+            return m_selfValue;
+        }
+
     protected:
         TypeRef             m_owner;
 
@@ -63,6 +74,8 @@ namespace codegen {
         llvm::Module*       m_module;
         llvm::Function*     m_function;
         llvm::BasicBlock*   m_block;
+        llvm::Value*        m_thisValue;
+        llvm::Value*        m_selfValue;
     }; // class StatementGen
 
 }} /// namespace kiwi::codegen

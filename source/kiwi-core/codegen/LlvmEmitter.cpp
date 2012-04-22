@@ -158,6 +158,7 @@ ExpressionGen LlvmCharPrintOperator::emit(const StatementGen& gen, const Express
     return ExpressionGen(gen, value.getType(), value.getValue());
 }
 
+// emit print for string
 ExpressionGen LlvmStringPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value)
 {
     // create stub for u_strCompare

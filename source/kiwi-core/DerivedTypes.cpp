@@ -1,7 +1,8 @@
 #include "ContextMeta.hpp"
-#include "kiwi/DerivedTypes.hpp"
-#include "kiwi/Module.hpp"
 #include "kiwi/Context.hpp"
+#include "kiwi/Module.hpp"
+#include "kiwi/DerivedTypes.hpp"
+#include "kiwi/Members.hpp"
 #include "codegen/LlvmEmitter.hpp"
 #include <llvm/DerivedTypes.h>
 #include <llvm/Instruction.h>

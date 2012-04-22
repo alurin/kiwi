@@ -1,5 +1,7 @@
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
+#include "kiwi/Type.hpp"
+#include "kiwi/Members.hpp"
 #include "kiwi/codegen/Emitter.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include <llvm/Constants.h>
@@ -10,7 +12,7 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
-BinaryNode::BinaryNode(Opcode opcode, RightNode* left, RightNode* right, bool logic)
+BinaryNode::BinaryNode(Member::BinaryOpcode opcode, RightNode* left, RightNode* right, bool logic)
 : m_opcode(opcode), m_left(left), m_right(right), m_logic(logic)
 {}
 
@@ -20,7 +22,7 @@ BinaryNode::~BinaryNode()
     delete m_right;
 }
 
-UnaryNode::UnaryNode(Opcode opcode, RightNode* value, bool post)
+UnaryNode::UnaryNode(Member::UnaryOpcode opcode, RightNode* value, bool post)
 : m_opcode(opcode), m_value(value), m_post(post)
 {}
 
@@ -67,6 +69,12 @@ CharConstNode::CharConstNode(ContextRef context, const UChar& value)
 
 CallNode::CallNode(const Identifier& method)
 : m_method(method), m_hasNamed(false) {}
+
+InstanceLeftNode::InstanceLeftNode(const Identifier& name)
+: m_name(name) { }
+
+InstanceRightNode::InstanceRightNode(const Identifier& name)
+: m_name(name) { }
 
 void CallNode::append(const Identifier& name, RightNode* value)
 {
@@ -266,4 +274,88 @@ ExpressionGen CallNode::emit(const StatementGen& gen)
     } else {
         throw "Method not found";
     }
+}
+
+ExpressionGen InstanceLeftNode::emit(const ExpressionGen& gen)
+{
+    TypeRef owner    = gen.getOwner();
+    FieldRef field   = owner->find(m_name);
+
+    if (!field) {
+        throw "Field not found";
+    }
+
+    llvm::Type* type      = owner->getVarType()->getPointerTo();
+    llvm::Type* fieldType = field->getFieldType()->getVarType()->getPointerTo();
+    llvm::LLVMContext& context = type->getContext();
+
+    // find offset for field
+    llvm::Value* addressMap = owner->getVarAddressMap();
+
+    // create variable for compare
+    llvm::APInt cst(32, 0, false);
+    llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
+
+    cst = llvm::APInt(32, field->getPosition(), false);
+    llvm::ConstantInt* one = llvm::ConstantInt::get(gen.getContext(), cst);
+
+    // prepare GetElementPtrInst indexes
+    std::vector<llvm::Value*> lengthIdx; // length
+    lengthIdx.push_back(zero);
+    lengthIdx.push_back(one);
+
+    llvm::Value* thisValue  = gen.getThisValue();
+    llvm::Value* position   = llvm::GetElementPtrInst::Create(addressMap, makeArrayRef(lengthIdx), "", gen.getBlock());
+    llvm::Value* offset     = new llvm::LoadInst(position, "", gen.getBlock());
+
+    llvm::Value* castNull   = new llvm::PtrToIntInst(thisValue, llvm::IntegerType::get(context, 64), "", gen.getBlock());
+    llvm::Value* castOffset = new llvm::PtrToIntInst(offset, llvm::IntegerType::get(context, 64), "", gen.getBlock());
+    llvm::Value* summInst   = llvm::BinaryOperator::Create(llvm::Instruction::Add, castNull, castOffset, "", gen.getBlock());
+    llvm::Value* realOffset = new llvm::IntToPtrInst(summInst, fieldType, "", gen.getBlock());
+
+    // load value and yeld
+    new llvm::StoreInst(gen.getValue(), realOffset, "", gen.getBlock());
+    return gen;
+}
+
+ExpressionGen InstanceRightNode::emit(const StatementGen& gen)
+{
+    TypeRef owner    = gen.getOwner();
+    FieldRef field   = owner->find(m_name);
+
+    if (!field) {
+        throw "Field not found";
+    }
+
+    llvm::Type* type      = owner->getVarType()->getPointerTo();
+    llvm::Type* fieldType = field->getFieldType()->getVarType()->getPointerTo();
+    llvm::LLVMContext& context = type->getContext();
+
+    // find offset for field
+    llvm::Value* addressMap = owner->getVarAddressMap();
+
+    // create variable for compare
+    llvm::APInt cst(32, 0, false);
+    llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
+
+    cst = llvm::APInt(32, field->getPosition(), false);
+    llvm::ConstantInt* one = llvm::ConstantInt::get(gen.getContext(), cst);
+
+    // prepare GetElementPtrInst indexes
+    std::vector<llvm::Value*> lengthIdx; // length
+    lengthIdx.push_back(zero);
+    lengthIdx.push_back(one);
+
+    llvm::Value* thisValue  = gen.getThisValue();
+    llvm::Value* position   = llvm::GetElementPtrInst::Create(addressMap, makeArrayRef(lengthIdx), "", gen.getBlock());
+    llvm::Value* offset     = new llvm::LoadInst(position, "", gen.getBlock());
+
+    llvm::Value* castNull   = new llvm::PtrToIntInst(thisValue, llvm::IntegerType::get(context, 64), "", gen.getBlock());
+    llvm::Value* castOffset = new llvm::PtrToIntInst(offset, llvm::IntegerType::get(context, 64), "", gen.getBlock());
+    llvm::Value* summInst   = llvm::BinaryOperator::Create(llvm::Instruction::Add, castNull, castOffset, "", gen.getBlock());
+    llvm::Value* realOffset = new llvm::IntToPtrInst(summInst, fieldType, "", gen.getBlock());
+
+    // load value and yeld
+    llvm::Value* loadInst   = new llvm::LoadInst(realOffset, "", gen.getBlock());
+    return ExpressionGen(gen, field->getFieldType(), loadInst);
 }

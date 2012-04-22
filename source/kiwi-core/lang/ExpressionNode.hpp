@@ -2,9 +2,10 @@
 #define KIWI_LANG_EXPRESSIONNODE_INTERNAL
 
 #include "Node.hpp"
-#include "kiwi/Type.hpp"
+#include "kiwi/Member.hpp"
 #include "kiwi/codegen/Expression.hpp"
 #include "kiwi/codegen/Variable.hpp"
+#include <vector>
 
 namespace kiwi {
     typedef boost::shared_ptr<class Context> ContextRef;
@@ -29,35 +30,32 @@ namespace lang {
 
     class BinaryNode : public RightNode {
     public:
-        typedef BinaryOperator::Opcode Opcode;
 
-        BinaryNode(Opcode opcode, RightNode* left, RightNode* right, bool logic = false);
+        BinaryNode(Member::BinaryOpcode opcode, RightNode* left, RightNode* right, bool logic = false);
 
         virtual ~BinaryNode();
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
-        Opcode      m_opcode;
-        RightNode*  m_left;
-        RightNode*  m_right;
-        bool        m_logic;
+        Member::BinaryOpcode    m_opcode;
+        RightNode*              m_left;
+        RightNode*              m_right;
+        bool                    m_logic;
     };
 
     class UnaryNode : public RightNode {
     public:
-        typedef UnaryOperator::Opcode Opcode;
-
-        UnaryNode(Opcode opcode, RightNode* value, bool post = false);
+        UnaryNode(Member::UnaryOpcode opcode, RightNode* value, bool post = false);
 
         virtual ~UnaryNode();
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
-        Opcode      m_opcode;
-        RightNode*  m_value;
-        bool        m_post;
+        Member::UnaryOpcode m_opcode;
+        RightNode*          m_value;
+        bool                m_post;
     };
 
     class AssignNode : public RightNode {
@@ -111,6 +109,26 @@ namespace lang {
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         VariableNode* o_var;
+    };
+
+    class InstanceLeftNode : public LeftNode {
+    public:
+        InstanceLeftNode(const Identifier& name);
+
+        /// emit instructions
+        virtual ExpressionGen emit(const ExpressionGen& gen);
+    protected:
+        Identifier m_name;
+    };
+
+    class InstanceRightNode : public RightNode {
+    public:
+        InstanceRightNode(const Identifier& name);
+
+        /// emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
+    protected:
+        Identifier m_name;
     };
 
     class IntegerConstNode : public RightNode

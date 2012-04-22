@@ -57,6 +57,20 @@ namespace lang {
         /// returns right expression for named node
         RightNode* right(const Identifier& name, const location& loc);
 
+        // returns left expression for instance node
+        LeftNode* instanceLeft(const Identifier& name, const location& loc) {
+            LeftNode* node = new InstanceLeftNode(name);
+            node->setLocation(loc);
+            return node;
+        }
+
+        /// returns right expression for instance node
+        RightNode* instanceRight(const Identifier& name, const location& loc) {
+            RightNode* node = new InstanceRightNode(name);
+            node->setLocation(loc);
+            return node;
+        }
+
         //===--------------------------------------------------------------===//
         //    Types
         //===--------------------------------------------------------------===//
@@ -130,133 +144,133 @@ namespace lang {
         //===--------------------------------------------------------------===//
         RightNode* createNeg(RightNode* value, const location& loc)
         {
-            RightNode* node = new UnaryNode(UnaryOperator::NEG, value);
+            RightNode* node = new UnaryNode(Member::NEG, value);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createPos(RightNode* value, const location& loc)
         {
-            RightNode* node = new UnaryNode(UnaryOperator::POS, value);
+            RightNode* node = new UnaryNode(Member::POS, value);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createNot(RightNode* value, const location& loc)
         {
-            RightNode* node = new UnaryNode(UnaryOperator::NOT, value);
+            RightNode* node = new UnaryNode(Member::NOT, value);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createDec(RightNode* value, bool post, const location& loc)
         {
-            RightNode* node = new UnaryNode(UnaryOperator::DEC, value, post);
+            RightNode* node = new UnaryNode(Member::DEC, value, post);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createInc(RightNode* value, bool post, const location& loc)
         {
-            RightNode* node = new UnaryNode(UnaryOperator::INC, value, post);
+            RightNode* node = new UnaryNode(Member::INC, value, post);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createAdd(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::ADD, left, right);
+            RightNode* node = new BinaryNode(Member::ADD, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createSub(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::SUB, left, right);
+            RightNode* node = new BinaryNode(Member::SUB, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createMul(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::MUL, left, right);
+            RightNode* node = new BinaryNode(Member::MUL, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createDiv(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::DIV, left, right);
+            RightNode* node = new BinaryNode(Member::DIV, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createLsh(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::LSH, left, right);
+            RightNode* node = new BinaryNode(Member::LSH, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createRsh(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::RSH, left, right);
+            RightNode* node = new BinaryNode(Member::RSH, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createOr(RightNode* left, RightNode* right, bool logic, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::OR, left, right, logic);
+            RightNode* node = new BinaryNode(Member::OR, left, right, logic);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createAnd(RightNode* left, RightNode* right, bool logic, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::AND, left, right, logic);
+            RightNode* node = new BinaryNode(Member::AND, left, right, logic);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createEq(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::EQ, left, right);
+            RightNode* node = new BinaryNode(Member::EQ, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createNeq(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::NEQ, left, right);
+            RightNode* node = new BinaryNode(Member::NEQ, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createGe(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::GE, left, right);
+            RightNode* node = new BinaryNode(Member::GE, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createLe(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::LE, left, right);
+            RightNode* node = new BinaryNode(Member::LE, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createGt(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::GT, left, right);
+            RightNode* node = new BinaryNode(Member::GT, left, right);
             node->setLocation(loc);
             return node;
         }
 
         RightNode* createLt(RightNode* left, RightNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(BinaryOperator::LT, left, right);
+            RightNode* node = new BinaryNode(Member::LT, left, right);
             node->setLocation(loc);
             return node;
         }
