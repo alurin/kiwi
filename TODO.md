@@ -20,7 +20,7 @@ Features
 * Add support for inheritance (multi)
 * Add support for method overrides by virtual tables
 * Add support for interfaces
-* Add support for properties (C# style or PHP style)
+* Add support for properties (C# style or Ruby style)
 * Add support for visibility:
     * Field visibility
         * `private`
@@ -32,3 +32,4 @@ Features
         * `protected`
         * `protected internal` - visible in all internal module's classes, but only in child external classes
         * `public`
+* Add support for metadata attributes and metadata evalutions (e.g. methods for extend class in build time)

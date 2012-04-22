@@ -2,7 +2,7 @@
 #define KIWI_LANG_STATEMENTNODE_INTERNAL
 
 #include "Node.hpp"
-#include "kiwi/codegen/Statement.hpp"
+#include "kiwi/Codegen/Statement.hpp"
 
 namespace kiwi
 {

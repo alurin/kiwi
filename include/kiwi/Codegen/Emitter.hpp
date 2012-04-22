@@ -1,8 +1,8 @@
 #ifndef KIWI_CODEGEN_EMITTER_INCLUDED
 #define KIWI_CODEGEN_EMITTER_INCLUDED
 
-#include "kiwi/codegen/Expression.hpp"
-#include "kiwi/codegen/Statement.hpp"
+#include "kiwi/Codegen/Expression.hpp"
+#include "kiwi/Codegen/Statement.hpp"
 
 namespace kiwi {
 namespace codegen {

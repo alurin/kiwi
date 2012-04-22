@@ -3,7 +3,7 @@
 #include "kiwi/Module.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Members.hpp"
-#include "codegen/LlvmEmitter.hpp"
+#include "Codegen/LlvmEmitter.hpp"
 #include <llvm/DerivedTypes.h>
 #include <llvm/Instruction.h>
 #include <llvm/ADT/ArrayRef.h>

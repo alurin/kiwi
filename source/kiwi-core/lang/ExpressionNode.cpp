@@ -2,7 +2,7 @@
 #include "FunctionNode.hpp"
 #include "kiwi/Type.hpp"
 #include "kiwi/Members.hpp"
-#include "kiwi/codegen/Emitter.hpp"
+#include "kiwi/Codegen/Emitter.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include <llvm/Constants.h>
 #include <llvm/Function.h>

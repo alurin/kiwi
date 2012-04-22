@@ -1,5 +1,5 @@
 #include "ContextMeta.hpp"
-#include "kiwi/codegen/Emitter.hpp"
+#include "kiwi/Codegen/Emitter.hpp"
 #include "kiwi/Type.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Module.hpp"

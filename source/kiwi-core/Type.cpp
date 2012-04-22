@@ -3,7 +3,7 @@
 #include "kiwi/Module.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Members.hpp"
-#include "codegen/LlvmEmitter.hpp"
+#include "Codegen/LlvmEmitter.hpp"
 #include <llvm/Constants.h>
 #include <llvm/DerivedTypes.h>
 #include <llvm/GlobalVariable.h>

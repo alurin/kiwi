@@ -1,7 +1,7 @@
 #ifndef KIWI_CODEGEN_EMITTER_INTERNAL
 #define KIWI_CODEGEN_EMITTER_INTERNAL
 
-#include "kiwi/codegen/Emitter.hpp"
+#include "kiwi/Codegen/Emitter.hpp"
 #include <llvm/Instruction.h>
 #include <llvm/InstrTypes.h>
 

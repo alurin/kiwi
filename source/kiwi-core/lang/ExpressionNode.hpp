@@ -3,8 +3,8 @@
 
 #include "Node.hpp"
 #include "kiwi/Member.hpp"
-#include "kiwi/codegen/Expression.hpp"
-#include "kiwi/codegen/Variable.hpp"
+#include "kiwi/Codegen/Expression.hpp"
+#include "kiwi/Codegen/Variable.hpp"
 #include <vector>
 
 namespace kiwi {

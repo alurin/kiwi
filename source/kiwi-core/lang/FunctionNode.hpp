@@ -1,7 +1,7 @@
 #ifndef KIWI_LANG_FUNCTIONNODE_INTERNAL
 #define KIWI_LANG_FUNCTIONNODE_INTERNAL
 
-#include "kiwi/codegen/Variable.hpp"
+#include "kiwi/Codegen/Variable.hpp"
 #include "StatementNode.hpp"
 #include "boost/shared_ptr.hpp"
 #include <map>

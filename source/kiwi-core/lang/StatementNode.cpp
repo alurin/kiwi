@@ -3,9 +3,9 @@
 #include "ExpressionNode.hpp"
 #include "kiwi/Type.hpp"
 #include "kiwi/Members.hpp"
-#include "kiwi/codegen/Emitter.hpp"
-#include "kiwi/codegen/Expression.hpp"
-#include "kiwi/codegen/Variable.hpp"
+#include "kiwi/Codegen/Emitter.hpp"
+#include "kiwi/Codegen/Expression.hpp"
+#include "kiwi/Codegen/Variable.hpp"
 #include <llvm/Instructions.h>
 
 using namespace kiwi;

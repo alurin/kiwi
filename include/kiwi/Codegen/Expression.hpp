@@ -1,7 +1,7 @@
 #ifndef KIWI_CODEGEN_EXPRESSION_INCLUDED
 #define KIWI_CODEGEN_EXPRESSION_INCLUDED
 
-#include "kiwi/codegen/Statement.hpp"
+#include "kiwi/Codegen/Statement.hpp"
 
 namespace llvm {
     class Value;
