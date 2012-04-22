@@ -152,6 +152,11 @@ namespace kiwi
             return m_resultType.lock();
         }
 
+        /// returns this is static method?
+        bool isStatic() const {
+            return m_isStatic;
+        }
+
         /// returns llvm analog
         llvm::Function* getFunction() const {
             return m_func;
@@ -182,6 +187,7 @@ namespace kiwi
         TypeWeak                    m_resultType;
         std::vector<ArgumentRef>    m_arguments;
         llvm::Function*             m_func;
+        bool                        m_isStatic;
 
         Method(const Identifier& name, const TypeRef& ownerType, const TypeRef& resultType, std::vector<ArgumentRef> arguments);
     };

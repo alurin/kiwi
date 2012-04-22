@@ -1,11 +1,12 @@
 #include "Factory.hpp"
+#include <assert.h>
 
 using namespace kiwi;
 using namespace kiwi::lang;
 
 FunctionNode* NodeFactory::func()
 {
-    //assert(!m_funcs.empty() && "Functions stack is empty");
+    assert(!m_funcs.empty() && "Functions stack is empty");
     return m_funcs.top();
 }
 
@@ -19,7 +20,7 @@ FunctionNode* NodeFactory::func(const Identifier& name, TypeNode* type)
 
 FunctionNode* NodeFactory::funcEnd()
 {
-    //assert(!m_funcs.empty() && "Functions stack is empty");
+    assert(!m_funcs.empty() && "Functions stack is empty");
     FunctionNode* func = m_funcs.top();
     m_funcs.pop();
     m_scopes.pop();
@@ -39,7 +40,7 @@ FieldNode* NodeFactory::field(const Identifier& name, TypeNode* type)
 // returns current scope
 ScopeNode* NodeFactory::scope()
 {
-    //assert(!m_scopes.empty() && "Scopes stack is empty");
+    assert(!m_scopes.empty() && "Scopes stack is empty");
     return m_scopes.top();
 }
 
@@ -55,7 +56,7 @@ ScopeNode* NodeFactory::scopeBegin()
 // end current scope
 ScopeNode* NodeFactory::scopeEnd()
 {
-    //assert(!m_scopes.empty() && "Scopes stack is empty");
+    assert(!m_scopes.empty() && "Scopes stack is empty");
     ScopeNode* scope = m_scopes.top();
     m_scopes.pop();
     return scope;
@@ -77,14 +78,14 @@ ExpressionNode* NodeFactory::right(const Identifier& name, const location& loc)
 /// returns current call
 CallNode* NodeFactory::call()
 {
-    //assert(!m_calls.empty() && "Calls stack is empty");
+    assert(!m_calls.empty() && "Calls stack is empty");
     return m_calls.top();
 }
 
 /// declare call
 CallNode* NodeFactory::call(const Identifier& name)
 {
-    //assert(!m_calls.empty() && "Calls stack is empty");
+    assert(!m_calls.empty() && "Calls stack is empty");
     CallNode* call = new CallNode(name);
     m_calls.push(call);
     return call;
@@ -93,7 +94,7 @@ CallNode* NodeFactory::call(const Identifier& name)
 /// end current call
 CallNode* NodeFactory::callEnd()
 {
-    //assert(!m_calls.empty() && "Calls stack is empty");
+    assert(!m_calls.empty() && "Calls stack is empty");
     CallNode* call = m_calls.top();
     m_calls.pop();
     return call;
