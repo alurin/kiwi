@@ -3,10 +3,6 @@ TODO
 
 Source code clean up
 --------------------
-* Syntax nodes
-    * Rename `ExpressionNode` to `ExpressionStatementNode`
-    * Rename `LeftNode` to `MutableNode`
-    * Rename `RightNode` to `ExpressionNode`
 * Types
     * Devide types to:
         * Value types: `integer`, `char` and `float`
