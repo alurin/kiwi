@@ -7,6 +7,7 @@ Add submodule for [LLVM](git://github.com/earl/llvm-mirror.git)
 
 Source code clean up
 --------------------
+* Clean up memory leaks!!!
 * Types
     * Devide types to:
         * Value types: `integer`, `char`, `float` and `structures`
@@ -14,7 +15,6 @@ Source code clean up
         * Full object types: `objects`
 * Move all LLVM code from syntax nodes and metadata
 * Warning and errors
-* Remove all smart pointers. Reason: it's not big help
 
 Runtime
 -------

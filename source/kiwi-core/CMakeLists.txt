@@ -13,7 +13,7 @@ LIST(REMOVE_ITEM core_SOURCES "lang/parser.cpp")
 LIST(REMOVE_ITEM core_SOURCES "lang/parser.hpp")
 SET (core_SOURCES ${core_SOURCES} ${BISON_KiwiParser_OUTPUTS} ${FLEX_KiwiScanner_OUTPUTS})
 
-SET (core_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${Log4Cxx_LIBRARIES} ${LLVM_LIBRARIES} "${PROJECT_NAME}-runtime")
+SET (core_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${LLVM_LIBRARIES} "${PROJECT_NAME}-runtime")
 SET (core_LIB "lib${PROJECT_NAME}")
 
 # Remove no exception from LLVM flags

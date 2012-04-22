@@ -1,6 +1,6 @@
 FILE (GLOB_RECURSE compiler_SOURCES *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 
-SET (compiler_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${Log4Cxx_LIBRARIES} "lib${PROJECT_NAME}" "kiwi-runtime")
+SET (compiler_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} "lib${PROJECT_NAME}" "kiwi-runtime")
 SET (compiler_BIN ${PROJECT_NAME})
 
 ADD_EXECUTABLE(${compiler_BIN} ${compiler_SOURCES})

@@ -21,15 +21,17 @@ distclean:
 	@- $(RM) ./build/cmake.*
 	@- $(RM) ./build/*.cmake
 	@- $(RM) ./build/*.txt
-	@- $(RM) ./docs/*.html
-	@- $(RM) ./docs/*.css
-	@- $(RM) ./docs/*.png
-	@- $(RM) ./docs/*.jpg
-	@- $(RM) ./docs/*.gif
-	@- $(RM) ./docs/*.tiff
-	@- $(RM) ./docs/*.php
-	@- $(RM) ./docs/search
-	@- $(RM) ./docs/installdox
+	@- $(RM) ./build/Doxyfile
+	@- $(RM) ./doc/*.html
+	@- $(RM) ./doc/*.css
+	@- $(RM) ./doc/*.png
+	@- $(RM) ./doc/*.jpg
+	@- $(RM) ./doc/*.gif
+	@- $(RM) ./doc/*.tiff
+	@- $(RM) ./doc/*.php
+	@- $(RM) ./doc/*.js
+	@- $(RM) ./doc/search
+	@- $(RM) ./doc/installdox
 
 
 ifeq ($(findstring distclean,$(MAKECMDGOALS)),)
