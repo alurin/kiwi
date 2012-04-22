@@ -52,21 +52,21 @@ namespace lang {
         //    Variables
         //===--------------------------------------------------------------===//
         // returns left expression for named node
-        LeftNode* left(const Identifier& name, const location& loc);
+        MutableNode* left(const Identifier& name, const location& loc);
 
         /// returns right expression for named node
-        RightNode* right(const Identifier& name, const location& loc);
+        ExpressionNode* right(const Identifier& name, const location& loc);
 
         // returns left expression for instance node
-        LeftNode* instanceLeft(const Identifier& name, const location& loc) {
-            LeftNode* node = new InstanceLeftNode(name);
+        MutableNode* instanceLeft(const Identifier& name, const location& loc) {
+            MutableNode* node = new InstanceMutableNode(name);
             node->setLocation(loc);
             return node;
         }
 
         /// returns right expression for instance node
-        RightNode* instanceRight(const Identifier& name, const location& loc) {
-            RightNode* node = new InstanceRightNode(name);
+        ExpressionNode* instanceRight(const Identifier& name, const location& loc) {
+            ExpressionNode* node = new InstanceExpressionNode(name);
             node->setLocation(loc);
             return node;
         }
@@ -111,30 +111,30 @@ namespace lang {
         //===--------------------------------------------------------------===//
         //    Constants
         //===--------------------------------------------------------------===//
-        RightNode* createInt(int32_t value, const location& loc)
+        ExpressionNode* createInt(int32_t value, const location& loc)
         {
-            RightNode* node = new IntegerConstNode(m_context, value);
+            ExpressionNode* node = new IntegerConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createString(const String& value, const location& loc)
+        ExpressionNode* createString(const String& value, const location& loc)
         {
-            RightNode* node = new StringConstNode(m_context, value);
+            ExpressionNode* node = new StringConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createChar(const UChar& value, const location& loc)
+        ExpressionNode* createChar(const UChar& value, const location& loc)
         {
-            RightNode* node = new CharConstNode(m_context, value);
+            ExpressionNode* node = new CharConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createBool(bool value, const location& loc)
+        ExpressionNode* createBool(bool value, const location& loc)
         {
-            RightNode* node = new BoolConstNode(m_context, value);
+            ExpressionNode* node = new BoolConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }
@@ -142,142 +142,142 @@ namespace lang {
         //===--------------------------------------------------------------===//
         //    Expressions
         //===--------------------------------------------------------------===//
-        RightNode* createNeg(RightNode* value, const location& loc)
+        ExpressionNode* createNeg(ExpressionNode* value, const location& loc)
         {
-            RightNode* node = new UnaryNode(Member::NEG, value);
+            ExpressionNode* node = new UnaryNode(Member::NEG, value);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createPos(RightNode* value, const location& loc)
+        ExpressionNode* createPos(ExpressionNode* value, const location& loc)
         {
-            RightNode* node = new UnaryNode(Member::POS, value);
+            ExpressionNode* node = new UnaryNode(Member::POS, value);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createNot(RightNode* value, const location& loc)
+        ExpressionNode* createNot(ExpressionNode* value, const location& loc)
         {
-            RightNode* node = new UnaryNode(Member::NOT, value);
+            ExpressionNode* node = new UnaryNode(Member::NOT, value);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createDec(RightNode* value, bool post, const location& loc)
+        ExpressionNode* createDec(ExpressionNode* value, bool post, const location& loc)
         {
-            RightNode* node = new UnaryNode(Member::DEC, value, post);
+            ExpressionNode* node = new UnaryNode(Member::DEC, value, post);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createInc(RightNode* value, bool post, const location& loc)
+        ExpressionNode* createInc(ExpressionNode* value, bool post, const location& loc)
         {
-            RightNode* node = new UnaryNode(Member::INC, value, post);
+            ExpressionNode* node = new UnaryNode(Member::INC, value, post);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createAdd(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createAdd(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::ADD, left, right);
+            ExpressionNode* node = new BinaryNode(Member::ADD, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createSub(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createSub(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::SUB, left, right);
+            ExpressionNode* node = new BinaryNode(Member::SUB, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createMul(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createMul(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::MUL, left, right);
+            ExpressionNode* node = new BinaryNode(Member::MUL, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createDiv(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createDiv(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::DIV, left, right);
+            ExpressionNode* node = new BinaryNode(Member::DIV, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createLsh(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createLsh(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::LSH, left, right);
+            ExpressionNode* node = new BinaryNode(Member::LSH, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createRsh(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createRsh(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::RSH, left, right);
+            ExpressionNode* node = new BinaryNode(Member::RSH, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createOr(RightNode* left, RightNode* right, bool logic, const location& loc)
+        ExpressionNode* createOr(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::OR, left, right, logic);
+            ExpressionNode* node = new BinaryNode(Member::OR, left, right, logic);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createAnd(RightNode* left, RightNode* right, bool logic, const location& loc)
+        ExpressionNode* createAnd(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::AND, left, right, logic);
+            ExpressionNode* node = new BinaryNode(Member::AND, left, right, logic);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createEq(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createEq(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::EQ, left, right);
+            ExpressionNode* node = new BinaryNode(Member::EQ, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createNeq(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createNeq(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::NEQ, left, right);
+            ExpressionNode* node = new BinaryNode(Member::NEQ, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createGe(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createGe(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::GE, left, right);
+            ExpressionNode* node = new BinaryNode(Member::GE, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createLe(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createLe(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::LE, left, right);
+            ExpressionNode* node = new BinaryNode(Member::LE, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createGt(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createGt(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::GT, left, right);
+            ExpressionNode* node = new BinaryNode(Member::GT, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createLt(RightNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createLt(ExpressionNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new BinaryNode(Member::LT, left, right);
+            ExpressionNode* node = new BinaryNode(Member::LT, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        RightNode* createAssign(LeftNode* left, RightNode* right, const location& loc)
+        ExpressionNode* createAssign(MutableNode* left, ExpressionNode* right, const location& loc)
         {
-            RightNode* node = new AssignNode(left, right);
+            ExpressionNode* node = new AssignNode(left, right);
             node->setLocation(loc);
             return node;
         }
@@ -292,14 +292,14 @@ namespace lang {
             return node;
         }
 
-        StatementNode* createReturn(RightNode* result, const location& loc)
+        StatementNode* createReturn(ExpressionNode* result, const location& loc)
         {
             StatementNode* node = new ReturnStatement(scope(), result);
             node->setLocation(loc);
             return node;
         }
 
-        StatementNode* createPrint(RightNode* result, const location& loc)
+        StatementNode* createPrint(ExpressionNode* result, const location& loc)
         {
             StatementNode* node = new PrintStatement(scope(), result);
             node->setLocation(loc);

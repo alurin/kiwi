@@ -63,8 +63,8 @@
     UChar                charVal;
 
     class TypeNode*		 typenode;
-    class LeftNode*      leftnode;
-    class RightNode*     rightnode;
+    class MutableNode*      leftnode;
+    class ExpressionNode*     rightnode;
     class StatementNode* stmtnode;
 }
 

@@ -20,8 +20,8 @@ namespace lang
 {
     class TypeNode;
     class FunctionNode;
-    class LeftNode;
-    class RightNode;
+    class MutableNode;
+    class ExpressionNode;
     class ScopeNode;
 
     using codegen::VariableGen;
@@ -39,10 +39,10 @@ namespace lang
         }
 
         /// create left node for this named node
-        virtual LeftNode*  getLeft() =0;
+        virtual MutableNode*  getLeft() =0;
 
         /// create right node for this named node
-        virtual RightNode* getRight() =0;
+        virtual ExpressionNode* getRight() =0;
 
         VariableGen getGenerator() const {
             return m_gen;
@@ -72,10 +72,10 @@ namespace lang
         }
 
         /// create left node for this named node
-        virtual LeftNode* getLeft();
+        virtual MutableNode* getLeft();
 
         /// create right node for this named node
-        virtual RightNode* getRight();
+        virtual ExpressionNode* getRight();
     protected:
         Identifier    m_name;
     };
@@ -93,27 +93,27 @@ namespace lang
         }
 
         /// create left node for this named node
-        virtual LeftNode* getLeft();
+        virtual MutableNode* getLeft();
 
         /// create right node for this named node
-        virtual RightNode* getRight();
+        virtual ExpressionNode* getRight();
     protected:
         ScopeNode*    o_owner;
         Identifier    m_name;
     };
 
     /// Expression statment node
-    class ExpressionNode : public StatementNode
+    class ExpressionStatementNode : public StatementNode
     {
     public:
-        ExpressionNode(ScopeNode* parent, RightNode* expr);
+        ExpressionStatementNode(ScopeNode* parent, ExpressionNode* expr);
 
-        virtual ~ExpressionNode();
+        virtual ~ExpressionStatementNode();
 
         /// Emit instructions for expression
         virtual StatementGen emit(const StatementGen& gen);
     protected:
-        RightNode* m_expr;
+        ExpressionNode* m_expr;
     };
 
     /// Scope syntax node for collect variables and statements
@@ -133,7 +133,7 @@ namespace lang
         void append(StatementNode* scope);
 
         /// add expression node
-        void append(RightNode* expr);
+        void append(ExpressionNode* expr);
 
         /// Emit instructions for scope statement
         virtual StatementGen emit(const StatementGen& gen);

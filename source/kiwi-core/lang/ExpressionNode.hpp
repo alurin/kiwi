@@ -18,20 +18,20 @@ namespace lang {
     using codegen::StatementGen;
     using codegen::VariableGen;
 
-    class LeftNode : public Node {
+    class MutableNode : public Node {
     public:
         virtual ExpressionGen emit(const ExpressionGen& gen) =0;
     };
 
-    class RightNode : public Node {
+    class ExpressionNode : public Node {
     public:
         virtual ExpressionGen emit(const StatementGen& value) =0;
     };
 
-    class BinaryNode : public RightNode {
+    class BinaryNode : public ExpressionNode {
     public:
 
-        BinaryNode(Member::BinaryOpcode opcode, RightNode* left, RightNode* right, bool logic = false);
+        BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic = false);
 
         virtual ~BinaryNode();
 
@@ -39,14 +39,14 @@ namespace lang {
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         Member::BinaryOpcode    m_opcode;
-        RightNode*              m_left;
-        RightNode*              m_right;
+        ExpressionNode*              m_left;
+        ExpressionNode*              m_right;
         bool                    m_logic;
     };
 
-    class UnaryNode : public RightNode {
+    class UnaryNode : public ExpressionNode {
     public:
-        UnaryNode(Member::UnaryOpcode opcode, RightNode* value, bool post = false);
+        UnaryNode(Member::UnaryOpcode opcode, ExpressionNode* value, bool post = false);
 
         virtual ~UnaryNode();
 
@@ -54,26 +54,26 @@ namespace lang {
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         Member::UnaryOpcode m_opcode;
-        RightNode*          m_value;
+        ExpressionNode*          m_value;
         bool                m_post;
     };
 
-    class AssignNode : public RightNode {
+    class AssignNode : public ExpressionNode {
     public:
-        AssignNode(LeftNode* left, RightNode* right);
+        AssignNode(MutableNode* left, ExpressionNode* right);
 
         virtual ~AssignNode();
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
-        LeftNode*   m_left;
-        RightNode*  m_right;
+        MutableNode*   m_left;
+        ExpressionNode*  m_right;
     };
 
-    class ArgumentLeftNode : public LeftNode {
+    class ArgumentMutableNode : public MutableNode {
     public:
-        ArgumentLeftNode(ArgumentNode* arg);
+        ArgumentMutableNode(ArgumentNode* arg);
 
         /// emit instructions
         virtual ExpressionGen emit(const ExpressionGen& gen);
@@ -81,9 +81,9 @@ namespace lang {
         ArgumentNode* o_arg;
     };
 
-    class ArgumentRightNode : public RightNode {
+    class ArgumentExpressionNode : public ExpressionNode {
     public:
-        ArgumentRightNode(ArgumentNode* arg);
+        ArgumentExpressionNode(ArgumentNode* arg);
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
@@ -91,9 +91,9 @@ namespace lang {
         ArgumentNode* o_arg;
     };
 
-    class VariableLeftNode : public LeftNode {
+    class VariableMutableNode : public MutableNode {
     public:
-        VariableLeftNode(VariableNode* var);
+        VariableMutableNode(VariableNode* var);
 
         /// emit instructions
         virtual ExpressionGen emit(const ExpressionGen& gen);
@@ -101,9 +101,9 @@ namespace lang {
         VariableNode* o_var;
     };
 
-    class VariableRightNode : public RightNode {
+    class VariableExpressionNode : public ExpressionNode {
     public:
-        VariableRightNode(VariableNode* var);
+        VariableExpressionNode(VariableNode* var);
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
@@ -111,9 +111,9 @@ namespace lang {
         VariableNode* o_var;
     };
 
-    class InstanceLeftNode : public LeftNode {
+    class InstanceMutableNode : public MutableNode {
     public:
-        InstanceLeftNode(const Identifier& name);
+        InstanceMutableNode(const Identifier& name);
 
         /// emit instructions
         virtual ExpressionGen emit(const ExpressionGen& gen);
@@ -121,9 +121,9 @@ namespace lang {
         Identifier m_name;
     };
 
-    class InstanceRightNode : public RightNode {
+    class InstanceExpressionNode : public ExpressionNode {
     public:
-        InstanceRightNode(const Identifier& name);
+        InstanceExpressionNode(const Identifier& name);
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
@@ -131,7 +131,7 @@ namespace lang {
         Identifier m_name;
     };
 
-    class IntegerConstNode : public RightNode
+    class IntegerConstNode : public ExpressionNode
     {
     public:
         IntegerConstNode(ContextRef context, int32_t value);
@@ -143,7 +143,7 @@ namespace lang {
         int32_t     m_value;
     };
 
-    class StringConstNode : public RightNode
+    class StringConstNode : public ExpressionNode
     {
     public:
         StringConstNode(ContextRef context, const String& value);
@@ -155,7 +155,7 @@ namespace lang {
         String      m_value;
     };
 
-    class CharConstNode : public RightNode
+    class CharConstNode : public ExpressionNode
     {
     public:
         CharConstNode(ContextRef context, const UChar& value);
@@ -167,7 +167,7 @@ namespace lang {
         UChar     m_value;
     };
 
-    class BoolConstNode : public RightNode
+    class BoolConstNode : public ExpressionNode
     {
     public:
         BoolConstNode(ContextRef context, bool value);
@@ -179,22 +179,22 @@ namespace lang {
         bool        m_value;
     };
 
-    class CallNode : public RightNode {
+    class CallNode : public ExpressionNode {
     public:
         CallNode(const Identifier& method);
 
         /// Add named argument
-        void append(const Identifier& name, RightNode* value);
+        void append(const Identifier& name, ExpressionNode* value);
 
         /// Add positior argument
-        void append(RightNode* value);
+        void append(ExpressionNode* value);
 
         /// emit instructions
         virtual ExpressionGen emit(const StatementGen& gen);
     protected:
         class CallArgument {
         public:
-            RightNode*  Value;
+            ExpressionNode*  Value;
             int32_t     Position;
             Identifier  Name;
         };

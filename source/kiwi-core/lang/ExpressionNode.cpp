@@ -12,7 +12,7 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
-BinaryNode::BinaryNode(Member::BinaryOpcode opcode, RightNode* left, RightNode* right, bool logic)
+BinaryNode::BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic)
 : m_opcode(opcode), m_left(left), m_right(right), m_logic(logic)
 {}
 
@@ -22,7 +22,7 @@ BinaryNode::~BinaryNode()
     delete m_right;
 }
 
-UnaryNode::UnaryNode(Member::UnaryOpcode opcode, RightNode* value, bool post)
+UnaryNode::UnaryNode(Member::UnaryOpcode opcode, ExpressionNode* value, bool post)
 : m_opcode(opcode), m_value(value), m_post(post)
 {}
 
@@ -31,7 +31,7 @@ UnaryNode::~UnaryNode()
     delete m_value;
 }
 
-AssignNode::AssignNode(LeftNode* left, RightNode* right)
+AssignNode::AssignNode(MutableNode* left, ExpressionNode* right)
 : m_left(left), m_right(right)
 {
 
@@ -43,16 +43,16 @@ AssignNode::~AssignNode()
     delete m_right;
 }
 
-VariableLeftNode::VariableLeftNode(VariableNode* var)
+VariableMutableNode::VariableMutableNode(VariableNode* var)
 : o_var(var) { }
 
-VariableRightNode::VariableRightNode(VariableNode* var)
+VariableExpressionNode::VariableExpressionNode(VariableNode* var)
 : o_var(var) { }
 
-ArgumentLeftNode::ArgumentLeftNode(ArgumentNode* arg)
+ArgumentMutableNode::ArgumentMutableNode(ArgumentNode* arg)
 : o_arg(arg) { }
 
-ArgumentRightNode::ArgumentRightNode(ArgumentNode* arg)
+ArgumentExpressionNode::ArgumentExpressionNode(ArgumentNode* arg)
 : o_arg(arg) { }
 
 IntegerConstNode::IntegerConstNode(ContextRef context, int32_t value)
@@ -70,13 +70,13 @@ CharConstNode::CharConstNode(ContextRef context, const UChar& value)
 CallNode::CallNode(const Identifier& method)
 : m_method(method), m_hasNamed(false) {}
 
-InstanceLeftNode::InstanceLeftNode(const Identifier& name)
+InstanceMutableNode::InstanceMutableNode(const Identifier& name)
 : m_name(name) { }
 
-InstanceRightNode::InstanceRightNode(const Identifier& name)
+InstanceExpressionNode::InstanceExpressionNode(const Identifier& name)
 : m_name(name) { }
 
-void CallNode::append(const Identifier& name, RightNode* value)
+void CallNode::append(const Identifier& name, ExpressionNode* value)
 {
     CallArgument arg;
     arg.Name     = name;
@@ -86,7 +86,7 @@ void CallNode::append(const Identifier& name, RightNode* value)
     m_hasNamed = true;
 }
 
-void CallNode::append(RightNode* value)
+void CallNode::append(ExpressionNode* value)
 {
     CallArgument arg;
     arg.Name     = "";
@@ -134,7 +134,7 @@ ExpressionGen AssignNode::emit(const StatementGen& gen)
     return m_left->emit(value);
 }
 
-ExpressionGen ArgumentLeftNode::emit(const ExpressionGen& gen)
+ExpressionGen ArgumentMutableNode::emit(const ExpressionGen& gen)
 {
     VariableGen var = o_arg->getGenerator();
     if (var.getType() == gen.getType()) {
@@ -145,14 +145,14 @@ ExpressionGen ArgumentLeftNode::emit(const ExpressionGen& gen)
     throw "unknown cast";
 }
 
-ExpressionGen ArgumentRightNode::emit(const StatementGen& gen)
+ExpressionGen ArgumentExpressionNode::emit(const StatementGen& gen)
 {
     VariableGen var      = o_arg->getGenerator();
     llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, var.getType(), inst);
 }
 
-ExpressionGen VariableLeftNode::emit(const ExpressionGen& gen)
+ExpressionGen VariableMutableNode::emit(const ExpressionGen& gen)
 {
     VariableGen var = o_var->getGenerator();
     if (var.getType() == gen.getType()) {
@@ -163,7 +163,7 @@ ExpressionGen VariableLeftNode::emit(const ExpressionGen& gen)
     throw "unknown cast";
 }
 
-ExpressionGen VariableRightNode::emit(const StatementGen& gen)
+ExpressionGen VariableExpressionNode::emit(const StatementGen& gen)
 {
     VariableGen var      = o_var->getGenerator();
     llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
@@ -276,7 +276,7 @@ ExpressionGen CallNode::emit(const StatementGen& gen)
     }
 }
 
-ExpressionGen InstanceLeftNode::emit(const ExpressionGen& gen)
+ExpressionGen InstanceMutableNode::emit(const ExpressionGen& gen)
 {
     TypeRef owner    = gen.getOwner();
     FieldRef field   = owner->find(m_name);
@@ -318,7 +318,7 @@ ExpressionGen InstanceLeftNode::emit(const ExpressionGen& gen)
     return gen;
 }
 
-ExpressionGen InstanceRightNode::emit(const StatementGen& gen)
+ExpressionGen InstanceExpressionNode::emit(const StatementGen& gen)
 {
     TypeRef owner    = gen.getOwner();
     FieldRef field   = owner->find(m_name);

@@ -23,7 +23,7 @@ ReturnStatement::ReturnStatement(ScopeNode* parent)
 : StatementNode(parent), m_result(0) {}
 
 // constructor
-ReturnStatement::ReturnStatement(ScopeNode* parent, RightNode* result)
+ReturnStatement::ReturnStatement(ScopeNode* parent, ExpressionNode* result)
 : StatementNode(parent), m_result(result) {}
 
 // destructor
@@ -32,7 +32,7 @@ ReturnStatement::~ReturnStatement()
     delete m_result;
 }
 // constructor
-PrintStatement::PrintStatement(ScopeNode* parent, RightNode* result)
+PrintStatement::PrintStatement(ScopeNode* parent, ExpressionNode* result)
 : StatementNode(parent), m_result(result) {}
 
 // destructor

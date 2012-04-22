@@ -61,15 +61,15 @@ ScopeNode* NodeFactory::scopeEnd()
     return scope;
 }
 
-LeftNode* NodeFactory::left(const Identifier& name, const location& loc)
+MutableNode* NodeFactory::left(const Identifier& name, const location& loc)
 {
-    LeftNode* node = scope()->get(name)->getLeft();
+    MutableNode* node = scope()->get(name)->getLeft();
     node->setLocation(loc);
     return node;
 }
-RightNode* NodeFactory::right(const Identifier& name, const location& loc)
+ExpressionNode* NodeFactory::right(const Identifier& name, const location& loc)
 {
-    RightNode* node = scope()->get(name)->getRight();
+    ExpressionNode* node = scope()->get(name)->getRight();
     node->setLocation(loc);
     return node;
 }

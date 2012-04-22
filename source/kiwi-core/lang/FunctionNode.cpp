@@ -78,10 +78,10 @@ FieldNode::~FieldNode()
     delete m_type;
 }
 
-ExpressionNode::ExpressionNode(ScopeNode* parent, RightNode* expr)
+ExpressionStatementNode::ExpressionStatementNode(ScopeNode* parent, ExpressionNode* expr)
 : StatementNode(parent), m_expr(expr) { }
 
-ExpressionNode::~ExpressionNode()
+ExpressionStatementNode::~ExpressionStatementNode()
 {
     delete m_expr;
 }
@@ -128,29 +128,29 @@ void ScopeNode::append(StatementNode* scope)
     m_stmts.push_back(scope);
 }
 
-void ScopeNode::append(RightNode* expr)
+void ScopeNode::append(ExpressionNode* expr)
 {
-    append(new ExpressionNode(this, expr));
+    append(new ExpressionStatementNode(this, expr));
 }
 
-LeftNode* ArgumentNode::getLeft()
+MutableNode* ArgumentNode::getLeft()
 {
-    return new ArgumentLeftNode(this);
+    return new ArgumentMutableNode(this);
 }
 
-RightNode* ArgumentNode::getRight()
+ExpressionNode* ArgumentNode::getRight()
 {
-    return new ArgumentRightNode(this);
+    return new ArgumentExpressionNode(this);
 }
 
-LeftNode* VariableNode::getLeft()
+MutableNode* VariableNode::getLeft()
 {
-    return new VariableLeftNode(this);
+    return new VariableMutableNode(this);
 }
 
-RightNode* VariableNode::getRight()
+ExpressionNode* VariableNode::getRight()
 {
-    return new VariableRightNode(this);
+    return new VariableExpressionNode(this);
 }
 
 void FieldNode::generate(TypeRef ownerType)
@@ -258,7 +258,7 @@ StatementGen ScopeNode::emit(const StatementGen& gen)
     return result;
 }
 
-StatementGen ExpressionNode::emit(const StatementGen& gen)
+StatementGen ExpressionStatementNode::emit(const StatementGen& gen)
 {
     return m_expr->emit(gen);
 }

@@ -11,7 +11,7 @@ namespace lang
     class TypeNode;
     class FunctionNode;
     class ScopeNode;
-    class RightNode;
+    class ExpressionNode;
 
     using codegen::StatementGen;
 
@@ -48,7 +48,7 @@ namespace lang
         ReturnStatement(ScopeNode* parent);
 
         /// constructor
-        ReturnStatement(ScopeNode* parent, RightNode* result);
+        ReturnStatement(ScopeNode* parent, ExpressionNode* result);
 
         /// destructor
         ~ReturnStatement();
@@ -56,14 +56,14 @@ namespace lang
         /// emit instructions for statement
         virtual StatementGen emit(const StatementGen& gen);
     protected:
-        RightNode* m_result;
+        ExpressionNode* m_result;
     };
 
     /// Print statement syntax node
     class PrintStatement : public StatementNode {
     public:
         /// constructor
-        PrintStatement(ScopeNode* parent, RightNode* result);
+        PrintStatement(ScopeNode* parent, ExpressionNode* result);
 
         /// destructor
         ~PrintStatement();
@@ -71,7 +71,7 @@ namespace lang
         /// emit instructions for statement
         virtual StatementGen emit(const StatementGen& gen);
     protected:
-        RightNode* m_result;
+        ExpressionNode* m_result;
     };
 }}
 
