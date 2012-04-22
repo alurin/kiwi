@@ -3,6 +3,13 @@
 
 #include "kiwi/Config.hpp"
 
+namespace llvm
+{
+    class Type;
+    class Function;
+    class GlobalVariable;
+}
+
 namespace kiwi
 {
     typedef boost::shared_ptr<class Member>             MemberRef;

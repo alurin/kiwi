@@ -10,6 +10,7 @@ Source code clean up
         * Full object types: `objects`
 * Move all LLVM code from syntax nodes and metadata
 * Warning and errors
+* Remove all smart pointers. Reason: it's not big help
 
 Runtime
 -------

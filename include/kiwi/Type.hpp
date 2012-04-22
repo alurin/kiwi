@@ -7,8 +7,6 @@
 namespace llvm
 {
     class Type;
-    class Function;
-    class GlobalVariable;
 }
 
 namespace kiwi
