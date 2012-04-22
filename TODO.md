@@ -1,6 +1,10 @@
 TODO
 ====
 
+Git
+---
+Add submodule for [LLVM](git://github.com/earl/llvm-mirror.git)
+
 Source code clean up
 --------------------
 * Types
