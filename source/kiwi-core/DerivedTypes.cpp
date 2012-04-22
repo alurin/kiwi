@@ -140,7 +140,6 @@ void BoolType::initializate()
     add(UnaryOperator::PRINT, voidTy, new LlvmBoolPrintOperator());
 }
 
-
 void CharType::initializate()
 {
     ContextRef context = m_module.lock()->getContext();
