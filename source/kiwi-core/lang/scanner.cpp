@@ -59,7 +59,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types.
+ * if you want the limit (max/min) macros for int types. 
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -76,7 +76,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t;
+typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 
@@ -117,7 +117,7 @@ typedef unsigned int flex_uint32_t;
 
 /* %if-c++-only */
 /* begin standard C++ headers. */
-#include <iostream>
+#include <iostream> 
 #include <errno.h>
 #include <cstdlib>
 #include <cstdio>
@@ -226,7 +226,7 @@ extern int yyleng;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
-
+    
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
 	do \
@@ -293,7 +293,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-
+    
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -803,7 +803,7 @@ YY_DECL
 	register yy_state_type yy_current_state;
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
-
+    
 /* %% [7.0] user's declarations go here */
 #line 58 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/scanner.ll"
 
@@ -1671,7 +1671,7 @@ int yyFlexLexer::yy_get_next_buffer()
 {
 	register yy_state_type yy_current_state;
 	register char *yy_cp;
-
+    
 /* %% [15.0] code to get the start state into yy_current_state goes here */
 	yy_current_state = (yy_start);
 
@@ -1736,7 +1736,7 @@ int yyFlexLexer::yy_get_next_buffer()
 /* %endif */
 {
 	register char *yy_cp;
-
+    
     yy_cp = (yy_c_buf_p);
 
 	/* undo effects of setting up yytext */
@@ -1781,7 +1781,7 @@ int yyFlexLexer::yy_get_next_buffer()
 /* %endif */
 {
 	int c;
-
+    
 	*(yy_c_buf_p) = (yy_hold_char);
 
 	if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
@@ -1851,7 +1851,7 @@ int yyFlexLexer::yy_get_next_buffer()
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
- *
+ * 
  * @note This function does not reset the start condition to @c INITIAL .
  */
 /* %if-c-only */
@@ -1860,7 +1860,7 @@ int yyFlexLexer::yy_get_next_buffer()
     void yyFlexLexer::yyrestart( std::istream* input_file )
 /* %endif */
 {
-
+    
 	if ( ! YY_CURRENT_BUFFER ){
         yyensure_buffer_stack ();
 		YY_CURRENT_BUFFER_LVALUE =
@@ -1873,7 +1873,7 @@ int yyFlexLexer::yy_get_next_buffer()
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
- *
+ * 
  */
 /* %if-c-only */
 /* %endif */
@@ -1881,7 +1881,7 @@ int yyFlexLexer::yy_get_next_buffer()
     void yyFlexLexer::yy_switch_to_buffer( YY_BUFFER_STATE new_buffer )
 /* %endif */
 {
-
+    
 	/* TODO. We should be able to replace this entire function body
 	 * with
 	 *		yypop_buffer_state();
@@ -1925,7 +1925,7 @@ int yyFlexLexer::yy_get_next_buffer()
 /** Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
- *
+ * 
  * @return the allocated buffer state.
  */
 /* %if-c-only */
@@ -1935,7 +1935,7 @@ int yyFlexLexer::yy_get_next_buffer()
 /* %endif */
 {
 	YY_BUFFER_STATE b;
-
+    
 	b = (YY_BUFFER_STATE) Examplealloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
@@ -1958,7 +1958,7 @@ int yyFlexLexer::yy_get_next_buffer()
 
 /** Destroy the buffer.
  * @param b a buffer created with yy_create_buffer()
- *
+ * 
  */
 /* %if-c-only */
 /* %endif */
@@ -1966,7 +1966,7 @@ int yyFlexLexer::yy_get_next_buffer()
     void yyFlexLexer::yy_delete_buffer( YY_BUFFER_STATE b )
 /* %endif */
 {
-
+    
 	if ( ! b )
 		return;
 
@@ -2000,7 +2000,7 @@ extern "C" int isatty (int );
 
 {
 	int oerrno = errno;
-
+    
 	yy_flush_buffer( b );
 
 	b->yy_input_file = file;
@@ -2025,7 +2025,7 @@ extern "C" int isatty (int );
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
- *
+ * 
  */
 /* %if-c-only */
 /* %endif */
@@ -2059,7 +2059,7 @@ extern "C" int isatty (int );
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
- *
+ *  
  */
 /* %if-c-only */
 /* %endif */
@@ -2095,7 +2095,7 @@ void yyFlexLexer::yypush_buffer_state (YY_BUFFER_STATE new_buffer)
 /* %if-c-or-c++ */
 /** Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
- *
+ *  
  */
 /* %if-c-only */
 /* %endif */
@@ -2129,7 +2129,7 @@ void yyFlexLexer::yyensure_buffer_stack(void)
 /* %endif */
 {
 	int num_to_alloc;
-
+    
 	if (!(yy_buffer_stack)) {
 
 		/* First allocation is just for 2 elements, since we don't know if this
@@ -2142,9 +2142,9 @@ void yyFlexLexer::yyensure_buffer_stack(void)
 								);
 		if ( ! (yy_buffer_stack) )
 			YY_FATAL_ERROR( "out of dynamic memory in yyensure_buffer_stack()" );
-
+								  
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
-
+				
 		(yy_buffer_stack_max) = num_to_alloc;
 		(yy_buffer_stack_top) = 0;
 		return;

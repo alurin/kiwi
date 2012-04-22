@@ -10,18 +10,17 @@ namespace llvm {
 }
 
 namespace kiwi {
-    typedef boost::shared_ptr<class Method> MethodRef;
+    class Method;
 namespace codegen {
 
     /// Emitter for method calls and definitions
-    class MethodEmitter
-    {
+    class MethodEmitter {
     public:
         /// Type for list of method arguments
         typedef std::vector<ExpressionGen> ArgumentList;
 
         /// constructor
-        MethodEmitter(MethodRef method);
+        MethodEmitter(Method* method);
 
         /// emit method type
         llvm::FunctionType* emitType();
@@ -32,7 +31,7 @@ namespace codegen {
         /// emit method call with ordered arguments
         ExpressionGen emitCall(const StatementGen& gen, const ExpressionGen& thisObject, const ArgumentList& args);
     protected:
-        MethodRef m_method;
+        Method* m_method;
     };
 
 }}

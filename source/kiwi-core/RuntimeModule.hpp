@@ -5,7 +5,7 @@
 
 namespace kiwi
 {
-    void initRuntimeModule(ModuleRef module);
+    void initRuntimeModule(Module* module);
 }
 
 #endif

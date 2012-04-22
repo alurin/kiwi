@@ -11,13 +11,11 @@ namespace llvm {
     class Function;
 }
 
-namespace kiwi
-{
-    typedef boost::shared_ptr<class Module> ModuleRef;
-    typedef boost::shared_ptr<class Method> MethodRef;
+namespace kiwi {
+    class Module;
+    class Method;
 
-namespace lang
-{
+namespace lang {
     class TypeNode;
     class FunctionNode;
     class MutableNode;
@@ -27,8 +25,7 @@ namespace lang
     using codegen::VariableGen;
 
     /// Named parameter syntax node
-    class NamedNode : public Node
-    {
+    class NamedNode : public Node {
     public:
         // destructor
         virtual ~NamedNode();
@@ -150,7 +147,7 @@ namespace lang
         virtual ~FieldNode();
 
         /// Generate metadata
-        virtual void generate(TypeRef owner);
+        virtual void generate(Type* owner);
     protected:
         // store fields
         Identifier                  m_name;
@@ -179,24 +176,24 @@ namespace lang
         }
 
         /// Generate metadata
-        virtual void generate(TypeRef owner);
+        virtual void generate(Type* owner);
 
         /// Emit function code and instruction
-        void emit(TypeRef owner);
+        void emit(Type* owner);
 
         llvm::Function* getFunction() {
             return m_func;
         }
     protected:
         // store fields
-        Identifier                  m_name;
-        TypeNode*                   m_type;
-        ScopeNode*                  m_root;
+        Identifier m_name;
+        TypeNode* m_type;
+        ScopeNode* m_root;
 
         // generated fields
-        MethodRef                   m_method;
-        llvm::Function*             m_func;
-        std::vector<ArgumentNode*>  m_positions;
+        Method* m_method;
+        llvm::Function* m_func;
+        std::vector<ArgumentNode*> m_positions;
 
         std::map<Identifier, ArgumentNode*> m_args;
     };

@@ -10,27 +10,24 @@ namespace llvm {
 
 namespace kiwi
 {
-    typedef boost::shared_ptr<class Module>     ModuleRef;
-    typedef boost::shared_ptr<class Context>    ContextRef;
-    typedef boost::weak_ptr<class Context>      ContextWeak;
+    class Context;
 
-    class Module : public boost::enable_shared_from_this<Module>
-    {
+    class Module {
         Module(const Module&);            ///< NOT IMPLEMENT!!!
         Module& operator=(const Module&); ///< NOT IMPLEMENT!!!
     public:
-        /// destuctor
+        /// destructor
         ~Module();
 
         /// create module
-        static ModuleRef create(const Identifier& name, const ContextRef& ref);
+        static Module* create(const Identifier& name, Context* ref);
 
         /// include and run file as script
         void includeFile(const Path& filename);
 
-        /// Returns module owner
-        ContextRef getContext() const {
-            return m_context.lock();
+        /// returns module owner
+        Context* getContext() const {
+            return m_context;
         }
 
         /// returns LLVM module
@@ -38,22 +35,23 @@ namespace kiwi
             return m_module;
         }
 
-        /// Build module
+        /// build module
         void build();
 
-        /// Dump module
+        /// dump module
         void dump();
 
-        /// Run main function in module
+        /// run main function in module
         int32_t run();
     protected:
+        /// module name
         Identifier              m_name;
-        ContextWeak             m_context;
+        Context*                m_context;
         llvm::Module*           m_module;
         llvm::ExecutionEngine*  m_engine;
 
         /// module constructor
-        Module(const Identifier& name, const ContextRef& ref);
+        Module(const Identifier& name, Context* ref);
     };
 }
 

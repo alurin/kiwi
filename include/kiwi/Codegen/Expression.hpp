@@ -8,26 +8,22 @@ namespace llvm {
 }
 
 namespace kiwi {
-
-    typedef boost::shared_ptr<class Type> TypeRef;
-
 namespace codegen {
 
     /// Structure for store information about instructions emit process
-    class ExpressionGen : public StatementGen
-    {
+    class ExpressionGen : public StatementGen {
     public:
         /// copy constructor
         ExpressionGen(const ExpressionGen& gen);
 
         /// constructor
-        ExpressionGen(const StatementGen& gen, TypeRef type, llvm::Value* value);
+        ExpressionGen(const StatementGen& gen, Type* type, llvm::Value* value);
 
         /// assigment operator
         ExpressionGen& operator=(const ExpressionGen& gen);
 
         /// returns type
-        TypeRef getType() const {
+        Type* getType() const {
             return m_type;
         }
 
@@ -36,8 +32,11 @@ namespace codegen {
             return m_value;
         }
     protected:
-        TypeRef         m_type;
-        llvm::Value*    m_value;
+        /// Expression type
+        Type* m_type;
+
+        /// Expression value
+        llvm::Value* m_value;
     };
 
 }}

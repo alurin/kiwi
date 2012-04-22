@@ -27,7 +27,7 @@ class Driver : public NodeFactory
 {
 public:
     /// construct a new parser driver context
-    Driver(ContextRef context);
+    Driver(Context* context);
 
 public:
     /// enable debug output in the flex scanner

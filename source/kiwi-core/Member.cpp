@@ -11,7 +11,7 @@ using namespace kiwi;
 using namespace kiwi::codegen;
 
 // cosntructor
-Member::Member(const TypeRef& type)
+Member::Member(Type* type)
 : m_memberID((MemberID) 0), m_ownerType(type) { }
 
 // destructor

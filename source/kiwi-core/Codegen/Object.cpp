@@ -9,7 +9,7 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-ObjectEmitter::ObjectEmitter(ObjectTy type)
+ObjectEmitter::ObjectEmitter(ObjectType* type)
 : m_type(type) { }
 
 // emit instructions for load value from object field
@@ -41,7 +41,7 @@ ExpressionGen ObjectEmitter::emitNew(const StatementGen& gen)
 ExpressionGen ObjectEmitter::findField(const StatementGen& gen, const Identifier& name)
 {
     // Find field
-    FieldRef field = m_type->find(name);
+    Field* field = m_type->find(name);
     if (!field) {
         throw "Field not found";
     }

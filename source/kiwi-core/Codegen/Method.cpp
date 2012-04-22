@@ -11,14 +11,14 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-MethodEmitter::MethodEmitter(MethodRef method)
+MethodEmitter::MethodEmitter(Method* method)
 : m_method(method) { }
 
 
 // emit method type
 llvm::FunctionType* MethodEmitter::emitType()
 {
-    ModuleRef module = m_method->getOwnerType()->getModule();
+    Module* module = m_method->getOwnerType()->getModule();
 
     // collect arguments types
     std::vector<llvm::Type*> args;
@@ -34,8 +34,8 @@ llvm::FunctionType* MethodEmitter::emitType()
     }
 
     // collect explicit arguments
-    for (std::vector<ArgumentRef>::const_iterator i = m_method->begin(); i != m_method->end(); ++i) {
-        ArgumentRef arg = *i;
+    for (std::vector<Argument*>::const_iterator i = m_method->begin(); i != m_method->end(); ++i) {
+        Argument* arg = *i;
         args.push_back(arg->getType()->getVarType());
     }
 
@@ -47,15 +47,15 @@ llvm::FunctionType* MethodEmitter::emitType()
 llvm::Function* MethodEmitter::emitDefinition()
 {
     if (!m_method->getFunction()) {
-        ModuleRef module             = m_method->getOwnerType()->getModule();
+        Module* module             = m_method->getOwnerType()->getModule();
         llvm::FunctionType* funcType = emitType();
         llvm::Function* func         = llvm::Function::Create(funcType, llvm::GlobalValue::ExternalLinkage, m_method->getName(), module->getModule());
         m_method->setFunction(func);
 
         std::vector<Identifier> argNames;
         // collect explicit arguments
-        for (std::vector<ArgumentRef>::const_iterator i = m_method->begin(); i != m_method->end(); ++i) {
-            ArgumentRef arg = *i;
+        for (std::vector<Argument*>::const_iterator i = m_method->begin(); i != m_method->end(); ++i) {
+            Argument* arg = *i;
             argNames.push_back(arg->getName());
         }
 

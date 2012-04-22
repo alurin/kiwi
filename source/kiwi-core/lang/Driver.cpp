@@ -13,7 +13,7 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
-Driver::Driver(ContextRef context)
+Driver::Driver(Context* context)
     : NodeFactory(context),
       trace_scanning(context->isDebug()),
       trace_parsing(context->isDebug())

@@ -6,17 +6,17 @@
 
 namespace kiwi
 {
-    typedef boost::shared_ptr<class Argument> ArgumentRef;
+    class Argument;
+    class Method;
 
-    namespace codegen
-    {
+    namespace codegen {
         class UnaryEmitter;
         class BinaryEmitter;
     };
 
+    //==--------------------------------------------------------------------==//
     /// Unary operator
-    class UnaryOperator : public Member
-    {
+    class UnaryOperator : public Member {
         friend class Type;
     public:
         /// virtual destructor
@@ -28,8 +28,8 @@ namespace kiwi
         }
 
         /// returns result type
-        TypeRef getResultType() const {
-            return m_resultType.lock();
+        Type* getResultType() const {
+            return m_resultType;
         }
 
         /// returns IR code emitter
@@ -38,28 +38,29 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(const MemberRef& type) {
+        static bool classof(class Member* type) {
             return type->getMemberID() == UnaryOperatorID;
         }
 
         /// classof check
-        static bool classof(const UnaryRef&) {
+        static bool classof(const UnaryOperator*) {
             return true;
         }
     protected:
         UnaryOpcode             m_opcode;
-        TypeWeak                m_resultType;
+        Type*                m_resultType;
         codegen::UnaryEmitter*  m_emitter;
 
         /// constructor
         UnaryOperator(
             UnaryOpcode opcode,
-            const TypeRef& ownerType,
-            const TypeRef& resultType,
+            Type* ownerType,
+            Type* resultType,
             codegen::UnaryEmitter* emitter
         );
     };
 
+    //==--------------------------------------------------------------------==//
     /// Binary operator
     class BinaryOperator : public Member {
         friend class Type;
@@ -74,14 +75,14 @@ namespace kiwi
 
         /// return result type
         /// @nostable
-        TypeRef getResultType() const {
-            return m_resultType.lock();
+        Type* getResultType() const {
+            return m_resultType;
         }
 
         /// return second operator type
         /// @nostable
-        TypeRef getOperandType() const {
-            return m_operandType.lock();
+        Type* getOperandType() const {
+            return m_operandType;
         }
 
         /// return IR code emitter
@@ -90,54 +91,81 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(const MemberRef& type) {
+        static bool classof(class Member* type) {
             return type->getMemberID() == BinaryOperatorID;
         }
 
         /// classof check
-        static bool classof(const BinaryRef&) {
+        static bool classof(const BinaryOperator&) {
             return true;
         }
     protected:
         BinaryOpcode             m_opcode;
-        TypeWeak                 m_resultType;
-        TypeWeak                 m_operandType;
+        Type*                 m_resultType;
+        Type*                 m_operandType;
         codegen::BinaryEmitter*  m_emitter;
 
         /// constructor
         BinaryOperator(
             BinaryOpcode opcode,
-            const TypeRef& ownerType,
-            const TypeRef& resultType,
-            const TypeRef& operandType,
+            Type* ownerType,
+            Type* resultType,
+            Type* operandType,
             codegen::BinaryEmitter* emitter
         );
     };
 
+    //==--------------------------------------------------------------------==//
     /// Method argument
     class Argument {
+        friend class Method;
     public:
-        static ArgumentRef create(const Identifier& name, const TypeRef& type);
+        /// return argument owner
+        Method* getOwner() const {
+            return m_owner;
+        }
 
+        /// returns argument name
         Identifier getName() const {
             return m_name;
         }
 
-        TypeRef getType () const {
-            return m_type.lock();
+        /// set argument name
+        void setName(const Identifier& name) {
+            m_name = name;
+        }
+
+        /// returns argument type
+        Type* getType () const {
+            return m_type;
+        }
+
+        /// returns argument position
+        int32_t getPosition() const {
+            return m_position;
         }
     protected:
-        Identifier  m_name;
-        TypeWeak    m_type;
+        /// argument owner method
+        Method* m_owner;
 
-        Argument(const Identifier& name, const TypeRef& type);
+        /// argument name
+        Identifier m_name;
+
+        /// argument type
+        Type* m_type;
+
+        /// argument position
+        int32_t m_position;
+
+        Argument(Method* owner, Type* type, int32_t position);
     };
 
+    //==--------------------------------------------------------------------==//
     /// Methods
     class Method : public Member {
         friend class Type;
     public:
-        typedef std::vector<ArgumentRef>::const_iterator const_iterator;
+        typedef std::vector<Argument*>::const_iterator const_iterator;
 
         /// virtual destructor
         virtual ~Method();
@@ -148,8 +176,8 @@ namespace kiwi
         }
 
         /// returns method result type
-        TypeRef getResultType() const {
-            return m_resultType.lock();
+        Type* getResultType() const {
+            return m_resultType;
         }
 
         /// returns this is static method?
@@ -173,28 +201,30 @@ namespace kiwi
         const_iterator end()   const { return m_arguments.end();   }
 
         /// classof check
-        static bool classof(const MemberRef& type) {
+        static bool classof(class Member* type) {
             return type->getMemberID() == MethodID;
         }
 
         /// classof check
-        static bool classof(const MethodRef&) {
+        static bool classof(const Method*) {
             return true;
         }
     protected:
-        Identifier                  m_name;
-        TypeWeak                    m_ownerType;
-        TypeWeak                    m_resultType;
-        std::vector<ArgumentRef>    m_arguments;
-        llvm::Function*             m_func;
-        bool                        m_isStatic;
+        Identifier m_name;
+        Type* m_ownerType;
+        Type* m_resultType;
+        std::vector<Argument*> m_arguments;
+        llvm::Function* m_func;
+        bool m_isStatic;
 
-        Method(const Identifier& name, const TypeRef& ownerType, const TypeRef& resultType, std::vector<ArgumentRef> arguments);
+        Method(const Identifier& name, Type* ownerType, Type* resultType, std::vector<Type*> arguments);
     };
 
+    //==--------------------------------------------------------------------==//
     /// Fields. Not implemented
     class Field : public Member {
         friend class Type;
+        friend class ObjectType;
     public:
         /// virtual destructor
         virtual ~Field();
@@ -205,8 +235,8 @@ namespace kiwi
         }
 
         /// returns field type
-        TypeRef getFieldType() const {
-            return m_fieldType.lock();
+        Type* getFieldType() const {
+            return m_fieldType;
         }
 
         /// returns position in address map
@@ -215,23 +245,23 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(const MemberRef& type) {
+        static bool classof(class Member* type) {
             return type->getMemberID() == FieldID;
         }
 
         /// classof check
-        static bool classof(const FieldRef&) {
+        static bool classof(const Field*) {
             return true;
         }
     protected:
         Identifier  m_name;
-        TypeWeak    m_fieldType;
+        Type*    m_fieldType;
         int32_t     m_position;
 
         /// constructor
-        Field(const Identifier& name, const TypeRef& ownerType, const TypeRef& fieldType);
+        Field(const Identifier& name, Type* ownerType, Type* fieldType);
 
-        ///
+        /// Set position
         void setPosition(int32_t position) {
             m_position = position;
         }

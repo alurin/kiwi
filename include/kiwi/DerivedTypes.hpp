@@ -11,23 +11,23 @@ namespace kiwi
         friend class Context;
     public:
         /// returns void type from context
-        static VoidTy get(const ContextRef& context);
+        static VoidType* get(Context* context);
 
         /// classof check
-        static bool classof(const TypeRef& type) {
+        static bool classof(const Type* type) {
             return type->getTypeID() == VoidID;
         }
 
         /// classof check
-        static bool classof(const VoidTy&) {
+        static bool classof(const VoidType*) {
             return true;
         }
     private:
         /// constructor
-        VoidType(const ModuleRef& module);
+        VoidType(Module* module);
 
         /// create integer type
-        static VoidTy create(const ModuleRef& module);
+        static VoidType* create(Module* module);
     };
 
     //==--------------------------------------------------------------------==//
@@ -37,23 +37,23 @@ namespace kiwi
         friend class Context;
     public:
         /// returns 32-bit signed integer type for context
-        static IntTy get32(const ContextRef& context);
+        static IntType* get32(Context* context);
 
         /// classof check
-        static bool classof(const TypeRef& type) {
+        static bool classof(const Type* type) {
             return type->getTypeID() == IntID;
         }
 
         /// classof check
-        static bool classof(const IntTy&) {
+        static bool classof(const IntType*) {
             return true;
         }
     private:
         /// constructor
-        IntType(const ModuleRef& module, int32_t size, bool unsign);
+        IntType(Module* module, int32_t size, bool unsign);
 
         /// create integer type
-        static IntTy create(const ModuleRef& module, int32_t size, bool unsign);
+        static IntType* create(Module* module, int32_t size, bool unsign);
 
         /// initializator
         void initializate();
@@ -66,23 +66,23 @@ namespace kiwi
         friend class Context;
     public:
         /// returns boolean type from context
-        static BoolTy get(const ContextRef& context);
+        static BoolType* get(Context* context);
 
         /// classof check
-        static bool classof(const TypeRef& type) {
+        static bool classof(const Type* type) {
             return type->getTypeID() == BoolID;
         }
 
         /// classof check
-        static bool classof(const BoolTy&) {
+        static bool classof(const BoolType*) {
             return true;
         }
     protected:
         /// constructor
-        BoolType(const ModuleRef& module);
+        BoolType(Module* module);
 
         /// create module type
-        static BoolTy create(const ModuleRef& module);
+        static BoolType* create(Module* module);
 
         /// initializator
         void initializate();
@@ -94,23 +94,23 @@ namespace kiwi
         friend class Context;
     public:
         /// return unicode character type from context
-        static CharTy get(const ContextRef& context);
+        static CharType* get(Context* context);
 
         /// classof check
-        static bool classof(const TypeRef& type) {
+        static bool classof(const Type* type) {
             return type->getTypeID() == CharID;
         }
 
         /// classof check
-        static bool classof(const CharTy&) {
+        static bool classof(const CharType*) {
             return true;
         }
     protected:
         /// constructor
-        CharType(const ModuleRef& module);
+        CharType(Module* module);
 
         /// create module type
-        static CharTy create(const ModuleRef& module);
+        static CharType* create(Module* module);
 
         /// initializator
         void initializate();
@@ -122,23 +122,23 @@ namespace kiwi
         friend class Context;
     public:
         /// returns unicode string type from context
-        static StringTy get(const ContextRef& context);
+        static StringType* get(Context* context);
 
         /// classof check
-        static bool classof(const TypeRef& type) {
+        static bool classof(const Type* type) {
             return type->getTypeID() == StringID;
         }
 
         /// classof check
-        static bool classof(const StringTy&) {
+        static bool classof(const StringType*) {
             return true;
         }
     protected:
         /// constructor
-        StringType(const ModuleRef& module);
+        StringType(Module* module);
 
         /// create module type
-        static StringTy create(const ModuleRef& module);
+        static StringType* create(Module* module);
 
         /// initializator
         void initializate();
@@ -154,30 +154,41 @@ namespace kiwi
     class ObjectType : public Type {
     public:
         /// Create anonym object type in module
-        static ObjectTy create(const ModuleRef& module);
+        static ObjectType* create(Module* module);
 
         /// Create object type in module
-        static ObjectTy create(const ModuleRef& module, const Identifier& name);
+        static ObjectType* create(Module* module, const Identifier& name);
 
         /// classof check
-        static bool classof(const TypeRef& type) {
+        static bool classof(const Type* type) {
             return type->getTypeID() == ObjectID;
         }
 
         /// classof check
-        static bool classof(const ObjectTy&) {
+        static bool classof(const ObjectType*) {
             return true;
         }
+        /// return LLVM analog for address map
+        llvm::GlobalVariable* getVarAddressMap() const {
+            return m_addressMap;
+        }
 
-        // void inherit(ObjectTy type);
-        // AddressMap      getAddressMap() const;
-        // VirtualTable    getVirtualTable() const;
+        /// return LLVM analog for address map
+        llvm::GlobalVariable* getVarVirtualTable() const {
+            return m_virtualTable;
+        }
+
+        /// emit LLVM analog for type
+        virtual void emit();
     protected:
+        llvm::GlobalVariable* m_addressMap;
+        llvm::GlobalVariable* m_virtualTable;
+
         // anonym object constructor
-        ObjectType(const ModuleRef& module);
+        ObjectType(Module* module);
 
         // constructor
-        ObjectType(const ModuleRef& module, const Identifier& name);
+        ObjectType(Module* module, const Identifier& name);
     };
 }
 

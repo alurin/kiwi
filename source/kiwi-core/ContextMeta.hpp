@@ -4,15 +4,15 @@
 #include "kiwi/Config.hpp"
 #include "kiwi/DerivedTypes.hpp"
 
-namespace kiwi
-{
+namespace kiwi {
+    /// Internal class for store information of runtime types
     class ContextMeta {
     public:
-        IntTy       int32Ty;
-        BoolTy      boolTy;
-        VoidTy      voidTy;
-        CharTy      charTy;
-        StringTy    stringTy;
+        IntType* int32Ty;
+        BoolType* boolTy;
+        VoidType* voidTy;
+        CharType* charTy;
+        StringType* stringTy;
     };
 }
 

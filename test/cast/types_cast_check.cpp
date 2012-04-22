@@ -11,12 +11,9 @@ using namespace kiwi;
 template<typename T, typename R>
 class cast_checker {
 public:
-    typedef boost::shared_ptr<R> RootRef;
-    typedef boost::shared_ptr<T> ConcreteRef;
-
     /// check type
-    static void check(const ConcreteRef& instType) {
-        RootRef anyType = instType;
+    static void check(T* instType) {
+        R* anyType = instType;
 
         CHECK(classof<T>(instType));                 // check current class
         CHECK(classof<T>(anyType));                  // check root class
@@ -26,7 +23,7 @@ public:
 
 TEST(types_cast_check) // Declares a test named "types_cast_check"
 {
-    ContextRef context = Context::create();
+    Context* context = Context::create();
 
     cast_checker<VoidType, Type>::check(VoidType::get(context));
     cast_checker<BoolType, Type>::check(BoolType::get(context));
@@ -34,17 +31,17 @@ TEST(types_cast_check) // Declares a test named "types_cast_check"
     cast_checker<IntType, Type>::check(IntType::get32(context));
     cast_checker<StringType, Type>::check(StringType::get(context));
 
-    ModuleRef  module  = Module::create("script", context);
+    Module*  module  = Module::create("script", context);
     cast_checker<ObjectType, Type>::check(ObjectType::create(module));
 }
 
 TEST(members_cast_check) // Declares a test named "members_cast_check"
 {
-    ContextRef context = Context::create();
-    ModuleRef  module  = Module::create("name", context);
-    ObjectTy   type    = ObjectType::create(module);
+    Context* context = Context::create();
+    Module*  module  = Module::create("name", context);
+    ObjectType* type = ObjectType::create(module);
 
-    std::vector<ArgumentRef> args;
+    std::vector<Type*> args;
 
     cast_checker<Field, Member>::check(type->add("field", type));
     cast_checker<Method, Member>::check(type->add("method", type, args));

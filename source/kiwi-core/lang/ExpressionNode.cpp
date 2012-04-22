@@ -5,6 +5,7 @@
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Codegen/Emitter.hpp"
 #include "kiwi/Codegen/Object.hpp"
+#include "kiwi/Codegen/String.hpp"
 #include "kiwi/Support/Cast.hpp"
 #include <llvm/Constants.h>
 #include <llvm/Function.h>
@@ -58,16 +59,16 @@ ArgumentMutableNode::ArgumentMutableNode(ArgumentNode* arg)
 ArgumentExpressionNode::ArgumentExpressionNode(ArgumentNode* arg)
 : o_arg(arg) { }
 
-IntegerConstNode::IntegerConstNode(ContextRef context, int32_t value)
+IntegerConstNode::IntegerConstNode(Context* context, int32_t value)
 : m_context(context), m_value(value) { }
 
-BoolConstNode::BoolConstNode(ContextRef context, bool value)
+BoolConstNode::BoolConstNode(Context* context, bool value)
 : m_context(context), m_value(value) { }
 
-StringConstNode::StringConstNode(ContextRef context, const String& value)
+StringConstNode::StringConstNode(Context* context, const String& value)
 : m_context(context), m_value(value) { }
 
-CharConstNode::CharConstNode(ContextRef context, const UChar& value)
+CharConstNode::CharConstNode(Context* context, const UChar& value)
 : m_context(context), m_value(value) { }
 
 CallNode::CallNode(const Identifier& method)
@@ -105,8 +106,8 @@ ExpressionGen BinaryNode::emit(const StatementGen& gen)
     ExpressionGen right = m_right->emit(gen);
 
     // find emitter
-    TypeRef type = left.getType();
-    BinaryRef op = type->find(m_opcode, right.getType());
+    Type* type = left.getType();
+    BinaryOperator* op = type->find(m_opcode, right.getType());
 
     // emit instruction
     if (op) {
@@ -121,8 +122,8 @@ ExpressionGen UnaryNode::emit(const StatementGen& gen)
     ExpressionGen value  = m_value->emit(gen);
 
     // find emitter
-    TypeRef type = value.getType();
-    UnaryRef op  = type->find(m_opcode);
+    Type* type = value.getType();
+    UnaryOperator* op  = type->find(m_opcode);
 
     // emit instruction
     if (op) {
@@ -189,51 +190,7 @@ ExpressionGen BoolConstNode::emit(const StatementGen& gen)
 
 ExpressionGen StringConstNode::emit(const StatementGen& gen)
 {
-    // get partial types for string
-    llvm::LLVMContext& context   = gen.getContext();
-    llvm::Type* charType         = llvm::IntegerType::get(context, 16);
-    llvm::Type* sizeType         = llvm::IntegerType::get(context, 32);
-    llvm::ArrayType* bufferType  = llvm::ArrayType::get(charType, m_value.length());
-    TypeRef                 type = StringType::get(m_context);
-
-    // generate string type
-    std::vector<llvm::Type*> elements;
-    elements.push_back(sizeType);
-    elements.push_back(bufferType);
-    llvm::StructType* stringType = llvm::StructType::create(context, llvm::makeArrayRef(elements), "string", false);
-
-    // generate size
-    llvm::Constant* size = 0;
-    {
-        llvm::APInt cst(32, m_value.length(), false);
-        size = llvm::ConstantInt::get(context, cst);
-    }
-
-    // generate buffer
-    llvm::Constant* buffer = 0;
-    {
-        std::vector<llvm::Constant*> bufferConst;
-        for (int i = 0; i < m_value.length(); ++i)
-        {
-            llvm::APInt cst(16, m_value[i], false);
-            llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
-            bufferConst.push_back(value);
-        }
-        buffer = llvm::ConstantArray::get(bufferType, bufferConst);
-    }
-
-    // generate string
-    llvm::Constant* string = llvm::ConstantStruct::get(stringType, size, buffer, NULL);
-    llvm::GlobalVariable* value  = new llvm::GlobalVariable(
-        *(gen.getModule()),
-        stringType,
-        true,
-        llvm::GlobalValue::PrivateLinkage,
-        string,
-        "string"
-     );
-    value->setUnnamedAddr(true); // Binary equal strings must be merged
-    return ExpressionGen(gen, StringType::get(m_context), value);
+    return StringEmitter(StringType::get(m_context)).emit(gen, m_value);
 }
 
 ExpressionGen CharConstNode::emit(const StatementGen& gen)
@@ -245,7 +202,7 @@ ExpressionGen CharConstNode::emit(const StatementGen& gen)
 
 ExpressionGen CallNode::emit(const StatementGen& gen)
 {
-    std::vector<TypeRef>        types;
+    std::vector<Type*>        types;
     std::vector<llvm::Value*>   args;
 
     if (m_hasNamed) {
@@ -263,8 +220,8 @@ ExpressionGen CallNode::emit(const StatementGen& gen)
         args.push_back(expr.getValue());
     }
 
-    TypeRef owner    = gen.getOwner();
-    MethodRef method = owner->find(m_method, types);
+    Type* owner    = gen.getOwner();
+    Method* method = owner->find(m_method, types);
     if (method) {
         llvm::Function* func = method->getFunction();
         if (!func) {
@@ -281,8 +238,8 @@ ExpressionGen CallNode::emit(const StatementGen& gen)
 
 ExpressionGen InstanceMutableNode::emit(const ExpressionGen& gen)
 {
-    TypeRef owner = gen.getOwner();
-    ObjectTy type = dyn_cast<ObjectType>(owner);
+    Type* owner = gen.getOwner();
+    ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
         return ObjectEmitter(type).emitStore(gen, m_name, gen);
     } else {
@@ -292,8 +249,8 @@ ExpressionGen InstanceMutableNode::emit(const ExpressionGen& gen)
 
 ExpressionGen InstanceExpressionNode::emit(const StatementGen& gen)
 {
-    TypeRef owner = gen.getOwner();
-    ObjectTy type = dyn_cast<ObjectType>(owner);
+    Type* owner = gen.getOwner();
+    ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
         return ObjectEmitter(type).emitLoad(gen, m_name);
     } else {

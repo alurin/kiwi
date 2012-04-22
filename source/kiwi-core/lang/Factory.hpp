@@ -11,7 +11,7 @@
 #include <stack>
 
 namespace kiwi {
-    typedef boost::shared_ptr<class Context> ContextRef;
+    class Context;
 namespace lang {
 
     /// Factory for nodes
@@ -324,7 +324,7 @@ namespace lang {
         //===--------------------------------------------------------------===//
 
         // constructor
-        NodeFactory(ContextRef context)
+        NodeFactory(Context* context)
         : m_context(context) { }
 
         // returns begin of functions vector
@@ -351,12 +351,23 @@ namespace lang {
             return m_fields.end();
         }
     protected:
-        ContextRef                  m_context;
-        std::stack<FunctionNode*>   m_funcs;
-        std::stack<ScopeNode*>      m_scopes;
-        std::stack<CallNode*>       m_calls;
-        std::vector<FunctionNode*>  m_functions;
-        std::vector<FieldNode*>     m_fields;
+        /// Current context
+        Context* m_context;
+
+        /// Stack of current parse functions
+        std::stack<FunctionNode*> m_funcs;
+
+        /// Stack of current parse scopes
+        std::stack<ScopeNode*> m_scopes;
+
+        /// Stack of current parse calls
+        std::stack<CallNode*> m_calls;
+
+        /// List of parsed functions
+        std::vector<FunctionNode*> m_functions;
+
+        /// List of parsed fields
+        std::vector<FieldNode*> m_fields;
     };
 
 }}

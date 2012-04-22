@@ -62,8 +62,8 @@ StatementGen PrintStatement::emit(const StatementGen& gen)
     ExpressionGen result = m_result->emit(gen);
 
     // find emitter
-    TypeRef type = result.getType();
-    UnaryRef op  = type->find(UnaryOperator::PRINT);
+    Type* type = result.getType();
+    UnaryOperator* op = type->find(UnaryOperator::PRINT);
 
     // emit instruction
     if (op) {

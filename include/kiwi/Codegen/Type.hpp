@@ -8,17 +8,16 @@ namespace llvm {
 }
 
 namespace kiwi {
-    typedef boost::shared_ptr<class Type> TypeRef;
-
+    class Type;
 namespace codegen {
     /// Structure for store information about instructions emit process
     class TypeGen
     {
     public:
-        TypeGen(TypeRef type);
+        TypeGen(Type* type);
 
     protected:
-        TypeRef         m_type;
+        Type*         m_type;
         llvm::Type      m_llvmType;
     }; // class StatementGen
 

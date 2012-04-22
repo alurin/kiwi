@@ -8,7 +8,7 @@ ExpressionGen::ExpressionGen(const ExpressionGen& gen)
 {
 }
 
-ExpressionGen::ExpressionGen(const StatementGen& gen, TypeRef type, llvm::Value* value)
+ExpressionGen::ExpressionGen(const StatementGen& gen, Type* type, llvm::Value* value)
 : StatementGen(gen), m_type(type), m_value(value)
 {
 }

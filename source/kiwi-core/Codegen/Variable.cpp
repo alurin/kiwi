@@ -5,7 +5,7 @@ using namespace kiwi::codegen;
 
 VariableGen::VariableGen() { }
 
-VariableGen::VariableGen(TypeRef type, llvm::Value* value)
+VariableGen::VariableGen(Type* type, llvm::Value* value)
 : m_type(type), m_value(value) { }
 
 VariableGen::VariableGen(const VariableGen& gen)

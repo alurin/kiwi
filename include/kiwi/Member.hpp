@@ -12,13 +12,7 @@ namespace llvm
 
 namespace kiwi
 {
-    typedef boost::shared_ptr<class Member>             MemberRef;
-    typedef boost::shared_ptr<class Type>               TypeRef;
-    typedef boost::weak_ptr<class Type>                 TypeWeak;
-    typedef boost::shared_ptr<class BinaryOperator>     BinaryRef;
-    typedef boost::shared_ptr<class UnaryOperator>      UnaryRef;
-    typedef boost::shared_ptr<class Method>             MethodRef;
-    typedef boost::shared_ptr<class Field>              FieldRef;
+    class Type;
 
     /// Type member
     class Member {
@@ -62,8 +56,8 @@ namespace kiwi
         virtual ~Member();
 
         /// Returns owner type
-        TypeRef getOwnerType() const {
-            return m_ownerType.lock();
+        Type* getOwnerType() const {
+            return m_ownerType;
         }
 
         /// get member class identifier
@@ -75,10 +69,10 @@ namespace kiwi
         MemberID m_memberID;
 
         /// member owner type
-        TypeWeak m_ownerType;
+        Type* m_ownerType;
 
         /// cosntructor
-        Member(const TypeRef& type);
+        Member(Type* type);
     };
 }
 

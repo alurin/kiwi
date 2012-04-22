@@ -6,18 +6,18 @@
 namespace kiwi {
     /// simple check if object is instance of class B
     template<typename D, typename S>
-    bool classof(const boost::shared_ptr<S>& obj)
+    bool classof(S* obj)
     {
         return D::classof(obj);
     }
 
     /// simple dynamic cast to instance B
     template<typename D, typename S>
-    boost::shared_ptr<D> dyn_cast(const boost::shared_ptr<S>& obj)
+    D* dyn_cast(S* obj)
     {
         if (classof<D>(obj))
-            return boost::shared_ptr<D>(obj, reinterpret_cast<D*>(obj.get()));
-        return boost::shared_ptr<D>();
+            return reinterpret_cast<D*>(obj);
+        return 0;
     }
 }
 

@@ -153,32 +153,31 @@ ExpressionNode* VariableNode::getRight()
     return new VariableExpressionNode(this);
 }
 
-void FieldNode::generate(TypeRef ownerType)
+void FieldNode::generate(Type* ownerType)
 {
-    TypeRef resultType = m_type->get();
+    Type* resultType = m_type->get();
     ownerType->add(m_name, resultType);
 }
 
-void FunctionNode::generate(TypeRef ownerType)
+void FunctionNode::generate(Type* ownerType)
 {
-    ModuleRef module = ownerType->getModule();
+    Module* module = ownerType->getModule();
 
     // collect nodes
-    TypeRef     frontendResultType = m_type->get();
+    Type*     frontendResultType = m_type->get();
     llvm::Type* backendResultType  = frontendResultType->getVarType();
 
     // collect arguments
-    std::vector<llvm::Type*>    backendArgs;
-    std::vector<ArgumentRef>    frontendArgs;
+    std::vector<llvm::Type*> backendArgs;
+    std::vector<Type*> frontendArgs;
     for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i)
     {
         ArgumentNode* arg = i->second;
-        TypeRef       frontend_type = arg->getType()->get();
-        ArgumentRef   frontend_arg  = Argument::create(i->first, frontend_type);
+        Type*         frontend_type = arg->getType()->get();
         llvm::Type*   backend_type  = frontend_type->getVarType();
 
         backendArgs.push_back(backend_type);
-        frontendArgs.push_back(frontend_arg);
+        frontendArgs.push_back(frontend_type);
         m_positions.push_back(arg);
     }
 
@@ -196,7 +195,7 @@ void FunctionNode::generate(TypeRef ownerType)
     }
 }
 
-void FunctionNode::emit(TypeRef ownerType)
+void FunctionNode::emit(Type* ownerType)
 {
     llvm::BasicBlock* entry  = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
 
@@ -238,7 +237,7 @@ StatementGen ScopeNode::emit(const StatementGen& gen)
     {
         VariableNode* var = i->second;
 
-        TypeRef type             = var->getType()->get();
+        Type* type             = var->getType()->get();
         llvm::Type* var_type     = type->getVarType();
         llvm::Value* var_default = llvm::Constant::getNullValue(var_type);
         llvm::AllocaInst* value  = new llvm::AllocaInst(var_type, i->first, gen.getBlock());

@@ -11,8 +11,8 @@ using namespace kiwi::codegen;
 // constructor
 UnaryOperator::UnaryOperator(
     Member::UnaryOpcode opcode,
-    const TypeRef& ownerType,
-    const TypeRef& resultType,
+    Type* ownerType,
+    Type* resultType,
     codegen::UnaryEmitter* emitter
 ) : Member(ownerType), m_opcode(opcode), m_resultType(resultType), m_emitter(emitter)
 {
@@ -27,9 +27,9 @@ UnaryOperator::~UnaryOperator() {
 // constructor
 BinaryOperator::BinaryOperator(
     Member::BinaryOpcode opcode,
-    const TypeRef& ownerType,
-    const TypeRef& resultType,
-    const TypeRef& operandType,
+    Type* ownerType,
+    Type* resultType,
+    Type* operandType,
     codegen::BinaryEmitter* emitter
 ) : Member(ownerType), m_opcode(opcode), m_resultType(resultType), m_operandType(operandType), m_emitter(emitter)
 {
@@ -42,7 +42,7 @@ BinaryOperator::~BinaryOperator() {
 }
 
 // constructor
-Field::Field(const Identifier& name, const TypeRef& ownerType, const TypeRef& fieldType)
+Field::Field(const Identifier& name, Type* ownerType, Type* fieldType)
 : Member(ownerType), m_name(name), m_fieldType(fieldType) {
     m_memberID = FieldID;
 }
@@ -51,21 +51,21 @@ Field::Field(const Identifier& name, const TypeRef& ownerType, const TypeRef& fi
 Field::~Field() {}
 
 // constructor
-Method::Method(const Identifier& name, const TypeRef& ownerType, const TypeRef& resultType, std::vector<ArgumentRef> arguments)
-: Member(ownerType), m_name(name), m_resultType(resultType), m_arguments(arguments), m_func(0)
+Method::Method(const Identifier& name, Type* ownerType, Type* resultType, std::vector<Type*> arguments)
+: Member(ownerType), m_name(name), m_resultType(resultType), m_func(0)
 {
     m_memberID = MethodID;
+    for (std::vector<Type*>::iterator i = arguments.begin(); i != arguments.end(); ++i)
+    {
+        Type* type    = *i;
+        Argument* arg = new Argument(this, type, m_arguments.size());
+        m_arguments.push_back(arg);
+    }
 }
 
 // destructor
 Method::~Method() {}
 
 // constructor
-Argument::Argument(const Identifier& name, const TypeRef& type)
-: m_name(name), m_type(type) { }
-
-ArgumentRef Argument::create(const Identifier& name, const TypeRef& type)
-{
-    ArgumentRef arg = ArgumentRef(new Argument(name, type));
-    return arg;
-}
+Argument::Argument(Method* owner, Type* type, int32_t position)
+: m_owner(owner), m_type(type) { }

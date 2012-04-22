@@ -10,5 +10,5 @@ using namespace kiwi::lang;
 TypeNode::TypeNode() { }
 TypeNode::~TypeNode() { }
 
-ConcreteTypeNode::ConcreteTypeNode(TypeRef type)
+ConcreteTypeNode::ConcreteTypeNode(Type* type)
 : m_type(type) { }

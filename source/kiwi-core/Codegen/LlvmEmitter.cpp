@@ -11,18 +11,18 @@ using namespace kiwi;
 using namespace kiwi::codegen;
 
 // constructor
-LlvmZeroUnaryOperator::LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, TypeRef type)
+LlvmZeroUnaryOperator::LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, Type* type)
 : m_opcode(opcode), m_type(type) { }
 
 // constructor
-LlvmBinaryOperator::LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, TypeRef type)
+LlvmBinaryOperator::LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, Type* type)
 : m_opcode(opcode), m_type(type) { }
 
 // constructor
-LlvmIntegerCompareOperator::LlvmIntegerCompareOperator(llvm::CmpInst::Predicate predicate, ContextRef context)
+LlvmIntegerCompareOperator::LlvmIntegerCompareOperator(llvm::CmpInst::Predicate predicate, Context* context)
 : m_predicate(predicate), m_context(context) { }
 
-LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate predicate, ContextRef context)
+LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate predicate, Context* context)
 : m_predicate(predicate), m_context(context) { }
 
 // emit instruction for interger unary operator
@@ -32,21 +32,21 @@ ExpressionGen LlvmZeroUnaryOperator::emit(const StatementGen& gen, const Express
     llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
 
     llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, zero, value.getValue(), "", gen.getBlock());
-    return ExpressionGen(gen, m_type.lock(), result);
+    return ExpressionGen(gen, m_type, result);
 }
 
 // emit instruction for binary operator
 ExpressionGen LlvmBinaryOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right)
 {
     llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, left.getValue(), right.getValue(), "", gen.getBlock());
-    return ExpressionGen(gen, m_type.lock(), result);
+    return ExpressionGen(gen, m_type, result);
 }
 
 // emit instruction for binary operator
 ExpressionGen LlvmIntegerCompareOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right)
 {
     llvm::Value* result = new llvm::ICmpInst(*(gen.getBlock()), m_predicate, left.getValue(), right.getValue(), "");
-    return ExpressionGen(gen, BoolType::get(m_context.lock()), result);
+    return ExpressionGen(gen, BoolType::get(m_context), result);
 }
 #include <iostream>
 // emit instruction for binary operator
@@ -104,7 +104,7 @@ ExpressionGen LlvmStringCompareOperator::emit(const StatementGen& gen, const Exp
     // compute string compare and return result
     llvm::Value* value  = llvm::CallInst::Create(compare, makeArrayRef(args), "", gen.getBlock());
     llvm::Value* result = new llvm::ICmpInst(*(gen.getBlock()), m_predicate, zero, value, "");
-    return ExpressionGen(gen, BoolType::get(m_context.lock()), result);
+    return ExpressionGen(gen, BoolType::get(m_context), result);
 }
 
 ExpressionGen LlvmIntegerPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value)

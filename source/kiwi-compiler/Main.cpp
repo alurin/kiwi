@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
     int result = 0;
     startup();
     {
-        ContextRef context = Context::create();
+        Context* context = Context::create();
         context->setOptimizationLevel(opt);
         context->setDebug(vm.count("debug"));
 
@@ -58,7 +58,7 @@ int main(int argc, char const *argv[])
 
             try {
                 // create script module
-                ModuleRef module = Module::create("Kiwi::Script", context);
+                Module* module = Module::create("Kiwi::Script", context);
                 for (vector<string>::iterator i = files.begin(); i != files.end(); ++i) {
                     module->includeFile(*i);
                 }

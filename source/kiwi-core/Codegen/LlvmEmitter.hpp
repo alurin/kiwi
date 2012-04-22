@@ -6,10 +6,8 @@
 #include <llvm/InstrTypes.h>
 
 namespace kiwi {
-    typedef boost::shared_ptr<class Type>    TypeRef;
-    typedef boost::weak_ptr<class Type>      TypeWeak;
-    typedef boost::shared_ptr<class Context> ContextRef;
-    typedef boost::weak_ptr<class Context>   ContextWeak;
+    class Type;
+    class Context;
 namespace codegen {
 
     /// LLVM unary operators emitter
@@ -22,52 +20,52 @@ namespace codegen {
     class LlvmZeroUnaryOperator : public UnaryEmitter {
     public:
         /// constructor
-        LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, TypeRef type);
+        LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, Type* type);
 
         /// emit llvm operator
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& value);
     protected:
         llvm::Instruction::BinaryOps    m_opcode;
-        TypeWeak                        m_type;
+        Type*                        m_type;
     }; /// class LlvmZeroUnaryOperator
 
     /// LLVM binary operators emitter
     class LlvmBinaryOperator : public BinaryEmitter {
     public:
         /// constructor
-        LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, TypeRef type);
+        LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, Type* type);
 
         /// emit llvm operator
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right);
     protected:
         llvm::Instruction::BinaryOps    m_opcode;
-        TypeWeak                        m_type;
+        Type*                        m_type;
     }; /// class LlvmBinaryOperator
 
     /// LLVM binary operators emitter for compare integers
     class LlvmIntegerCompareOperator : public BinaryEmitter {
     public:
         /// constructor
-        LlvmIntegerCompareOperator(llvm::CmpInst::Predicate predicate, ContextRef context);
+        LlvmIntegerCompareOperator(llvm::CmpInst::Predicate predicate, Context* context);
 
         /// emit llvm operator
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right);
     protected:
         llvm::CmpInst::Predicate    m_predicate;
-        ContextWeak                 m_context;
+        Context*                 m_context;
     }; /// class LlvmIntegerCompareOperator
 
     /// LLVM binary operators emitter for compare strings
     class LlvmStringCompareOperator : public BinaryEmitter {
     public:
         /// constructor
-        LlvmStringCompareOperator(llvm::CmpInst::Predicate predicate, ContextRef context);
+        LlvmStringCompareOperator(llvm::CmpInst::Predicate predicate, Context* context);
 
         /// emit llvm operator
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right);
     protected:
         llvm::CmpInst::Predicate    m_predicate;
-        ContextWeak                 m_context;
+        Context*                 m_context;
     }; /// class LlvmStringCompareOperator
 
     class LlvmIntegerPrintOperator : public UnaryEmitter {

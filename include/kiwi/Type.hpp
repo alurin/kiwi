@@ -4,36 +4,26 @@
 #include "kiwi/Member.hpp"
 #include <vector>
 
-namespace llvm
-{
+namespace llvm {
     class Type;
 }
 
-namespace kiwi
-{
-    typedef boost::shared_ptr<class Context>            ContextRef;
-    typedef boost::shared_ptr<class Module>             ModuleRef;
-    typedef boost::shared_ptr<class Type>               TypeRef;
-    typedef boost::shared_ptr<class Argument>           ArgumentRef;
-    typedef boost::weak_ptr<class Module>               ModuleWeak;
-    typedef boost::weak_ptr<class Type>                 TypeWeak;
-    typedef boost::shared_ptr<class VoidType>           VoidTy;
-    typedef boost::shared_ptr<class IntType>            IntTy;
-    typedef boost::shared_ptr<class BoolType>           BoolTy;
-    typedef boost::shared_ptr<class CharType>           CharTy;
-    typedef boost::shared_ptr<class StringType>         StringTy;
-    typedef boost::shared_ptr<class InterfaceType>      InterfaceTy;
-    typedef boost::shared_ptr<class ObjectType>         ObjectTy;
-
-    namespace codegen
-    {
+namespace kiwi {
+    namespace codegen {
         class UnaryEmitter;
         class BinaryEmitter;
     };
+    class Context;
+    class Module;
+    class Member;
+    class Type;
+    class BinaryOperator;
+    class UnaryOperator;
+    class Method;
+    class Field;
 
     /// Type metadata
-    class Type : public boost::enable_shared_from_this<Type>
-    {
+    class Type {
         Type(const Type&);                   ///< NOT IMPLEMENT!!!
         Type& operator=(const Type& type);   ///< NOT IMPLEMENT!!!
     public:
@@ -56,8 +46,8 @@ namespace kiwi
         }
 
         /// returns type owner module
-        ModuleRef getModule() const {
-            return m_module.lock();
+        Module* getModule() const {
+            return m_module;
         }
 
         /// return LLVM analog for variables
@@ -65,64 +55,65 @@ namespace kiwi
             return m_varType;
         }
 
-        /// return LLVM analog for address map
-        llvm::GlobalVariable* getVarAddressMap() const {
-            return m_addressMap;
-        }
-
-        /// return LLVM analog for address map
-        llvm::GlobalVariable* getVarVirtualTable() const {
-            return m_virtualTable;
-        }
-
         /// add unary operator
-        UnaryRef add(
+        UnaryOperator* add(
             Member::UnaryOpcode opcode,
-            TypeRef resultType,
+            Type* resultType,
             codegen::UnaryEmitter* emitter
         );
 
         /// add binary operator
-        BinaryRef add(
+        BinaryOperator* add(
             Member::BinaryOpcode opcode,
-            TypeRef resultType,
-            TypeRef operandType,
+            Type* resultType,
+            Type* operandType,
             codegen::BinaryEmitter* emitter
         );
 
         /// add field
-        FieldRef add(const Identifier& name, const TypeRef& type);
+        Field* add(const Identifier& name, Type* type);
 
         /// add method
-        MethodRef add(const Identifier& name, const TypeRef& resultType, std::vector<ArgumentRef> arguments);
+        Method* add(const Identifier& name, Type* resultType, std::vector<Type*> arguments);
 
         /// find unary operator
-        UnaryRef find(Member::UnaryOpcode opcode);
+        UnaryOperator* find(Member::UnaryOpcode opcode);
 
         /// find binary operator
-        BinaryRef find(Member::BinaryOpcode opcode, const TypeRef& operandType);
+        BinaryOperator* find(Member::BinaryOpcode opcode, Type* operandType);
 
-        /// find unary operator
-        FieldRef find(const Identifier& name);
+        /// find field operator
+        Field* find(const Identifier& name);
 
         /// find method
-        MethodRef find(const Identifier& name, std::vector<TypeRef> arguments);
+        Method* find(const Identifier& name, std::vector<Type*> arguments);
 
         /// emit type metadata and structure
-        void emit();
+        virtual void emit();
     protected:
         /// Class uniqual identifier
-        TypeID                  m_typeID;
-        ModuleWeak              m_module;
-        std::vector<UnaryRef>   m_unary;
-        std::vector<BinaryRef>  m_binary;
-        std::vector<MethodRef>  m_methods;
-        std::vector<FieldRef>   m_fields;
-        llvm::Type*             m_varType;
-        llvm::GlobalVariable*   m_addressMap;
-        llvm::GlobalVariable*   m_virtualTable;
+        TypeID m_typeID;
 
-        Type(ModuleRef module);
+        /// Type module
+        Module* m_module;
+
+        /// List of unary operators
+        std::vector<UnaryOperator*> m_unary;
+
+        /// List of binary operators
+        std::vector<BinaryOperator*> m_binary;
+
+        /// List of methods
+        std::vector<Method*> m_methods;
+
+        /// List of fields
+        std::vector<Field*> m_fields;
+
+        /// LLVM analog
+        llvm::Type* m_varType;
+
+        /// constructor
+        Type(Module* module);
     };
 }
 

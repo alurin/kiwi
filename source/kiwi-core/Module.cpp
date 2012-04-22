@@ -19,7 +19,7 @@ using namespace kiwi;
 typedef void    (*VoidMainPoint)();
 typedef int32_t (*ReturnMainPoint)();
 
-Module::Module(const Identifier& name, const ContextRef& context)
+Module::Module(const Identifier& name, Context* context)
 : m_name(name), m_context(context), m_module(0), m_engine(0)
 {
     m_module = new llvm::Module(name, context->getContext());
@@ -34,19 +34,19 @@ Module::~Module() {
     delete m_module;
 }
 
-ModuleRef Module::create(const Identifier& name, const ContextRef& ref)
+Module* Module::create(const Identifier& name, Context* ref)
 {
-    ModuleRef module = ModuleRef(new Module(name, ref));
+    Module* module = new Module(name, ref);
     return module;
 }
 
 void Module::includeFile(const Path& filename)
 {
-    ContextRef context = getContext();
+    Context* context = getContext();
     lang::Driver driver(context);
     if (driver.parseFile(filename)) {
 
-        ObjectTy type = ObjectType::create(shared_from_this());
+        ObjectType* type = ObjectType::create(this);
 
         for (std::vector<lang::FieldNode*>::const_iterator i = driver.field_begin(); i != driver.field_end(); ++i) {
             (*i)->generate(type);

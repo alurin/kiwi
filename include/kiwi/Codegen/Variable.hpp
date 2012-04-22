@@ -14,7 +14,7 @@ namespace llvm {
 }
 
 namespace kiwi {
-    typedef boost::shared_ptr<class Type> TypeRef;
+    class Type;
 
 namespace codegen {
     /// Store information about variable
@@ -25,7 +25,7 @@ namespace codegen {
         VariableGen();
 
         /// constructor
-        VariableGen(TypeRef type, llvm::Value* value);
+        VariableGen(Type* type, llvm::Value* value);
 
         /// copy constructor
         VariableGen(const VariableGen& gen);
@@ -34,7 +34,7 @@ namespace codegen {
         VariableGen& operator=(const VariableGen& gen);
 
         /// returns variable type
-        TypeRef getType() const {
+        Type* getType() const {
             return m_type;
         }
 
@@ -43,7 +43,7 @@ namespace codegen {
             return m_value;
         }
     protected:
-        TypeRef         m_type;
+        Type*         m_type;
         llvm::Value*    m_value;
     };
 

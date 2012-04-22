@@ -14,8 +14,6 @@ namespace kiwi
 {
     /// Internal framework metadata
     class ContextMeta;
-    class Context;
-    typedef boost::shared_ptr<Context> ContextRef;
 
     /**
      * General enter point for Kiwi compiler infrastructure
@@ -23,14 +21,13 @@ namespace kiwi
      * @author Vasiliy Sheredeko
      * @since 2012-04-15
      */
-    class Context : public boost::enable_shared_from_this<Context>
+    class Context
     {
         Context(const Context&);                ///< NOT IMPLEMENT!!!
         Context& operator=(const Context&);     ///< NOT IMPLEMENT!!!
-
     public:
-        /// create new instance and return smart reference for this instance
-        static ContextRef create();
+        /// create new instance
+        static Context* create();
 
         /// destructor
         virtual ~Context();

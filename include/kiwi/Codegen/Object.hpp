@@ -4,13 +4,13 @@
 #include "kiwi/Codegen/Expression.hpp"
 
 namespace kiwi {
-    typedef boost::shared_ptr<class ObjectType> ObjectTy;
+    class ObjectType;
 
 namespace codegen {
     /// Emitter for standart operation with objects
     class ObjectEmitter {
     public:
-        ObjectEmitter(ObjectTy type);
+        ObjectEmitter(ObjectType* type);
 
         /// emit instructions for load value from object field
         ExpressionGen emitLoad(const StatementGen& gen, const Identifier& name);
@@ -21,7 +21,7 @@ namespace codegen {
         /// emit instruction for create new instance of class
         ExpressionGen emitNew(const StatementGen& gen);
     protected:
-        ObjectTy m_type;
+        ObjectType* m_type;
 
         /// Returns pointer to value of field obkect
         ExpressionGen findField(const StatementGen& gen, const Identifier& name);

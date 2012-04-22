@@ -4,6 +4,8 @@
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Members.hpp"
 #include "Codegen/LlvmEmitter.hpp"
+#include <llvm/Constants.h>
+#include <llvm/GlobalVariable.h>
 #include <llvm/DerivedTypes.h>
 #include <llvm/Instruction.h>
 #include <llvm/ADT/ArrayRef.h>
@@ -11,40 +13,40 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-IntType::IntType(const ModuleRef& module, int32_t size, bool unsign)
+IntType::IntType(Module* module, int32_t size, bool unsign)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, size);
     m_typeID  = IntID;
 }
 
-BoolType::BoolType(const ModuleRef& module)
+BoolType::BoolType(Module* module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, 1);
     m_typeID  = BoolID;
 }
 
-VoidType::VoidType(const ModuleRef& module)
+VoidType::VoidType(Module* module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::Type::getVoidTy(context);
     m_typeID  = VoidID;
 }
 
-CharType::CharType(const ModuleRef& module)
+CharType::CharType(Module* module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, 16);
     m_typeID  = CharID;
 }
 
-ObjectType::ObjectType(const ModuleRef& module)
-: Type(module) {
+ObjectType::ObjectType(Module* module)
+: Type(module), m_addressMap(0), m_virtualTable(0) {
     m_typeID  = ObjectID;
 }
 
-StringType::StringType(const ModuleRef& module)
+StringType::StringType(Module* module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     llvm::Type* charType       = llvm::IntegerType::get(context, 16);
@@ -58,58 +60,58 @@ StringType::StringType(const ModuleRef& module)
     m_typeID                   = StringID;
 }
 
-IntTy IntType::create(const ModuleRef& module, int32_t size, bool unsign)
+IntType* IntType::create(Module* module, int32_t size, bool unsign)
 {
-    IntTy type = IntTy(new IntType(module, size, unsign));
+    IntType* type = new IntType(module, size, unsign);
     type->initializate();
     return type;
 }
 
-BoolTy BoolType::create(const ModuleRef& module)
+BoolType* BoolType::create(Module* module)
 {
-    BoolTy type = BoolTy(new BoolType(module));
+    BoolType* type = new BoolType(module);
     type->initializate();
     return type;
 }
 
-VoidTy VoidType::create(const ModuleRef& module)
+VoidType* VoidType::create(Module* module)
 {
-    VoidTy type = VoidTy(new VoidType(module));
+    VoidType* type = new VoidType(module);
     return type;
 }
 
-CharTy CharType::create(const ModuleRef& module)
+CharType* CharType::create(Module* module)
 {
-    CharTy type = CharTy(new CharType(module));
+    CharType* type = new CharType(module);
     type->initializate();
     return type;
 }
 
-StringTy StringType::create(const ModuleRef& module)
+StringType* StringType::create(Module* module)
 {
-    StringTy type = StringTy(new StringType(module));
+    StringType* type = new StringType(module);
     type->initializate();
     return type;
 }
 
-ObjectTy ObjectType::create(const ModuleRef& module)
+ObjectType* ObjectType::create(Module* module)
 {
-    ObjectTy type = ObjectTy(new ObjectType(module));
+    ObjectType* type = new ObjectType(module);
     return type;
 }
 
-ObjectTy ObjectType::create(const ModuleRef& module, const Identifier& name)
+ObjectType* ObjectType::create(Module* module, const Identifier& name)
 {
-    ObjectTy type = ObjectTy(new ObjectType(module));
+    ObjectType* type = new ObjectType(module);
     return type;
 }
 
 void IntType::initializate()
 {
-    ContextRef context = m_module.lock()->getContext();
-    TypeRef     boolTy = BoolType::get(context);
-    TypeRef     voidTy = VoidType::get(context);
-    TypeRef     intTy  = shared_from_this();
+    Context* context = m_module->getContext();
+    Type* boolTy = BoolType::get(context);
+    Type* voidTy = VoidType::get(context);
+    Type* intTy = this;
 
     add(UnaryOperator::POS,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Add, intTy));
     add(UnaryOperator::NEG,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Sub, intTy));
@@ -130,9 +132,9 @@ void IntType::initializate()
 
 void BoolType::initializate()
 {
-    ContextRef context = m_module.lock()->getContext();
-    TypeRef     voidTy = VoidType::get(context);
-    TypeRef     boolTy = shared_from_this();
+    Context* context = m_module->getContext();
+    Type*     voidTy = VoidType::get(context);
+    Type*     boolTy = this;
 
     add(BinaryOperator::EQ,  boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
     add(BinaryOperator::NEQ, boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
@@ -142,21 +144,21 @@ void BoolType::initializate()
 
 void CharType::initializate()
 {
-    ContextRef context = m_module.lock()->getContext();
-    TypeRef     boolTy = BoolType::get(context);
-    TypeRef     voidTy = VoidType::get(context);
-    TypeRef     charTy = shared_from_this();
+    Context* context = m_module->getContext();
+    Type*     boolTy = BoolType::get(context);
+    Type*     voidTy = VoidType::get(context);
+    Type*     charTy = this;
 
     add(UnaryOperator::PRINT, voidTy, new LlvmCharPrintOperator());
 }
 
 void StringType::initializate()
 {
-    ContextRef context = m_module.lock()->getContext();
-    TypeRef     charTy = CharType::get(context);
-    TypeRef     boolTy = BoolType::get(context);
-    TypeRef     voidTy = VoidType::get(context);
-    TypeRef   stringTy = shared_from_this();
+    Context* context = m_module->getContext();
+    Type*     charTy = CharType::get(context);
+    Type*     boolTy = BoolType::get(context);
+    Type*     voidTy = VoidType::get(context);
+    Type*   stringTy = this;
 
     add(BinaryOperator::EQ,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_EQ, context));
     add(BinaryOperator::NEQ, boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_NE, context));
@@ -168,32 +170,94 @@ void StringType::initializate()
     add(UnaryOperator::PRINT, voidTy, new LlvmStringPrintOperator());
 }
 
-IntTy IntType::get32(const ContextRef& context)
+IntType* IntType::get32(Context* context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->int32Ty;
 }
 
-BoolTy BoolType::get(const ContextRef& context)
+BoolType* BoolType::get(Context* context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->boolTy;
 }
 
-VoidTy VoidType::get(const ContextRef& context)
+VoidType* VoidType::get(Context* context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->voidTy;
 }
 
-CharTy CharType::get(const ContextRef& context)
+CharType* CharType::get(Context* context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->charTy;
 }
 
-StringTy StringType::get(const ContextRef& context)
+StringType* StringType::get(Context* context)
 {
     ContextMeta* meta = context->getMetadata();
     return meta->stringTy;
+}
+
+// Emit type structure
+void ObjectType::emit() {
+    if (m_varType != 0) {
+        return;
+    }
+
+    // collect fields
+    std::vector<llvm::Type*> types;
+    int j = 0;
+    for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
+        Field* field = *i;
+
+        Type* type = field->getFieldType();
+        types.push_back(type->getVarType());
+
+        field->setPosition(j);
+    }
+
+    // emit llvm type analog
+    llvm::LLVMContext& context = m_module->getContext()->getContext();
+    llvm::Module* module       = m_module->getModule();
+    if (types.size()) {
+        m_varType = llvm::StructType::create(types);
+    } else {
+        m_varType = llvm::StructType::create(context);
+    }
+
+    // emit address map
+    std::vector<llvm::Constant*> addresses;
+    std::vector<llvm::Constant*> buffer;
+    llvm::Constant* nullCst = llvm::Constant::getNullValue(m_varType->getPointerTo());
+    llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(32, 0, false));
+    j = 0;
+    for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
+        // create variable for compare
+        llvm::APInt idxV(32, j, false);
+        llvm::ConstantInt* idx = llvm::ConstantInt::get(context, idxV);
+
+        // buffer
+        buffer.clear();
+        buffer.push_back(zero);
+        buffer.push_back(idx);
+
+        llvm::Constant* cst = llvm::ConstantExpr::getGetElementPtr(nullCst, makeArrayRef(buffer));
+        addresses.push_back(cst);
+    }
+
+    llvm::Type* sizeType            = llvm::IntegerType::get(context, 8)->getPointerTo();
+    llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, m_fields.size());
+    llvm::Constant* addressMapValue = llvm::ConstantArray::get(addressMapType, makeArrayRef(addresses));
+
+    // generate string
+    m_addressMap  = new llvm::GlobalVariable(
+        *module,
+        addressMapType,
+        true,
+        llvm::GlobalValue::PrivateLinkage,
+        addressMapValue,
+        "amap"
+    );
 }

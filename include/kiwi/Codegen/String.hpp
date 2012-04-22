@@ -4,18 +4,18 @@
 #include "kiwi/Codegen/Expression.hpp"
 
 namespace kiwi {
-    typedef boost::shared_ptr<StringType> StringTy;
+    class StringType;
 namespace codegen {
     /// Emitter for standart operation with objects
     class StringEmitter {
     public:
         /// constructor
-        StringEmitter(StringTy);
+        StringEmitter(StringType* stringTy);
 
         /// emit constant string
-        ExpressionGen emit(const String& value);
+        ExpressionGen emit(const StatementGen& gen, const String& value);
     protected:
-        ContextWeak m_context;
+        StringType* m_stringTy;
     };
 
 }} // namespace kiwi::codegen

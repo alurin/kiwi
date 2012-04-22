@@ -8,7 +8,7 @@ using namespace kiwi::codegen;
 #include <llvm/Function.h>
 #include <assert.h>
 
-StatementGen::StatementGen(TypeRef owner, llvm::BasicBlock* block, llvm::Value* thisValue)
+StatementGen::StatementGen(Type* owner, llvm::BasicBlock* block, llvm::Value* thisValue)
 : m_owner(owner), m_context(&(block->getParent()->getContext())), m_module(block->getParent()->getParent()),
   m_function(block->getParent()), m_block(block), m_thisValue(thisValue)
 {

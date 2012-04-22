@@ -4,22 +4,19 @@
 #include "kiwi/Config.hpp"
 #include "Node.hpp"
 
-namespace kiwi
-{
-    typedef boost::shared_ptr<class Type>    TypeRef;
-    typedef boost::shared_ptr<class Context> ContextRef;
+namespace kiwi {
+    class Type;
+    class Context;
 
-namespace lang
-{
+namespace lang {
     /// Type node
-    class TypeNode : public Node
-    {
+    class TypeNode : public Node {
     public:
         /// destructor
         virtual ~TypeNode();
 
         /// get type
-        virtual TypeRef get() =0;
+        virtual Type* get() =0;
 
     protected:
         TypeNode();
@@ -29,15 +26,14 @@ namespace lang
     class ConcreteTypeNode : public TypeNode {
     public:
         /// constructor
-        ConcreteTypeNode(TypeRef type);
+        ConcreteTypeNode(Type* type);
 
         /// get type
-        virtual TypeRef get()
-        {
+        virtual Type* get() {
             return m_type;
         }
     protected:
-        TypeRef m_type;
+        Type* m_type;
     };
 
 }}
