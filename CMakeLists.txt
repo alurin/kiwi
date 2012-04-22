@@ -1,4 +1,4 @@
-# <Copyright Holder>. Copyright (C) <Copyright Year(s)>. <License>.
+# Vasiliy Sheredeko. Copyright (C) 2012. MIT license.
 
 #
 # Project Properties

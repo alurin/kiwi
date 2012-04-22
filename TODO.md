@@ -15,9 +15,12 @@ Source code clean up
 Runtime
 -------
 * Add support for return pointer for methods or operators
+* Add support for GC
 
 Features
 --------
+* Add support for exceptions
+* Add support for GC
 * Add support for inheritance (multi)
 * Add support for method overrides by virtual tables
 * Add support for interfaces
