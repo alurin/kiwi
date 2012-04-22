@@ -19,13 +19,6 @@ Type::Type(ModuleRef module)
 
 Type::~Type() { }
 
-// crate type
-TypeRef Type::create(ModuleRef module)
-{
-    TypeRef type = TypeRef(new Type(module));
-    return type;
-}
-
 // add binary operator
 UnaryRef Type::add(
     Member::UnaryOpcode opcode,

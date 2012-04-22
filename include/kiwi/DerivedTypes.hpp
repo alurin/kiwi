@@ -22,10 +22,10 @@ namespace kiwi
         static VoidTy get(ContextRef context);
     private:
         /// constructor
-        VoidType(ModuleRef module);
+        VoidType(const ModuleRef& module);
 
         /// create integer type
-        static VoidTy create(ModuleRef module);
+        static VoidTy create(const ModuleRef& module);
     };
 
     //==--------------------------------------------------------------------==//
@@ -37,10 +37,10 @@ namespace kiwi
         static IntTy get32(ContextRef context);
     private:
         /// constructor
-        IntType(ModuleRef module, int32_t size, bool unsign);
+        IntType(const ModuleRef& module, int32_t size, bool unsign);
 
         /// create integer type
-        static IntTy create(ModuleRef module, int32_t size, bool unsign);
+        static IntTy create(const ModuleRef& module, int32_t size, bool unsign);
 
         /// initializator
         void initializate();
@@ -55,10 +55,10 @@ namespace kiwi
         static BoolTy get(ContextRef context);
     protected:
         /// constructor
-        BoolType(ModuleRef module);
+        BoolType(const ModuleRef& module);
 
         /// create module type
-        static BoolTy create(ModuleRef module);
+        static BoolTy create(const ModuleRef& module);
 
         /// initializator
         void initializate();
@@ -72,10 +72,10 @@ namespace kiwi
         static CharTy get(ContextRef context);
     protected:
         /// constructor
-        CharType(ModuleRef module);
+        CharType(const ModuleRef& module);
 
         /// create module type
-        static CharTy create(ModuleRef module);
+        static CharTy create(const ModuleRef& module);
 
         /// initializator
         void initializate();
@@ -89,10 +89,10 @@ namespace kiwi
         static StringTy get(ContextRef context);
     protected:
         /// constructor
-        StringType(ModuleRef module);
+        StringType(const ModuleRef& module);
 
         /// create module type
-        static StringTy create(ModuleRef module);
+        static StringTy create(const ModuleRef& module);
 
         /// initializator
         void initializate();
@@ -107,6 +107,9 @@ namespace kiwi
     /// Object type
     class ObjectType : public Type {
     public:
+        /// Create anonym object type
+        static ObjectTy create(const ModuleRef& module);
+
         /// Create object type
         static ObjectTy create(const ModuleRef& module, const Identifier& name);
 
@@ -114,6 +117,11 @@ namespace kiwi
         // AddressMap      getAddressMap() const;
         // VirtualTable    getVirtualTable() const;
     protected:
+        // anonym object constructor
+        ObjectType(const ModuleRef& module);
+
+        // constructor
+        ObjectType(const ModuleRef& module, const Identifier& name);
     };
 }
 

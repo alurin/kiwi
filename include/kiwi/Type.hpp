@@ -39,8 +39,6 @@ namespace kiwi
         /// destructor
         virtual ~Type();
 
-        static TypeRef create(ModuleRef module);
-
         /// returns type owner module
         ModuleRef getModule() const {
             return m_module.lock();

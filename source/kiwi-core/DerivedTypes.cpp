@@ -11,31 +11,36 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-IntType::IntType(ModuleRef module, int32_t size, bool unsign)
+IntType::IntType(const ModuleRef& module, int32_t size, bool unsign)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, size);
 }
 
-BoolType::BoolType(ModuleRef module)
+BoolType::BoolType(const ModuleRef& module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, 1);
 }
 
-VoidType::VoidType(ModuleRef module)
+VoidType::VoidType(const ModuleRef& module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::Type::getVoidTy(context);
 }
 
-CharType::CharType(ModuleRef module)
+CharType::CharType(const ModuleRef& module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, 16);
 }
 
-StringType::StringType(ModuleRef module)
+ObjectType::ObjectType(const ModuleRef& module)
+: Type(module) {
+
+}
+
+StringType::StringType(const ModuleRef& module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     llvm::Type* charType       = llvm::IntegerType::get(context, 16);
@@ -48,37 +53,49 @@ StringType::StringType(ModuleRef module)
     m_varType                  = stringType->getPointerTo(0);
 }
 
-IntTy IntType::create(ModuleRef module, int32_t size, bool unsign)
+IntTy IntType::create(const ModuleRef& module, int32_t size, bool unsign)
 {
     IntTy type = IntTy(new IntType(module, size, unsign));
     type->initializate();
     return type;
 }
 
-BoolTy BoolType::create(ModuleRef module)
+BoolTy BoolType::create(const ModuleRef& module)
 {
     BoolTy type = BoolTy(new BoolType(module));
     type->initializate();
     return type;
 }
 
-VoidTy VoidType::create(ModuleRef module)
+VoidTy VoidType::create(const ModuleRef& module)
 {
     VoidTy type = VoidTy(new VoidType(module));
     return type;
 }
 
-CharTy CharType::create(ModuleRef module)
+CharTy CharType::create(const ModuleRef& module)
 {
     CharTy type = CharTy(new CharType(module));
     type->initializate();
     return type;
 }
 
-StringTy StringType::create(ModuleRef module)
+StringTy StringType::create(const ModuleRef& module)
 {
     StringTy type = StringTy(new StringType(module));
     type->initializate();
+    return type;
+}
+
+ObjectTy ObjectType::create(const ModuleRef& module)
+{
+    ObjectTy type = ObjectTy(new ObjectType(module));
+    return type;
+}
+
+ObjectTy ObjectType::create(const ModuleRef& module, const Identifier& name)
+{
+    ObjectTy type = ObjectTy(new ObjectType(module));
     return type;
 }
 

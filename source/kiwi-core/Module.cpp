@@ -46,7 +46,7 @@ void Module::includeFile(const Path& filename)
     lang::Driver driver(context);
     if (driver.parseFile(filename)) {
 
-        TypeRef type = Type::create(shared_from_this());
+        ObjectTy type = ObjectType::create(shared_from_this());
 
         for (std::vector<lang::FieldNode*>::const_iterator i = driver.field_begin(); i != driver.field_end(); ++i) {
             (*i)->generate(type);
