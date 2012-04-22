@@ -35,4 +35,3 @@ StatementGen& StatementGen::operator=(const StatementGen& gen)
 
     return *this;
 }
-
