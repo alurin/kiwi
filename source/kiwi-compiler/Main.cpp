@@ -1,3 +1,4 @@
+#include "kiwi/Engine.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 using namespace kiwi;
@@ -21,7 +22,7 @@ ostream& operator<<(ostream& os, const vector<T>& v)
 
 int main(int argc, char const *argv[])
 {
-    int  opt     = 0;
+    int  opt = 0;
 
     // Declare the supported options.
     po::options_description desc("Allowed options");
@@ -43,34 +44,42 @@ int main(int argc, char const *argv[])
           options(desc).positional(p).run(), vm);
     po::notify(vm);
 
-    ContextRef context = Context::create();
-    context->setOptimizationLevel(opt);
-    context->setDebug(vm.count("debug"));
+    /// Run application
+    //
+    int result = 0;
+    startup();
+    {
+        ContextRef context = Context::create();
+        context->setOptimizationLevel(opt);
+        context->setDebug(vm.count("debug"));
 
-    if (vm.count("input-file")) {
-        vector<string> files = vm["input-file"].as< vector<string> >();
+        if (vm.count("input-file")) {
+            vector<string> files = vm["input-file"].as< vector<string> >();
 
-        try {
-            // create script module
-            ModuleRef module = Module::create("Kiwi::Script", context);
-            for (vector<string>::iterator i = files.begin(); i != files.end(); ++i) {
-                module->includeFile(*i);
+            try {
+                // create script module
+                ModuleRef module = Module::create("Kiwi::Script", context);
+                for (vector<string>::iterator i = files.begin(); i != files.end(); ++i) {
+                    module->includeFile(*i);
+                }
+
+                // build module and dump or execute
+                module->build();
+                if (vm.count("ir-dump")) {
+                    module->dump();
+                } else {
+                    result = module->run();
+                }
+            } catch (const char* ex) {
+                std::cerr << ex << "\n";
+                result = 1;
             }
-
-            // build module and dump or execute
-            module->build();
-            if (vm.count("ir-dump")) {
-                module->dump();
-            } else {
-                return module->run();
-            }
-        } catch (const char* ex) {
-            std::cerr << ex << "\n";
-            return 1;
+        } else if (vm.count("help")) {
+            cout << desc << "\n";
+            result = 1;
         }
-    } else if (vm.count("help")) {
-        cout << desc << "\n";
-        return 1;
     }
-    return 0;
+
+    shutdown();
+    return result;
 }

@@ -1,4 +1,4 @@
-FILE (GLOB_RECURSE runtime_SOURCES *.c *.h)
+FILE (GLOB_RECURSE runtime_SOURCES *.c *.h *.cpp *.hpp)
 
 SET (runtime_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} icuuc icuio)
 SET (runtime_LIB "${PROJECT_NAME}-runtime")

@@ -30,6 +30,10 @@ Module::Module(const Identifier& name, const ContextRef& context)
     }
 }
 
+Module::~Module() {
+    delete m_module;
+}
+
 ModuleRef Module::create(const Identifier& name, const ContextRef& ref)
 {
     ModuleRef module = ModuleRef(new Module(name, ref));

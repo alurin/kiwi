@@ -22,6 +22,9 @@ namespace kiwi
         Module(const Module&);            ///< NOT IMPLEMENT!!!
         Module& operator=(const Module&); ///< NOT IMPLEMENT!!!
     public:
+        /// destuctor
+        ~Module();
+
         /// create module
         static ModuleRef create(const Identifier& name, const ContextRef& ref);
 

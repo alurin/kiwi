@@ -1,11 +1,9 @@
-#include "kiwi/Context.hpp"
-#include "kiwi/Module.hpp"
-#include "kiwi/DerivedTypes.hpp"
 #include "ContextMeta.hpp"
-#include "llvm/Support/TargetSelect.h"
+#include "kiwi/Context.hpp"
+#include "kiwi/DerivedTypes.hpp"
+#include "kiwi/Module.hpp"
 #include "RuntimeModule.hpp"
 #include <llvm/LLVMContext.h>
-#include <log4cxx/patternlayout.h>
 
 using namespace kiwi;
 
@@ -29,7 +27,6 @@ ContextRef Context::create()
 
 void Context::initializate()
 {
-    llvm::InitializeNativeTarget();
     m_context = new llvm::LLVMContext();
 
     ModuleRef module = Module::create("system", shared_from_this());

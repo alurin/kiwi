@@ -1,3 +1,4 @@
+#include "kiwi-runtime/ustring.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <unicode/ustring.h>

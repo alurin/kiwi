@@ -22,6 +22,7 @@ namespace kiwi
     typedef boost::shared_ptr<class Argument>           ArgumentRef;
 
     typedef boost::weak_ptr<class Module>               ModuleWeak;
+    typedef boost::weak_ptr<class Type>                 TypeWeak;
 
     namespace codegen
     {
@@ -48,7 +49,7 @@ namespace kiwi
         }
 
         TypeRef getResultType() const {
-            return m_resultType;
+            return m_resultType.lock();
         }
 
         codegen::UnaryEmitter* getEmitter() const {
@@ -56,7 +57,7 @@ namespace kiwi
         }
     protected:
         Opcode                  m_opcode;
-        TypeRef                 m_resultType;
+        TypeWeak                m_resultType;
         codegen::UnaryEmitter*  m_emitter;
 
         /// constructor
@@ -93,11 +94,11 @@ namespace kiwi
         }
 
         TypeRef getResultType() const {
-            return m_resultType;
+            return m_resultType.lock();
         }
 
         TypeRef getOperatorType() const {
-            return m_operatorType;
+            return m_operatorType.lock();
         }
 
         codegen::BinaryEmitter* getEmitter() const {
@@ -105,8 +106,8 @@ namespace kiwi
         }
     protected:
         Opcode                  m_opcode;
-        TypeRef                 m_resultType;
-        TypeRef                 m_operatorType;
+        TypeWeak                 m_resultType;
+        TypeWeak                 m_operatorType;
         codegen::BinaryEmitter* m_emitter;
 
         /// constructor
@@ -127,11 +128,11 @@ namespace kiwi
         }
 
         TypeRef getType () const {
-            return m_type;
+            return m_type.lock();
         }
     protected:
         Identifier  m_name;
-        TypeRef     m_type;
+        TypeWeak    m_type;
 
         Argument(const Identifier& name, const TypeRef& type);
     };
@@ -147,11 +148,11 @@ namespace kiwi
         }
 
         TypeRef getOwnerType() const {
-            return m_ownerType;
+            return m_ownerType.lock();
         }
 
         TypeRef getResultType() const {
-            return m_resultType;
+            return m_resultType.lock();
         }
 
         llvm::Function* getFunction() const {
@@ -166,8 +167,8 @@ namespace kiwi
         const_iterator end()   const { return m_arguments.end();   }
     protected:
         Identifier                  m_name;
-        TypeRef                     m_ownerType;
-        TypeRef                     m_resultType;
+        TypeWeak                    m_ownerType;
+        TypeWeak                    m_resultType;
         std::vector<ArgumentRef>    m_arguments;
         llvm::Function*             m_func;
 
@@ -179,7 +180,7 @@ namespace kiwi
         friend class Type;
     protected:
         Identifier  m_name;
-        TypeRef     m_fieldType;
+        TypeWeak    m_fieldType;
 
         Field(const Identifier& name, const TypeRef& fieldType);
     };
