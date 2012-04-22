@@ -5,5 +5,5 @@ Authors
 
 Acknowledgements
 ----------------
-See "thirdparty/LICENSES.txt" for a list of thirdparty software
+See "vendor/LICENSES.txt" for a list of thirdparty software
 used by this project and for their respective licenses.
