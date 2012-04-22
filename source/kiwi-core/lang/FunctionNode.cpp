@@ -216,7 +216,7 @@ void FunctionNode::emit(TypeRef ownerType)
     llvm::Value* thisValue = new llvm::AllocaInst(ownerType->getVarType(), "this", entry);
 
     // emit instructions
-    StatementGen gen(ownerType, entry, thisValue, thisValue);
+    StatementGen gen(ownerType, entry, thisValue);
     gen = m_root->emit(gen);
 
     /// emit terminator for last block
