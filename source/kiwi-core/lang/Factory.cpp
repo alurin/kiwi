@@ -5,6 +5,19 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
+NodeFactory::~NodeFactory() {
+    for (std::vector<FieldNode*>::const_iterator i = field_begin(); i != field_end(); ++i) {
+        FieldNode* node = *i;
+        delete node;
+    }
+
+    for (std::vector<FunctionNode*>::const_iterator i = func_begin(); i != func_end(); ++i) {
+        FunctionNode* node = *i;
+        delete node;
+    }
+}
+
+
 FunctionNode* NodeFactory::func() {
     assert(!m_funcs.empty() && "Functions stack is empty");
     return m_funcs.top();
