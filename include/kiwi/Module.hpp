@@ -34,7 +34,7 @@ namespace kiwi
         }
 
         /// include and run file as script
-        void includeFile(const Path& filename);
+        bool includeFile(const Path& filename);
 
         /// returns module owner
         Context* getContext() const {

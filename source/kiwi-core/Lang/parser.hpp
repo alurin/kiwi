@@ -50,7 +50,7 @@
 namespace kiwi { namespace lang {
 
 /* Line 35 of lalr1.cc  */
-#line 54 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 54 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
   class position;
   class location;
 
@@ -60,7 +60,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 64 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 64 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
 
 #include "location.hh"
 
@@ -108,7 +108,7 @@ do {							\
 namespace kiwi { namespace lang {
 
 /* Line 35 of lalr1.cc  */
-#line 112 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 112 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
 
   /// A Bison parser.
   class Parser
@@ -120,7 +120,7 @@ namespace kiwi { namespace lang {
     {
 
 /* Line 35 of lalr1.cc  */
-#line 58 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 58 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 
     int                  integerVal;
     double               doubleVal;
@@ -136,7 +136,7 @@ namespace kiwi { namespace lang {
 
 
 /* Line 35 of lalr1.cc  */
-#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -367,7 +367,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 371 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 371 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
 
 
 

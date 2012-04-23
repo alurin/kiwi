@@ -38,7 +38,7 @@
 /* First part of user declarations.  */
 
 /* Line 311 of lalr1.cc  */
-#line 4 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 4 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
  /*** C/C++ Declarations ***/
 
 #include "kiwi/Config.hpp"
@@ -52,7 +52,7 @@
 
 
 /* Line 311 of lalr1.cc  */
-#line 56 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 56 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 
 
 #include "parser.hpp"
@@ -60,7 +60,7 @@
 /* User implementation prologue.  */
 
 /* Line 317 of lalr1.cc  */
-#line 145 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 145 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 
 
 #include "Driver.hpp"
@@ -77,7 +77,7 @@
 
 
 /* Line 317 of lalr1.cc  */
-#line 81 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 81 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 
 #ifndef YY_
 # if YYENABLE_NLS
@@ -146,7 +146,7 @@ do {					\
 namespace kiwi { namespace lang {
 
 /* Line 380 of lalr1.cc  */
-#line 150 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 150 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 #if YYERROR_VERBOSE
 
   /* Return YYSTR after stripping away unnecessary quotes and
@@ -249,137 +249,137 @@ namespace kiwi { namespace lang {
         case 23: /* "\"identifier\"" */
 
 /* Line 480 of lalr1.cc  */
-#line 137 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 137 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->stringVal); };
 
 /* Line 480 of lalr1.cc  */
-#line 257 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 257 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 25: /* "\"string constant\"" */
 
 /* Line 480 of lalr1.cc  */
-#line 141 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 141 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->ustringVal); };
 
 /* Line 480 of lalr1.cc  */
-#line 266 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 266 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 29: /* "\"local variable\"" */
 
 /* Line 480 of lalr1.cc  */
-#line 137 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 137 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->stringVal); };
 
 /* Line 480 of lalr1.cc  */
-#line 275 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 275 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 30: /* "\"instance attribute\"" */
 
 /* Line 480 of lalr1.cc  */
-#line 137 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 137 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->stringVal); };
 
 /* Line 480 of lalr1.cc  */
-#line 284 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 284 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 76: /* "statement" */
 
 /* Line 480 of lalr1.cc  */
-#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->stmtnode); };
 
 /* Line 480 of lalr1.cc  */
-#line 293 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 293 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 77: /* "scope" */
 
 /* Line 480 of lalr1.cc  */
-#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->stmtnode); };
 
 /* Line 480 of lalr1.cc  */
-#line 302 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 302 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 79: /* "scope_end" */
 
 /* Line 480 of lalr1.cc  */
-#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->stmtnode); };
 
 /* Line 480 of lalr1.cc  */
-#line 311 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 311 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 80: /* "return_statement" */
 
 /* Line 480 of lalr1.cc  */
-#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->stmtnode); };
 
 /* Line 480 of lalr1.cc  */
-#line 320 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 320 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 81: /* "print_statement" */
 
 /* Line 480 of lalr1.cc  */
-#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->stmtnode); };
 
 /* Line 480 of lalr1.cc  */
-#line 329 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 329 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 82: /* "conditional_statement" */
 
 /* Line 480 of lalr1.cc  */
-#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->stmtnode); };
 
 /* Line 480 of lalr1.cc  */
-#line 338 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 338 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 87: /* "expression" */
 
 /* Line 480 of lalr1.cc  */
-#line 138 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 138 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->rightnode); };
 
 /* Line 480 of lalr1.cc  */
-#line 347 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 347 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 91: /* "right" */
 
 /* Line 480 of lalr1.cc  */
-#line 138 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 138 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->rightnode); };
 
 /* Line 480 of lalr1.cc  */
-#line 356 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 356 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 92: /* "type" */
 
 /* Line 480 of lalr1.cc  */
-#line 139 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 139 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->typenode); };
 
 /* Line 480 of lalr1.cc  */
-#line 365 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 365 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 93: /* "type_complex" */
 
 /* Line 480 of lalr1.cc  */
-#line 139 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 139 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->typenode); };
 
 /* Line 480 of lalr1.cc  */
-#line 374 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 374 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
       case 94: /* "type_primary" */
 
 /* Line 480 of lalr1.cc  */
-#line 139 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 139 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 	{ delete (yyvaluep->typenode); };
 
 /* Line 480 of lalr1.cc  */
-#line 383 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 383 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	break;
 
 	default:
@@ -458,14 +458,14 @@ namespace kiwi { namespace lang {
     /* User initialization code.  */
     
 /* Line 553 of lalr1.cc  */
-#line 43 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 43 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 {
     // initialize the initial location object
     yylloc.begin.filename = yylloc.end.filename = &driver.streamname;
 }
 
 /* Line 553 of lalr1.cc  */
-#line 469 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 469 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 
     /* Initialize the stacks.  The initial state will be pushed in
        yynewstate, since the latter expects the semantical and the
@@ -584,434 +584,434 @@ namespace kiwi { namespace lang {
 	  case 2:
 
 /* Line 678 of lalr1.cc  */
-#line 169 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 169 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.field(*(yysemantic_stack_[(3) - (2)].stringVal), (yysemantic_stack_[(3) - (1)].typenode)); yyfree((yysemantic_stack_[(3) - (2)].stringVal)); }
     break;
 
   case 3:
 
 /* Line 678 of lalr1.cc  */
-#line 176 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 176 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.func(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode)); yyfree((yysemantic_stack_[(2) - (2)].stringVal)); }
     break;
 
   case 4:
 
 /* Line 678 of lalr1.cc  */
-#line 179 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 179 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.funcEnd();     }
     break;
 
   case 9:
 
 /* Line 678 of lalr1.cc  */
-#line 193 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 193 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.func()->declare(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode)); }
     break;
 
   case 12:
 
 /* Line 678 of lalr1.cc  */
-#line 205 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 205 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.scope()->append((yysemantic_stack_[(1) - (1)].stmtnode)); }
     break;
 
   case 15:
 
 /* Line 678 of lalr1.cc  */
-#line 210 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 210 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.stmtnode) = driver.createExpr((yysemantic_stack_[(2) - (1)].rightnode));       }
     break;
 
   case 20:
 
 /* Line 678 of lalr1.cc  */
-#line 215 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 215 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.stmtnode) = 0; }
     break;
 
   case 21:
 
 /* Line 678 of lalr1.cc  */
-#line 219 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 219 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.scopeBegin();              }
     break;
 
   case 22:
 
 /* Line 678 of lalr1.cc  */
-#line 220 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 220 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.stmtnode) = (yysemantic_stack_[(3) - (3)].stmtnode);                          }
     break;
 
   case 23:
 
 /* Line 678 of lalr1.cc  */
-#line 224 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 224 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.stmtnode) = driver.scopeEnd();           }
     break;
 
   case 24:
 
 /* Line 678 of lalr1.cc  */
-#line 228 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 228 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.stmtnode) = driver.createReturn((yylocation_stack_[(1) - (1)]));     }
     break;
 
   case 25:
 
 /* Line 678 of lalr1.cc  */
-#line 229 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 229 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.stmtnode) = driver.createReturn((yysemantic_stack_[(2) - (2)].rightnode), (yylocation_stack_[(2) - (1)])); }
     break;
 
   case 26:
 
 /* Line 678 of lalr1.cc  */
-#line 233 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 233 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.stmtnode) = driver.createPrint((yysemantic_stack_[(2) - (2)].rightnode), (yylocation_stack_[(2) - (1)]));  }
     break;
 
   case 27:
 
 /* Line 678 of lalr1.cc  */
-#line 239 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 239 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.stmtnode) = driver.createCond((yysemantic_stack_[(5) - (3)].rightnode), (yysemantic_stack_[(5) - (5)].stmtnode), 0,  (yylocation_stack_[(5) - (1)])); }
     break;
 
   case 28:
 
 /* Line 678 of lalr1.cc  */
-#line 240 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 240 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.stmtnode) = driver.createCond((yysemantic_stack_[(7) - (3)].rightnode), (yysemantic_stack_[(7) - (5)].stmtnode), (yysemantic_stack_[(7) - (7)].stmtnode), (yylocation_stack_[(7) - (1)])); }
     break;
 
   case 33:
 
 /* Line 678 of lalr1.cc  */
-#line 257 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 257 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.call()->append(*(yysemantic_stack_[(3) - (1)].stringVal), (yysemantic_stack_[(3) - (3)].rightnode)); yyfree((yysemantic_stack_[(3) - (1)].stringVal)); }
     break;
 
   case 34:
 
 /* Line 678 of lalr1.cc  */
-#line 258 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 258 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.call()->append((yysemantic_stack_[(1) - (1)].rightnode));      }
     break;
 
   case 35:
 
 /* Line 678 of lalr1.cc  */
-#line 266 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 266 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.scope()->declare(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode));     yyfree((yysemantic_stack_[(2) - (2)].stringVal)); }
     break;
 
   case 36:
 
 /* Line 678 of lalr1.cc  */
-#line 267 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 267 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.scope()->declare(*(yysemantic_stack_[(4) - (2)].stringVal), (yysemantic_stack_[(4) - (1)].typenode), (yysemantic_stack_[(4) - (4)].rightnode)); yyfree((yysemantic_stack_[(4) - (2)].stringVal)); }
     break;
 
   case 37:
 
 /* Line 678 of lalr1.cc  */
-#line 268 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 268 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.scope()->declare(*(yysemantic_stack_[(4) - (2)].stringVal), (yysemantic_stack_[(4) - (4)].rightnode));     yyfree((yysemantic_stack_[(4) - (2)].stringVal)); }
     break;
 
   case 38:
 
 /* Line 678 of lalr1.cc  */
-#line 272 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 272 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createNeg((yysemantic_stack_[(2) - (2)].rightnode), (yylocation_stack_[(2) - (1)])); }
     break;
 
   case 39:
 
 /* Line 678 of lalr1.cc  */
-#line 273 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 273 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createPos((yysemantic_stack_[(2) - (2)].rightnode), (yylocation_stack_[(2) - (1)])); }
     break;
 
   case 40:
 
 /* Line 678 of lalr1.cc  */
-#line 274 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 274 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createNot((yysemantic_stack_[(2) - (2)].rightnode), (yylocation_stack_[(2) - (1)])); }
     break;
 
   case 41:
 
 /* Line 678 of lalr1.cc  */
-#line 277 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 277 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createAdd((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 42:
 
 /* Line 678 of lalr1.cc  */
-#line 278 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 278 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createSub((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 43:
 
 /* Line 678 of lalr1.cc  */
-#line 279 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 279 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createMul((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 44:
 
 /* Line 678 of lalr1.cc  */
-#line 280 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 280 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createDiv((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 45:
 
 /* Line 678 of lalr1.cc  */
-#line 281 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 281 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createLsh((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 46:
 
 /* Line 678 of lalr1.cc  */
-#line 282 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 282 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createRsh((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 47:
 
 /* Line 678 of lalr1.cc  */
-#line 284 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 284 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createOr ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), false, (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 48:
 
 /* Line 678 of lalr1.cc  */
-#line 285 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 285 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createOr ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), true,  (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 49:
 
 /* Line 678 of lalr1.cc  */
-#line 286 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 286 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createAnd((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), false, (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 50:
 
 /* Line 678 of lalr1.cc  */
-#line 287 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 287 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createAnd((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), true,  (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 51:
 
 /* Line 678 of lalr1.cc  */
-#line 289 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 289 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createEq ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 52:
 
 /* Line 678 of lalr1.cc  */
-#line 290 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 290 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createNeq((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 53:
 
 /* Line 678 of lalr1.cc  */
-#line 291 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 291 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createGe ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 54:
 
 /* Line 678 of lalr1.cc  */
-#line 292 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 292 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createLe ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 55:
 
 /* Line 678 of lalr1.cc  */
-#line 293 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 293 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createGt ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 56:
 
 /* Line 678 of lalr1.cc  */
-#line 294 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 294 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createLt ((yysemantic_stack_[(3) - (1)].rightnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 57:
 
 /* Line 678 of lalr1.cc  */
-#line 296 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 296 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.call(*(yysemantic_stack_[(1) - (1)].stringVal), (yylocation_stack_[(1) - (1)])); yyfree((yysemantic_stack_[(1) - (1)].stringVal));  }
     break;
 
   case 58:
 
 /* Line 678 of lalr1.cc  */
-#line 297 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 297 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.callEnd();             }
     break;
 
   case 59:
 
 /* Line 678 of lalr1.cc  */
-#line 299 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 299 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { driver.call((yysemantic_stack_[(3) - (1)].rightnode), *(yysemantic_stack_[(3) - (3)].stringVal), (yylocation_stack_[(3) - (1)]) + (yylocation_stack_[(3) - (3)])); yyfree((yysemantic_stack_[(3) - (3)].stringVal)); }
     break;
 
   case 60:
 
 /* Line 678 of lalr1.cc  */
-#line 300 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 300 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.callEnd();                     }
     break;
 
   case 61:
 
 /* Line 678 of lalr1.cc  */
-#line 302 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 302 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createAssign((yysemantic_stack_[(3) - (1)].leftnode), (yysemantic_stack_[(3) - (3)].rightnode), (yylocation_stack_[(3) - (2)])); }
     break;
 
   case 63:
 
 /* Line 678 of lalr1.cc  */
-#line 307 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 307 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.leftnode) = driver.left(*(yysemantic_stack_[(1) - (1)].stringVal), (yylocation_stack_[(1) - (1)])); yyfree((yysemantic_stack_[(1) - (1)].stringVal));          }
     break;
 
   case 64:
 
 /* Line 678 of lalr1.cc  */
-#line 308 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 308 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.leftnode) = driver.instanceLeft(*(yysemantic_stack_[(1) - (1)].stringVal), (yylocation_stack_[(1) - (1)])); yyfree((yysemantic_stack_[(1) - (1)].stringVal));  }
     break;
 
   case 65:
 
 /* Line 678 of lalr1.cc  */
-#line 312 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 312 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.right(*(yysemantic_stack_[(1) - (1)].stringVal), (yylocation_stack_[(1) - (1)])); yyfree((yysemantic_stack_[(1) - (1)].stringVal));         }
     break;
 
   case 66:
 
 /* Line 678 of lalr1.cc  */
-#line 313 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 313 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.instanceRight(*(yysemantic_stack_[(1) - (1)].stringVal), (yylocation_stack_[(1) - (1)])); yyfree((yysemantic_stack_[(1) - (1)].stringVal)); }
     break;
 
   case 67:
 
 /* Line 678 of lalr1.cc  */
-#line 314 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 314 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createInt((yysemantic_stack_[(1) - (1)].integerVal), (yylocation_stack_[(1) - (1)]));                  }
     break;
 
   case 68:
 
 /* Line 678 of lalr1.cc  */
-#line 315 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 315 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createString(*(yysemantic_stack_[(1) - (1)].ustringVal), (yylocation_stack_[(1) - (1)])); yyfree((yysemantic_stack_[(1) - (1)].ustringVal));  }
     break;
 
   case 69:
 
 /* Line 678 of lalr1.cc  */
-#line 316 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 316 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createBool(true, (yylocation_stack_[(1) - (1)]));               }
     break;
 
   case 70:
 
 /* Line 678 of lalr1.cc  */
-#line 317 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 317 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createBool(false, (yylocation_stack_[(1) - (1)]));              }
     break;
 
   case 71:
 
 /* Line 678 of lalr1.cc  */
-#line 318 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 318 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createChar((yysemantic_stack_[(1) - (1)].charVal), (yylocation_stack_[(1) - (1)]));                 }
     break;
 
   case 72:
 
 /* Line 678 of lalr1.cc  */
-#line 319 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 319 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = driver.createThis((yylocation_stack_[(1) - (1)]));                     }
     break;
 
   case 73:
 
 /* Line 678 of lalr1.cc  */
-#line 320 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 320 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.rightnode) = (yysemantic_stack_[(3) - (2)].rightnode);                                        }
     break;
 
   case 76:
 
 /* Line 678 of lalr1.cc  */
-#line 330 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 330 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.typenode) = driver.createVoidTy((yylocation_stack_[(1) - (1)]));    }
     break;
 
   case 77:
 
 /* Line 678 of lalr1.cc  */
-#line 334 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 334 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.typenode) = driver.createArrayTy((yysemantic_stack_[(3) - (1)].typenode), (yylocation_stack_[(3) - (2)]) + (yylocation_stack_[(3) - (3)])); }
     break;
 
   case 78:
 
 /* Line 678 of lalr1.cc  */
-#line 338 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 338 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.typenode) = driver.createIntTy((yylocation_stack_[(1) - (1)]));     }
     break;
 
   case 79:
 
 /* Line 678 of lalr1.cc  */
-#line 339 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 339 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.typenode) = driver.createBoolTy((yylocation_stack_[(1) - (1)]));    }
     break;
 
   case 80:
 
 /* Line 678 of lalr1.cc  */
-#line 340 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 340 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.typenode) = driver.createStringTy((yylocation_stack_[(1) - (1)]));  }
     break;
 
   case 81:
 
 /* Line 678 of lalr1.cc  */
-#line 341 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 341 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     { (yyval.typenode) = driver.createCharTy((yylocation_stack_[(1) - (1)]));    }
     break;
 
 
 
 /* Line 678 of lalr1.cc  */
-#line 1015 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 1015 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 	default:
           break;
       }
@@ -1222,7 +1222,7 @@ namespace kiwi { namespace lang {
   {
        -17,  -130,  -130,  -130,  -130,  -130,  -130,  -130,   -16,  -130,
      -35,   -17,    13,  -130,   -25,   -14,    53,  -130,    -3,  -130,
-    -130,  -130,   -17,    -2,    -4,  -130,    30,    -1,   -17,  -130,
+    -130,  -130,   -17,    -2,  -130,    -4,    30,    -1,   -17,  -130,
      245,  -130,  -130,  -130,  -130,  -130,  -130,  -130,  -130,    17,
       38,    33,  -130,   325,    25,   325,   325,   325,   325,   325,
     -130,  -130,    20,  -130,  -130,    26,    27,  -130,    28,    91,
@@ -1264,7 +1264,7 @@ namespace kiwi { namespace lang {
   const short int
   Parser::yypgoto_[] =
   {
-      -130,  -130,  -130,  -130,  -130,  -130,   116,  -130,   -52,  -130,
+      -130,  -130,  -130,  -130,  -130,   116,  -130,  -130,   -52,  -130,
     -129,  -130,  -130,  -130,  -130,  -130,  -130,     7,    10,  -130,
     -130,   -43,  -130,  -130,  -130,  -130,   230,  -130,  -130,  -130,
      138
@@ -1383,7 +1383,7 @@ namespace kiwi { namespace lang {
          0,    32,    33,    34,    35,    36,    67,    68,    92,    93,
       94,    95,    96,    23,    30,    56,    96,     0,    69,    59,
       65,     0,    57,    70,    71,    72,    92,    60,    61,    29,
-      62,    73,    72,    23,    24,    25,    26,    27,    28,    29,
+      62,    73,    71,    23,    24,    25,    26,    27,    28,    29,
       30,    31,    37,    38,    39,    42,    48,    49,    53,    57,
       59,    62,    74,    76,    77,    80,    81,    82,    86,    87,
       90,    91,    92,    88,    29,    87,    57,    87,    87,    87,
@@ -1476,8 +1476,8 @@ namespace kiwi { namespace lang {
   Parser::yyrhs_[] =
   {
         96,     0,    -1,    92,    30,    59,    -1,    -1,    92,    23,
-      69,    57,    70,    60,    73,    -1,    -1,    71,    -1,    71,
-      61,    72,    -1,    72,    -1,    92,    29,    -1,    62,    74,
+      69,    57,    70,    60,    73,    -1,    -1,    71,    -1,    72,
+      61,    71,    -1,    72,    -1,    92,    29,    -1,    62,    74,
       63,    -1,    -1,    -1,    76,    75,    74,    -1,    59,    -1,
       87,    59,    -1,    77,    -1,    82,    -1,    80,    59,    -1,
       81,    59,    -1,    86,    59,    -1,    -1,    62,    78,    79,
@@ -1627,11 +1627,11 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 1054 of lalr1.cc  */
-#line 1631 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.cpp"
+#line 1631 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.cpp"
 
 
 /* Line 1056 of lalr1.cc  */
-#line 357 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.yy"
+#line 357 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
  /*** Additional Code ***/
 
 void kiwi::lang::Parser::error(const Parser::location_type& l,

@@ -54,6 +54,8 @@ Field::~Field() {}
 Method::Method(const Identifier& name, Type* ownerType, Type* resultType, std::vector<Type*> arguments)
 : Member(ownerType), m_name(name), m_returnType(resultType), m_func(0) {
     m_memberID = MethodID;
+
+    // add $this as shadow argument
     for (std::vector<Type*>::iterator i = arguments.begin(); i != arguments.end(); ++i) {
         Type* type    = *i;
         Argument* arg = new Argument(this, type, m_arguments.size());

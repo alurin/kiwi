@@ -14,6 +14,7 @@ namespace kiwi {
 namespace lang {
     class VariableNode;
     class ArgumentNode;
+    class Driver;
 
     using codegen::ExpressionGen;
     using codegen::StatementGen;
@@ -24,7 +25,7 @@ namespace lang {
     class MutableNode : public Node {
     public:
         /// Emit instructions for store value
-        virtual ExpressionGen emit(const ExpressionGen& gen) =0;
+        virtual ExpressionGen emit(Driver& driver, const ExpressionGen& gen) =0;
     };
 
     //==--------------------------------------------------------------------==//
@@ -32,7 +33,7 @@ namespace lang {
     class ExpressionNode : public Node {
     public:
         /// Emit instruction for receive value
-        virtual ExpressionGen emit(const StatementGen& value) =0;
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& value) =0;
     };
 
     //==--------------------------------------------------------------------==//
@@ -46,7 +47,7 @@ namespace lang {
         virtual ~BinaryNode();
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         /// Binary operation opcode
         Member::BinaryOpcode m_opcode;
@@ -72,7 +73,7 @@ namespace lang {
         virtual ~UnaryNode();
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         /// Unary operation opcode
         Member::UnaryOpcode m_opcode;
@@ -96,7 +97,7 @@ namespace lang {
         virtual ~AssignNode();
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         /// Left expression node
         MutableNode* m_left;
@@ -113,7 +114,7 @@ namespace lang {
         ArgumentMutableNode(ArgumentNode* arg);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const ExpressionGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const ExpressionGen& gen);
     protected:
         /// Argument node
         ArgumentNode* o_arg;
@@ -127,7 +128,7 @@ namespace lang {
         ArgumentExpressionNode(ArgumentNode* arg);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         /// Argument node
         ArgumentNode* o_arg;
@@ -141,7 +142,7 @@ namespace lang {
         VariableMutableNode(VariableNode* var);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const ExpressionGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const ExpressionGen& gen);
     protected:
         /// Varaible node
         VariableNode* o_var;
@@ -155,7 +156,7 @@ namespace lang {
         VariableExpressionNode(VariableNode* var);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         /// Varaible node
         VariableNode* o_var;
@@ -167,7 +168,7 @@ namespace lang {
         InstanceMutableNode(const Identifier& name);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const ExpressionGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const ExpressionGen& gen);
     protected:
         Identifier m_name;
     };
@@ -177,7 +178,7 @@ namespace lang {
         InstanceExpressionNode(const Identifier& name);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         Identifier m_name;
     };
@@ -188,7 +189,7 @@ namespace lang {
         IntegerConstNode(Context* context, int32_t value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         Context*  m_context;
         int32_t     m_value;
@@ -200,7 +201,7 @@ namespace lang {
         StringConstNode(Context* context, const String& value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         Context*  m_context;
         String      m_value;
@@ -212,7 +213,7 @@ namespace lang {
         CharConstNode(Context* context, const UChar& value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         Context*  m_context;
         UChar     m_value;
@@ -224,7 +225,7 @@ namespace lang {
         BoolConstNode(Context* context, bool value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         Context*  m_context;
         bool        m_value;
@@ -243,7 +244,7 @@ namespace lang {
         void append(ExpressionNode* value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         class CallArgument {
         public:
@@ -263,7 +264,7 @@ namespace lang {
         ThisNode(ObjectType* thisType);
 
         /// Emit instructions
-        virtual ExpressionGen emit(const StatementGen& gen);
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         ObjectType* m_thisType;
     };

@@ -185,7 +185,7 @@ function_arguments
     ;
 
 function_arguments_required
-    : function_arguments_required ',' function_argument
+    : function_argument ',' function_arguments_required
     | function_argument
     ;
 

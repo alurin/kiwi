@@ -59,10 +59,10 @@ ConditionalNode::~ConditionalNode() {
 }
 
 // emit instructions for return statement
-StatementGen ReturnStatement::emit(const StatementGen& gen) {
+StatementGen ReturnStatement::emit(Driver& driver, const StatementGen& gen) {
     if (m_return) {
         /// @todo check equals of return type
-        ExpressionGen result = m_return->emit(gen);
+        ExpressionGen result = m_return->emit(driver, gen);
         llvm::ReturnInst::Create(gen.getContext(), result.getValue(), result.getBlock());
         return result;
     } else {
@@ -73,9 +73,9 @@ StatementGen ReturnStatement::emit(const StatementGen& gen) {
 }
 
 // emit instructions for print statement
-StatementGen PrintStatement::emit(const StatementGen& gen) {
+StatementGen PrintStatement::emit(Driver& driver, const StatementGen& gen) {
     // emit operand
-    ExpressionGen result = m_return->emit(gen);
+    ExpressionGen result = m_return->emit(driver, gen);
 
     // find emitter
     Type* type = result.getType();
@@ -89,7 +89,7 @@ StatementGen PrintStatement::emit(const StatementGen& gen) {
 }
 
 /// emit instructions for statement
-StatementGen ConditionalNode::emit(const StatementGen& gen) {
+StatementGen ConditionalNode::emit(Driver& driver, const StatementGen& gen) {
     llvm::BasicBlock* blockTrue  = llvm::BasicBlock::Create(gen.getContext(), "true", gen.getFunction());
     llvm::BasicBlock* blockFalse = llvm::BasicBlock::Create(gen.getContext(), "false", gen.getFunction());
     llvm::BasicBlock* blockNext  = llvm::BasicBlock::Create(gen.getContext(), "next", gen.getFunction());
@@ -98,15 +98,15 @@ StatementGen ConditionalNode::emit(const StatementGen& gen) {
     StatementGen genFalse(gen.getOwner(), blockFalse);
     StatementGen genNext(gen.getOwner(), blockNext);
 
-    ExpressionGen result = m_cond->emit(gen);
+    ExpressionGen result = m_cond->emit(driver, gen);
     llvm::Value* cond = result.getValue();
     if (!cond->getType()->isIntegerTy(1)) {
         throw "Condition must be boolean";
     }
 
     /// Emit branches
-    if (m_trueStmt)  genTrue  = m_trueStmt->emit(genTrue);
-    if (m_falseStmt) genFalse = m_falseStmt->emit(genFalse);
+    if (m_trueStmt)  genTrue  = m_trueStmt->emit(driver, genTrue);
+    if (m_falseStmt) genFalse = m_falseStmt->emit(driver, genFalse);
 
     llvm::BranchInst::Create(blockTrue, blockFalse, cond, result.getBlock());
     llvm::BranchInst::Create(blockNext, 0, 0, genTrue.getBlock());

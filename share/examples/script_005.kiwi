@@ -15,6 +15,6 @@ void main() {
     auto $a = 10;
     auto $b = 12;
 
-    summa("A < B", $a, $b);
-    summa("B < A", $a, $b);
+    // summa("A < B", $a, $b);
+    // summa("B < A", $a, $b);
 }

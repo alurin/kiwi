@@ -88,6 +88,7 @@ ExpressionStatementNode::~ExpressionStatementNode() {
 
 ArgumentNode* FunctionNode::declare(const Identifier& name, TypeNode* type) {
     ArgumentNode* arg = new ArgumentNode(this, name, type);
+    m_positions.push_back(arg);
     m_args.insert(std::make_pair(name, arg));
     return arg;
 }
@@ -162,18 +163,16 @@ void FieldNode::generate(Type* ownerType) {
     ownerType->add(m_name, resultType);
 }
 
-void FunctionNode::generate(Type* ownerType) {
+void FunctionNode::generate(Driver& driver, Type* ownerType) {
     Module* module   = ownerType->getModule();
     Type* resultType = m_type->get();
     std::vector<Type*> frontendArgs;
 
     // collect arguments
-    for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i) {
-        ArgumentNode* arg = i->second;
+    for (std::vector<ArgumentNode*>::iterator i = m_positions.begin(); i != m_positions.end(); ++i) {
+        ArgumentNode* arg = *i;
         Type*         frontend_type = arg->getType()->get();
-
         frontendArgs.push_back(frontend_type);
-        m_positions.push_back(arg);
     }
 
     m_method = ownerType->add(m_name, resultType, frontendArgs);
@@ -191,7 +190,7 @@ void FunctionNode::generate(Type* ownerType) {
     }
 }
 
-void FunctionNode::emit(Type* ownerType) {
+void FunctionNode::emit(Driver& driver, Type* ownerType) {
     llvm::BasicBlock* entry = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
 
     // emit mutable variables for arguments
@@ -214,7 +213,7 @@ void FunctionNode::emit(Type* ownerType) {
 
     // emit instructions
     StatementGen gen(ownerType, entry);
-    gen = m_root->emit(gen);
+    gen = m_root->emit(driver, gen);
 
     /// emit terminator for last block
     if (!gen.getBlock()->getTerminator()) {
@@ -228,7 +227,7 @@ void FunctionNode::emit(Type* ownerType) {
     }
 }
 
-StatementGen ScopeNode::emit(const StatementGen& gen) {
+StatementGen ScopeNode::emit(Driver& driver, const StatementGen& gen) {
     StatementGen current = gen;
     // emit mutable variables
     for (std::map<Identifier, VariableNode*>::iterator i = m_vars.begin(); i != m_vars.end(); ++i) {
@@ -239,7 +238,7 @@ StatementGen ScopeNode::emit(const StatementGen& gen) {
 
         if (var->getInitilizator()) {
             ExpressionNode* init = var->getInitilizator();
-            ExpressionGen value  = init->emit(current);
+            ExpressionGen value  = init->emit(driver, current);
             current = value;
 
             // store information about auto type
@@ -263,11 +262,11 @@ StatementGen ScopeNode::emit(const StatementGen& gen) {
     // emit statements and expressions
     for (std::vector<StatementNode*>::iterator i = m_stmts.begin(); i != m_stmts.end(); ++i) {
         StatementNode* stmt = *i;
-        current = stmt->emit(current);
+        current = stmt->emit(driver, current);
     }
     return current;
 }
 
-StatementGen ExpressionStatementNode::emit(const StatementGen& gen) {
-    return m_expr->emit(gen);
+StatementGen ExpressionStatementNode::emit(Driver& driver, const StatementGen& gen) {
+    return m_expr->emit(driver, gen);
 }

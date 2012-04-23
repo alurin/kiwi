@@ -18,7 +18,7 @@ namespace lang {
     class NodeFactory {
     public:
         // destructor
-        ~NodeFactory();
+        virtual ~NodeFactory();
 
         //===--------------------------------------------------------------===//
         //    Functions

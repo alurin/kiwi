@@ -194,16 +194,26 @@ namespace lang {
 
 Scanner::Scanner(std::istream* in,
 		 std::ostream* out)
-    : ExampleFlexLexer(in, out)
-{
+    : ExampleFlexLexer(in, out) {
 }
 
-Scanner::~Scanner()
-{
+Scanner::~Scanner() {
 }
 
-void Scanner::set_debug(bool b)
-{
+int Scanner::LexerInput(char* buf, int max_size) {
+    int result = ExampleFlexLexer::LexerInput(buf, max_size);
+    return result;
+}
+
+void Scanner::LexerError(const char* msg) {
+
+}
+
+void Scanner::LexerOutput(const char* buf, int size) {
+
+}
+
+void Scanner::set_debug(bool b) {
     yy_flex_debug = b;
 }
 
@@ -218,8 +228,7 @@ void Scanner::set_debug(bool b)
 #undef yylex
 #endif
 
-int ExampleFlexLexer::yylex()
-{
+int ExampleFlexLexer::yylex() {
     std::cerr << "in ExampleFlexLexer::yylex() !" << std::endl;
     return 0;
 }
@@ -230,7 +239,6 @@ int ExampleFlexLexer::yylex()
  * another input file, and scanning continues. If it returns true (non-zero),
  * then the scanner terminates, returning 0 to its caller. */
 
-int ExampleFlexLexer::yywrap()
-{
+int ExampleFlexLexer::yywrap() {
     return 1;
 }

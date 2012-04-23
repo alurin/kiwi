@@ -49,9 +49,17 @@ public:
      * the macro declaration YY_DECL above. The generated bison parser then
      * calls this virtual function to fetch new tokens. */
     virtual Parser::token_type lex(
-	Parser::semantic_type* yylval,
-	Parser::location_type* yylloc
+	   Parser::semantic_type* yylval,
+	   Parser::location_type* yylloc
 	);
+
+    /// Save buffer for lexer
+    virtual int LexerInput(char* buf, int max_size);
+
+    virtual void LexerError(const char* msg);
+
+    /// Discard all unknwon function
+    virtual void LexerOutput(const char* buf, int size);
 
     /** Enable debug output (via arg_yyout) if compiled into the scanner. */
     void set_debug(bool b);

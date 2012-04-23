@@ -4,7 +4,6 @@
 #include "kiwi/Module.hpp"
 #include "kiwi/Codegen/Startup.hpp"
 #include "Lang/Driver.hpp"
-#include "Lang/FunctionNode.hpp"
 #include "llvm/Analysis/Passes.h"
 #include "llvm/Analysis/Verifier.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
@@ -51,30 +50,17 @@ Method* Module::getMainMethod() {
     return m_metadata->mainMethod;
 }
 
-void Module::includeFile(const Path& filename) {
+bool Module::includeFile(const Path& filename) {
     Context* context = getContext();
     ObjectType* type = ObjectType::create(this);
-    lang::Driver driver(context, type);
+    lang::DriverRef driver(context, type);
     if (driver.parseFile(filename)) {
-        for (std::vector<lang::FieldNode*>::const_iterator i = driver.field_begin(); i != driver.field_end(); ++i) {
-            (*i)->generate(type);
+        if (!m_metadata->mainMethod && driver.getMainMethod()) {
+            m_metadata->mainMethod = driver.getMainMethod();
         }
-
-        /// Emit type structure
-        type->emit();
-
-        for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i) {
-            (*i)->generate(type);
-            if ((*i)->getName() == "main") {
-                m_metadata->mainMethod = (*i)->getMethod();
-            }
-        }
-
-        /// @todo build examples
-        for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i) {
-            (*i)->emit(type);
-        }
+        return true;
     }
+    return false;
 }
 
 // Build module
@@ -89,7 +75,6 @@ void Module::build() {
         StartupEmitter emitter(mainMethod);
         emitter.emitJIT();
     }
-
 
     // Set up the optimizer pipeline.  Start with registering info about how the
     // target lays out data structures.

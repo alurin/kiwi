@@ -12,6 +12,7 @@ namespace lang
     class FunctionNode;
     class ScopeNode;
     class ExpressionNode;
+    class Driver;
 
     using codegen::StatementGen;
 
@@ -19,7 +20,7 @@ namespace lang
     class StatementNode : public Node {
     public:
         /// emit instructions for statement
-        virtual StatementGen emit(const StatementGen& gen) =0;
+        virtual StatementGen emit(Driver& driver, const StatementGen& gen) =0;
 
         /// returns parent function node
         FunctionNode* getOwner() const {
@@ -54,7 +55,7 @@ namespace lang
         ~ReturnStatement();
 
         /// emit instructions for statement
-        virtual StatementGen emit(const StatementGen& gen);
+        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
     protected:
         ExpressionNode* m_return;
     };
@@ -69,7 +70,7 @@ namespace lang
         ~PrintStatement();
 
         /// emit instructions for statement
-        virtual StatementGen emit(const StatementGen& gen);
+        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
     protected:
         ExpressionNode* m_return;
     };
@@ -84,7 +85,7 @@ namespace lang
         ~ConditionalNode();
 
         /// emit instructions for statement
-        virtual StatementGen emit(const StatementGen& gen);
+        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
     protected:
         ExpressionNode* m_cond;
         StatementNode*  m_trueStmt;

@@ -16,8 +16,7 @@ MethodEmitter::MethodEmitter(Method* method)
 
 
 // emit method type
-llvm::FunctionType* MethodEmitter::emitType()
-{
+llvm::FunctionType* MethodEmitter::emitType() {
     Module* module = m_method->getOwnerType()->getModule();
 
     // collect arguments types
@@ -44,8 +43,7 @@ llvm::FunctionType* MethodEmitter::emitType()
 }
 
 // emit method definition
-llvm::Function* MethodEmitter::emitDefinition()
-{
+llvm::Function* MethodEmitter::emitDefinition() {
     if (!m_method->getFunction()) {
         Module* module             = m_method->getOwnerType()->getModule();
         llvm::FunctionType* funcType = emitType();
@@ -73,8 +71,7 @@ llvm::Function* MethodEmitter::emitDefinition()
 }
 
 // emit method call
-ExpressionGen MethodEmitter::emitCall(const StatementGen& gen, const ExpressionGen& thisObject, const ArgumentList& args)
-{
+ExpressionGen MethodEmitter::emitCall(const StatementGen& gen, const ExpressionGen& thisObject, const ArgumentList& args) {
     llvm::Function* func = emitDefinition();
     if (!func) {
         throw "Function implementation not found";

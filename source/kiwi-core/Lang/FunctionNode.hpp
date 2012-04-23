@@ -123,7 +123,7 @@ namespace lang {
         virtual ~ExpressionStatementNode();
 
         /// Emit instructions for expression
-        virtual StatementGen emit(const StatementGen& gen);
+        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
     protected:
         ExpressionNode* m_expr;
     };
@@ -155,7 +155,7 @@ namespace lang {
         void append(ExpressionNode* expr);
 
         /// Emit instructions for scope statement
-        virtual StatementGen emit(const StatementGen& gen);
+        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
     protected:
         std::map<Identifier, VariableNode*> m_vars;
         std::vector<StatementNode*>         m_stmts;
@@ -200,10 +200,10 @@ namespace lang {
         }
 
         /// Generate metadata
-        virtual void generate(Type* owner);
+        virtual void generate(Driver& driver, Type* owner);
 
         /// Emit function code and instruction
-        void emit(Type* owner);
+        void emit(Driver& driver, Type* owner);
 
         Method* getMethod() const {
             return m_method;
@@ -226,8 +226,8 @@ namespace lang {
         // generated fields
         Method* m_method;
         llvm::Function* m_func;
-        std::vector<ArgumentNode*> m_positions;
 
+        std::vector<ArgumentNode*>          m_positions;
         std::map<Identifier, ArgumentNode*> m_args;
     };
 

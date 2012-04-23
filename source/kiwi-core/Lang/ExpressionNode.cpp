@@ -1,3 +1,4 @@
+#include "Driver.hpp"
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
 #include "kiwi/Type.hpp"
@@ -12,9 +13,14 @@
 #include <llvm/GlobalVariable.h>
 #include <llvm/Instructions.h>
 
+#define KIWI_ERROR_AND_EXIT(message, location) \
+    driver.error(location, message); \
+    throw message
+
 using namespace kiwi;
 using namespace kiwi::lang;
 using namespace kiwi::codegen;
+
 
 BinaryNode::BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic)
 : m_opcode(opcode), m_left(left), m_right(right), m_logic(logic)
@@ -105,11 +111,11 @@ void CallNode::append(ExpressionNode* value)
     m_arguments.push_back(arg);
 }
 
-ExpressionGen BinaryNode::emit(const StatementGen& gen)
+ExpressionGen BinaryNode::emit(Driver& driver, const StatementGen& gen)
 {
     // emit operands
-    ExpressionGen left  = m_left->emit(gen);
-    ExpressionGen right = m_right->emit(gen);
+    ExpressionGen left  = m_left->emit(driver, gen);
+    ExpressionGen right = m_right->emit(driver, gen);
 
     // find emitter
     Type* type = left.getType();
@@ -119,13 +125,13 @@ ExpressionGen BinaryNode::emit(const StatementGen& gen)
     if (op) {
         return op->getEmitter()->emit(right, left, right);
     }
-    throw "not found binary operator";
+    KIWI_ERROR_AND_EXIT("not found binary operator", getLocation());
 }
 
-ExpressionGen UnaryNode::emit(const StatementGen& gen)
+ExpressionGen UnaryNode::emit(Driver& driver, const StatementGen& gen)
 {
     // emit operand
-    ExpressionGen value  = m_value->emit(gen);
+    ExpressionGen value  = m_value->emit(driver, gen);
 
     // find emitter
     Type* type = value.getType();
@@ -135,16 +141,16 @@ ExpressionGen UnaryNode::emit(const StatementGen& gen)
     if (op) {
         return op->getEmitter()->emit(value, value);
     }
-    throw "not found unary operator";
+    KIWI_ERROR_AND_EXIT("not found unary operator", getLocation());
 }
 
-ExpressionGen AssignNode::emit(const StatementGen& gen)
+ExpressionGen AssignNode::emit(Driver& driver, const StatementGen& gen)
 {
-    ExpressionGen value = m_right->emit(gen);
-    return m_left->emit(value);
+    ExpressionGen value = m_right->emit(driver, gen);
+    return m_left->emit(driver, value);
 }
 
-ExpressionGen ArgumentMutableNode::emit(const ExpressionGen& gen)
+ExpressionGen ArgumentMutableNode::emit(Driver& driver, const ExpressionGen& gen)
 {
     VariableGen var = o_arg->getGenerator();
     if (var.getType() == gen.getType()) {
@@ -152,17 +158,17 @@ ExpressionGen ArgumentMutableNode::emit(const ExpressionGen& gen)
         return gen;
     }
 
-    throw "unknown cast";
+    KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
 }
 
-ExpressionGen ArgumentExpressionNode::emit(const StatementGen& gen)
+ExpressionGen ArgumentExpressionNode::emit(Driver& driver, const StatementGen& gen)
 {
     VariableGen var      = o_arg->getGenerator();
     llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, var.getType(), inst);
 }
 
-ExpressionGen VariableMutableNode::emit(const ExpressionGen& gen)
+ExpressionGen VariableMutableNode::emit(Driver& driver, const ExpressionGen& gen)
 {
     VariableGen var = o_var->getGenerator();
     if (var.getType() == gen.getType()) {
@@ -170,60 +176,60 @@ ExpressionGen VariableMutableNode::emit(const ExpressionGen& gen)
         return gen;
     }
 
-    throw "unknown cast";
+    KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
 }
 
-ExpressionGen VariableExpressionNode::emit(const StatementGen& gen)
+ExpressionGen VariableExpressionNode::emit(Driver& driver, const StatementGen& gen)
 {
     VariableGen var      = o_var->getGenerator();
     llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, var.getType(), inst);
 }
 
-ExpressionGen IntegerConstNode::emit(const StatementGen& gen)
+ExpressionGen IntegerConstNode::emit(Driver& driver, const StatementGen& gen)
 {
     llvm::APInt cst(32, m_value, false);
     llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
     return ExpressionGen(gen, IntType::get32(m_context), value);
 }
 
-ExpressionGen BoolConstNode::emit(const StatementGen& gen)
+ExpressionGen BoolConstNode::emit(Driver& driver, const StatementGen& gen)
 {
     llvm::APInt cst(1, m_value, false);
     llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
     return ExpressionGen(gen, BoolType::get(m_context), value);
 }
 
-ExpressionGen StringConstNode::emit(const StatementGen& gen)
+ExpressionGen StringConstNode::emit(Driver& driver, const StatementGen& gen)
 {
     return StringEmitter(StringType::get(m_context)).emit(gen, m_value);
 }
 
-ExpressionGen CharConstNode::emit(const StatementGen& gen)
+ExpressionGen CharConstNode::emit(Driver& driver, const StatementGen& gen)
 {
     llvm::APInt cst(16, m_value, true);
     llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
     return ExpressionGen(gen, CharType::get(m_context), value);
 }
 
-ExpressionGen CallNode::emit(const StatementGen& gen)
+ExpressionGen CallNode::emit(Driver& driver, const StatementGen& gen)
 {
-    std::vector<Type*>        types;
+    std::vector<Type*>          types;
     std::vector<llvm::Value*>   args;
 
     if (m_hasNamed) {
-        throw "Not implement call by named arguments";
+        KIWI_ERROR_AND_EXIT("Not implement call by named arguments", getLocation());
     } else if (m_method.empty()) {
-        throw "Not implement call expression";
+        KIWI_ERROR_AND_EXIT("Not implement call expression", getLocation());
     }
 
-    ExpressionGen calle = m_calle->emit(gen);
+    ExpressionGen calle = m_calle->emit(driver, gen);
     StatementGen current = calle;
     args.push_back(calle.getValue());
 
     for (std::vector<CallArgument>::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
         // emit code for argument
-        ExpressionGen expr = i->Value->emit(current);
+        ExpressionGen expr = i->Value->emit(driver, current);
         current            = expr;
 
         // store info
@@ -236,45 +242,45 @@ ExpressionGen CallNode::emit(const StatementGen& gen)
     if (method) {
         llvm::Function* func = method->getFunction();
         if (!func) {
-            throw "Function implementation not found";
+            KIWI_ERROR_AND_EXIT("Function implementation not found", getLocation());
         }
 
         // return result of call
         llvm::Value* result = llvm::CallInst::Create(func, makeArrayRef(args), "", current.getBlock());
         return ExpressionGen(current, method->getReturnType(), result);
     } else {
-        throw "Method not found";
+        KIWI_ERROR_AND_EXIT("Method not found", getLocation());
     }
 }
 
-ExpressionGen InstanceMutableNode::emit(const ExpressionGen& gen)
+ExpressionGen InstanceMutableNode::emit(Driver& driver, const ExpressionGen& gen)
 {
     Type* owner = gen.getOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
-        ExpressionGen thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(gen);
+        ExpressionGen thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
         return ObjectEmitter(type).emitStore(gen, thisValue, m_name, gen);
     } else {
-        throw "Fields not exists in type";
+        KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
     }
 }
 
-ExpressionGen InstanceExpressionNode::emit(const StatementGen& gen)
+ExpressionGen InstanceExpressionNode::emit(Driver& driver, const StatementGen& gen)
 {
     Type* owner = gen.getOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
-        ExpressionGen thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(gen);
+        ExpressionGen thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
         return ObjectEmitter(type).emitLoad(gen, thisValue, m_name);
     } else {
-        throw "Fields not exists in type";
+        KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
     }
 }
 
-ExpressionGen ThisNode::emit(const StatementGen& gen) {
+ExpressionGen ThisNode::emit(Driver& driver, const StatementGen& gen) {
     llvm::Function* func = gen.getFunction();
     if (func->arg_empty()) {
-        throw "Not found this";
+        KIWI_ERROR_AND_EXIT("Not found this", getLocation());
     }
     llvm::Argument* arg  = func->arg_begin();
     return ExpressionGen(gen, m_thisType, arg);
