@@ -177,18 +177,20 @@ namespace kiwi { namespace lang {
      BOOL_FALSE = 283,
      VAR_LOCAL = 284,
      VAR_INSTANCE = 285,
-     TYPE_VOID = 286,
-     TYPE_INT = 287,
-     TYPE_BOOL = 288,
-     TYPE_CHAR = 289,
-     TYPE_STRING = 290,
-     RETURN = 291,
-     IF = 292,
-     ELSE = 293,
-     IFELSE = 294,
-     PRINT = 295,
-     UNARY = 296,
-     PRE = 297
+     TYPE_AUTO = 286,
+     TYPE_VOID = 287,
+     TYPE_INT = 288,
+     TYPE_BOOL = 289,
+     TYPE_CHAR = 290,
+     TYPE_STRING = 291,
+     THIS = 292,
+     RETURN = 293,
+     IF = 294,
+     ELSE = 295,
+     IFELSE = 296,
+     PRINT = 297,
+     UNARY = 298,
+     PRE = 299
    };
 
     };
@@ -275,7 +277,7 @@ namespace kiwi { namespace lang {
     static const unsigned char yydefact_[];
 
     static const short int yypgoto_[];
-    static const signed char yydefgoto_[];
+    static const short int yydefgoto_[];
 
     /// What to do in a state.
     /// \a yytable_[yypact_[s]]: what to do in state \a s.
@@ -365,7 +367,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 369 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
+#line 371 "/home/alurin/workplace/project/kiwi/source/kiwi-core/lang/parser.hpp"
 
 
 

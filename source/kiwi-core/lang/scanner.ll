@@ -91,6 +91,7 @@ typedef kiwi::lang::Parser::token_type token_type;
 "bool"   { return token::TYPE_BOOL;   }
 "string" { return token::TYPE_STRING; }
 "char"   { return token::TYPE_CHAR;   }
+"auto"   { return token::TYPE_AUTO;   }
 
 "return" { return token::RETURN;      }
 "if"     { return token::IF;          }
@@ -101,6 +102,9 @@ typedef kiwi::lang::Parser::token_type token_type;
 
 "true"   { return token::BOOL_TRUE;   }
 "false"  { return token::BOOL_FALSE;  }
+
+"$this"  { return token::THIS;        }
+"this"   { return token::THIS;        }
 
 [A-Za-z][A-Za-z0-9]* {
     yylval->stringVal = new std::string(yytext, yyleng);

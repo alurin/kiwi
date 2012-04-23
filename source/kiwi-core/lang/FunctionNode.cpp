@@ -29,10 +29,14 @@ ArgumentNode::ArgumentNode(FunctionNode* owner, const Identifier& name, TypeNode
 
 ArgumentNode::~ArgumentNode() { }
 
-VariableNode::VariableNode(ScopeNode* owner, const Identifier& name, TypeNode* type)
-: NamedNode(owner->getOwner(), type), o_owner(owner), m_name(name) { }
+VariableNode::VariableNode(ScopeNode* owner, const Identifier& name, TypeNode* type, ExpressionNode* expr)
+: NamedNode(owner->getOwner(), type), o_owner(owner), m_name(name), m_init(expr) {
 
-VariableNode::~VariableNode() { }
+}
+
+VariableNode::~VariableNode() {
+    delete m_init;
+}
 
 ScopeNode::ScopeNode(ScopeNode* parent)
 : StatementNode(parent) { }
@@ -41,14 +45,12 @@ ScopeNode::ScopeNode(FunctionNode* parent)
 : StatementNode(parent) { }
 
 ScopeNode::~ScopeNode() {
-    for (std::vector<StatementNode*>::iterator i = m_stmts.begin(); i != m_stmts.end(); ++i)
-    {
+    for (std::vector<StatementNode*>::iterator i = m_stmts.begin(); i != m_stmts.end(); ++i) {
         StatementNode* stmt = *i;
         delete stmt;
     }
 
-    for (std::map<Identifier, VariableNode*>::iterator i = m_vars.begin(); i != m_vars.end(); ++i)
-    {
+    for (std::map<Identifier, VariableNode*>::iterator i = m_vars.begin(); i != m_vars.end(); ++i) {
         VariableNode* arg = i->second;
         delete arg;
     }
@@ -98,9 +100,23 @@ ArgumentNode* FunctionNode::get(const Identifier& name) {
         /// @todo Implement exception or error
     }
 }
-
+  // declare scope variable with initilizator
 VariableNode* ScopeNode::declare(const Identifier& name, TypeNode* type) {
-    VariableNode* var = new VariableNode(this, name, type);
+    VariableNode* var = new VariableNode(this, name, type, 0);
+    m_vars.insert(std::make_pair(name, var));
+    return var;
+}
+
+// declare scope variable with initilizator
+VariableNode* ScopeNode::declare(const Identifier& name, TypeNode* type, ExpressionNode* expr) {
+    VariableNode* var = new VariableNode(this, name, type, expr);
+    m_vars.insert(std::make_pair(name, var));
+    return var;
+}
+
+// declare scope variable with initilizator and auto type
+VariableNode* ScopeNode::declare(const Identifier& name, ExpressionNode* expr) {
+    VariableNode* var = new VariableNode(this, name, 0, expr);
     m_vars.insert(std::make_pair(name, var));
     return var;
 }
@@ -213,29 +229,43 @@ void FunctionNode::emit(Type* ownerType) {
 }
 
 StatementGen ScopeNode::emit(const StatementGen& gen) {
+    StatementGen current = gen;
     // emit mutable variables
-    for (std::map<Identifier, VariableNode*>::iterator i = m_vars.begin(); i != m_vars.end(); ++i)
-    {
+    for (std::map<Identifier, VariableNode*>::iterator i = m_vars.begin(); i != m_vars.end(); ++i) {
         VariableNode* var = i->second;
 
-        Type* type             = var->getType()->get();
-        llvm::Type* var_type     = type->getVarType();
-        llvm::Value* var_default = llvm::Constant::getNullValue(var_type);
-        llvm::AllocaInst* value  = new llvm::AllocaInst(var_type, i->first, gen.getBlock());
-        new llvm::StoreInst(var_default, value, gen.getBlock());
+        Type* type               = 0;
+        llvm::Value* var_default = 0;
+
+        if (var->getInitilizator()) {
+            ExpressionNode* init = var->getInitilizator();
+            ExpressionGen value  = init->emit(current);
+            current = value;
+
+            // store information about auto type
+            type        = value.getType();
+            var_default = value.getValue();
+            var->setType(new ConcreteTypeNode(type));
+        } else {
+            type        = var->getType()->get();
+            var_default = llvm::Constant::getNullValue(type->getVarType());
+        }
+        llvm::Type* var_type = type->getVarType();
+
+        // initilizate variable
+        llvm::AllocaInst* value  = new llvm::AllocaInst(var_type, i->first, current.getBlock());
+        new llvm::StoreInst(var_default, value, current.getBlock());
 
         VariableGen vargen(type, value);
         var->setGenerator(vargen);
     }
 
     // emit statements and expressions
-    StatementGen result = gen;
-    for (std::vector<StatementNode*>::iterator i = m_stmts.begin(); i != m_stmts.end(); ++i)
-    {
+    for (std::vector<StatementNode*>::iterator i = m_stmts.begin(); i != m_stmts.end(); ++i) {
         StatementNode* stmt = *i;
-        result = stmt->emit(result);
+        current = stmt->emit(current);
     }
-    return result;
+    return current;
 }
 
 StatementGen ExpressionStatementNode::emit(const StatementGen& gen) {

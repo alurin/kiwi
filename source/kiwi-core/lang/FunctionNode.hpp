@@ -84,9 +84,19 @@ namespace lang {
     class VariableNode : public NamedNode
     {
     public:
-        VariableNode(ScopeNode* owner, const Identifier& name, TypeNode* type);
+        /// declare scope variable
+        VariableNode(ScopeNode* owner, const Identifier& name, TypeNode* type, ExpressionNode* expr);
 
         virtual ~VariableNode();
+
+        ExpressionNode* getInitilizator() {
+            return m_init;
+        }
+
+        /// returns type node for this named node
+        void setType(TypeNode* type){
+            m_type = type;
+        }
 
         Identifier getName() const {
             return m_name;
@@ -98,8 +108,9 @@ namespace lang {
         /// create right node for this named node
         virtual ExpressionNode* getRight();
     protected:
-        ScopeNode*    o_owner;
-        Identifier    m_name;
+        ScopeNode*      o_owner;
+        ExpressionNode* m_init;
+        Identifier      m_name;
     };
 
     //==--------------------------------------------------------------------==//
@@ -127,6 +138,12 @@ namespace lang {
 
         /// declare scope variable
         VariableNode* declare(const Identifier& name, TypeNode* type);
+
+        /// declare scope variable with initilizator
+        VariableNode* declare(const Identifier& name, TypeNode* type, ExpressionNode* expr);
+
+        /// declare scope variable with initilizator and auto type
+        VariableNode* declare(const Identifier& name, ExpressionNode* expr);
 
         /// returns named node from scope
         NamedNode* get(const Identifier& name);

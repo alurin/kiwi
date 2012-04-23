@@ -1,4 +1,5 @@
 #!/usr/bin/env kiwi
+/* Test script for methods call */
 
 void printHelloWord() {
     print "Hello word!\n";

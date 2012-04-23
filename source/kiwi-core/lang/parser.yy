@@ -101,13 +101,14 @@
 %token  <stringVal>     VAR_LOCAL           "local variable"
 %token  <stringVal>     VAR_INSTANCE        "instance attribute"
 
+%token                  TYPE_AUTO           "auto type"
 %token                  TYPE_VOID           "void type"
 %token                  TYPE_INT            "int type"
 %token                  TYPE_BOOL           "bool type"
 %token                  TYPE_CHAR           "char type"
 %token                  TYPE_STRING         "string type"
 
-
+%token                  THIS                "this"
 %token                  RETURN              "return"
 %token                  IF                  "if"
 %token                  ELSE                "else"
@@ -249,7 +250,9 @@ call_argument
 //==------------------------------------------------------------------------==//
 
 variable_declare
-    : type VAR_LOCAL                { driver.scope()->declare(*$2, $1); yyfree($2); }
+    : type      VAR_LOCAL                { driver.scope()->declare(*$2, $1);     yyfree($2); }
+    | type      VAR_LOCAL '=' expression { driver.scope()->declare(*$2, $1, $4); yyfree($2); }
+    | TYPE_AUTO VAR_LOCAL '=' expression { driver.scope()->declare(*$2, $4);     yyfree($2); }
     ;
 
 expression
@@ -277,14 +280,11 @@ expression
     | expression '>'   expression   { $$ = driver.createGt ($1, $3, @2); }
     | expression '<'   expression   { $$ = driver.createLt ($1, $3, @2); }
 
-    | IDENT                         { driver.call(*$1); yyfree($1);      }
+    | IDENT                         { driver.call(*$1, @1); yyfree($1);  }
         '(' call_arguments ')'      { $$ = driver.callEnd();             }
 
-    //| expression                    { driver.call($1);                   }
-    //    '(' call_arguments ')'      { $$ = driver.callEnd();             }
-
-    //| right '.' IDENT          { driver.call($1, *$3); yyfree($3);  }
-    //    '(' call_arguments ')'      { $$ = driver.callEnd();             }
+    | right '.' IDENT               { driver.call($1, *$3, @1 + @3); yyfree($3); }
+        '(' call_arguments ')'      { $$ = driver.callEnd();                     }
 
     | left       '='   expression   { $$ = driver.createAssign($1, $3, @2); }
     | right
@@ -303,6 +303,7 @@ right
     | BOOL_TRUE                     { $$ = driver.createBool(true, @1);               }
     | BOOL_FALSE                    { $$ = driver.createBool(false, @1);              }
     | CHAR                          { $$ = driver.createChar($1, @1);                 }
+    | THIS                          { $$ = driver.createThis(@1);                     }
     | '(' expression ')'            { $$ = $2;                                        }
     ;
 

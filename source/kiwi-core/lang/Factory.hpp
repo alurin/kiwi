@@ -136,6 +136,8 @@ namespace lang {
             return node;
         }
 
+        ExpressionNode* createThis(const location& loc);
+
         //===--------------------------------------------------------------===//
         //    Expressions
         //===--------------------------------------------------------------===//
@@ -288,13 +290,13 @@ namespace lang {
         CallNode* call();
 
         /// declare call
-        CallNode* call(const Identifier& name);
+        CallNode* call(const Identifier& name, const location& loc);
 
         /// declare call
-        CallNode* call(ExpressionNode* expr, const Identifier& name);
+        CallNode* call(ExpressionNode* expr, const Identifier& name, const location& loc);
 
         /// declare call
-        CallNode* call(ExpressionNode* expr);
+        CallNode* call(ExpressionNode* expr, const location& loc);
 
         /// end current call
         CallNode* callEnd();

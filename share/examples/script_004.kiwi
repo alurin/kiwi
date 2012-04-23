@@ -1,0 +1,12 @@
+#!/usr/bin/env kiwi
+/* Test script for auto variables and this pointer */
+
+int summa(int $a, int $b) {
+    return $a + $b;
+}
+
+void main() {
+    auto $a = 10;
+    auto $b = 15;
+    print $this.summa($a, $b); print "\n";
+}

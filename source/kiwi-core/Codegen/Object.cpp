@@ -13,8 +13,7 @@ ObjectEmitter::ObjectEmitter(ObjectType* type)
 : m_type(type) { }
 
 // emit instructions for load value from object field
-ExpressionGen ObjectEmitter::emitLoad(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name)
-{
+ExpressionGen ObjectEmitter::emitLoad(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name) {
     const ExpressionGen offset = findField(gen, thisValue, name);
     // load value and yeld
     llvm::Value* loadInst   = new llvm::LoadInst(offset.getValue(), "", gen.getBlock());
@@ -22,8 +21,7 @@ ExpressionGen ObjectEmitter::emitLoad(const StatementGen& gen, const ExpressionG
 }
 
 // emit instructions for store value in object field
-ExpressionGen ObjectEmitter::emitStore(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name, const ExpressionGen& value)
-{
+ExpressionGen ObjectEmitter::emitStore(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name, const ExpressionGen& value) {
     const ExpressionGen offset = findField(gen, thisValue, name);
     // store value and yeld
     new llvm::StoreInst(value.getValue(), offset.getValue(), "", gen.getBlock());
@@ -31,15 +29,13 @@ ExpressionGen ObjectEmitter::emitStore(const StatementGen& gen, const Expression
 }
 
 // emit instruction for create new instance of class
-ExpressionGen ObjectEmitter::emitNew(const StatementGen& gen)
-{
+ExpressionGen ObjectEmitter::emitNew(const StatementGen& gen) {
     llvm::Value* value = new llvm::AllocaInst(m_type->getVarType(), "this", gen.getBlock());
     return ExpressionGen(gen, m_type, value);
 }
 
 // Returns pointer to value of field obkect
-ExpressionGen ObjectEmitter::findField(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name)
-{
+ExpressionGen ObjectEmitter::findField(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name) {
     // Find field
     Field* field = m_type->find(name);
     if (!field) {
