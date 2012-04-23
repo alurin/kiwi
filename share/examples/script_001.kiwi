@@ -1,11 +1,9 @@
 #!/usr/bin/env kiwi
 
-void printHelloWord()
-{
+void printHelloWord() {
     print "Hello word!\n";
 }
 
-void main()
-{
+void main() {
     printHelloWord();
 }

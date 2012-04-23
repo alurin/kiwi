@@ -182,7 +182,7 @@ namespace kiwi
 
         /// returns this is static method?
         bool isStatic() const {
-            return m_isStatic;
+            return false;
         }
 
         /// returns this is abstract method?
@@ -220,7 +220,6 @@ namespace kiwi
         Type* m_returnType;
         std::vector<Argument*> m_arguments;
         llvm::Function* m_func;
-        bool m_isStatic;
 
         Method(const Identifier& name, Type* ownerType, Type* resultType, std::vector<Type*> arguments);
     };

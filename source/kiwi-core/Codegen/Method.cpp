@@ -26,7 +26,7 @@ llvm::FunctionType* MethodEmitter::emitType()
 
     // collect implicit arguments
     if (m_method->isStatic()) {
-         throw "Static methods not implemented";
+        throw "Static methods not implemented";
     } else {
         /// @todo remove pointer to
         llvm::Type* argType = m_method->getOwnerType()->getVarType();
@@ -63,7 +63,7 @@ llvm::Function* MethodEmitter::emitDefinition()
         size_t j = 0;
         for (llvm::Function::arg_iterator i = func->arg_begin(); i != func->arg_end(); ++i, ++j) {
             if (j) {
-                i->setName(argNames[j]);
+                i->setName(argNames[j - 1]);
             } else {
                 i->setName("this");
             }

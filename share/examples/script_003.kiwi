@@ -1,0 +1,16 @@
+#!/usr/bin/env kiwi
+
+int summa(int $a, int $b) {
+    return $a + $b;
+}
+
+void main() {
+    print summa(1, 2 * 3 + 1);   print "\n";
+    print summa(1, 2 * (3 + 1)); print "\n";
+    {
+        int $c;
+        $c = 4;
+        print summa(1, 2 * $c + 1);   print "\n";
+        print summa(1, 2 * ($c + 1)); print "\n";
+    }
+}

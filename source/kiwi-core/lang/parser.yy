@@ -131,12 +131,12 @@
 %type   <typenode>      type type_complex type_primary
 %type   <rightnode>     expression right
 %type   <leftnode>      left
-%type   <stmtnode>      scope return_statement print_statement
+%type   <stmtnode>      scope scope_end return_statement print_statement
 
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
 %destructor { delete $$; } expression right
 %destructor { delete $$; } type type_complex type_primary
-%destructor { delete $$; } scope return_statement print_statement
+%destructor { delete $$; } scope scope_end return_statement print_statement
 %destructor { delete $$; } STRING
 
  /*** END EXAMPLE - Change the example grammar's tokens above ***/
@@ -210,12 +210,12 @@ statements
     ;
 
 scope
-    : '{'                   { driver.scopeBegin(); }
-        scope_end
+    : '{'                   { driver.scopeBegin();    }
+        scope_end           { $$ = $3;                }
     ;
 
 scope_end
-    : statements '}'        { driver.scopeEnd(); }
+    : statements '}'        { $$ = driver.scopeEnd(); }
     ;
 
 return_statement
@@ -280,11 +280,11 @@ expression
     | IDENT                         { driver.call(*$1); yyfree($1);      }
         '(' call_arguments ')'      { $$ = driver.callEnd();             }
 
-    | expression                    { driver.call($1);                   }
-        '(' call_arguments ')'      { $$ = driver.callEnd();             }
+    //| expression                    { driver.call($1);                   }
+    //    '(' call_arguments ')'      { $$ = driver.callEnd();             }
 
-    | expression '.' IDENT          { driver.call($1, *$3); yyfree($3);  }
-        '(' call_arguments ')'      { $$ = driver.callEnd();             }
+    //| right '.' IDENT          { driver.call($1, *$3); yyfree($3);  }
+    //    '(' call_arguments ')'      { $$ = driver.callEnd();             }
 
     | left       '='   expression   { $$ = driver.createAssign($1, $3, @2); }
     | right
