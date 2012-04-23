@@ -14,7 +14,7 @@ UnaryOperator::UnaryOperator(
     Type* ownerType,
     Type* resultType,
     codegen::UnaryEmitter* emitter
-) : Member(ownerType), m_opcode(opcode), m_resultType(resultType), m_emitter(emitter)
+) : Member(ownerType), m_opcode(opcode), m_returnType(resultType), m_emitter(emitter)
 {
     m_memberID = UnaryOperatorID;
 }
@@ -31,7 +31,7 @@ BinaryOperator::BinaryOperator(
     Type* resultType,
     Type* operandType,
     codegen::BinaryEmitter* emitter
-) : Member(ownerType), m_opcode(opcode), m_resultType(resultType), m_operandType(operandType), m_emitter(emitter)
+) : Member(ownerType), m_opcode(opcode), m_returnType(resultType), m_operandType(operandType), m_emitter(emitter)
 {
     m_memberID = BinaryOperatorID;
 }
@@ -52,7 +52,7 @@ Field::~Field() {}
 
 // constructor
 Method::Method(const Identifier& name, Type* ownerType, Type* resultType, std::vector<Type*> arguments)
-: Member(ownerType), m_name(name), m_resultType(resultType), m_func(0) {
+: Member(ownerType), m_name(name), m_returnType(resultType), m_func(0) {
     m_memberID = MethodID;
     for (std::vector<Type*>::iterator i = arguments.begin(); i != arguments.end(); ++i) {
         Type* type    = *i;

@@ -8,8 +8,8 @@ void kiwi_startup() {
     startup();
 }
 
-// shut down runtime void kiwi_shutdown()
-{
+// shut down runtime
+void kiwi_shutdown() {
     shutdown();
 }
 

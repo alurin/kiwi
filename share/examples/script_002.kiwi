@@ -7,4 +7,7 @@ void main()
 {
     @a = 10;
     print @a; print "\n";
+
+    @b = "This is string";
+    print @b; print "\n";
 }

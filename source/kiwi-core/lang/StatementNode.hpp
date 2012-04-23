@@ -56,7 +56,7 @@ namespace lang
         /// emit instructions for statement
         virtual StatementGen emit(const StatementGen& gen);
     protected:
-        ExpressionNode* m_result;
+        ExpressionNode* m_return;
     };
 
     /// Print statement syntax node
@@ -71,7 +71,7 @@ namespace lang
         /// emit instructions for statement
         virtual StatementGen emit(const StatementGen& gen);
     protected:
-        ExpressionNode* m_result;
+        ExpressionNode* m_return;
     };
 }}
 

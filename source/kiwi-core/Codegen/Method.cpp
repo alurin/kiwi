@@ -22,7 +22,7 @@ llvm::FunctionType* MethodEmitter::emitType()
 
     // collect arguments types
     std::vector<llvm::Type*> args;
-    llvm::Type* resultType = m_method->getResultType()->getVarType();
+    llvm::Type* resultType = m_method->getReturnType()->getVarType();
 
     // collect implicit arguments
     if (m_method->isStatic()) {
@@ -88,5 +88,5 @@ ExpressionGen MethodEmitter::emitCall(const StatementGen& gen, const ExpressionG
 
      // return result of call
      llvm::Value* result = llvm::CallInst::Create(func, llvm::makeArrayRef(largs), "", gen.getBlock());
-     return ExpressionGen(gen, m_method->getResultType(), result);
+     return ExpressionGen(gen, m_method->getReturnType(), result);
 }

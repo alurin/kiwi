@@ -13,8 +13,8 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
-Driver::Driver(Context* context)
-    : NodeFactory(context),
+Driver::Driver(Context* context, Type* thisType)
+    : NodeFactory(context, thisType),
       trace_scanning(context->isDebug()),
       trace_parsing(context->isDebug())
 {

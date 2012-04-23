@@ -9,8 +9,12 @@ namespace kiwi {
 
     /// Internal class for store information of runtime types
     class ModuleImpl {
+        friend class Module;
+    private:
+        ModuleImpl() : mainMethod(0) { }
     public:
         std::vector<Type*> types;
+        Method*            mainMethod;
     };
 }
 

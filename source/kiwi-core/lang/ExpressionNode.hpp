@@ -9,6 +9,7 @@
 
 namespace kiwi {
     class Context;
+    class ObjectType;
 
 namespace lang {
     class VariableNode;
@@ -231,7 +232,9 @@ namespace lang {
 
     class CallNode : public ExpressionNode {
     public:
-        CallNode(const Identifier& method);
+        CallNode(ExpressionNode* expr, const Identifier& method);
+
+        CallNode(ExpressionNode* expr);
 
         /// Add named argument
         void append(const Identifier& name, ExpressionNode* value);
@@ -249,9 +252,20 @@ namespace lang {
             Identifier  Name;
         };
     protected:
+        ExpressionNode*             m_calle;
         Identifier                  m_method;
         std::vector<CallArgument>   m_arguments;
         bool                        m_hasNamed;
+    };
+
+    class ThisNode : public ExpressionNode {
+    public:
+        ThisNode(ObjectType* thisType);
+
+        /// Emit instructions
+        virtual ExpressionGen emit(const StatementGen& gen);
+    protected:
+        ObjectType* m_thisType;
     };
 }}
 

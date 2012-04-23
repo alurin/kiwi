@@ -13,18 +13,18 @@ ObjectEmitter::ObjectEmitter(ObjectType* type)
 : m_type(type) { }
 
 // emit instructions for load value from object field
-ExpressionGen ObjectEmitter::emitLoad(const StatementGen& gen, const Identifier& name)
+ExpressionGen ObjectEmitter::emitLoad(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name)
 {
-    const ExpressionGen offset = findField(gen, name);
+    const ExpressionGen offset = findField(gen, thisValue, name);
     // load value and yeld
     llvm::Value* loadInst   = new llvm::LoadInst(offset.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, offset.getType(), loadInst);
 }
 
 // emit instructions for store value in object field
-ExpressionGen ObjectEmitter::emitStore(const StatementGen& gen, const Identifier& name, const ExpressionGen& value)
+ExpressionGen ObjectEmitter::emitStore(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name, const ExpressionGen& value)
 {
-    const ExpressionGen offset = findField(gen, name);
+    const ExpressionGen offset = findField(gen, thisValue, name);
     // store value and yeld
     new llvm::StoreInst(value.getValue(), offset.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, value.getType(), value.getValue());
@@ -38,7 +38,7 @@ ExpressionGen ObjectEmitter::emitNew(const StatementGen& gen)
 }
 
 // Returns pointer to value of field obkect
-ExpressionGen ObjectEmitter::findField(const StatementGen& gen, const Identifier& name)
+ExpressionGen ObjectEmitter::findField(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name)
 {
     // Find field
     Field* field = m_type->find(name);
@@ -64,12 +64,13 @@ ExpressionGen ObjectEmitter::findField(const StatementGen& gen, const Identifier
     lengthIdx.push_back(zero);
     lengthIdx.push_back(one);
 
-    llvm::Value* thisValue   = gen.getThisValue();
-    assert(thisValue && "thisValue is null");
+    llvm::Value* value = thisValue.getValue();
+    assert(value && "value is null");
+
     llvm::Value* position    = llvm::GetElementPtrInst::Create(addressMap, makeArrayRef(lengthIdx), "", gen.getBlock());
     llvm::Value* fieldOffset = new llvm::LoadInst(position, "", gen.getBlock());
 
-    llvm::Value* castNull   = new llvm::PtrToIntInst(thisValue, llvm::IntegerType::get(context, 64), "", gen.getBlock());
+    llvm::Value* castNull   = new llvm::PtrToIntInst(value, llvm::IntegerType::get(context, 64), "", gen.getBlock());
     llvm::Value* castOffset = new llvm::PtrToIntInst(fieldOffset, llvm::IntegerType::get(context, 64), "", gen.getBlock());
     llvm::Value* summInst   = llvm::BinaryOperator::Create(llvm::Instruction::Add, castNull, castOffset, "", gen.getBlock());
     llvm::Value* offset     = new llvm::IntToPtrInst(summInst, fieldType, "", gen.getBlock());

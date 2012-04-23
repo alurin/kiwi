@@ -20,32 +20,32 @@ StatementNode::StatementNode(FunctionNode* parent)
 
 // constructor
 ReturnStatement::ReturnStatement(ScopeNode* parent)
-: StatementNode(parent), m_result(0) {}
+: StatementNode(parent), m_return(0) {}
 
 // constructor
 ReturnStatement::ReturnStatement(ScopeNode* parent, ExpressionNode* result)
-: StatementNode(parent), m_result(result) {}
+: StatementNode(parent), m_return(result) {}
 
 // destructor
 ReturnStatement::~ReturnStatement()
 {
-    delete m_result;
+    delete m_return;
 }
 // constructor
 PrintStatement::PrintStatement(ScopeNode* parent, ExpressionNode* result)
-: StatementNode(parent), m_result(result) {}
+: StatementNode(parent), m_return(result) {}
 
 // destructor
 PrintStatement::~PrintStatement()
 {
-    delete m_result;
+    delete m_return;
 }
 // emit instructions for return statement
 StatementGen ReturnStatement::emit(const StatementGen& gen)
 {
-    if (m_result) {
+    if (m_return) {
         /// @todo check equals of return type
-        ExpressionGen result = m_result->emit(gen);
+        ExpressionGen result = m_return->emit(gen);
         llvm::ReturnInst::Create(gen.getContext(), result.getValue(), result.getBlock());
         return result;
     } else {
@@ -59,7 +59,7 @@ StatementGen ReturnStatement::emit(const StatementGen& gen)
 StatementGen PrintStatement::emit(const StatementGen& gen)
 {
     // emit operand
-    ExpressionGen result = m_result->emit(gen);
+    ExpressionGen result = m_return->emit(gen);
 
     // find emitter
     Type* type = result.getType();

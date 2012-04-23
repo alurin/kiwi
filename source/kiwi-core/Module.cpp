@@ -2,6 +2,7 @@
 #include "ModuleImpl.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
+#include "kiwi/Codegen/Startup.hpp"
 #include "lang/Driver.hpp"
 #include "lang/FunctionNode.hpp"
 #include "llvm/Analysis/Passes.h"
@@ -17,8 +18,8 @@
 #include "llvm/Type.h"
 
 using namespace kiwi;
+using namespace kiwi::codegen;
 
-typedef void    (*VoidMainPoint)();
 typedef int32_t (*ReturnMainPoint)();
 
 Module::Module(const Identifier& name, Context* context)
@@ -46,13 +47,15 @@ Module* Module::create(const Identifier& name, Context* ref) {
     return module;
 }
 
+Method* Module::getMainMethod() {
+    return m_metadata->mainMethod;
+}
+
 void Module::includeFile(const Path& filename) {
     Context* context = getContext();
-    lang::Driver driver(context);
+    ObjectType* type = ObjectType::create(this);
+    lang::Driver driver(context, type);
     if (driver.parseFile(filename)) {
-
-        ObjectType* type = ObjectType::create(this);
-
         for (std::vector<lang::FieldNode*>::const_iterator i = driver.field_begin(); i != driver.field_end(); ++i) {
             (*i)->generate(type);
         }
@@ -62,6 +65,9 @@ void Module::includeFile(const Path& filename) {
 
         for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i) {
             (*i)->generate(type);
+            if ((*i)->getName() == "main") {
+                m_metadata->mainMethod = (*i)->getMethod();
+            }
         }
 
         /// @todo build examples
@@ -74,8 +80,16 @@ void Module::includeFile(const Path& filename) {
 // Build module
 /// @todo Constant propagation pass not worked
 void Module::build() {
-    llvm::FunctionPassManager   funcManager(m_module);
-    llvm::PassManager           moduleManager;
+    llvm::FunctionPassManager funcManager(m_module);
+    llvm::PassManager moduleManager;
+
+    /// create startup function
+    Method* mainMethod = getMainMethod();
+    if (mainMethod) {
+        StartupEmitter emitter(mainMethod);
+        emitter.emitJIT();
+    }
+
 
     // Set up the optimizer pipeline.  Start with registering info about how the
     // target lays out data structures.
@@ -127,27 +141,13 @@ void Module::dump() {
 
 // Run module main function
 int32_t Module::run() {
-    llvm::Function* mainFunc = m_module->getFunction("main");
-
+    // JIT the function, returning a function pointer.
+    llvm::Function* mainFunc = m_module->getFunction("__start");
     if (mainFunc) {
-        // JIT the function, returning a function pointer.
-        void *pointFunc = m_engine->getPointerToFunction(mainFunc);
-
-        if (mainFunc->empty()) {
-            throw "Main function is empty";
-        } else if (!mainFunc->arg_empty()) {
-            throw "Main function has arguments";
-        } else if (mainFunc->getReturnType()->isVoidTy()) {
-            VoidMainPoint main = reinterpret_cast<VoidMainPoint>(reinterpret_cast<intptr_t>(pointFunc));
-            main();
-            return 0;
-        } else if (mainFunc->getReturnType()->isIntegerTy(32)) {
-            ReturnMainPoint main = reinterpret_cast<ReturnMainPoint>(reinterpret_cast<intptr_t>(pointFunc));
-            return main();
-        }
-
-        throw "Main function has unsupported return type";
+        void *pointFunc          = m_engine->getPointerToFunction(mainFunc);
+        ReturnMainPoint main     = reinterpret_cast<ReturnMainPoint>(reinterpret_cast<intptr_t>(pointFunc));
+        return main();
     }
 
-    throw "Main function is not found";
+    throw "Not found main function";
 }

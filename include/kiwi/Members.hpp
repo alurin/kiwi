@@ -28,8 +28,8 @@ namespace kiwi
         }
 
         /// returns result type
-        Type* getResultType() const {
-            return m_resultType;
+        Type* getReturnType() const {
+            return m_returnType;
         }
 
         /// returns IR code emitter
@@ -48,7 +48,7 @@ namespace kiwi
         }
     protected:
         UnaryOpcode             m_opcode;
-        Type*                m_resultType;
+        Type*                m_returnType;
         codegen::UnaryEmitter*  m_emitter;
 
         /// constructor
@@ -75,8 +75,8 @@ namespace kiwi
 
         /// return result type
         /// @nostable
-        Type* getResultType() const {
-            return m_resultType;
+        Type* getReturnType() const {
+            return m_returnType;
         }
 
         /// return second operator type
@@ -101,7 +101,7 @@ namespace kiwi
         }
     protected:
         BinaryOpcode             m_opcode;
-        Type*                 m_resultType;
+        Type*                 m_returnType;
         Type*                 m_operandType;
         codegen::BinaryEmitter*  m_emitter;
 
@@ -161,7 +161,7 @@ namespace kiwi
     };
 
     //==--------------------------------------------------------------------==//
-    /// Methods
+    /// Method member
     class Method : public Member {
         friend class Type;
     public:
@@ -176,13 +176,18 @@ namespace kiwi
         }
 
         /// returns method result type
-        Type* getResultType() const {
-            return m_resultType;
+        Type* getReturnType() const {
+            return m_returnType;
         }
 
         /// returns this is static method?
         bool isStatic() const {
             return m_isStatic;
+        }
+
+        /// returns this is abstract method?
+        bool isAbstract() const {
+            return false;
         }
 
         /// returns llvm analog
@@ -212,7 +217,7 @@ namespace kiwi
     protected:
         Identifier m_name;
         Type* m_ownerType;
-        Type* m_resultType;
+        Type* m_returnType;
         std::vector<Argument*> m_arguments;
         llvm::Function* m_func;
         bool m_isStatic;
@@ -221,7 +226,7 @@ namespace kiwi
     };
 
     //==--------------------------------------------------------------------==//
-    /// Fields. Not implemented
+    /// Field member
     class Field : public Member {
         friend class Type;
         friend class ObjectType;
@@ -254,9 +259,9 @@ namespace kiwi
             return true;
         }
     protected:
-        Identifier  m_name;
-        Type*    m_fieldType;
-        int32_t     m_position;
+        Identifier m_name;
+        Type* m_fieldType;
+        int32_t m_position;
 
         /// constructor
         Field(const Identifier& name, Type* ownerType, Type* fieldType);

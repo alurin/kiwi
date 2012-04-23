@@ -13,6 +13,7 @@ namespace kiwi
 {
     class Context;
     class Type;
+    class Method;
     /// Storage for internal module metadata
     class ModuleImpl;
 
@@ -44,6 +45,9 @@ namespace kiwi
         llvm::Module* getModule() const {
             return m_module;
         }
+
+        /// fund main method in current module
+        Method* getMainMethod();
 
         /// build module
         void build();

@@ -129,12 +129,12 @@
 %right      PRE '.' '[' '('
 
 %type   <typenode>      type type_complex type_primary
-%type   <rightnode>     expression right call_expression
+%type   <rightnode>     expression right
 %type   <leftnode>      left
 %type   <stmtnode>      scope return_statement print_statement
 
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
-%destructor { delete $$; } expression right call_expression
+%destructor { delete $$; } expression right
 %destructor { delete $$; } type type_complex type_primary
 %destructor { delete $$; } scope return_statement print_statement
 %destructor { delete $$; } STRING
@@ -229,11 +229,6 @@ print_statement
 //==------------------------------------------------------------------------==//
 //      Calls
 //==------------------------------------------------------------------------==//
-call_expression
-    : IDENT                         { driver.call(*$1); yyfree($1); }
-        '(' call_arguments ')'      { $$ = driver.callEnd();        }
-    ;
-
 call_arguments
     : /* empty */
     | call_arguments_required
@@ -282,6 +277,15 @@ expression
     | expression '>'   expression   { $$ = driver.createGt ($1, $3, @2); }
     | expression '<'   expression   { $$ = driver.createLt ($1, $3, @2); }
 
+    | IDENT                         { driver.call(*$1); yyfree($1);      }
+        '(' call_arguments ')'      { $$ = driver.callEnd();             }
+
+    | expression                    { driver.call($1);                   }
+        '(' call_arguments ')'      { $$ = driver.callEnd();             }
+
+    | expression '.' IDENT          { driver.call($1, *$3); yyfree($3);  }
+        '(' call_arguments ')'      { $$ = driver.callEnd();             }
+
     | left       '='   expression   { $$ = driver.createAssign($1, $3, @2); }
     | right
     ;
@@ -300,7 +304,6 @@ right
     | BOOL_FALSE                    { $$ = driver.createBool(false, @1);              }
     | CHAR                          { $$ = driver.createChar($1, @1);                 }
     | '(' expression ')'            { $$ = $2;                                        }
-    | call_expression               { $$ = $1;                                        }
     ;
 
 

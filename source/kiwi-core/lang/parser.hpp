@@ -274,8 +274,8 @@ namespace kiwi { namespace lang {
     /// Zero means the default is an error.
     static const unsigned char yydefact_[];
 
-    static const short int yypgoto_[];
-    static const signed char yydefgoto_[];
+    static const signed char yypgoto_[];
+    static const short int yydefgoto_[];
 
     /// What to do in a state.
     /// \a yytable_[yypact_[s]]: what to do in state \a s.

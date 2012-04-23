@@ -4,6 +4,7 @@
 #include "kiwi/Members.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Type.hpp"
+#include "kiwi/Codegen/Method.hpp"
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/BasicBlock.h>
 #include <llvm/Constant.h>
@@ -14,6 +15,7 @@
 
 using namespace kiwi;
 using namespace kiwi::lang;
+using namespace kiwi::codegen;
 
 NamedNode::NamedNode(FunctionNode* owner, TypeNode* type)
 : o_owner(owner), m_type(type) { }
@@ -38,8 +40,7 @@ ScopeNode::ScopeNode(ScopeNode* parent)
 ScopeNode::ScopeNode(FunctionNode* parent)
 : StatementNode(parent) { }
 
-ScopeNode::~ScopeNode()
-{
+ScopeNode::~ScopeNode() {
     for (std::vector<StatementNode*>::iterator i = m_stmts.begin(); i != m_stmts.end(); ++i)
     {
         StatementNode* stmt = *i;
@@ -53,48 +54,43 @@ ScopeNode::~ScopeNode()
     }
 }
 
-FunctionNode::FunctionNode(const Identifier& name, TypeNode* type)
-: m_name(name), m_type(type), m_root(new ScopeNode(this)), m_func(0)
-{
+FunctionNode::FunctionNode(const Identifier& name, TypeNode* thisType, TypeNode* resultType)
+: m_name(name), m_this(thisType), m_type(resultType), m_root(new ScopeNode(this)), m_func(0) {
+
 }
 
-FunctionNode::~FunctionNode()
-{
+FunctionNode::~FunctionNode() {
     delete m_root;
     delete m_type;
-    for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i)
-    {
+    for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i) {
         ArgumentNode* arg = i->second;
         delete arg;
     }
 }
 
 FieldNode::FieldNode(const Identifier& name, TypeNode* type)
-: m_name(name), m_type(type)
-{}
+: m_name(name), m_type(type) {
 
-FieldNode::~FieldNode()
-{
+}
+
+FieldNode::~FieldNode() {
     delete m_type;
 }
 
 ExpressionStatementNode::ExpressionStatementNode(ScopeNode* parent, ExpressionNode* expr)
 : StatementNode(parent), m_expr(expr) { }
 
-ExpressionStatementNode::~ExpressionStatementNode()
-{
+ExpressionStatementNode::~ExpressionStatementNode() {
     delete m_expr;
 }
 
-ArgumentNode* FunctionNode::declare(const Identifier& name, TypeNode* type)
-{
+ArgumentNode* FunctionNode::declare(const Identifier& name, TypeNode* type) {
     ArgumentNode* arg = new ArgumentNode(this, name, type);
     m_args.insert(std::make_pair(name, arg));
     return arg;
 }
 
-ArgumentNode* FunctionNode::get(const Identifier& name)
-{
+ArgumentNode* FunctionNode::get(const Identifier& name) {
     std::map<Identifier, ArgumentNode*>::iterator it = m_args.find(name);
     if (it != m_args.end()) {
         return it->second;
@@ -103,15 +99,13 @@ ArgumentNode* FunctionNode::get(const Identifier& name)
     }
 }
 
-VariableNode* ScopeNode::declare(const Identifier& name, TypeNode* type)
-{
+VariableNode* ScopeNode::declare(const Identifier& name, TypeNode* type) {
     VariableNode* var = new VariableNode(this, name, type);
     m_vars.insert(std::make_pair(name, var));
     return var;
 }
 
-NamedNode* ScopeNode::get(const Identifier& name)
-{
+NamedNode* ScopeNode::get(const Identifier& name) {
     std::map<Identifier, VariableNode*>::iterator it = m_vars.find(name);
     if (it != m_vars.end()) {
         return it->second;
@@ -123,99 +117,87 @@ NamedNode* ScopeNode::get(const Identifier& name)
     }
 }
 
-void ScopeNode::append(StatementNode* scope)
-{
+void ScopeNode::append(StatementNode* scope) {
     m_stmts.push_back(scope);
 }
 
-void ScopeNode::append(ExpressionNode* expr)
-{
+void ScopeNode::append(ExpressionNode* expr) {
     append(new ExpressionStatementNode(this, expr));
 }
 
-MutableNode* ArgumentNode::getLeft()
-{
+MutableNode* ArgumentNode::getLeft() {
     return new ArgumentMutableNode(this);
 }
 
-ExpressionNode* ArgumentNode::getRight()
-{
+ExpressionNode* ArgumentNode::getRight() {
     return new ArgumentExpressionNode(this);
 }
 
-MutableNode* VariableNode::getLeft()
-{
+MutableNode* VariableNode::getLeft() {
     return new VariableMutableNode(this);
 }
 
-ExpressionNode* VariableNode::getRight()
-{
+ExpressionNode* VariableNode::getRight() {
     return new VariableExpressionNode(this);
 }
 
-void FieldNode::generate(Type* ownerType)
-{
+void FieldNode::generate(Type* ownerType) {
     Type* resultType = m_type->get();
     ownerType->add(m_name, resultType);
 }
 
-void FunctionNode::generate(Type* ownerType)
-{
-    Module* module = ownerType->getModule();
-
-    // collect nodes
-    Type*     frontendResultType = m_type->get();
-    llvm::Type* backendResultType  = frontendResultType->getVarType();
+void FunctionNode::generate(Type* ownerType) {
+    Module* module   = ownerType->getModule();
+    Type* resultType = m_type->get();
+    std::vector<Type*> frontendArgs;
 
     // collect arguments
-    std::vector<llvm::Type*> backendArgs;
-    std::vector<Type*> frontendArgs;
-    for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i)
-    {
+    for (std::map<Identifier, ArgumentNode*>::iterator i = m_args.begin(); i != m_args.end(); ++i) {
         ArgumentNode* arg = i->second;
         Type*         frontend_type = arg->getType()->get();
-        llvm::Type*   backend_type  = frontend_type->getVarType();
 
-        backendArgs.push_back(backend_type);
         frontendArgs.push_back(frontend_type);
         m_positions.push_back(arg);
     }
 
-    llvm::FunctionType* backendType = llvm::FunctionType::get(backendResultType, llvm::makeArrayRef(backendArgs), false);
-    m_method = ownerType->add(m_name, frontendResultType, frontendArgs);
-    m_func   = llvm::Function::Create(backendType, llvm::GlobalValue::ExternalLinkage , m_name, module->getModule());
-    m_method->setFunction(m_func);
+    m_method = ownerType->add(m_name, resultType, frontendArgs);
+    m_func   = MethodEmitter(m_method).emitDefinition();
 
     // emit mutable variables for arguments
     size_t j = 0;
-    for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j)
-    {
-        ArgumentNode* arg = m_positions[j];
-        i->setName(arg->getName());
+    for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
+        if (j) {
+            ArgumentNode* arg = m_positions[j-1];
+            i->setName(arg->getName());
+        } else {
+            i->setName("this");
+        }
     }
 }
 
-void FunctionNode::emit(Type* ownerType)
-{
-    llvm::BasicBlock* entry  = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
+void FunctionNode::emit(Type* ownerType) {
+    llvm::BasicBlock* entry = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
 
     // emit mutable variables for arguments
     size_t j = 0;
-    for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j)
-    {
-        ArgumentNode* arg = m_positions[j];
-        llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
-        llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
+    for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
+        if (j) {
+            ArgumentNode* arg = m_positions[j-1];
+            llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
+            llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
 
-        VariableGen vargen(arg->getType()->get(), value);
-        arg->setGenerator(vargen);
+            VariableGen vargen(arg->getType()->get(), value);
+            arg->setGenerator(vargen);
+        } else {
+            /// @todo remove
+            // thisValue = new llvm::AllocaInst(ownerType->getVarType(), "this", entry);
+            // llvm::StoreInst* store = new llvm::StoreInst(i, thisValue, entry);
+            //thisValue->setGenerator(vargen);
+        }
     }
 
-    /// @todo remove
-    llvm::Value* thisValue = new llvm::AllocaInst(ownerType->getVarType(), "this", entry);
-
     // emit instructions
-    StatementGen gen(ownerType, entry, thisValue);
+    StatementGen gen(ownerType, entry);
     gen = m_root->emit(gen);
 
     /// emit terminator for last block
@@ -230,8 +212,7 @@ void FunctionNode::emit(Type* ownerType)
     }
 }
 
-StatementGen ScopeNode::emit(const StatementGen& gen)
-{
+StatementGen ScopeNode::emit(const StatementGen& gen) {
     // emit mutable variables
     for (std::map<Identifier, VariableNode*>::iterator i = m_vars.begin(); i != m_vars.end(); ++i)
     {
@@ -257,7 +238,6 @@ StatementGen ScopeNode::emit(const StatementGen& gen)
     return result;
 }
 
-StatementGen ExpressionStatementNode::emit(const StatementGen& gen)
-{
+StatementGen ExpressionStatementNode::emit(const StatementGen& gen) {
     return m_expr->emit(gen);
 }

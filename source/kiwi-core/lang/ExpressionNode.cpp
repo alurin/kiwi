@@ -71,14 +71,20 @@ StringConstNode::StringConstNode(Context* context, const String& value)
 CharConstNode::CharConstNode(Context* context, const UChar& value)
 : m_context(context), m_value(value) { }
 
-CallNode::CallNode(const Identifier& method)
-: m_method(method), m_hasNamed(false) {}
+CallNode::CallNode(ExpressionNode* calle, const Identifier& method)
+: m_calle(calle), m_method(method), m_hasNamed(false) {}
+
+CallNode::CallNode(ExpressionNode* calle)
+: m_calle(calle), m_hasNamed(false) {}
 
 InstanceMutableNode::InstanceMutableNode(const Identifier& name)
 : m_name(name) { }
 
 InstanceExpressionNode::InstanceExpressionNode(const Identifier& name)
 : m_name(name) { }
+
+ThisNode::ThisNode(ObjectType* thisType)
+: m_thisType(thisType) { }
 
 void CallNode::append(const Identifier& name, ExpressionNode* value)
 {
@@ -207,9 +213,14 @@ ExpressionGen CallNode::emit(const StatementGen& gen)
 
     if (m_hasNamed) {
         throw "Not implement call by named arguments";
+    } else if (m_method.empty()) {
+        throw "Not implement call expression";
     }
 
-    StatementGen current = gen;
+    ExpressionGen calle = m_calle->emit(gen);
+    StatementGen current = calle;
+    args.push_back(calle.getValue());
+
     for (std::vector<CallArgument>::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
         // emit code for argument
         ExpressionGen expr = i->Value->emit(current);
@@ -220,7 +231,7 @@ ExpressionGen CallNode::emit(const StatementGen& gen)
         args.push_back(expr.getValue());
     }
 
-    Type* owner    = gen.getOwner();
+    Type* owner    = calle.getType();
     Method* method = owner->find(m_method, types);
     if (method) {
         llvm::Function* func = method->getFunction();
@@ -230,7 +241,7 @@ ExpressionGen CallNode::emit(const StatementGen& gen)
 
         // return result of call
         llvm::Value* result = llvm::CallInst::Create(func, makeArrayRef(args), "", current.getBlock());
-        return ExpressionGen(current, method->getResultType(), result);
+        return ExpressionGen(current, method->getReturnType(), result);
     } else {
         throw "Method not found";
     }
@@ -241,7 +252,8 @@ ExpressionGen InstanceMutableNode::emit(const ExpressionGen& gen)
     Type* owner = gen.getOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
-        return ObjectEmitter(type).emitStore(gen, m_name, gen);
+        ExpressionGen thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(gen);
+        return ObjectEmitter(type).emitStore(gen, thisValue, m_name, gen);
     } else {
         throw "Fields not exists in type";
     }
@@ -252,8 +264,18 @@ ExpressionGen InstanceExpressionNode::emit(const StatementGen& gen)
     Type* owner = gen.getOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
-        return ObjectEmitter(type).emitLoad(gen, m_name);
+        ExpressionGen thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(gen);
+        return ObjectEmitter(type).emitLoad(gen, thisValue, m_name);
     } else {
         throw "Fields not exists in type";
     }
+}
+
+ExpressionGen ThisNode::emit(const StatementGen& gen) {
+    llvm::Function* func = gen.getFunction();
+    if (func->arg_empty()) {
+        throw "Not found this";
+    }
+    llvm::Argument* arg  = func->arg_begin();
+    return ExpressionGen(gen, m_thisType, arg);
 }

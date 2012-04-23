@@ -24,6 +24,7 @@ namespace lang {
 
     using codegen::VariableGen;
 
+    //==--------------------------------------------------------------------==//
     /// Named parameter syntax node
     class NamedNode : public Node {
     public:
@@ -56,6 +57,7 @@ namespace lang {
         NamedNode(FunctionNode* owner, TypeNode* type);
     };
 
+    //==--------------------------------------------------------------------==//
     /// Argument syntax node
     class ArgumentNode : public NamedNode
     {
@@ -77,6 +79,7 @@ namespace lang {
         Identifier    m_name;
     };
 
+    //==--------------------------------------------------------------------==//
     /// Variable syntax node
     class VariableNode : public NamedNode
     {
@@ -99,6 +102,7 @@ namespace lang {
         Identifier    m_name;
     };
 
+    //==--------------------------------------------------------------------==//
     /// Expression statment node
     class ExpressionStatementNode : public StatementNode
     {
@@ -113,6 +117,7 @@ namespace lang {
         ExpressionNode* m_expr;
     };
 
+    //==--------------------------------------------------------------------==//
     /// Scope syntax node for collect variables and statements
     class ScopeNode : public StatementNode {
     public:
@@ -139,6 +144,7 @@ namespace lang {
         std::vector<StatementNode*>         m_stmts;
     };
 
+    //==--------------------------------------------------------------------==//
     /// Field syntax node
     class FieldNode : public Node {
     public:
@@ -154,12 +160,13 @@ namespace lang {
         TypeNode*                   m_type;
     };
 
+    //==--------------------------------------------------------------------==//
     /// Function syntx node
     class FunctionNode : public Node
     {
     public:
         /// construct function node
-        FunctionNode(const Identifier& name, TypeNode* type);
+        FunctionNode(const Identifier& name, TypeNode* thisType, TypeNode* resultType);
 
         /// destructor
         virtual ~FunctionNode();
@@ -181,12 +188,21 @@ namespace lang {
         /// Emit function code and instruction
         void emit(Type* owner);
 
+        Method* getMethod() const {
+            return m_method;
+        }
+
+        Identifier getName() const {
+            return m_name;
+        }
+
         llvm::Function* getFunction() {
             return m_func;
         }
     protected:
         // store fields
         Identifier m_name;
+        TypeNode* m_this;
         TypeNode* m_type;
         ScopeNode* m_root;
 

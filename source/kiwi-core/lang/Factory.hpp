@@ -17,6 +17,7 @@ namespace lang {
     /// Factory for nodes
     class NodeFactory {
     public:
+        // destructor
         ~NodeFactory();
 
         //===--------------------------------------------------------------===//
@@ -111,29 +112,25 @@ namespace lang {
         //===--------------------------------------------------------------===//
         //    Constants
         //===--------------------------------------------------------------===//
-        ExpressionNode* createInt(int32_t value, const location& loc)
-        {
+        ExpressionNode* createInt(int32_t value, const location& loc) {
             ExpressionNode* node = new IntegerConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createString(const String& value, const location& loc)
-        {
+        ExpressionNode* createString(const String& value, const location& loc) {
             ExpressionNode* node = new StringConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createChar(const UChar& value, const location& loc)
-        {
+        ExpressionNode* createChar(const UChar& value, const location& loc) {
             ExpressionNode* node = new CharConstNode(m_context, value);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createBool(bool value, const location& loc)
-        {
+        ExpressionNode* createBool(bool value, const location& loc) {
             ExpressionNode* node = new BoolConstNode(m_context, value);
             node->setLocation(loc);
             return node;
@@ -142,141 +139,121 @@ namespace lang {
         //===--------------------------------------------------------------===//
         //    Expressions
         //===--------------------------------------------------------------===//
-        ExpressionNode* createNeg(ExpressionNode* value, const location& loc)
-        {
+        ExpressionNode* createNeg(ExpressionNode* value, const location& loc) {
             ExpressionNode* node = new UnaryNode(Member::NEG, value);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createPos(ExpressionNode* value, const location& loc)
-        {
+        ExpressionNode* createPos(ExpressionNode* value, const location& loc) {
             ExpressionNode* node = new UnaryNode(Member::POS, value);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createNot(ExpressionNode* value, const location& loc)
-        {
+        ExpressionNode* createNot(ExpressionNode* value, const location& loc) {
             ExpressionNode* node = new UnaryNode(Member::NOT, value);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createDec(ExpressionNode* value, bool post, const location& loc)
-        {
+        ExpressionNode* createDec(ExpressionNode* value, bool post, const location& loc) {
             ExpressionNode* node = new UnaryNode(Member::DEC, value, post);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createInc(ExpressionNode* value, bool post, const location& loc)
-        {
+        ExpressionNode* createInc(ExpressionNode* value, bool post, const location& loc) {
             ExpressionNode* node = new UnaryNode(Member::INC, value, post);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createAdd(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createAdd(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::ADD, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createSub(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createSub(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::SUB, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createMul(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createMul(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::MUL, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createDiv(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createDiv(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::DIV, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createLsh(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createLsh(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::LSH, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createRsh(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createRsh(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::RSH, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createOr(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc)
-        {
+        ExpressionNode* createOr(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::OR, left, right, logic);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createAnd(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc)
-        {
+        ExpressionNode* createAnd(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::AND, left, right, logic);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createEq(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createEq(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::EQ, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createNeq(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createNeq(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::NEQ, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createGe(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createGe(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::GE, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createLe(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createLe(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::LE, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createGt(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createGt(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::GT, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createLt(ExpressionNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createLt(ExpressionNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new BinaryNode(Member::LT, left, right);
             node->setLocation(loc);
             return node;
         }
 
-        ExpressionNode* createAssign(MutableNode* left, ExpressionNode* right, const location& loc)
-        {
+        ExpressionNode* createAssign(MutableNode* left, ExpressionNode* right, const location& loc) {
             ExpressionNode* node = new AssignNode(left, right);
             node->setLocation(loc);
             return node;
@@ -285,22 +262,19 @@ namespace lang {
         //===--------------------------------------------------------------===//
         //    Statements
         //===--------------------------------------------------------------===//
-        StatementNode* createReturn(const location& loc)
-        {
+        StatementNode* createReturn(const location& loc) {
             StatementNode* node = new ReturnStatement(scope());
             node->setLocation(loc);
             return node;
         }
 
-        StatementNode* createReturn(ExpressionNode* result, const location& loc)
-        {
+        StatementNode* createReturn(ExpressionNode* result, const location& loc) {
             StatementNode* node = new ReturnStatement(scope(), result);
             node->setLocation(loc);
             return node;
         }
 
-        StatementNode* createPrint(ExpressionNode* result, const location& loc)
-        {
+        StatementNode* createPrint(ExpressionNode* result, const location& loc) {
             StatementNode* node = new PrintStatement(scope(), result);
             node->setLocation(loc);
             return node;
@@ -316,6 +290,12 @@ namespace lang {
         /// declare call
         CallNode* call(const Identifier& name);
 
+        /// declare call
+        CallNode* call(ExpressionNode* expr, const Identifier& name);
+
+        /// declare call
+        CallNode* call(ExpressionNode* expr);
+
         /// end current call
         CallNode* callEnd();
 
@@ -324,35 +304,34 @@ namespace lang {
         //===--------------------------------------------------------------===//
 
         // constructor
-        NodeFactory(Context* context)
-        : m_context(context) { }
+        NodeFactory(Context* context, Type* thisType)
+        : m_context(context), m_this(thisType) { }
 
         // returns begin of functions vector
-        std::vector<FunctionNode*>::const_iterator func_begin() const
-        {
+        std::vector<FunctionNode*>::const_iterator func_begin() const {
             return m_functions.begin();
         }
 
         // returns end of functions vector
-        std::vector<FunctionNode*>::const_iterator func_end() const
-        {
+        std::vector<FunctionNode*>::const_iterator func_end() const {
             return m_functions.end();
         }
 
         // returns begin of fields vector
-        std::vector<FieldNode*>::const_iterator field_begin() const
-        {
+        std::vector<FieldNode*>::const_iterator field_begin() const {
             return m_fields.begin();
         }
 
         // returns end of fields vector
-        std::vector<FieldNode*>::const_iterator field_end() const
-        {
+        std::vector<FieldNode*>::const_iterator field_end() const {
             return m_fields.end();
         }
     protected:
         /// Current context
         Context* m_context;
+
+        /// This type
+        Type* m_this;
 
         /// Stack of current parse functions
         std::stack<FunctionNode*> m_funcs;

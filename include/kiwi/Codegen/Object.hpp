@@ -13,10 +13,10 @@ namespace codegen {
         ObjectEmitter(ObjectType* type);
 
         /// emit instructions for load value from object field
-        ExpressionGen emitLoad(const StatementGen& gen, const Identifier& name);
+        ExpressionGen emitLoad(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name);
 
         /// emit instructions for store value in object field
-        ExpressionGen emitStore(const StatementGen& gen, const Identifier& name, const ExpressionGen& value);
+        ExpressionGen emitStore(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name, const ExpressionGen& value);
 
         /// emit instruction for create new instance of class
         ExpressionGen emitNew(const StatementGen& gen);
@@ -24,10 +24,10 @@ namespace codegen {
         ObjectType* m_type;
 
         /// Returns pointer to value of field obkect
-        ExpressionGen findField(const StatementGen& gen, const Identifier& name);
+        ExpressionGen findField(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name);
 
         /// Returns pointer to method of object
-        ExpressionGen findMethod(const StatementGen& gen, const Identifier& name);
+        ExpressionGen findMethod(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name);
     };
 
 }} // namespace kiwi::codegen

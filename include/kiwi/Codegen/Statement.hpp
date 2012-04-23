@@ -19,7 +19,7 @@ namespace codegen {
     class StatementGen {
     public:
         /// constructor
-        StatementGen(Type* owner, llvm::BasicBlock* block, llvm::Value* thisValue);
+        StatementGen(Type* owner, llvm::BasicBlock* block);
 
         /// copy constructor
         StatementGen(const StatementGen& gen);
@@ -55,12 +55,6 @@ namespace codegen {
         {
             return m_block;
         }
-
-        /// returns this value
-        llvm::Value* getThisValue() const {
-            return m_thisValue;
-        }
-
     protected:
         /// Owner type
         Type*m_owner;
@@ -76,9 +70,6 @@ namespace codegen {
 
         /// LLVM block
         llvm::BasicBlock* m_block;
-
-        /// LLVM this value
-        llvm::Value* m_thisValue;
     }; // class StatementGen
 
 }} /// namespace kiwi::codegen
