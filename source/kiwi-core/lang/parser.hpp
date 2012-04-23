@@ -269,7 +269,7 @@ namespace kiwi { namespace lang {
     /* Tables.  */
     /// For a state, the index in \a yytable_ of its portion.
     static const short int yypact_[];
-    static const signed char yypact_ninf_;
+    static const short int yypact_ninf_;
 
     /// For a state, default rule to reduce.
     /// Unless\a  yytable_ specifies something else to do.
@@ -313,7 +313,7 @@ namespace kiwi { namespace lang {
     /// A `-1'-separated list of the rules' RHS.
     static const rhs_number_type yyrhs_[];
     /// For each rule, the index of the first RHS symbol in \a yyrhs_.
-    static const unsigned char yyprhs_[];
+    static const unsigned short int yyprhs_[];
     /// For each rule, its source line number.
     static const unsigned short int yyrline_[];
     /// For each scanner token number, its symbol number.

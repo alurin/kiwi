@@ -7,42 +7,59 @@
 #include "kiwi/Codegen/Expression.hpp"
 #include "kiwi/Codegen/Variable.hpp"
 #include <llvm/Instructions.h>
+#include <llvm/BasicBlock.h>
 
 using namespace kiwi;
 using namespace kiwi::lang;
 using namespace kiwi::codegen;
 
 StatementNode::StatementNode(ScopeNode* parent)
-: o_owner(parent->o_owner), o_parent(parent) { }
+: o_owner(parent->o_owner), o_parent(parent) {
+}
 
 StatementNode::StatementNode(FunctionNode* parent)
-: o_owner(parent), o_parent(0) { }
+: o_owner(parent), o_parent(0) {
+}
 
 // constructor
 ReturnStatement::ReturnStatement(ScopeNode* parent)
-: StatementNode(parent), m_return(0) {}
+: StatementNode(parent), m_return(0) {
+
+}
 
 // constructor
 ReturnStatement::ReturnStatement(ScopeNode* parent, ExpressionNode* result)
-: StatementNode(parent), m_return(result) {}
+: StatementNode(parent), m_return(result) {
+
+}
 
 // destructor
-ReturnStatement::~ReturnStatement()
-{
+ReturnStatement::~ReturnStatement() {
     delete m_return;
 }
 // constructor
 PrintStatement::PrintStatement(ScopeNode* parent, ExpressionNode* result)
-: StatementNode(parent), m_return(result) {}
+: StatementNode(parent), m_return(result) {
+
+}
 
 // destructor
-PrintStatement::~PrintStatement()
-{
+PrintStatement::~PrintStatement() {
     delete m_return;
 }
+
+/// constructor
+ConditionalNode::ConditionalNode(ScopeNode* parent, ExpressionNode* cond, StatementNode* trueStmt, StatementNode* falseStmt)
+: StatementNode(parent), m_cond(cond) , m_trueStmt(trueStmt) , m_falseStmt(falseStmt) {
+}
+
+/// destructor
+ConditionalNode::~ConditionalNode() {
+
+}
+
 // emit instructions for return statement
-StatementGen ReturnStatement::emit(const StatementGen& gen)
-{
+StatementGen ReturnStatement::emit(const StatementGen& gen) {
     if (m_return) {
         /// @todo check equals of return type
         ExpressionGen result = m_return->emit(gen);
@@ -56,8 +73,7 @@ StatementGen ReturnStatement::emit(const StatementGen& gen)
 }
 
 // emit instructions for print statement
-StatementGen PrintStatement::emit(const StatementGen& gen)
-{
+StatementGen PrintStatement::emit(const StatementGen& gen) {
     // emit operand
     ExpressionGen result = m_return->emit(gen);
 
@@ -70,4 +86,31 @@ StatementGen PrintStatement::emit(const StatementGen& gen)
         return op->getEmitter()->emit(result, result);
     }
     throw "not found unary operator";
+}
+
+/// emit instructions for statement
+StatementGen ConditionalNode::emit(const StatementGen& gen) {
+    llvm::BasicBlock* blockTrue  = llvm::BasicBlock::Create(gen.getContext(), "true", gen.getFunction());
+    llvm::BasicBlock* blockFalse = llvm::BasicBlock::Create(gen.getContext(), "false", gen.getFunction());
+    llvm::BasicBlock* blockNext  = llvm::BasicBlock::Create(gen.getContext(), "next", gen.getFunction());
+
+    StatementGen genTrue(gen.getOwner(), blockTrue);
+    StatementGen genFalse(gen.getOwner(), blockFalse);
+    StatementGen genNext(gen.getOwner(), blockNext);
+
+    ExpressionGen result = m_cond->emit(gen);
+    llvm::Value* cond = result.getValue();
+    if (!cond->getType()->isIntegerTy(1)) {
+        throw "Condition must be boolean";
+    }
+
+    /// Emit branches
+    if (m_trueStmt)  genTrue  = m_trueStmt->emit(genTrue);
+    if (m_falseStmt) genFalse = m_falseStmt->emit(genFalse);
+
+    llvm::BranchInst::Create(blockTrue, blockFalse, cond, result.getBlock());
+    llvm::BranchInst::Create(blockNext, 0, 0, genTrue.getBlock());
+    llvm::BranchInst::Create(blockNext, 0, 0, genFalse.getBlock());
+
+    return genNext;
 }

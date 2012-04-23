@@ -10,6 +10,7 @@ Source code clean up
 * Clean up memory leaks!!!
 * Move all LLVM code from syntax nodes and metadata
 * Warning and errors
+* Variable initilizator position in statement!!!
 
 Runtime
 -------

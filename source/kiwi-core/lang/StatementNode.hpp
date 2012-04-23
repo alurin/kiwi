@@ -73,6 +73,24 @@ namespace lang
     protected:
         ExpressionNode* m_return;
     };
+
+    /// Conditional statement syntax node (if-then-else)
+    class ConditionalNode : public StatementNode {
+    public:
+        /// constructor
+        ConditionalNode(ScopeNode* parent, ExpressionNode* cond, StatementNode* trueStmt, StatementNode* falseStmt);
+
+        /// destructor
+        ~ConditionalNode();
+
+        /// emit instructions for statement
+        virtual StatementGen emit(const StatementGen& gen);
+    protected:
+        ExpressionNode* m_cond;
+        StatementNode*  m_trueStmt;
+        StatementNode*  m_falseStmt;
+    };
+
 }}
 
 #endif

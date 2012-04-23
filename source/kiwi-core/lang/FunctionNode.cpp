@@ -134,11 +134,11 @@ NamedNode* ScopeNode::get(const Identifier& name) {
 }
 
 void ScopeNode::append(StatementNode* scope) {
-    m_stmts.push_back(scope);
+    if (scope) m_stmts.push_back(scope);
 }
 
 void ScopeNode::append(ExpressionNode* expr) {
-    append(new ExpressionStatementNode(this, expr));
+    if (expr) append(new ExpressionStatementNode(this, expr));
 }
 
 MutableNode* ArgumentNode::getLeft() {

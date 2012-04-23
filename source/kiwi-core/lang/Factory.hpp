@@ -60,49 +60,35 @@ namespace lang {
 
         // returns left expression for instance node
         MutableNode* instanceLeft(const Identifier& name, const location& loc) {
-            MutableNode* node = new InstanceMutableNode(name);
-            node->setLocation(loc);
-            return node;
+            return inject(new InstanceMutableNode(name), loc);
         }
 
         /// returns right expression for instance node
         ExpressionNode* instanceRight(const Identifier& name, const location& loc) {
-            ExpressionNode* node = new InstanceExpressionNode(name);
-            node->setLocation(loc);
-            return node;
+            return inject(new InstanceExpressionNode(name), loc);
         }
 
         //===--------------------------------------------------------------===//
         //    Types
         //===--------------------------------------------------------------===//
         TypeNode* createVoidTy(const location& loc) {
-            TypeNode* node = new ConcreteTypeNode(VoidType::get(m_context));
-            node->setLocation(loc);
-            return node;
+            return inject(new ConcreteTypeNode(VoidType::get(m_context)), loc);
         }
 
         TypeNode* createIntTy(const location& loc) {
-            TypeNode* node = new ConcreteTypeNode(IntType::get32(m_context));
-            node->setLocation(loc);
-            return node;
+            return inject(new ConcreteTypeNode(IntType::get32(m_context)), loc);
         }
 
         TypeNode* createBoolTy(const location& loc) {
-            TypeNode* node = new ConcreteTypeNode(BoolType::get(m_context));
-            node->setLocation(loc);
-            return node;
+            return inject(new ConcreteTypeNode(BoolType::get(m_context)), loc);
         }
 
         TypeNode* createStringTy(const location& loc) {
-            TypeNode* node = new ConcreteTypeNode(StringType::get(m_context));
-            node->setLocation(loc);
-            return node;
+            return inject(new ConcreteTypeNode(StringType::get(m_context)), loc);
         }
 
         TypeNode* createCharTy(const location& loc) {
-            TypeNode* node = new ConcreteTypeNode(CharType::get(m_context));
-            node->setLocation(loc);
-            return node;
+            return inject(new ConcreteTypeNode(CharType::get(m_context)), loc);
         }
 
         TypeNode* createArrayTy(TypeNode* type, const location& loc) {
@@ -113,27 +99,19 @@ namespace lang {
         //    Constants
         //===--------------------------------------------------------------===//
         ExpressionNode* createInt(int32_t value, const location& loc) {
-            ExpressionNode* node = new IntegerConstNode(m_context, value);
-            node->setLocation(loc);
-            return node;
+            return inject(new IntegerConstNode(m_context, value), loc);
         }
 
         ExpressionNode* createString(const String& value, const location& loc) {
-            ExpressionNode* node = new StringConstNode(m_context, value);
-            node->setLocation(loc);
-            return node;
+            return inject(new StringConstNode(m_context, value), loc);
         }
 
         ExpressionNode* createChar(const UChar& value, const location& loc) {
-            ExpressionNode* node = new CharConstNode(m_context, value);
-            node->setLocation(loc);
-            return node;
+            return inject(new CharConstNode(m_context, value), loc);
         }
 
         ExpressionNode* createBool(bool value, const location& loc) {
-            ExpressionNode* node = new BoolConstNode(m_context, value);
-            node->setLocation(loc);
-            return node;
+            return inject(new BoolConstNode(m_context, value), loc);
         }
 
         ExpressionNode* createThis(const location& loc);
@@ -142,144 +120,105 @@ namespace lang {
         //    Expressions
         //===--------------------------------------------------------------===//
         ExpressionNode* createNeg(ExpressionNode* value, const location& loc) {
-            ExpressionNode* node = new UnaryNode(Member::NEG, value);
-            node->setLocation(loc);
-            return node;
+            return inject(new UnaryNode(Member::NEG, value), loc);
         }
 
         ExpressionNode* createPos(ExpressionNode* value, const location& loc) {
-            ExpressionNode* node = new UnaryNode(Member::POS, value);
-            node->setLocation(loc);
-            return node;
+            return inject(new UnaryNode(Member::POS, value), loc);
         }
 
         ExpressionNode* createNot(ExpressionNode* value, const location& loc) {
-            ExpressionNode* node = new UnaryNode(Member::NOT, value);
-            node->setLocation(loc);
-            return node;
+            return inject(new UnaryNode(Member::NOT, value), loc);
         }
 
         ExpressionNode* createDec(ExpressionNode* value, bool post, const location& loc) {
-            ExpressionNode* node = new UnaryNode(Member::DEC, value, post);
-            node->setLocation(loc);
-            return node;
+            return inject(new UnaryNode(Member::DEC, value, post), loc);
         }
 
         ExpressionNode* createInc(ExpressionNode* value, bool post, const location& loc) {
-            ExpressionNode* node = new UnaryNode(Member::INC, value, post);
-            node->setLocation(loc);
-            return node;
+            return inject(new UnaryNode(Member::INC, value, post), loc);
         }
 
         ExpressionNode* createAdd(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::ADD, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::ADD, left, right), loc);
         }
 
         ExpressionNode* createSub(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::SUB, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::SUB, left, right), loc);
         }
 
         ExpressionNode* createMul(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::MUL, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::MUL, left, right), loc);
         }
 
         ExpressionNode* createDiv(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::DIV, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::DIV, left, right), loc);
         }
 
         ExpressionNode* createLsh(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::LSH, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::LSH, left, right), loc);
         }
 
         ExpressionNode* createRsh(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::RSH, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::RSH, left, right), loc);
         }
 
         ExpressionNode* createOr(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::OR, left, right, logic);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::OR, left, right, logic), loc);
         }
 
         ExpressionNode* createAnd(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::AND, left, right, logic);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::AND, left, right, logic), loc);
         }
 
         ExpressionNode* createEq(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::EQ, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::EQ, left, right), loc);
         }
 
         ExpressionNode* createNeq(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::NEQ, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::NEQ, left, right), loc);
         }
 
         ExpressionNode* createGe(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::GE, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::GE, left, right), loc);
         }
 
         ExpressionNode* createLe(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::LE, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::LE, left, right), loc);
         }
 
         ExpressionNode* createGt(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::GT, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::GT, left, right), loc);
         }
 
         ExpressionNode* createLt(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new BinaryNode(Member::LT, left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new BinaryNode(Member::LT, left, right), loc);
         }
 
         ExpressionNode* createAssign(MutableNode* left, ExpressionNode* right, const location& loc) {
-            ExpressionNode* node = new AssignNode(left, right);
-            node->setLocation(loc);
-            return node;
+            return inject(new AssignNode(left, right), loc);
         }
 
         //===--------------------------------------------------------------===//
         //    Statements
         //===--------------------------------------------------------------===//
+        StatementNode* createExpr(ExpressionNode* expr) {
+            return inject(new ExpressionStatementNode(scope(), expr), expr->getLocation());
+        }
         StatementNode* createReturn(const location& loc) {
-            StatementNode* node = new ReturnStatement(scope());
-            node->setLocation(loc);
-            return node;
+            return inject(new ReturnStatement(scope()), loc);
         }
 
         StatementNode* createReturn(ExpressionNode* result, const location& loc) {
-            StatementNode* node = new ReturnStatement(scope(), result);
-            node->setLocation(loc);
-            return node;
+            return inject(new ReturnStatement(scope(), result), loc);
         }
 
         StatementNode* createPrint(ExpressionNode* result, const location& loc) {
-            StatementNode* node = new PrintStatement(scope(), result);
-            node->setLocation(loc);
-            return node;
+            return inject(new PrintStatement(scope(), result), loc);
+        }
+
+        StatementNode* createCond(ExpressionNode* cond, StatementNode* trueStmt, StatementNode* falseStmt, const location& loc) {
+            return inject(new ConditionalNode(scope(), cond, trueStmt, falseStmt), loc);
         }
 
         //===--------------------------------------------------------------===//
@@ -349,6 +288,15 @@ namespace lang {
 
         /// List of parsed fields
         std::vector<FieldNode*> m_fields;
+
+        //===--------------------------------------------------------------===//
+        //    Utils
+        //===--------------------------------------------------------------===//
+        template<typename NodeT>
+        NodeT* inject(NodeT* node, const location& loc) {
+            node->setLocation(loc);
+            return node;
+        }
     };
 
 }}

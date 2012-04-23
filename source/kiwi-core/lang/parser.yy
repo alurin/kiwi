@@ -132,12 +132,12 @@
 %type   <typenode>      type type_complex type_primary
 %type   <rightnode>     expression right
 %type   <leftnode>      left
-%type   <stmtnode>      scope scope_end return_statement print_statement
+%type   <stmtnode>      statement scope scope_end return_statement print_statement conditional_statement
 
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
 %destructor { delete $$; } expression right
 %destructor { delete $$; } type type_complex type_primary
-%destructor { delete $$; } scope scope_end return_statement print_statement
+%destructor { delete $$; } statement scope scope_end return_statement print_statement conditional_statement
 %destructor { delete $$; } STRING
 
  /*** END EXAMPLE - Change the example grammar's tokens above ***/
@@ -202,30 +202,43 @@ function_statement
 //==------------------------------------------------------------------------==//
 statements
     : /** empty */
-    | expression ';'        { driver.scope()->append($1); } statements
-    | scope                 { driver.scope()->append($1); } statements
-    | return_statement      { driver.scope()->append($1); } statements
-    | print_statement       { driver.scope()->append($1); } statements
-    | variable_declare ';' statements
+    | statement { driver.scope()->append($1); } statements
     | ';'
     ;
 
+statement
+    : expression       ';'       { $$ = driver.createExpr($1);       }
+    | scope
+    | conditional_statement
+    | return_statement ';'
+    | print_statement  ';'
+    | variable_declare ';'       { $$ = 0; }
+    ;
+
 scope
-    : '{'                   { driver.scopeBegin();    }
-        scope_end           { $$ = $3;                }
+    : '{'                        { driver.scopeBegin();              }
+        scope_end                { $$ = $3;                          }
     ;
 
 scope_end
-    : statements '}'        { $$ = driver.scopeEnd(); }
+    : statements '}'             { $$ = driver.scopeEnd();           }
     ;
 
 return_statement
-    : RETURN ';'                    { $$ = driver.createReturn(@1);     }
-    | RETURN expression ';'         { $$ = driver.createReturn($2, @1); }
+    : RETURN                     { $$ = driver.createReturn(@1);     }
+    | RETURN expression          { $$ = driver.createReturn($2, @1); }
     ;
 
 print_statement
-    : PRINT expression  ';'         { $$ = driver.createPrint($2, @1);  }
+    : PRINT expression           { $$ = driver.createPrint($2, @1);  }
+
+//==------------------------------------------------------------------------==//
+//      Conditional statement
+//==------------------------------------------------------------------------==//
+conditional_statement
+    : IF '(' expression ')' statement                { $$ = driver.createCond($3, $5, 0,  @1); }
+    | IF '(' expression ')' statement ELSE statement { $$ = driver.createCond($3, $5, $7, @1); }
+    ;
 
 //==------------------------------------------------------------------------==//
 //      Calls
