@@ -1,5 +1,4 @@
 #include "kiwi/Engine.hpp"
-#include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 using namespace kiwi;
 
@@ -47,9 +46,10 @@ int main(int argc, char const *argv[])
     /// Run application
     //
     int result = 0;
-    startup();
+
     {
-        Context* context = Context::create();
+        ContextEngine engine;
+        Context* context = engine.get();
         context->setOptimizationLevel(opt);
         context->setDebug(vm.count("debug"));
 
@@ -79,7 +79,5 @@ int main(int argc, char const *argv[])
             result = 1;
         }
     }
-
-    shutdown();
     return result;
 }

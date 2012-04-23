@@ -4,18 +4,15 @@
 using namespace kiwi;
 
 // start up runtime
-void kiwi_startup()
-{
+void kiwi_startup() {
     startup();
 }
 
-// shut down runtime
-void kiwi_shutdown()
+// shut down runtime void kiwi_shutdown()
 {
     shutdown();
 }
 
 // dummy
-void kiwi_dummy()
-{
+void kiwi_dummy() {
 }

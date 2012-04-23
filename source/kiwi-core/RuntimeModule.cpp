@@ -9,13 +9,7 @@
 
 using namespace kiwi;
 
-#include <iostream>
-
-extern "C"
-void kiwi_print_string(UChar* buffer, int32_t lenght);
-
-void kiwi::initRuntimeModule(Module* mod)
-{
+void kiwi::initRuntimeModule(Module* mod) {
     llvm::Module*       module = mod->getModule();
     llvm::LLVMContext& context = module->getContext();
     llvm::Type*       voidType = llvm::Type::getVoidTy(context);

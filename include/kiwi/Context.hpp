@@ -12,8 +12,8 @@ namespace llvm
 
 namespace kiwi
 {
-    /// Internal framework metadata
-    class ContextMeta;
+    /// Storage for internal context metadata
+    class ContextImpl;
 
     /**
      * General enter point for Kiwi compiler infrastructure
@@ -21,8 +21,7 @@ namespace kiwi
      * @author Vasiliy Sheredeko
      * @since 2012-04-15
      */
-    class Context
-    {
+    class Context {
         Context(const Context&);                ///< NOT IMPLEMENT!!!
         Context& operator=(const Context&);     ///< NOT IMPLEMENT!!!
     public:
@@ -38,8 +37,8 @@ namespace kiwi
         }
 
         /// returns internal context metadata
-        ContextMeta* getMetadata() const {
-            return m_meta;
+        ContextImpl* getMetadata() const {
+            return m_metadata;
         }
 
         /// Is scanner and parser debug mode
@@ -63,7 +62,7 @@ namespace kiwi
         }
     protected:
         llvm::LLVMContext*  m_context;
-        ContextMeta*        m_meta;
+        ContextImpl*        m_metadata;
 
         int8_t              m_optimizationLevel;
         bool                m_debug;

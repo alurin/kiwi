@@ -1,4 +1,4 @@
-#include "ContextMeta.hpp"
+#include "ContextImpl.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/DerivedTypes.hpp"
@@ -60,54 +60,46 @@ StringType::StringType(Module* module)
     m_typeID                   = StringID;
 }
 
-IntType* IntType::create(Module* module, int32_t size, bool unsign)
-{
+IntType* IntType::create(Module* module, int32_t size, bool unsign) {
     IntType* type = new IntType(module, size, unsign);
     type->initializate();
     return type;
 }
 
-BoolType* BoolType::create(Module* module)
-{
+BoolType* BoolType::create(Module* module) {
     BoolType* type = new BoolType(module);
     type->initializate();
     return type;
 }
 
-VoidType* VoidType::create(Module* module)
-{
+VoidType* VoidType::create(Module* module) {
     VoidType* type = new VoidType(module);
     return type;
 }
 
-CharType* CharType::create(Module* module)
-{
+CharType* CharType::create(Module* module) {
     CharType* type = new CharType(module);
     type->initializate();
     return type;
 }
 
-StringType* StringType::create(Module* module)
-{
+StringType* StringType::create(Module* module) {
     StringType* type = new StringType(module);
     type->initializate();
     return type;
 }
 
-ObjectType* ObjectType::create(Module* module)
-{
+ObjectType* ObjectType::create(Module* module) {
     ObjectType* type = new ObjectType(module);
     return type;
 }
 
-ObjectType* ObjectType::create(Module* module, const Identifier& name)
-{
+ObjectType* ObjectType::create(Module* module, const Identifier& name) {
     ObjectType* type = new ObjectType(module);
     return type;
 }
 
-void IntType::initializate()
-{
+void IntType::initializate() {
     Context* context = m_module->getContext();
     Type* boolTy = BoolType::get(context);
     Type* voidTy = VoidType::get(context);
@@ -130,8 +122,7 @@ void IntType::initializate()
     add(UnaryOperator::PRINT, voidTy, new LlvmIntegerPrintOperator());
 }
 
-void BoolType::initializate()
-{
+void BoolType::initializate() {
     Context* context = m_module->getContext();
     Type*     voidTy = VoidType::get(context);
     Type*     boolTy = this;
@@ -142,8 +133,7 @@ void BoolType::initializate()
     add(UnaryOperator::PRINT, voidTy, new LlvmBoolPrintOperator());
 }
 
-void CharType::initializate()
-{
+void CharType::initializate() {
     Context* context = m_module->getContext();
     Type*     boolTy = BoolType::get(context);
     Type*     voidTy = VoidType::get(context);
@@ -152,8 +142,7 @@ void CharType::initializate()
     add(UnaryOperator::PRINT, voidTy, new LlvmCharPrintOperator());
 }
 
-void StringType::initializate()
-{
+void StringType::initializate() {
     Context* context = m_module->getContext();
     Type*     charTy = CharType::get(context);
     Type*     boolTy = BoolType::get(context);
@@ -170,33 +159,28 @@ void StringType::initializate()
     add(UnaryOperator::PRINT, voidTy, new LlvmStringPrintOperator());
 }
 
-IntType* IntType::get32(Context* context)
-{
-    ContextMeta* meta = context->getMetadata();
+IntType* IntType::get32(Context* context) {
+    ContextImpl* meta = context->getMetadata();
     return meta->int32Ty;
 }
 
-BoolType* BoolType::get(Context* context)
-{
-    ContextMeta* meta = context->getMetadata();
+BoolType* BoolType::get(Context* context) {
+    ContextImpl* meta = context->getMetadata();
     return meta->boolTy;
 }
 
-VoidType* VoidType::get(Context* context)
-{
-    ContextMeta* meta = context->getMetadata();
+VoidType* VoidType::get(Context* context) {
+    ContextImpl* meta = context->getMetadata();
     return meta->voidTy;
 }
 
-CharType* CharType::get(Context* context)
-{
-    ContextMeta* meta = context->getMetadata();
+CharType* CharType::get(Context* context) {
+    ContextImpl* meta = context->getMetadata();
     return meta->charTy;
 }
 
-StringType* StringType::get(Context* context)
-{
-    ContextMeta* meta = context->getMetadata();
+StringType* StringType::get(Context* context) {
+    ContextImpl* meta = context->getMetadata();
     return meta->stringTy;
 }
 

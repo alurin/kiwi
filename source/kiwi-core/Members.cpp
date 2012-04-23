@@ -1,4 +1,4 @@
-#include "ContextMeta.hpp"
+#include "ContextImpl.hpp"
 #include "kiwi/Codegen/Emitter.hpp"
 #include "kiwi/Type.hpp"
 #include "kiwi/Members.hpp"
@@ -52,11 +52,9 @@ Field::~Field() {}
 
 // constructor
 Method::Method(const Identifier& name, Type* ownerType, Type* resultType, std::vector<Type*> arguments)
-: Member(ownerType), m_name(name), m_resultType(resultType), m_func(0)
-{
+: Member(ownerType), m_name(name), m_resultType(resultType), m_func(0) {
     m_memberID = MethodID;
-    for (std::vector<Type*>::iterator i = arguments.begin(); i != arguments.end(); ++i)
-    {
+    for (std::vector<Type*>::iterator i = arguments.begin(); i != arguments.end(); ++i) {
         Type* type    = *i;
         Argument* arg = new Argument(this, type, m_arguments.size());
         m_arguments.push_back(arg);
@@ -64,7 +62,12 @@ Method::Method(const Identifier& name, Type* ownerType, Type* resultType, std::v
 }
 
 // destructor
-Method::~Method() {}
+Method::~Method() {
+    for (std::vector<Argument*>::const_iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
+        Argument* arg = *i;
+        delete arg;
+    }
+}
 
 // constructor
 Argument::Argument(Method* owner, Type* type, int32_t position)

@@ -6,8 +6,7 @@
 #include <unicode/uclean.h>
 
 // start up runtime
-void kiwi::startup()
-{
+void kiwi::startup() {
     UErrorCode errorCode;
     kiwi_dummy();                       // Include kiwi-runtime dummy
     u_init(&errorCode);                 // ICU
@@ -16,8 +15,7 @@ void kiwi::startup()
 }
 
 // shut down runtime
-void kiwi::shutdown()
-{
+void kiwi::shutdown() {
     llvm::llvm_shutdown();              // LLVM
     u_cleanup();                        // ICU
 }

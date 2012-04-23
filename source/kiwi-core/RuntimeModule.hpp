@@ -3,8 +3,7 @@
 
 #include "kiwi/Module.hpp"
 
-namespace kiwi
-{
+namespace kiwi {
     void initRuntimeModule(Module* module);
 }
 

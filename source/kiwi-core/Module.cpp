@@ -1,3 +1,5 @@
+#include "ContextImpl.hpp"
+#include "ModuleImpl.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "lang/Driver.hpp"
@@ -20,8 +22,8 @@ typedef void    (*VoidMainPoint)();
 typedef int32_t (*ReturnMainPoint)();
 
 Module::Module(const Identifier& name, Context* context)
-: m_name(name), m_context(context), m_module(0), m_engine(0)
-{
+: m_name(name), m_context(context), m_module(0), m_engine(0), m_metadata(new ModuleImpl()) {
+    m_context->getMetadata()->modules.push_back(this);
     m_module = new llvm::Module(name, context->getContext());
     m_engine = llvm::EngineBuilder(m_module).create();
 
@@ -31,17 +33,20 @@ Module::Module(const Identifier& name, Context* context)
 }
 
 Module::~Module() {
+    for (std::vector<Type*>::iterator i = m_metadata->types.begin(); i != m_metadata->types.end(); ++i) {
+        Type* type = *i;
+        delete type;
+    }
+    delete m_metadata;
     delete m_module;
 }
 
-Module* Module::create(const Identifier& name, Context* ref)
-{
+Module* Module::create(const Identifier& name, Context* ref) {
     Module* module = new Module(name, ref);
     return module;
 }
 
-void Module::includeFile(const Path& filename)
-{
+void Module::includeFile(const Path& filename) {
     Context* context = getContext();
     lang::Driver driver(context);
     if (driver.parseFile(filename)) {
@@ -68,8 +73,7 @@ void Module::includeFile(const Path& filename)
 
 // Build module
 /// @todo Constant propagation pass not worked
-void Module::build()
-{
+void Module::build() {
     llvm::FunctionPassManager   funcManager(m_module);
     llvm::PassManager           moduleManager;
 
@@ -117,14 +121,12 @@ void Module::build()
 }
 
 // Dump module
-void Module::dump()
-{
+void Module::dump() {
     m_module->dump();
 }
 
 // Run module main function
-int32_t Module::run()
-{
+int32_t Module::run() {
     llvm::Function* mainFunc = m_module->getFunction("main");
 
     if (mainFunc) {

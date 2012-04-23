@@ -1,4 +1,4 @@
-#include "ContextMeta.hpp"
+#include "ContextImpl.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "RuntimeModule.hpp"
@@ -6,34 +6,37 @@
 
 using namespace kiwi;
 
-Context::Context()
-: m_context(0), m_meta(new ContextMeta()), m_optimizationLevel(1), m_debug(false)
-{
+ContextImpl::ContextImpl()
+: runtime(0), boolTy(0), int32Ty(0), voidTy(0), charTy(0), stringTy(0) {
+}
 
+Context::Context()
+: m_context(0), m_metadata(new ContextImpl()), m_optimizationLevel(1), m_debug(false) {
 }
 
 Context::~Context() {
+    for (std::vector<Module*>::iterator i = m_metadata->modules.begin(); i != m_metadata->modules.end(); ++i) {
+        Module* module = *i;
+        delete module;
+    }
+    delete m_metadata;
     delete m_context;
-    delete m_meta;
 }
 
-Context* Context::create()
-{
+Context* Context::create() {
     Context* context = new Context();
     context->initializate();
     return context;
 }
 
-void Context::initializate()
-{
-    m_context = new llvm::LLVMContext();
+void Context::initializate() {
+    m_context            = new llvm::LLVMContext();
+    m_metadata->runtime  = Module::create("system", this);
+    m_metadata->boolTy   = BoolType::create(m_metadata->runtime);
+    m_metadata->int32Ty  = IntType::create(m_metadata->runtime, 32, false);
+    m_metadata->voidTy   = VoidType::create(m_metadata->runtime);
+    m_metadata->charTy   = CharType::create(m_metadata->runtime);
+    m_metadata->stringTy = StringType::create(m_metadata->runtime);
 
-    Module* module = Module::create("system", this);
-    m_meta->boolTy = BoolType::create(module);
-    m_meta->int32Ty = IntType::create(module, 32, false);
-    m_meta->voidTy = VoidType::create(module);
-    m_meta->charTy = CharType::create(module);
-    m_meta->stringTy = StringType::create(module);
-
-    initRuntimeModule(module);
+    initRuntimeModule(m_metadata->runtime);
 }

@@ -1,4 +1,5 @@
-#include "ContextMeta.hpp"
+#include "ContextImpl.hpp"
+#include "ModuleImpl.hpp"
 #include "kiwi/Type.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Context.hpp"
@@ -15,9 +16,31 @@ using namespace kiwi;
 using namespace kiwi::codegen;
 
 Type::Type(Module* module)
-: m_typeID((TypeID) 0), m_module(module), m_varType(0) { }
+: m_typeID((TypeID) 0), m_module(module), m_varType(0) {
+    m_module->getMetadata()->types.push_back(this);
+}
 
-Type::~Type() { }
+Type::~Type() {
+    for (std::vector<UnaryOperator*>::iterator i = m_unary.begin(); i != m_unary.end(); ++i) {
+        UnaryOperator* op = *i;
+        delete op;
+    }
+
+    for (std::vector<BinaryOperator*>::iterator i = m_binary.begin(); i != m_binary.end(); ++i) {
+        BinaryOperator* op = *i;
+        delete op;
+    }
+
+    for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i) {
+        Field* field = *i;
+        delete field;
+    }
+
+    for (std::vector<Method*>::iterator i = m_methods.begin(); i != m_methods.end(); ++i) {
+        Method* method = *i;
+        delete method;
+    }
+}
 
 // add binary operator
 UnaryOperator* Type::add(
