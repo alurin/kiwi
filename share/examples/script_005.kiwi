@@ -2,19 +2,19 @@
 /* Test script for conditional statements */
 
 void summa(string $message, int $a, int $b) {
-    print $message; print ": ";
+    string $val;
     if ($a < $b) {
-        print "ON";
+        $val = "ON";
     } else {
-        print "OFF";
+        $val = "OFF";
     }
-    print "\n";
+    print $message; print ": "; print $val; print "\n";
 }
 
 void main() {
     auto $a = 10;
     auto $b = 12;
 
-    // summa("A < B", $a, $b);
-    // summa("B < A", $a, $b);
+    summa("A < B", $a, $b);
+    summa("B < A", $b, $a);
 }

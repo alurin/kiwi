@@ -13,10 +13,6 @@
 #include <llvm/GlobalVariable.h>
 #include <llvm/Instructions.h>
 
-#define KIWI_ERROR_AND_EXIT(message, location) \
-    driver.error(location, message); \
-    throw message
-
 using namespace kiwi;
 using namespace kiwi::lang;
 using namespace kiwi::codegen;

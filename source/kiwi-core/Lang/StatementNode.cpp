@@ -1,3 +1,4 @@
+#include "Driver.hpp"
 #include "StatementNode.hpp"
 #include "FunctionNode.hpp"
 #include "ExpressionNode.hpp"
@@ -8,6 +9,7 @@
 #include "kiwi/Codegen/Variable.hpp"
 #include <llvm/Instructions.h>
 #include <llvm/BasicBlock.h>
+#include <llvm/Support/IRBuilder.h>
 
 using namespace kiwi;
 using namespace kiwi::lang;
@@ -85,14 +87,14 @@ StatementGen PrintStatement::emit(Driver& driver, const StatementGen& gen) {
     if (op) {
         return op->getEmitter()->emit(result, result);
     }
-    throw "not found unary operator";
+    KIWI_ERROR_AND_EXIT("not found unary operator", getLocation());
 }
 
 /// emit instructions for statement
 StatementGen ConditionalNode::emit(Driver& driver, const StatementGen& gen) {
-    llvm::BasicBlock* blockTrue  = llvm::BasicBlock::Create(gen.getContext(), "true", gen.getFunction());
+    llvm::BasicBlock* blockTrue  = llvm::BasicBlock::Create(gen.getContext(), "true",  gen.getFunction());
     llvm::BasicBlock* blockFalse = llvm::BasicBlock::Create(gen.getContext(), "false", gen.getFunction());
-    llvm::BasicBlock* blockNext  = llvm::BasicBlock::Create(gen.getContext(), "next", gen.getFunction());
+    llvm::BasicBlock* blockNext  = llvm::BasicBlock::Create(gen.getContext(), "next",  gen.getFunction());
 
     StatementGen genTrue(gen.getOwner(), blockTrue);
     StatementGen genFalse(gen.getOwner(), blockFalse);
@@ -101,16 +103,16 @@ StatementGen ConditionalNode::emit(Driver& driver, const StatementGen& gen) {
     ExpressionGen result = m_cond->emit(driver, gen);
     llvm::Value* cond = result.getValue();
     if (!cond->getType()->isIntegerTy(1)) {
-        throw "Condition must be boolean";
+        KIWI_ERROR_AND_EXIT("Condition must be boolean", m_cond->getLocation());
     }
 
     /// Emit branches
     if (m_trueStmt)  genTrue  = m_trueStmt->emit(driver, genTrue);
     if (m_falseStmt) genFalse = m_falseStmt->emit(driver, genFalse);
 
-    llvm::BranchInst::Create(blockTrue, blockFalse, cond, result.getBlock());
-    llvm::BranchInst::Create(blockNext, 0, 0, genTrue.getBlock());
-    llvm::BranchInst::Create(blockNext, 0, 0, genFalse.getBlock());
+    llvm::IRBuilder<>(result.getBlock()).CreateCondBr(cond, blockTrue, blockFalse);
+    llvm::IRBuilder<>(genFalse.getBlock()).CreateBr(blockNext);
+    llvm::IRBuilder<>(genTrue.getBlock()).CreateBr(blockNext);
 
     return genNext;
 }

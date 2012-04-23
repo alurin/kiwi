@@ -4,6 +4,10 @@
 #include "kiwi/Config.hpp"
 #include "location.hh"
 
+#define KIWI_ERROR_AND_EXIT(message, location) \
+    driver.error(location, message); \
+    throw message
+
 namespace kiwi { namespace lang {
 
     /// Root for all statements nodes
