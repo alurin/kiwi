@@ -1,6 +1,11 @@
 #!/usr/bin/env kiwi
-/* Test script for conditional statements */
+/* Test script for recursive call ( as loop :) ) */
 
-void main() a {
+void loop(int $a) {
+    print $a; print "\n";
+    if ($a > 0) loop($a - 1);
+}
 
+void main() {
+    loop(4);
 }

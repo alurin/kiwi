@@ -1,9 +1,12 @@
 #include "ContextImpl.hpp"
+#include "Codegen/LlvmEmitter.hpp"
+
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Members.hpp"
-#include "Codegen/LlvmEmitter.hpp"
+#include "kiwi/Support/Array.hpp"
+
 #include <llvm/Constants.h>
 #include <llvm/GlobalVariable.h>
 #include <llvm/DerivedTypes.h>
@@ -105,21 +108,21 @@ void IntType::initializate() {
     Type* voidTy = VoidType::get(context);
     Type* intTy = this;
 
-    add(UnaryOperator::POS,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Add, intTy));
-    add(UnaryOperator::NEG,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Sub, intTy));
+    add(Member::Pos,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Add, intTy));
+    add(Member::Neg,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Sub, intTy));
 
-    add(BinaryOperator::ADD, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Add, intTy));
-    add(BinaryOperator::SUB, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Sub, intTy));
-    add(BinaryOperator::MUL, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Mul, intTy));
+    add(Member::Add, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Add, intTy));
+    add(Member::Sub, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Sub, intTy));
+    add(Member::Mul, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Mul, intTy));
 
-    add(BinaryOperator::EQ,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
-    add(BinaryOperator::NEQ, boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
-    add(BinaryOperator::GT,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGT, context));
-    add(BinaryOperator::GE,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGE, context));
-    add(BinaryOperator::LE,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLT, context));
-    add(BinaryOperator::LT,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLE, context));
+    add(Member::Eq,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
+    add(Member::Neq, boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
+    add(Member::Gt,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGT, context));
+    add(Member::Ge,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGE, context));
+    add(Member::Le,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLT, context));
+    add(Member::Lt,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLE, context));
 
-    add(UnaryOperator::PRINT, voidTy, new LlvmIntegerPrintOperator());
+    add(Member::Print, voidTy, new LlvmIntegerPrintOperator());
 }
 
 void BoolType::initializate() {
@@ -127,10 +130,10 @@ void BoolType::initializate() {
     Type*     voidTy = VoidType::get(context);
     Type*     boolTy = this;
 
-    add(BinaryOperator::EQ,  boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
-    add(BinaryOperator::NEQ, boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
+    add(Member::Eq,  boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
+    add(Member::Neq, boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
 
-    add(UnaryOperator::PRINT, voidTy, new LlvmBoolPrintOperator());
+    add(Member::Print, voidTy, new LlvmBoolPrintOperator());
 }
 
 void CharType::initializate() {
@@ -139,7 +142,7 @@ void CharType::initializate() {
     Type*     voidTy = VoidType::get(context);
     Type*     charTy = this;
 
-    add(UnaryOperator::PRINT, voidTy, new LlvmCharPrintOperator());
+    add(Member::Print, voidTy, new LlvmCharPrintOperator());
 }
 
 void StringType::initializate() {
@@ -147,16 +150,22 @@ void StringType::initializate() {
     Type*     charTy = CharType::get(context);
     Type*     boolTy = BoolType::get(context);
     Type*     voidTy = VoidType::get(context);
+    Type*      intTy = IntType::get32(context);
     Type*   stringTy = this;
 
-    add(BinaryOperator::EQ,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_EQ, context));
-    add(BinaryOperator::NEQ, boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_NE, context));
-    add(BinaryOperator::GT,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGT, context));
-    add(BinaryOperator::GE,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGE, context));
-    add(BinaryOperator::LE,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLT, context));
-    add(BinaryOperator::LT,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLE, context));
+    add(Member::Eq,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_EQ, context));
+    add(Member::Neq, boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_NE, context));
+    add(Member::Gt,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGT, context));
+    add(Member::Ge,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGE, context));
+    add(Member::Le,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLT, context));
+    add(Member::Lt,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLE, context));
 
-    add(UnaryOperator::PRINT, voidTy, new LlvmStringPrintOperator());
+
+    add(Member::Subtraction, stringTy, stringTy, stringTy,          new LlvmStringConcatenate()); // a + b
+    add(Member::Subtraction, charTy,   makeVector(intTy, 0),        new LlvmStringSubtraction()); // [a]
+    add(Member::Subtraction, stringTy, makeVector(intTy, intTy, 0), new LlvmStringSubtraction()); // [a, b]
+
+    add(Member::Print, voidTy, new LlvmStringPrintOperator());
 }
 
 IntType* IntType::get32(Context* context) {

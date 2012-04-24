@@ -3,8 +3,11 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-UnaryEmitter::~UnaryEmitter()
-{ }
+UnaryEmitter::~UnaryEmitter() {
+}
 
-BinaryEmitter::~BinaryEmitter()
-{ }
+BinaryEmitter::~BinaryEmitter() {
+}
+
+MultiaryEmitter::~MultiaryEmitter() {
+}

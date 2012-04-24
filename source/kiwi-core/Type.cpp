@@ -1,10 +1,13 @@
 #include "ContextImpl.hpp"
 #include "ModuleImpl.hpp"
+#include "Codegen/LlvmEmitter.hpp"
+
 #include "kiwi/Type.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Members.hpp"
-#include "Codegen/LlvmEmitter.hpp"
+#include "kiwi/Support/Array.hpp"
+
 #include <llvm/Constants.h>
 #include <llvm/DerivedTypes.h>
 #include <llvm/GlobalVariable.h>
@@ -28,6 +31,11 @@ Type::~Type() {
 
     for (std::vector<BinaryOperator*>::iterator i = m_binary.begin(); i != m_binary.end(); ++i) {
         BinaryOperator* op = *i;
+        delete op;
+    }
+
+    for (std::vector<MultiaryOperator*>::iterator i = m_multiary.begin(); i != m_multiary.end(); ++i) {
+        MultiaryOperator* op = *i;
         delete op;
     }
 
@@ -65,6 +73,18 @@ BinaryOperator* Type::add(
     return op;
 }
 
+/// add multiary operator
+MultiaryOperator* Type::add(
+    Member::MultiaryOpcode opcode,
+    Type* resultType,
+    std::vector<Type*> arguments,
+    codegen::MultiaryEmitter* emitter
+) {
+    MultiaryOperator* op = new MultiaryOperator(opcode, this, resultType, arguments, emitter);
+    m_multiary.push_back(op);
+    return op;
+}
+
 // add field
 Field* Type::add(const Identifier& name, Type* fieldType) {
     Field* field = new Field(name, this, fieldType);
@@ -83,7 +103,7 @@ Method* Type::add(const Identifier& name, Type* resultType, std::vector<Type*> a
 UnaryOperator* Type::find(Member::UnaryOpcode opcode) {
     for (std::vector<UnaryOperator*>::iterator i = m_unary.begin(); i != m_unary.end(); ++i) {
         UnaryOperator* op = *i;
-        if (op->getOpcode() == opcode) {
+        if (op->getOpcode() == opcode&& op->hasSignature(makeVector(this, 0), true)) {
             return op;
         }
     }
@@ -94,7 +114,18 @@ UnaryOperator* Type::find(Member::UnaryOpcode opcode) {
 BinaryOperator* Type::find(Member::BinaryOpcode opcode, Type* operandType) {
     for (std::vector<BinaryOperator*>::iterator i = m_binary.begin(); i != m_binary.end(); ++i) {
         BinaryOperator* op = *i;
-        if (op->getOpcode() == opcode && operandType == op->getOperandType()) {
+        if (op->getOpcode() == opcode && op->hasSignature(makeVector(this, operandType, 0), true)) {
+            return op;
+        }
+    }
+    return 0;
+}
+
+// find binary operator
+MultiaryOperator* Type::find(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) {
+    for (std::vector<MultiaryOperator*>::iterator i = m_multiary.begin(); i != m_multiary.end(); ++i) {
+        MultiaryOperator* op = *i;
+        if (op->getOpcode() == opcode && op->hasSignature(arguments, true)) {
             return op;
         }
     }
@@ -116,18 +147,8 @@ Field* Type::find(const Identifier& name) {
 Method* Type::find(const Identifier& name, std::vector<Type*> arguments) {
     for (std::vector<Method*>::iterator i = m_methods.begin(); i != m_methods.end(); ++i) {
         Method* method = *i;
-        if (method->getName() == name) {
-            bool isAccept = true;
-            int j         = 0;
-            for (Method::const_iterator i = method->begin(); i != method->end(); ++i, ++j) {
-                Argument* arg = *i;
-                if (arg->getType() != arguments[j]) {
-                    isAccept = false;
-                    break;
-                }
-            }
-
-            if (isAccept) return method;
+        if (method->getName() == name && method->hasSignature(arguments, true)) {
+            return method;
         }
     }
     return 0;

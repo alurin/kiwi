@@ -22,34 +22,43 @@ namespace kiwi
             FieldID = 1,
             MethodID,
             BinaryOperatorID,
-            UnaryOperatorID
+            UnaryOperatorID,
+            MultiaryOperatorID,
         };
 
         /// Unary operation code
         enum UnaryOpcode {
-            POS = 1,
-            NEG,
-            NOT,
-            DEC,
-            INC,
-            PRINT
+            Pos = 1,
+            Neg,
+            Not,
+            Dec,  // [ Not implemented                  ]
+            Inc,  // [ Not implemented                  ]
+            Print // [ Remove in favor of console.print ]
         };
+
         /// Binary operation code
         enum BinaryOpcode {
-            ADD = 1,
-            SUB,
-            MUL,
-            DIV,
-            LSH,
-            RSH,
-            OR,
-            AND,
-            EQ,
-            NEQ,
-            GE,
-            LE,
-            GT,
-            LT
+            Add = 1,
+            Sub,
+            Mul,
+            Div,
+            Lsh,
+            Rsh,
+            Or,
+            And,
+            Eq,
+            Neq,
+            Ge,
+            Le,
+            Gt,
+            Lt
+        };
+
+        /// Multiary operation code
+        enum MultiaryOpcode {
+            // Append,      // [   ] =
+            Subtraction, // [...]
+            Invoke       // (   )
         };
     public:
         /// virtual destructor

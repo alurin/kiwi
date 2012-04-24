@@ -258,6 +258,11 @@ call_argument
     | expression                    { driver.call()->append($1);      }
     ;
 
+subtraction_args
+    : expression ',' subtraction_args { driver.sub()->append($1); }
+    | expression                      { driver.sub()->append($1); }
+    ;
+
 //==------------------------------------------------------------------------==//
 //      Expressions
 //==------------------------------------------------------------------------==//
@@ -292,6 +297,9 @@ expression
     | expression "<="  expression   { $$ = driver.createLe ($1, $3, @2); }
     | expression '>'   expression   { $$ = driver.createGt ($1, $3, @2); }
     | expression '<'   expression   { $$ = driver.createLt ($1, $3, @2); }
+
+    | expression                    { driver.subBegin($1);               }
+        '[' subtraction_args ']'    { $$ = driver.subEnd(@2);            }
 
     | IDENT                         { driver.call(*$1, @1); yyfree($1);  }
         '(' call_arguments ')'      { $$ = driver.callEnd();             }

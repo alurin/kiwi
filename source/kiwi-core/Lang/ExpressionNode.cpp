@@ -19,32 +19,28 @@ using namespace kiwi::codegen;
 
 
 BinaryNode::BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic)
-: m_opcode(opcode), m_left(left), m_right(right), m_logic(logic)
-{}
+: m_opcode(opcode), m_left(left), m_right(right), m_logic(logic) {
+}
 
-BinaryNode::~BinaryNode()
-{
+BinaryNode::~BinaryNode() {
     delete m_left;
     delete m_right;
 }
 
 UnaryNode::UnaryNode(Member::UnaryOpcode opcode, ExpressionNode* value, bool post)
-: m_opcode(opcode), m_value(value), m_post(post)
-{}
+: m_opcode(opcode), m_value(value), m_post(post) {
+}
 
-UnaryNode::~UnaryNode()
-{
+UnaryNode::~UnaryNode() {
     delete m_value;
 }
 
 AssignNode::AssignNode(MutableNode* left, ExpressionNode* right)
-: m_left(left), m_right(right)
-{
+: m_left(left), m_right(right) {
 
 }
 
-AssignNode::~AssignNode()
-{
+AssignNode::~AssignNode() {
     delete m_left;
     delete m_right;
 }
@@ -74,10 +70,12 @@ CharConstNode::CharConstNode(Context* context, const UChar& value)
 : m_context(context), m_value(value) { }
 
 CallNode::CallNode(ExpressionNode* calle, const Identifier& method)
-: m_calle(calle), m_method(method), m_hasNamed(false) {}
+: m_calle(calle), m_method(method), m_hasNamed(false) {
+}
 
 CallNode::CallNode(ExpressionNode* calle)
-: m_calle(calle), m_hasNamed(false) {}
+: m_calle(calle), m_hasNamed(false) {
+}
 
 InstanceMutableNode::InstanceMutableNode(const Identifier& name)
 : m_name(name) { }
@@ -88,8 +86,18 @@ InstanceExpressionNode::InstanceExpressionNode(const Identifier& name)
 ThisNode::ThisNode(ObjectType* thisType)
 : m_thisType(thisType) { }
 
-void CallNode::append(const Identifier& name, ExpressionNode* value)
-{
+SubtractionNode::SubtractionNode(ExpressionNode* expr)
+: m_expr(expr) {
+}
+
+SubtractionNode::~SubtractionNode() {
+    for (std::vector<ExpressionNode*>::iterator i = m_indexes.begin(); i != m_indexes.end(); ++i) {
+        ExpressionNode* node;
+        delete node;
+    }
+}
+
+void CallNode::append(const Identifier& name, ExpressionNode* value) {
     CallArgument arg;
     arg.Name     = name;
     arg.Position = m_arguments.size();
@@ -98,8 +106,7 @@ void CallNode::append(const Identifier& name, ExpressionNode* value)
     m_hasNamed = true;
 }
 
-void CallNode::append(ExpressionNode* value)
-{
+void CallNode::append(ExpressionNode* value) {
     CallArgument arg;
     arg.Name     = "";
     arg.Position = m_arguments.size();
@@ -107,8 +114,7 @@ void CallNode::append(ExpressionNode* value)
     m_arguments.push_back(arg);
 }
 
-ExpressionGen BinaryNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen BinaryNode::emit(Driver& driver, const StatementGen& gen) {
     // emit operands
     ExpressionGen left  = m_left->emit(driver, gen);
     ExpressionGen right = m_right->emit(driver, gen);
@@ -124,8 +130,7 @@ ExpressionGen BinaryNode::emit(Driver& driver, const StatementGen& gen)
     KIWI_ERROR_AND_EXIT("not found binary operator", getLocation());
 }
 
-ExpressionGen UnaryNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen UnaryNode::emit(Driver& driver, const StatementGen& gen) {
     // emit operand
     ExpressionGen value  = m_value->emit(driver, gen);
 
@@ -140,14 +145,12 @@ ExpressionGen UnaryNode::emit(Driver& driver, const StatementGen& gen)
     KIWI_ERROR_AND_EXIT("not found unary operator", getLocation());
 }
 
-ExpressionGen AssignNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen AssignNode::emit(Driver& driver, const StatementGen& gen) {
     ExpressionGen value = m_right->emit(driver, gen);
     return m_left->emit(driver, value);
 }
 
-ExpressionGen ArgumentMutableNode::emit(Driver& driver, const ExpressionGen& gen)
-{
+ExpressionGen ArgumentMutableNode::emit(Driver& driver, const ExpressionGen& gen) {
     VariableGen var = o_arg->getGenerator();
     if (var.getType() == gen.getType()) {
         llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
@@ -157,15 +160,13 @@ ExpressionGen ArgumentMutableNode::emit(Driver& driver, const ExpressionGen& gen
     KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
 }
 
-ExpressionGen ArgumentExpressionNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen ArgumentExpressionNode::emit(Driver& driver, const StatementGen& gen) {
     VariableGen var      = o_arg->getGenerator();
     llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, var.getType(), inst);
 }
 
-ExpressionGen VariableMutableNode::emit(Driver& driver, const ExpressionGen& gen)
-{
+ExpressionGen VariableMutableNode::emit(Driver& driver, const ExpressionGen& gen) {
     VariableGen var = o_var->getGenerator();
     if (var.getType() == gen.getType()) {
         llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
@@ -175,41 +176,35 @@ ExpressionGen VariableMutableNode::emit(Driver& driver, const ExpressionGen& gen
     KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
 }
 
-ExpressionGen VariableExpressionNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen VariableExpressionNode::emit(Driver& driver, const StatementGen& gen) {
     VariableGen var      = o_var->getGenerator();
     llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, var.getType(), inst);
 }
 
-ExpressionGen IntegerConstNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen IntegerConstNode::emit(Driver& driver, const StatementGen& gen) {
     llvm::APInt cst(32, m_value, false);
     llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
     return ExpressionGen(gen, IntType::get32(m_context), value);
 }
 
-ExpressionGen BoolConstNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen BoolConstNode::emit(Driver& driver, const StatementGen& gen) {
     llvm::APInt cst(1, m_value, false);
     llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
     return ExpressionGen(gen, BoolType::get(m_context), value);
 }
 
-ExpressionGen StringConstNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen StringConstNode::emit(Driver& driver, const StatementGen& gen) {
     return StringEmitter(StringType::get(m_context)).emit(gen, m_value);
 }
 
-ExpressionGen CharConstNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen CharConstNode::emit(Driver& driver, const StatementGen& gen) {
     llvm::APInt cst(16, m_value, true);
     llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
     return ExpressionGen(gen, CharType::get(m_context), value);
 }
 
-ExpressionGen CallNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen CallNode::emit(Driver& driver, const StatementGen& gen) {
     std::vector<Type*>          types;
     std::vector<llvm::Value*>   args;
 
@@ -249,8 +244,7 @@ ExpressionGen CallNode::emit(Driver& driver, const StatementGen& gen)
     }
 }
 
-ExpressionGen InstanceMutableNode::emit(Driver& driver, const ExpressionGen& gen)
-{
+ExpressionGen InstanceMutableNode::emit(Driver& driver, const ExpressionGen& gen) {
     Type* owner = gen.getOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
@@ -261,8 +255,7 @@ ExpressionGen InstanceMutableNode::emit(Driver& driver, const ExpressionGen& gen
     }
 }
 
-ExpressionGen InstanceExpressionNode::emit(Driver& driver, const StatementGen& gen)
-{
+ExpressionGen InstanceExpressionNode::emit(Driver& driver, const StatementGen& gen) {
     Type* owner = gen.getOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
@@ -280,4 +273,28 @@ ExpressionGen ThisNode::emit(Driver& driver, const StatementGen& gen) {
     }
     llvm::Argument* arg  = func->arg_begin();
     return ExpressionGen(gen, m_thisType, arg);
+}
+
+ExpressionGen SubtractionNode::emit(Driver& driver, const StatementGen& gen) {
+    // emit operand
+    ExpressionGen value  = m_expr->emit(driver, gen);
+    StatementGen current = value;
+    std::vector<ExpressionGen>  values;
+    std::vector<Type*>          types;
+
+    for (std::vector<ExpressionNode*>::iterator i = m_indexes.begin(); i != m_indexes.end(); ++i) {
+        ExpressionNode* node = *i;
+        ExpressionGen nodeGen = node->emit(driver, current);
+        current = nodeGen;
+
+        values.push_back(nodeGen);
+        types.push_back(nodeGen.getType());
+    }
+
+    // find emitter
+    Type* type = value.getType();
+    MultiaryOperator* op = type->find(Member::Subtraction, types);
+    if (op)
+        return op->getEmitter()->emit(current, values);
+    KIWI_ERROR_AND_EXIT("not found multiary operator", getLocation());
 }

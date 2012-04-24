@@ -5,6 +5,27 @@
 #include <stdint.h>
 #include <unicode/utypes.h>
 
+/**
+ * return substring from ustring
+ *
+ * @param buffer
+ * @param lenght
+ * @param indexAt
+ */
+KIWI_RUNTIME
+int32_t kiwi_subchar(UChar* buffer, int32_t lenght, int32_t indexAt);
+
+/**
+ * return substring from ustring
+ *
+ * @param buffer
+ * @param lenght
+ * @param indexAt
+ * @param countAt
+ */
+KIWI_RUNTIME
+int32_t kiwi_substring(UChar* buffer, int32_t lenght, int32_t indexAt, int32_t countAt);
+
 /// Print integer value in output stream
 KIWI_RUNTIME
 void kiwi_print_integer(int32_t value);

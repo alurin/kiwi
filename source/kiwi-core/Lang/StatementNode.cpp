@@ -81,7 +81,7 @@ StatementGen PrintStatement::emit(Driver& driver, const StatementGen& gen) {
 
     // find emitter
     Type* type = result.getType();
-    UnaryOperator* op = type->find(UnaryOperator::PRINT);
+    UnaryOperator* op = type->find(UnaryOperator::Print);
 
     // emit instruction
     if (op) {

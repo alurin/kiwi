@@ -120,84 +120,96 @@ namespace lang {
         //    Expressions
         //===--------------------------------------------------------------===//
         ExpressionNode* createNeg(ExpressionNode* value, const location& loc) {
-            return inject(new UnaryNode(Member::NEG, value), loc);
+            return inject(new UnaryNode(Member::Neg, value), loc);
         }
 
         ExpressionNode* createPos(ExpressionNode* value, const location& loc) {
-            return inject(new UnaryNode(Member::POS, value), loc);
+            return inject(new UnaryNode(Member::Pos, value), loc);
         }
 
         ExpressionNode* createNot(ExpressionNode* value, const location& loc) {
-            return inject(new UnaryNode(Member::NOT, value), loc);
+            return inject(new UnaryNode(Member::Not, value), loc);
         }
 
         ExpressionNode* createDec(ExpressionNode* value, bool post, const location& loc) {
-            return inject(new UnaryNode(Member::DEC, value, post), loc);
+            return inject(new UnaryNode(Member::Dec, value, post), loc);
         }
 
         ExpressionNode* createInc(ExpressionNode* value, bool post, const location& loc) {
-            return inject(new UnaryNode(Member::INC, value, post), loc);
+            return inject(new UnaryNode(Member::Inc, value, post), loc);
         }
 
         ExpressionNode* createAdd(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::ADD, left, right), loc);
+            return inject(new BinaryNode(Member::Add, left, right), loc);
         }
 
         ExpressionNode* createSub(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::SUB, left, right), loc);
+            return inject(new BinaryNode(Member::Sub, left, right), loc);
         }
 
         ExpressionNode* createMul(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::MUL, left, right), loc);
+            return inject(new BinaryNode(Member::Mul, left, right), loc);
         }
 
         ExpressionNode* createDiv(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::DIV, left, right), loc);
+            return inject(new BinaryNode(Member::Div, left, right), loc);
         }
 
         ExpressionNode* createLsh(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::LSH, left, right), loc);
+            return inject(new BinaryNode(Member::Lsh, left, right), loc);
         }
 
         ExpressionNode* createRsh(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::RSH, left, right), loc);
+            return inject(new BinaryNode(Member::Rsh, left, right), loc);
         }
 
         ExpressionNode* createOr(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc) {
-            return inject(new BinaryNode(Member::OR, left, right, logic), loc);
+            return inject(new BinaryNode(Member::Or, left, right, logic), loc);
         }
 
         ExpressionNode* createAnd(ExpressionNode* left, ExpressionNode* right, bool logic, const location& loc) {
-            return inject(new BinaryNode(Member::AND, left, right, logic), loc);
+            return inject(new BinaryNode(Member::And, left, right, logic), loc);
         }
 
         ExpressionNode* createEq(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::EQ, left, right), loc);
+            return inject(new BinaryNode(Member::Eq, left, right), loc);
         }
 
         ExpressionNode* createNeq(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::NEQ, left, right), loc);
+            return inject(new BinaryNode(Member::Neq, left, right), loc);
         }
 
         ExpressionNode* createGe(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::GE, left, right), loc);
+            return inject(new BinaryNode(Member::Ge, left, right), loc);
         }
 
         ExpressionNode* createLe(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::LE, left, right), loc);
+            return inject(new BinaryNode(Member::Le, left, right), loc);
         }
 
         ExpressionNode* createGt(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::GT, left, right), loc);
+            return inject(new BinaryNode(Member::Gt, left, right), loc);
         }
 
         ExpressionNode* createLt(ExpressionNode* left, ExpressionNode* right, const location& loc) {
-            return inject(new BinaryNode(Member::LT, left, right), loc);
+            return inject(new BinaryNode(Member::Lt, left, right), loc);
         }
 
         ExpressionNode* createAssign(MutableNode* left, ExpressionNode* right, const location& loc) {
             return inject(new AssignNode(left, right), loc);
         }
+
+        //===--------------------------------------------------------------===//
+        //    Subtraction expressions
+        //===--------------------------------------------------------------===//
+        // returns current subtraction
+        SubtractionNode* sub();
+
+        // begin new subtraction
+        SubtractionNode* subBegin(ExpressionNode* expr);
+
+        // end current subtraction
+        SubtractionNode* subEnd(const location& loc);
 
         //===--------------------------------------------------------------===//
         //    Statements
@@ -282,6 +294,9 @@ namespace lang {
 
         /// Stack of current parse calls
         std::stack<CallNode*> m_calls;
+
+        /// Stack of current parse substractions
+        std::stack<SubtractionNode*> m_subs;
 
         /// List of parsed functions
         std::vector<FunctionNode*> m_functions;

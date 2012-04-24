@@ -46,7 +46,7 @@ TEST(members_cast_check) // Declares a test named "members_cast_check"
 
     cast_checker<Field, Member>::check(type->add("field", type));
     cast_checker<Method, Member>::check(type->add("method", type, args));
-    cast_checker<UnaryOperator, Member>::check(type->add(Member::NOT, type, 0));
-    cast_checker<BinaryOperator, Member>::check(type->add(Member::ADD, type, type, 0));
+    cast_checker<UnaryOperator, Member>::check(type->add(Member::Not, type, 0));
+    cast_checker<BinaryOperator, Member>::check(type->add(Member::Add, type, type, 0));
     delete context;
 }

@@ -3,6 +3,7 @@
 
 #include "kiwi/Codegen/Expression.hpp"
 #include "kiwi/Codegen/Statement.hpp"
+#include <vector>
 
 namespace kiwi {
 namespace codegen {
@@ -27,6 +28,16 @@ namespace codegen {
         virtual ExpressionGen emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) =0;
     }; // class BinaryEmitter
 
+    class MultiaryEmitter {
+    public:
+        typedef std::vector<ExpressionGen> expressions;
+
+        /// virtual destructor
+        virtual ~MultiaryEmitter();
+
+        /// emit IR instruction for binary operation
+        virtual ExpressionGen emit(const StatementGen& gen, const expressions& values) =0;
+    };
 } // namespace codegen
 } // namespace kiwi
 

@@ -162,6 +162,28 @@ namespace lang {
         VariableNode* o_var;
     };
 
+    //==--------------------------------------------------------------------==//
+    /// Subtraction expression syntax node
+    class SubtractionNode : public ExpressionNode {
+    public:
+        /// constructo
+        SubtractionNode(ExpressionNode* expr);
+
+        /// destructor
+        ~SubtractionNode();
+
+        /// append expression
+        void append(ExpressionNode* expr) {
+            m_indexes.push_back(expr);
+        }
+
+        /// Emit instructions
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+    protected:
+        ExpressionNode* m_expr;
+        std::vector<ExpressionNode*> m_indexes;
+    };
+
     /// TODO: ADD COMMETS ====================================================//
     class InstanceMutableNode : public MutableNode {
     public:

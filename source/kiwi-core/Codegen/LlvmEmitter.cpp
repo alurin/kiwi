@@ -26,8 +26,7 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 : m_predicate(predicate), m_context(context) { }
 
 // emit instruction for interger unary operator
-ExpressionGen LlvmZeroUnaryOperator::emit(const StatementGen& gen, const ExpressionGen& value)
-{
+ExpressionGen LlvmZeroUnaryOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
     llvm::APInt cst(32, 0, false);
     llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
 
@@ -36,22 +35,19 @@ ExpressionGen LlvmZeroUnaryOperator::emit(const StatementGen& gen, const Express
 }
 
 // emit instruction for binary operator
-ExpressionGen LlvmBinaryOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right)
-{
+ExpressionGen LlvmBinaryOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) {
     llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, left.getValue(), right.getValue(), "", gen.getBlock());
     return ExpressionGen(gen, m_type, result);
 }
 
 // emit instruction for binary operator
-ExpressionGen LlvmIntegerCompareOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right)
-{
+ExpressionGen LlvmIntegerCompareOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) {
     llvm::Value* result = new llvm::ICmpInst(*(gen.getBlock()), m_predicate, left.getValue(), right.getValue(), "");
     return ExpressionGen(gen, BoolType::get(m_context), result);
 }
-#include <iostream>
+
 // emit instruction for binary operator
-ExpressionGen LlvmStringCompareOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right)
-{
+ExpressionGen LlvmStringCompareOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) {
     // create stub for u_strCompare
     llvm::Module*       module = gen.getModule();
     llvm::LLVMContext& context = gen.getContext();
@@ -107,8 +103,7 @@ ExpressionGen LlvmStringCompareOperator::emit(const StatementGen& gen, const Exp
     return ExpressionGen(gen, BoolType::get(m_context), result);
 }
 
-ExpressionGen LlvmIntegerPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value)
-{
+ExpressionGen LlvmIntegerPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
     llvm::Module*       module = gen.getModule();
     llvm::LLVMContext& context = gen.getContext();
     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
@@ -124,8 +119,7 @@ ExpressionGen LlvmIntegerPrintOperator::emit(const StatementGen& gen, const Expr
     return ExpressionGen(gen, value.getType(), value.getValue());
 }
 
-ExpressionGen LlvmBoolPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value)
-{
+ExpressionGen LlvmBoolPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
     llvm::Module*       module = gen.getModule();
     llvm::LLVMContext& context = gen.getContext();
     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
@@ -141,8 +135,7 @@ ExpressionGen LlvmBoolPrintOperator::emit(const StatementGen& gen, const Express
     return ExpressionGen(gen, value.getType(), value.getValue());
 }
 
-ExpressionGen LlvmCharPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value)
-{
+ExpressionGen LlvmCharPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
     llvm::Module*       module = gen.getModule();
     llvm::LLVMContext& context = gen.getContext();
     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
@@ -159,8 +152,7 @@ ExpressionGen LlvmCharPrintOperator::emit(const StatementGen& gen, const Express
 }
 
 // emit print for string
-ExpressionGen LlvmStringPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value)
-{
+ExpressionGen LlvmStringPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
     // create stub for u_strCompare
     llvm::Module*       module = gen.getModule();
     llvm::LLVMContext& context = gen.getContext();
@@ -185,8 +177,7 @@ ExpressionGen LlvmStringPrintOperator::emit(const StatementGen& gen, const Expre
 }
 
 /// emit reduce string as size and buffer
-StatementGen LlvmStringEmitter::emit(const StatementGen& gen, const ExpressionGen& value)
-{
+StatementGen LlvmStringEmitter::emit(const StatementGen& gen, const ExpressionGen& value) {
     llvm::Module*       module = gen.getModule();
     llvm::LLVMContext& context = gen.getContext();
     llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
@@ -219,4 +210,27 @@ StatementGen LlvmStringEmitter::emit(const StatementGen& gen, const ExpressionGe
     m_lengthValue = length;
     m_bufferValue = buffer;
     return gen;
+}
+
+/// emit IR instruction for string concatenate
+ExpressionGen LlvmStringConcatenate::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) {
+
+}
+
+/// emit IR instruction for string substraction
+ExpressionGen LlvmStringSubtraction::emit(const StatementGen& gen, const expressions& values) {
+    llvm::Module*       module = gen.getModule();
+    llvm::LLVMContext& context = gen.getContext();
+    llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
+    llvm::Type*     charType   = llvm::IntegerType::get(context, 16)->getPointerTo();
+
+    if (values.size() == 1) {
+        /// substraction of character from string
+
+    } else if (values.size() == 2) {
+        /// substraction of substring from string
+
+    } else {
+        throw "Not implemented";
+    }
 }

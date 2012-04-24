@@ -124,3 +124,25 @@ ExpressionNode* NodeFactory::createThis(const location& loc) {
     node->setLocation(loc);
     return node;
 }
+
+// returns current subtraction
+SubtractionNode* NodeFactory::sub() {
+    assert(!m_subs.empty() && "Subtractions stack is empty");
+    return m_subs.top();
+}
+
+// begin new subtraction
+SubtractionNode* NodeFactory::subBegin(ExpressionNode* expr) {
+    SubtractionNode* sub = new SubtractionNode(expr);
+    m_subs.push(sub);
+    return sub;
+}
+
+// end current subtraction
+SubtractionNode* NodeFactory::subEnd(const location& loc) {
+    assert(!m_subs.empty() && "Subtractions stack is empty");
+    SubtractionNode* sub = m_subs.top();
+    sub->setLocation(loc);
+    m_subs.pop();
+    return sub;
+}

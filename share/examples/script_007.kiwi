@@ -1,0 +1,7 @@
+#!/usr/bin/env kiwi
+/* Test script for strings */
+
+void main() {
+    // [] - multi operators
+    // () - multi operators
+}

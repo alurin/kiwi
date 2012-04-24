@@ -12,6 +12,7 @@ namespace kiwi {
     namespace codegen {
         class UnaryEmitter;
         class BinaryEmitter;
+        class MultiaryEmitter;
     };
     class Context;
     class Module;
@@ -19,6 +20,7 @@ namespace kiwi {
     class Type;
     class BinaryOperator;
     class UnaryOperator;
+    class MultiaryOperator;
     class Method;
     class Field;
 
@@ -70,6 +72,14 @@ namespace kiwi {
             codegen::BinaryEmitter* emitter
         );
 
+        /// add binary operator
+        MultiaryOperator* add(
+            Member::MultiaryOpcode opcode,
+            Type* resultType,
+            std::vector<Type*> arguments,
+            codegen::MultiaryEmitter* emitter
+        );
+
         /// add field
         Field* add(const Identifier& name, Type* type);
 
@@ -81,6 +91,9 @@ namespace kiwi {
 
         /// find binary operator
         BinaryOperator* find(Member::BinaryOpcode opcode, Type* operandType);
+
+        /// find binary operator
+        MultiaryOperator* find(Member::MultiaryOpcode opcode, std::vector<Type*> arguments);
 
         /// find field operator
         Field* find(const Identifier& name);
@@ -102,6 +115,9 @@ namespace kiwi {
 
         /// List of binary operators
         std::vector<BinaryOperator*> m_binary;
+
+        /// List of multiary operators
+        std::vector<MultiaryOperator*> m_multiary;
 
         /// List of methods
         std::vector<Method*> m_methods;

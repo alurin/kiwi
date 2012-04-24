@@ -6,17 +6,114 @@
 
 namespace kiwi
 {
-    class Argument;
-    class Method;
+    class Callable;
 
     namespace codegen {
         class UnaryEmitter;
         class BinaryEmitter;
+        class MultiaryEmitter;
+    };
+
+    //==--------------------------------------------------------------------==//
+    /// Method argument
+    class Argument {
+        friend class Callable;
+    public:
+        /// return argument owner
+        Callable* getOwner() const {
+            return m_owner;
+        }
+
+        /// returns argument name
+        Identifier getName() const {
+            return m_name;
+        }
+
+        /// set argument name
+        void setName(const Identifier& name) {
+            m_name = name;
+        }
+
+        /// returns argument type
+        Type* getType () const {
+            return m_type;
+        }
+
+        /// returns argument position
+        int32_t getPosition() const {
+            return m_position;
+        }
+    protected:
+        /// argument owner method
+        Callable* m_owner;
+
+        /// argument name
+        Identifier m_name;
+
+        /// argument type
+        Type* m_type;
+
+        /// argument position
+        int32_t m_position;
+
+        Argument(Callable* owner, Type* type, int32_t position);
+    };
+
+    //==--------------------------------------------------------------------==//
+    /// Callable member, common base for all operators and methods
+    class Callable : public Member {
+    public:
+        typedef std::vector<Type*>      tlist;
+        typedef std::vector<Argument*>  avector;
+        typedef avector::const_iterator const_iterator;
+
+        /// virtual destructo
+        virtual ~Callable();
+
+        /// returns callable's return type
+        Type* getReturnType() const {
+            return m_returnType;
+        }
+
+        /// returns size of arguments
+        size_t size() const {
+            return m_args.size();
+        }
+
+        /// empty arguments?
+        bool empty() const {
+            return m_args.empty();
+        }
+
+        /// Check signature
+        bool hasSignature(const tlist& argTypes, bool isCast = false);
+
+        /// returns pointer to first argument from callable (iterator)
+        const_iterator begin() const {
+            return m_args.begin();
+        }
+
+        /// return pointer after last argument from callable (iterator)
+        const_iterator end() const {
+            return m_args.end();
+        }
+    protected:
+        /// return type
+        Type* m_returnType;
+
+        /// list of arguments
+        avector m_args;
+
+        /// constructor
+        Callable(Type* ownerType, Type* returnType);
+
+        /// constructor
+        Callable(Type* ownerType, Type* returnType, tlist argTypes);
     };
 
     //==--------------------------------------------------------------------==//
     /// Unary operator
-    class UnaryOperator : public Member {
+    class UnaryOperator : public Callable {
         friend class Type;
     public:
         /// virtual destructor
@@ -48,7 +145,6 @@ namespace kiwi
         }
     protected:
         UnaryOpcode             m_opcode;
-        Type*                m_returnType;
         codegen::UnaryEmitter*  m_emitter;
 
         /// constructor
@@ -62,7 +158,7 @@ namespace kiwi
 
     //==--------------------------------------------------------------------==//
     /// Binary operator
-    class BinaryOperator : public Member {
+    class BinaryOperator : public Callable {
         friend class Type;
     public:
         /// virtual destructor
@@ -71,18 +167,6 @@ namespace kiwi
         /// returns binary opcode
         BinaryOpcode getOpcode() const {
             return m_opcode;
-        }
-
-        /// return result type
-        /// @nostable
-        Type* getReturnType() const {
-            return m_returnType;
-        }
-
-        /// return second operator type
-        /// @nostable
-        Type* getOperandType() const {
-            return m_operandType;
         }
 
         /// return IR code emitter
@@ -101,8 +185,6 @@ namespace kiwi
         }
     protected:
         BinaryOpcode             m_opcode;
-        Type*                 m_returnType;
-        Type*                 m_operandType;
         codegen::BinaryEmitter*  m_emitter;
 
         /// constructor
@@ -117,67 +199,43 @@ namespace kiwi
 
     //==--------------------------------------------------------------------==//
     /// Method argument
-    class Argument {
-        friend class Method;
+    class MultiaryOperator : public Callable {
+        friend class Type;
     public:
-        /// return argument owner
-        Method* getOwner() const {
-            return m_owner;
+        /// destructor
+        ~MultiaryOperator();
+
+        /// returns multiary opcode
+        MultiaryOpcode getOpcode() const {
+            return m_opcode;
         }
 
-        /// returns argument name
-        Identifier getName() const {
-            return m_name;
-        }
-
-        /// set argument name
-        void setName(const Identifier& name) {
-            m_name = name;
-        }
-
-        /// returns argument type
-        Type* getType () const {
-            return m_type;
-        }
-
-        /// returns argument position
-        int32_t getPosition() const {
-            return m_position;
+        /// return multiary emitter
+        codegen::MultiaryEmitter* getEmitter() const {
+            return m_emitter;
         }
     protected:
-        /// argument owner method
-        Method* m_owner;
+        MultiaryOpcode            m_opcode;
+        codegen::MultiaryEmitter* m_emitter;
 
-        /// argument name
-        Identifier m_name;
-
-        /// argument type
-        Type* m_type;
-
-        /// argument position
-        int32_t m_position;
-
-        Argument(Method* owner, Type* type, int32_t position);
+        // constructor
+        MultiaryOperator(
+            MultiaryOpcode opcode,
+            Type* ownerType,
+            Type* resultType,
+            tlist argTypes,
+            codegen::MultiaryEmitter* emitter
+        );
     };
 
     //==--------------------------------------------------------------------==//
     /// Method member
-    class Method : public Member {
+    class Method : public Callable {
         friend class Type;
     public:
-        typedef std::vector<Argument*>::const_iterator const_iterator;
-
-        /// virtual destructor
-        virtual ~Method();
-
         /// Returns method name
         Identifier getName() const {
             return m_name;
-        }
-
-        /// returns method result type
-        Type* getReturnType() const {
-            return m_returnType;
         }
 
         /// returns this is static method?
@@ -200,11 +258,6 @@ namespace kiwi
             m_func = func;
         }
 
-        /// returns first argument (iterator)
-        const_iterator begin() const { return m_arguments.begin(); }
-        /// returns last argument (iterator)
-        const_iterator end()   const { return m_arguments.end();   }
-
         /// classof check
         static bool classof(class Member* type) {
             return type->getMemberID() == MethodID;
@@ -215,11 +268,8 @@ namespace kiwi
             return true;
         }
     protected:
-        Identifier m_name;
-        Type* m_ownerType;
-        Type* m_returnType;
-        std::vector<Argument*> m_arguments;
-        llvm::Function* m_func;
+        Identifier          m_name;
+        llvm::Function*     m_func;
 
         Method(const Identifier& name, Type* ownerType, Type* resultType, std::vector<Type*> arguments);
     };

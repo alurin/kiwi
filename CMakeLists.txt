@@ -77,6 +77,11 @@ INCLUDE_DIRECTORIES(${LLVM_INCLUDE_DIRS})
 LINK_DIRECTORIES(${LLVM_LIBRARY_DIRS})
 
 #
+# Locate External Projects
+#
+
+
+#
 # Configure Files
 #
 FILE (GLOB_RECURSE CONFIGINPUTS1 include/*.in.hpp.cmake)
