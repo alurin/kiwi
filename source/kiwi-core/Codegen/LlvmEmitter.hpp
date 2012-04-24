@@ -152,7 +152,7 @@ namespace codegen {
     }; /// class LlvmStringEmitter
 
     //==--------------------------------------------------------------------==//
-    class LlvmStringConcatenate {
+    class LlvmStringConcatenate : public BinaryEmitter {
     public:
         /// emit llvm operator
         virtual ExpressionGen emit(
@@ -160,7 +160,7 @@ namespace codegen {
             const ExpressionGen& left,
             const ExpressionGen& right
         );
-    } /// class LlvmStringConcatenate
+    }; /// class LlvmStringConcatenate
 
     //==--------------------------------------------------------------------==//
     class LlvmStringSubtraction : public MultiaryEmitter {

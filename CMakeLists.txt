@@ -79,7 +79,8 @@ LINK_DIRECTORIES(${LLVM_LIBRARY_DIRS})
 #
 # Locate External Projects
 #
-
+INCLUDE(ExternalProject)
+EXTERNALPROJECT_ADD(bdwgc PREFIX ${CMAKE_BINARY_DIR}/bdwgc SOURCE_DIR ${MAINFOLDER}/vendor/lib/bdwgc INSTALL_COMMAND "")
 
 #
 # Configure Files

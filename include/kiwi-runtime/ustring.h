@@ -8,9 +8,9 @@
 /**
  * return substring from ustring
  *
- * @param buffer
- * @param lenght
- * @param indexAt
+ * @param buffer    The input string
+ * @param lenght    The number of UChar code units
+ * @param indexAt   The index of character
  */
 KIWI_RUNTIME
 int32_t kiwi_subchar(UChar* buffer, int32_t lenght, int32_t indexAt);
@@ -18,10 +18,10 @@ int32_t kiwi_subchar(UChar* buffer, int32_t lenght, int32_t indexAt);
 /**
  * return substring from ustring
  *
- * @param buffer
- * @param lenght
- * @param indexAt
- * @param countAt
+ * @param buffer    The input string
+ * @param lenght    The number of UChar code units
+ * @param indexAt   The index of first character
+ * @param countAt   The
  */
 KIWI_RUNTIME
 int32_t kiwi_substring(UChar* buffer, int32_t lenght, int32_t indexAt, int32_t countAt);
