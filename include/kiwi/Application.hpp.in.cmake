@@ -1,5 +1,5 @@
-#ifndef KIWI_CONFIG_INCLUDED
-#define KIWI_CONFIG_INCLUDED
+#ifndef KIWI_APPLICATION_INCLUDED
+#define KIWI_APPLICATION_INCLUDED
 
 #include <boost/preprocessor/stringize.hpp>
 

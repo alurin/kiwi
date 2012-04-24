@@ -126,6 +126,7 @@ ENDFOREACH (CONFIGINPUT ${CONFIGINPUTS})
 ADD_SUBDIRECTORY(source/kiwi-core)
 ADD_SUBDIRECTORY(source/kiwi-runtime)
 ADD_SUBDIRECTORY(source/kiwi-compiler)
+ADD_SUBDIRECTORY(source/kiwi-interpreter)
 ADD_SUBDIRECTORY(test)
 
 #

@@ -103,12 +103,20 @@ namespace kiwi {
 
         /// emit type metadata and structure
         virtual void emit();
+
+        /// returns name of type
+        Identifier getName() const {
+            return m_name;
+        }
     protected:
         /// Class uniqual identifier
         TypeID m_typeID;
 
         /// Type module
         Module* m_module;
+
+        /// Name of type
+        Identifier m_name;
 
         /// List of unary operators
         std::vector<UnaryOperator*> m_unary;

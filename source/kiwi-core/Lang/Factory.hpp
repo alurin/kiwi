@@ -6,6 +6,7 @@
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
 #include "TypeNode.hpp"
+#include "CompoundNode.hpp"
 #include "location.hh"
 #include <vector>
 #include <stack>
@@ -19,6 +20,18 @@ namespace lang {
     public:
         // destructor
         virtual ~NodeFactory();
+
+        //===--------------------------------------------------------------===//
+        //    Classes
+        //===--------------------------------------------------------------===//
+        /// returns current function
+        CompoundNode* classTop();
+
+        /// declare function
+        CompoundNode* classBegin(const Identifier& name, const location& loc);
+
+        /// end current function
+        CompoundNode* classEnd();
 
         //===--------------------------------------------------------------===//
         //    Functions
@@ -35,7 +48,9 @@ namespace lang {
         //===--------------------------------------------------------------===//
         //    Functions
         //===--------------------------------------------------------------===//
-        FieldNode* field(const Identifier& name, TypeNode* type);
+        FieldNode* field(const Identifier& name, TypeNode* type) {
+            return new FieldNode(name, type);
+        }
 
         //===--------------------------------------------------------------===//
         //    Scopes
@@ -89,6 +104,10 @@ namespace lang {
 
         TypeNode* createCharTy(const location& loc) {
             return inject(new ConcreteTypeNode(CharType::get(m_context)), loc);
+        }
+
+        TypeNode* createQualifiedTy(const Identifier& qualified, const location& loc) {
+            return inject(new QualifiedTypeNode(qualified), loc);
         }
 
         TypeNode* createArrayTy(TypeNode* type, const location& loc) {
@@ -255,36 +274,40 @@ namespace lang {
         //===--------------------------------------------------------------===//
         //    Other staff
         //===--------------------------------------------------------------===//
-
-        // constructor
-        NodeFactory(Context* context, Type* thisType)
-        : m_context(context), m_this(thisType) { }
-
-        // returns begin of functions vector
-        std::vector<FunctionNode*>::const_iterator func_begin() const {
-            return m_functions.begin();
+        /// return context
+        Context* getContext() const {
+            return m_context;
         }
 
-        // returns end of functions vector
-        std::vector<FunctionNode*>::const_iterator func_end() const {
-            return m_functions.end();
+        /// returns module
+        Module* getModule() const;
+
+        /// returns iterator for compounds: begin
+        std::vector<CompoundNode*>::const_iterator begin() const {
+            return m_compounds.begin();
         }
 
-        // returns begin of fields vector
-        std::vector<FieldNode*>::const_iterator field_begin() const {
-            return m_fields.begin();
+        /// returns iterator for compounds: end
+        std::vector<CompoundNode*>::const_iterator end() const {
+            return m_compounds.end();
         }
 
-        // returns end of fields vector
-        std::vector<FieldNode*>::const_iterator field_end() const {
-            return m_fields.end();
+        // return count of compounds
+        size_t size() const {
+            return m_compounds.size();
         }
+
+        // prepare script level nodes
+        void prepareScript(const location& loc);
     protected:
         /// Current context
         Context* m_context;
 
         /// This type
         Type* m_this;
+
+        /// Stack of current parse functions
+        std::stack<CompoundNode*> m_classes;
 
         /// Stack of current parse functions
         std::stack<FunctionNode*> m_funcs;
@@ -298,11 +321,11 @@ namespace lang {
         /// Stack of current parse substractions
         std::stack<SubtractionNode*> m_subs;
 
-        /// List of parsed functions
-        std::vector<FunctionNode*> m_functions;
+        /// List of parsed classes
+        std::vector<CompoundNode*> m_compounds;
 
-        /// List of parsed fields
-        std::vector<FieldNode*> m_fields;
+        // constructor
+        NodeFactory(Context* context, Type* thisType);
 
         //===--------------------------------------------------------------===//
         //    Utils

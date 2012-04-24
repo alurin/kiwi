@@ -43,6 +43,7 @@
 {
     // initialize the initial location object
     @$.begin.filename = @$.end.filename = &driver.streamname;
+    driver.prepareScript(@$);
 };
 
 /* The driver is passed by reference to the parser and to the scanner. This
@@ -56,16 +57,17 @@
  /*** BEGIN EXAMPLE - Change the example grammar's tokens below ***/
 
 %union {
-    int                  integerVal;
-    double               doubleVal;
-    std::string*		 stringVal;
-    String*              ustringVal;
-    UChar                charVal;
+    int                     integerVal;
+    double                  doubleVal;
+    std::string*            stringVal;
+    String*                 ustringVal;
+    UChar                   charVal;
 
-    class TypeNode*		 typenode;
+    class TypeNode*         typenode;
     class MutableNode*      leftnode;
-    class ExpressionNode*     rightnode;
-    class StatementNode* stmtnode;
+    class ExpressionNode*   rightnode;
+    class StatementNode*    stmtnode;
+    class MemberNode*       membernode;
 }
 
 %token                  END             0   "end of file"
@@ -92,12 +94,12 @@
 %token                  OP_AOR              "|="
 
 %token  <stringVal>     IDENT               "identifier"
-
 %token  <integerVal>    INTEGER             "integer constant"
 %token  <ustringVal>    STRING              "string constant"
 %token  <charVal>       CHAR                "char constant"
 %token                  BOOL_TRUE           "true"
 %token                  BOOL_FALSE          "false"
+
 %token  <stringVal>     VAR_LOCAL           "local variable"
 %token  <stringVal>     VAR_INSTANCE        "instance attribute"
 
@@ -107,6 +109,10 @@
 %token                  TYPE_BOOL           "bool type"
 %token                  TYPE_CHAR           "char type"
 %token                  TYPE_STRING         "string type"
+
+%token                  CLASS               "class"
+%token                  INHERIT             "inherit"
+%token                  IMPLEMENT           "implement"
 
 %token                  THIS                "this"
 %token                  RETURN              "return"
@@ -133,12 +139,15 @@
 %type   <rightnode>     expression right
 %type   <leftnode>      left
 %type   <stmtnode>      statement scope scope_end return_statement print_statement conditional_statement
+%type   <membernode>    function field class_element
+%type   <stringVal>     qualified_identifier
 
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
 %destructor { delete $$; } expression right
 %destructor { delete $$; } type type_complex type_primary
 %destructor { delete $$; } statement scope scope_end return_statement print_statement conditional_statement
-%destructor { delete $$; } STRING
+%destructor { delete $$; } STRING qualified_identifier
+%destructor { delete $$; } function field class_element
 
  /*** END EXAMPLE - Change the example grammar's tokens above ***/
 
@@ -166,7 +175,7 @@
 //==------------------------------------------------------------------------==//
 
 field
-    : type VAR_INSTANCE ';'         { driver.field(*$2, $1); yyfree($2); }
+    : type VAR_INSTANCE ';'         { $$ = driver.field(*$2, $1); yyfree($2); }
     ;
 
 //==------------------------------------------------------------------------==//
@@ -175,8 +184,7 @@ field
 function
     : type IDENT                    { driver.func(*$2, $1); yyfree($2); }
       '(' function_arguments ')'
-      function_statement
-                                    { driver.funcEnd();     }
+      function_statement            { $$ = driver.funcEnd();            }
     ;
 
 function_arguments
@@ -202,7 +210,8 @@ function_statement
 //==------------------------------------------------------------------------==//
 statements
     : /** empty */
-    | statement { driver.scope()->append($1); } statements
+    | statement                  { driver.scope()->append($1); $1 = 0; }
+        statements
     | ';'
     ;
 
@@ -254,14 +263,14 @@ call_arguments_required
     ;
 
 call_argument
-    : IDENT ':' expression          { driver.call()->append(*$1, $3); yyfree($1); }
-    | expression                    { driver.call()->append($1);      }
+    : IDENT ':' expression          { driver.call()->append(*$1, $3); yyfree($1); $3 = 0; }
+    | expression                    { driver.call()->append($1); $1 = 0;          }
     ;
 
 subtraction_args
-    : expression                    { driver.sub()->append($1); }
+    : expression                    { driver.sub()->append($1); $1 = 0; }
         ',' subtraction_args
-    | expression                    { driver.sub()->append($1); }
+    | expression                    { driver.sub()->append($1); $1 = 0; }
     ;
 
 //==------------------------------------------------------------------------==//
@@ -329,6 +338,31 @@ right
     | '(' expression ')'            { $$ = $2;                                        }
     ;
 
+//==------------------------------------------------------------------------==//
+//      Types definition
+//==------------------------------------------------------------------------==//
+class_definition
+    : CLASS IDENT                   { driver.classBegin(*$2, @2); yyfree($2);   }
+        '{' class_body '}'          { driver.classEnd();                        }
+    ;
+
+class_body
+    : /* empty */
+    | class_element                 { driver.classTop()->append($1); $1 = 0;    }
+        class_body
+    | class_modificator
+        class_body
+    ;
+
+class_modificator
+    : INHERIT   IDENT ';'               { driver.classTop()->inherit(*$2);   yyfree($2); }
+    | IMPLEMENT IDENT ';'               { driver.classTop()->implement(*$2); yyfree($2); }
+    ;
+
+class_element
+    : function
+    | field
+    ;
 
 //==------------------------------------------------------------------------==//
 //      Types
@@ -344,21 +378,26 @@ type_complex
     ;
 
 type_primary
-    : TYPE_INT              { $$ = driver.createIntTy(@1);     }
-    | TYPE_BOOL             { $$ = driver.createBoolTy(@1);    }
-    | TYPE_STRING           { $$ = driver.createStringTy(@1);  }
-    | TYPE_CHAR             { $$ = driver.createCharTy(@1);    }
+    : TYPE_INT              { $$ = driver.createIntTy(@1);    }
+    | TYPE_BOOL             { $$ = driver.createBoolTy(@1);   }
+    | TYPE_STRING           { $$ = driver.createStringTy(@1); }
+    | TYPE_CHAR             { $$ = driver.createCharTy(@1);   }
+    | qualified_identifier  { $$ = driver.createQualifiedTy(*$1, @1); yyfree($1); }
     ;
 
-elements
-    : function
-    | field
+script_elements
+    : class_definition
+    | class_element         { driver.classTop()->append($1); $1 = 0; }
+    ;
+
+qualified_identifier
+    : IDENT
     ;
 
 /** START POINT **/
 start
     : /* empty */
-    | elements start END
+    | script_elements start END
     ;
 
 /*** END GRAMAR - Change the example grammar rules above ***/

@@ -3,6 +3,7 @@
 
 #include "kiwi/Config.hpp"
 #include <vector>
+#include <map>
 
 namespace llvm {
     class Module;
@@ -46,7 +47,13 @@ namespace kiwi
             return m_module;
         }
 
-        /// fund main method in current module
+        /// create alias for type
+        void registerType(Type* type, const Identifier& name);
+
+        /// find type with name
+        Type* find(const Identifier& name);
+
+        /// returns main method in current module
         Method* getMainMethod();
 
         /// build module
@@ -59,12 +66,25 @@ namespace kiwi
         int32_t run();
     protected:
         /// module name
-        Identifier              m_name;
-        Context*                m_context;
-        ModuleImpl*             m_metadata;
-        llvm::Module*           m_module;
-        llvm::ExecutionEngine*  m_engine;
-        std::vector<Type*>      m_types;
+        Identifier m_name;
+
+        /// module context
+        Context* m_context;
+
+        /// module internal metadata
+        ModuleImpl* m_metadata;
+
+        /// module LLVM analog
+        llvm::Module* m_module;
+
+        /// module runtime engine
+        llvm::ExecutionEngine* m_engine;
+
+        /// list of all module types
+        std::vector<Type*> m_types;
+
+        /// map for named types
+        std::map<Identifier, Type*> m_names;
 
         /// module constructor
         Module(const Identifier& name, Context* ref);

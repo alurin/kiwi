@@ -158,39 +158,32 @@ ExpressionNode* VariableNode::getRight() {
     return new VariableExpressionNode(this);
 }
 
-void FieldNode::generate(Type* ownerType) {
-    Type* resultType = m_type->get();
+void FieldNode::generate(Driver& driver, Type* ownerType) {
+    Type* resultType = m_type->get(driver);
     ownerType->add(m_name, resultType);
+}
+
+
+void FieldNode::emit(Driver& driver, Type* ownerType) {
 }
 
 void FunctionNode::generate(Driver& driver, Type* ownerType) {
     Module* module   = ownerType->getModule();
-    Type* resultType = m_type->get();
+    Type* resultType = m_type->get(driver);
     std::vector<Type*> frontendArgs;
 
     // collect arguments
     for (std::vector<ArgumentNode*>::iterator i = m_positions.begin(); i != m_positions.end(); ++i) {
         ArgumentNode* arg = *i;
-        Type*         frontend_type = arg->getType()->get();
+        Type*         frontend_type = arg->getType()->get(driver);
         frontendArgs.push_back(frontend_type);
     }
-
     m_method = ownerType->add(m_name, resultType, frontendArgs);
-    m_func   = MethodEmitter(m_method).emitDefinition();
 
-    // emit mutable variables for arguments
-    size_t j = 0;
-    for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
-        if (j) {
-            ArgumentNode* arg = m_positions[j-1];
-            i->setName(arg->getName());
-        } else {
-            i->setName("this");
-        }
-    }
 }
 
 void FunctionNode::emit(Driver& driver, Type* ownerType) {
+    m_func = MethodEmitter(m_method).emitDefinition();
     llvm::BasicBlock* entry = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
 
     // emit mutable variables for arguments
@@ -198,16 +191,19 @@ void FunctionNode::emit(Driver& driver, Type* ownerType) {
     for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
         if (j) {
             ArgumentNode* arg = m_positions[j-1];
+
+            // set argument name
+            i->setName(arg->getName());
+
+            // add mutable for arguments
             llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
             llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
 
-            VariableGen vargen(arg->getType()->get(), value);
+            // save information
+            VariableGen vargen(arg->getType()->get(driver), value);
             arg->setGenerator(vargen);
         } else {
-            /// @todo remove
-            // thisValue = new llvm::AllocaInst(ownerType->getVarType(), "this", entry);
-            // llvm::StoreInst* store = new llvm::StoreInst(i, thisValue, entry);
-            //thisValue->setGenerator(vargen);
+            i->setName("this");
         }
     }
 
@@ -246,7 +242,7 @@ StatementGen ScopeNode::emit(Driver& driver, const StatementGen& gen) {
             var_default = value.getValue();
             var->setType(new ConcreteTypeNode(type));
         } else {
-            type        = var->getType()->get();
+            type        = var->getType()->get(driver);
             var_default = llvm::Constant::getNullValue(type->getVarType());
         }
         llvm::Type* var_type = type->getVarType();

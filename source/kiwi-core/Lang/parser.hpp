@@ -120,23 +120,24 @@ namespace kiwi { namespace lang {
     {
 
 /* Line 35 of lalr1.cc  */
-#line 58 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
+#line 59 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 
-    int                  integerVal;
-    double               doubleVal;
-    std::string*		 stringVal;
-    String*              ustringVal;
-    UChar                charVal;
+    int                     integerVal;
+    double                  doubleVal;
+    std::string*            stringVal;
+    String*                 ustringVal;
+    UChar                   charVal;
 
-    class TypeNode*		 typenode;
+    class TypeNode*         typenode;
     class MutableNode*      leftnode;
-    class ExpressionNode*     rightnode;
-    class StatementNode* stmtnode;
+    class ExpressionNode*   rightnode;
+    class StatementNode*    stmtnode;
+    class MemberNode*       membernode;
 
 
 
 /* Line 35 of lalr1.cc  */
-#line 140 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
+#line 141 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -183,14 +184,17 @@ namespace kiwi { namespace lang {
      TYPE_BOOL = 289,
      TYPE_CHAR = 290,
      TYPE_STRING = 291,
-     THIS = 292,
-     RETURN = 293,
-     IF = 294,
-     ELSE = 295,
-     IFELSE = 296,
-     PRINT = 297,
-     UNARY = 298,
-     PRE = 299
+     CLASS = 292,
+     INHERIT = 293,
+     IMPLEMENT = 294,
+     THIS = 295,
+     RETURN = 296,
+     IF = 297,
+     ELSE = 298,
+     IFELSE = 299,
+     PRINT = 300,
+     UNARY = 301,
+     PRE = 302
    };
 
     };
@@ -367,7 +371,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 371 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
+#line 375 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
 
 
 

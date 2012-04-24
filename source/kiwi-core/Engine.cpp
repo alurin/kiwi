@@ -11,16 +11,16 @@
 void kiwi::startup() {
     UErrorCode errorCode;
 
-    kiwi_dummy();                       // Include kiwi-runtime dummy
-    GC_INIT();                          // GC
-    u_init(&errorCode);                 // ICU
-    // llvm_start_multithreaded();      // LLVM as multithreaded
-    llvm::InitializeNativeTarget();     // LLVM JIT
+    kiwi_dummy();                       // Init kiwi-runtime (link as dummy)
+    GC_INIT();                          // GC init
+    u_init(&errorCode);                 // ICU init
+    // llvm_start_multithreaded();      // LLVM init as multithreaded
+    llvm::InitializeNativeTarget();     // LLVM JIT init
 }
 
 // shut down runtime
 void kiwi::shutdown() {
-    llvm::llvm_shutdown();              // LLVM
-    u_cleanup();                        // ICU
-    GC_gcollect();                      // GC
+    llvm::llvm_shutdown();              // LLVM cleanup
+    u_cleanup();                        // ICU cleanup
+    GC_gcollect();                      // GC cleanup
 }

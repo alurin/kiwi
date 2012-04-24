@@ -3,6 +3,7 @@
 
 #include "kiwi/Codegen/Variable.hpp"
 #include "StatementNode.hpp"
+#include "MemberNode.hpp"
 #include "boost/shared_ptr.hpp"
 #include <map>
 #include <vector>
@@ -163,14 +164,17 @@ namespace lang {
 
     //==--------------------------------------------------------------------==//
     /// Field syntax node
-    class FieldNode : public Node {
+    class FieldNode : public MemberNode {
     public:
         FieldNode(const Identifier& name, TypeNode* type);
 
         virtual ~FieldNode();
 
         /// Generate metadata
-        virtual void generate(Type* owner);
+        virtual void generate(Driver& driver, Type* owner);
+
+        /// Emit function code and instruction
+        virtual void emit(Driver& driver, Type* owner);
     protected:
         // store fields
         Identifier                  m_name;
@@ -178,8 +182,8 @@ namespace lang {
     };
 
     //==--------------------------------------------------------------------==//
-    /// Function syntx node
-    class FunctionNode : public Node
+    /// Function syntax node
+    class FunctionNode : public MemberNode
     {
     public:
         /// construct function node
@@ -203,7 +207,7 @@ namespace lang {
         virtual void generate(Driver& driver, Type* owner);
 
         /// Emit function code and instruction
-        void emit(Driver& driver, Type* owner);
+        virtual void emit(Driver& driver, Type* owner);
 
         Method* getMethod() const {
             return m_method;
@@ -219,8 +223,8 @@ namespace lang {
     protected:
         // store fields
         Identifier m_name;
-        TypeNode* m_this;
-        TypeNode* m_type;
+        TypeNode*  m_this;
+        TypeNode*  m_type;
         ScopeNode* m_root;
 
         // generated fields

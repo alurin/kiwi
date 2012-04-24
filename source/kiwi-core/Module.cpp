@@ -2,6 +2,7 @@
 #include "ModuleImpl.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
+#include "kiwi/Type.hpp"
 #include "kiwi/Codegen/Startup.hpp"
 #include "Lang/Driver.hpp"
 #include "llvm/Analysis/Passes.h"
@@ -135,4 +136,19 @@ int32_t Module::run() {
     }
 
     throw "Not found main function";
+}
+
+// register type with alias
+void Module::registerType(Type* type, const Identifier& name) {
+    if (type->getModule() == this && this->find(name) == 0) {
+        m_names.insert(std::make_pair(name, type));
+    }
+}
+
+Type* Module::find(const Identifier& name) {
+    std::map<Identifier, Type*>::iterator result = m_names.find(name);
+    if (result != m_names.end()) {
+        return result->second;
+    }
+    return 0;
 }

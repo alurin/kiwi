@@ -55,12 +55,14 @@ bool Driver::parse() {
     Scanner      scanner(m_stream);
     scanner.set_debug(trace_scanning);
 
-    /// prepare lexer and loger
+    /// prepare lexer
     this->lexer  = &scanner;
 
-    /// parse stream
+    /// prepare parser
     Parser parser(*this);
     parser.set_debug_level(trace_parsing);
+
+    // parse stream
     return (parser.parse() == 0);
 }
 
@@ -71,7 +73,7 @@ void Driver::error(const class location& l,
 }
 
 DriverRef::DriverRef(Context* context, Type* thisType)
-: m_context(context), m_thisType(thisType), m_driver(0) {
+: m_context(context), m_thisType(thisType), m_driver(0), m_mainMethod(0) {
 }
 
 DriverRef::~DriverRef() {
@@ -103,23 +105,21 @@ bool DriverRef::parse() {
 
     Driver& driver = *m_driver;
     if (driver.parse()) {
-        for (std::vector<lang::FieldNode*>::const_iterator i = driver.field_begin(); i != driver.field_end(); ++i) {
-            (*i)->generate(m_thisType);
-        }
+        std::vector<Type*> empty;
 
-        /// Emit type structure
-        m_thisType->emit();
+        /// first step
+        for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
+            (*i)->generate(driver);
 
-        for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i) {
-            (*i)->generate(driver, m_thisType);
-            if ((*i)->getName() == "main") {
-                m_mainMethod = (*i)->getMethod();
+            Type* type = (*i)->getType();
+            if (type && !m_mainMethod) {
+                m_mainMethod = type->find("main", empty);
             }
         }
 
-        /// @todo build examples
-        for (std::vector<lang::FunctionNode*>::const_iterator i = driver.func_begin(); i != driver.func_end(); ++i) {
-            (*i)->emit(driver, m_thisType);
+        /// last step
+        for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
+            (*i)->emit(driver);
         }
     }
 }

@@ -5,18 +5,56 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
-NodeFactory::~NodeFactory() {
-    for (std::vector<FieldNode*>::const_iterator i = field_begin(); i != field_end(); ++i) {
-        FieldNode* node = *i;
-        delete node;
-    }
+NodeFactory::NodeFactory(Context* context, Type* thisType)
+: m_context(context), m_this(thisType) {
 
-    for (std::vector<FunctionNode*>::const_iterator i = func_begin(); i != func_end(); ++i) {
-        FunctionNode* node = *i;
+}
+
+/// @todo clear stacks!!!!
+NodeFactory::~NodeFactory() {
+    for (std::vector<CompoundNode*>::const_iterator i = m_compounds.begin(); i != m_compounds.end(); ++i) {
+        CompoundNode* node = *i;
         delete node;
     }
 }
 
+Module* NodeFactory::getModule() const {
+    return m_this->getModule();
+}
+
+void NodeFactory::prepareScript(const location& loc) {
+    /// add file level class
+    CompoundNode* current = new ConcreteClassType(m_this);
+    current->setLocation(loc);
+    m_classes.push(current);
+    m_compounds.push_back(current);
+
+    /// add file level function. This is not worked in current versions of parser
+    // FunctionNode* func = new FunctionNode("main", new ConcreteTypeNode(m_this), createVoidTy(loc));
+    // func->setLocation(loc);
+    // m_funcs.push(func);
+    // m_scopes.push(func->getRoot());
+    // current->append(func);
+}
+
+CompoundNode* NodeFactory::classTop() {
+    assert(!m_classes.empty() && "Classes stack is empty");
+    return m_classes.top();
+}
+
+CompoundNode* NodeFactory::classBegin(const Identifier& name, const location& loc) {
+    ClassNode* compound = new ClassNode(name);
+    m_classes.push(compound);
+    return compound;
+}
+
+CompoundNode* NodeFactory::classEnd() {
+    assert(!m_classes.empty() && "Classes stack is empty");
+    CompoundNode* compound = m_classes.top();
+    m_classes.pop();
+    m_compounds.push_back(compound);
+    return compound;
+}
 
 FunctionNode* NodeFactory::func() {
     assert(!m_funcs.empty() && "Functions stack is empty");
@@ -35,16 +73,7 @@ FunctionNode* NodeFactory::funcEnd() {
     FunctionNode* func = m_funcs.top();
     m_funcs.pop();
     m_scopes.pop();
-    if (m_funcs.empty()) {
-        m_functions.push_back(func);
-    }
     return func;
-}
-
-FieldNode* NodeFactory::field(const Identifier& name, TypeNode* type) {
-    FieldNode* field = new FieldNode(name, type);
-    m_fields.push_back(field);
-    return field;
 }
 
 // returns current scope
@@ -74,6 +103,7 @@ MutableNode* NodeFactory::left(const Identifier& name, const location& loc) {
     node->setLocation(loc);
     return node;
 }
+
 ExpressionNode* NodeFactory::right(const Identifier& name, const location& loc) {
     ExpressionNode* node = scope()->get(name)->getRight();
     node->setLocation(loc);

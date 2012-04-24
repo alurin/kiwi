@@ -9,6 +9,8 @@ namespace kiwi {
     class Context;
 
 namespace lang {
+    class Driver;
+
     /// Type node
     class TypeNode : public Node {
     public:
@@ -16,8 +18,7 @@ namespace lang {
         virtual ~TypeNode();
 
         /// get type
-        virtual Type* get() =0;
-
+        virtual Type* get(Driver& driver) =0;
     protected:
         TypeNode();
     };
@@ -29,13 +30,23 @@ namespace lang {
         ConcreteTypeNode(Type* type);
 
         /// get type
-        virtual Type* get() {
+        virtual Type* get(Driver& driver) {
             return m_type;
         }
     protected:
         Type* m_type;
     };
 
+    class QualifiedTypeNode : public TypeNode {
+    public:
+        /// constructor
+        QualifiedTypeNode(const Identifier& name);
+
+        /// get type
+        virtual Type* get(Driver& driver);
+    protected:
+        Identifier m_name;
+    };
 }}
 
 #endif

@@ -3,8 +3,8 @@
 
 #include "string.h"
 #include "stdint.h"
-
 #include <unicode/unistr.h>
+#include "kiwi/Application.hpp"
 
 namespace kiwi
 {

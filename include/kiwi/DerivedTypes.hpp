@@ -3,8 +3,7 @@
 
 #include "kiwi/Type.hpp"
 
-namespace kiwi
-{
+namespace kiwi {
     //==--------------------------------------------------------------------==//
     /// Void types metadata
     class VoidType : public Type {
@@ -145,19 +144,46 @@ namespace kiwi
     };
 
     //==--------------------------------------------------------------------==//
-    class InterfaceType : public Type {
+    // /// Interfaces metadata
+    // class InterfaceType : public Type {
+    // public:
+    //     /// Inherti other interface
+    //     void inherit(InterfaceType* type);
+    // protected:
+    //     // anonym object constructor
+    //     InterfaceType(Module* module);
 
-    };
+    //     // constructor
+    //     InterfaceType(Module* module, const Identifier& name);
+    // };
+    class InterfaceType;
 
     //==--------------------------------------------------------------------==//
     /// Object type
     class ObjectType : public Type {
     public:
+        typedef std::vector<InterfaceType*>     InterfaceVector;
+        typedef std::vector<ObjectType*>        ParentVector;
+        typedef InterfaceVector::const_iterator interface_iterator;
+        typedef ParentVector::const_iterator    parent_iterator;
+
         /// Create anonym object type in module
         static ObjectType* create(Module* module);
 
         /// Create object type in module
         static ObjectType* create(Module* module, const Identifier& name);
+
+        /// Implement interface
+        // void implement(InterfaceType* type);
+
+        /// Inherit class
+        bool inherit(ObjectType* type);
+
+        /// This class implement interface?
+        // void isInherit(InterfaceType* type, bool duckCast = true);
+
+        /// This class inherits from class?
+        bool isInherit(ObjectType* type);
 
         /// classof check
         static bool classof(const Type* type) {
@@ -168,6 +194,7 @@ namespace kiwi
         static bool classof(const ObjectType*) {
             return true;
         }
+
         /// return LLVM analog for address map
         llvm::GlobalVariable* getVarAddressMap() const {
             return m_addressMap;
@@ -178,10 +205,39 @@ namespace kiwi
             return m_virtualTable;
         }
 
+        /// returns iterator pointed to first parent in class
+        parent_iterator parent_begin() const {
+            return m_parents.begin();
+        }
+
+        /// returns iterator pointed after last parent in class
+        parent_iterator parent_end() const {
+            return m_parents.end();
+        }
+
+        /// returns iterator pointed to first interface in class
+        interface_iterator interface_begin() const {
+            return m_interfaces.begin();
+        }
+
+        /// returns iterator pointed after last interface in class
+        interface_iterator interface_end() const {
+            return m_interfaces.end();
+        }
+
         /// emit LLVM analog for type
         virtual void emit();
     protected:
+        /// List of implemented interfaces
+        InterfaceVector m_interfaces;
+
+        /// List of inherit classes
+        ParentVector m_parents;
+
+        /// LLVM global variable with address map for class
         llvm::GlobalVariable* m_addressMap;
+
+        /// LLVM global variable with virtual table for class
         llvm::GlobalVariable* m_virtualTable;
 
         // anonym object constructor

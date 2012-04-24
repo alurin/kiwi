@@ -67,44 +67,45 @@ typedef kiwi::lang::Parser::token_type token_type;
 
  /*** BEGIN EXAMPLE - Change the example lexer rules below ***/
 
-"<<"     { return token::OP_LSH;      }
-">>"     { return token::OP_RSH;      }
-"||"     { return token::OP_OR;       }
-"&&"     { return token::OP_AND;      }
-"=="     { return token::OP_EQ;       }
-"!="     { return token::OP_NE;       }
-">="     { return token::OP_GE;       }
-"<="     { return token::OP_LE;       }
-"++"     { return token::OP_INC;      }
-"--"     { return token::OP_DEC;      }
-"+="     { return token::OP_AADD;     }
-"-="     { return token::OP_ASUB;     }
-"/="     { return token::OP_ADIV;     }
-"*="     { return token::OP_AMUL;     }
-"<<="    { return token::OP_ASHL;     }
-">>="    { return token::OP_ASHR;     }
-"&="     { return token::OP_AAND;     }
-"|="     { return token::OP_AOR;      }
+"<<"            { return token::OP_LSH;                     }
+">>"            { return token::OP_RSH;                     }
+"||"            { return token::OP_OR;                      }
+"&&"            { return token::OP_AND;                     }
+"=="            { return token::OP_EQ;                      }
+"!="            { return token::OP_NE;                      }
+">="            { return token::OP_GE;                      }
+"<="            { return token::OP_LE;                      }
+"++"            { return token::OP_INC;                     }
+"--"            { return token::OP_DEC;                     }
+"+="            { return token::OP_AADD;                    }
+"-="            { return token::OP_ASUB;                    }
+"/="            { return token::OP_ADIV;                    }
+"*="            { return token::OP_AMUL;                    }
+"<<="           { return token::OP_ASHL;                    }
+">>="           { return token::OP_ASHR;                    }
+"&="            { return token::OP_AAND;                    }
+"|="            { return token::OP_AOR;                     }
 
-"void"   { return token::TYPE_VOID;   }
-"int"    { return token::TYPE_INT;    }
-"bool"   { return token::TYPE_BOOL;   }
-"string" { return token::TYPE_STRING; }
-"char"   { return token::TYPE_CHAR;   }
-"auto"   { return token::TYPE_AUTO;   }
+"void"          { return token::TYPE_VOID;                  }
+"int"           { return token::TYPE_INT;                   }
+"bool"          { return token::TYPE_BOOL;                  }
+"string"        { return token::TYPE_STRING;                }
+"char"          { return token::TYPE_CHAR;                  }
+"auto"          { return token::TYPE_AUTO;                  }
 
-"return" { return token::RETURN;      }
-"if"     { return token::IF;          }
-"else"   { return token::ELSE;        }
-"ifelse" { return token::IFELSE;      }
+"class"         { return token::CLASS;                      }
+"inherit"       { return token::INHERIT;                    }
+"implement"     { return token::IMPLEMENT;                  }
 
-"print"  { return token::PRINT;       }
-
-"true"   { return token::BOOL_TRUE;   }
-"false"  { return token::BOOL_FALSE;  }
-
-"$this"  { return token::THIS;        }
-"this"   { return token::THIS;        }
+"return"        { return token::RETURN;                     }
+"if"            { return token::IF;                         }
+"else"          { return token::ELSE;                       }
+"ifelse"        { return token::IFELSE;                     }
+"print"         { return token::PRINT;                      }
+"true"          { return token::BOOL_TRUE;                  }
+"false"         { return token::BOOL_FALSE;                 }
+"$this"         { return token::THIS;                       }
+"this"          { return token::THIS;                       }
 
 [A-Za-z][A-Za-z0-9]* {
     yylval->stringVal = new std::string(yytext, yyleng);
@@ -132,25 +133,26 @@ typedef kiwi::lang::Parser::token_type token_type;
 }
 [\n\r]+ {
     yylloc->lines(yyleng);
+    yylloc->step();
 }
 
  /* comments and strings */
-"/*"                    { BEGIN(comment);       }
-"//"                    { BEGIN(line_comment);  }
-"#"                     { BEGIN(line_comment);  }
-"\""                    { BEGIN(string_state);  }
-"\'"                    { BEGIN(char_state);    }
+"/*"                    { BEGIN(comment);      }
+"//"                    { BEGIN(line_comment); }
+"#"                     { BEGIN(line_comment); }
+"\""                    { BEGIN(string_state); }
+"\'"                    { BEGIN(char_state);   }
 
 <comment>{
-    [^*\n]*             { /* eat anything that's not a '*' */ }
+    [^*\n]*             { /* eat anything that's not a '*' */    }
     "*"+[^*/\n]*        { /* eat up '*'s not followed by '/'s */ }
-    \n                  { yylloc->lines(yyleng);              }
-    "*"+"/"             { BEGIN(INITIAL);                     }
+    [\n\r]+             { yylloc->lines(yyleng); yylloc->step(); }
+    "*"+"/"             { BEGIN(INITIAL);  yylloc->step();       }
 }
 
 <line_comment>{
-    [\n\r]+             { yylloc->lines(yyleng); BEGIN(INITIAL); }
-    .                   { }
+    [\n\r]+             { yylloc->lines(yyleng); BEGIN(INITIAL); yylloc->step(); }
+    .
 }
 
 <string_state>{

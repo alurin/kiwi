@@ -13,6 +13,8 @@
 #include <llvm/Instruction.h>
 #include <llvm/ADT/ArrayRef.h>
 
+#include <stack>
+
 using namespace kiwi;
 using namespace kiwi::codegen;
 
@@ -99,6 +101,8 @@ ObjectType* ObjectType::create(Module* module) {
 
 ObjectType* ObjectType::create(Module* module, const Identifier& name) {
     ObjectType* type = new ObjectType(module);
+    type->m_name = name;
+    module->registerType(type, name);
     return type;
 }
 
@@ -191,6 +195,36 @@ CharType* CharType::get(Context* context) {
 StringType* StringType::get(Context* context) {
     ContextImpl* meta = context->getMetadata();
     return meta->stringTy;
+}
+
+/// add parent type
+bool ObjectType::inherit(ObjectType* type) {
+    if (type != this && !isInherit(type)) {
+        m_parents.push_back(type);
+        /// @todo Add dependence to module
+        return true;
+    }
+    return false;
+}
+
+/// inherit type
+bool ObjectType::isInherit(ObjectType* type) {
+    std::stack<ObjectType*> parents;
+    parents.push(this);
+
+    while(!parents.empty()) {
+        // pop element off stack
+        ObjectType* parent = parents.top();
+        parents.pop();
+
+        if (parent == type)
+            return true;
+
+        for (parent_iterator i = parent->parent_begin(); i != parent->parent_end(); ++i) {
+            parents.push(*i);
+        }
+    }
+    return false;
 }
 
 // Emit type structure

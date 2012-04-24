@@ -1,17 +1,15 @@
 #!/usr/bin/env kiwi
-/* Test script for strings */
+/* Test script for substrings and characters substraction from string */
 
 void main() {
-    // [] - multi operators
-    // () - multi operators
     auto $str = "Test string";
 
-    print $str[ 0 ];    print "\n"; // Must print "T"
-    print $str[ 5 ];    print "\n"; // Must print "s"
-    print $str[ 0,  4]; print "\n"; // Must print "Test"
-    print $str[ 5, -1]; print "\n"; // Must print "string"
-    print $str[-6, -1]; print "\n"; // Must print "string"
-    print $str[-6,  6]; print "\n"; // Must print "string"
-    print $str[-6,  0]; print "\n"; // Must print ""
+    print $str[ 0 ];    print "\n";  // Must print "T"
+    print $str[ 5 ];    print "\n";  // Must print "s"
+    print $str[ 0,  4]; print "\n";  // Must print "Test"
+    print $str[ 5, -1]; print "\n";  // Must print "string"
+    print $str[-6, -1]; print "\n";  // Must print "string"
+    print $str[-6,  6]; print "\n";  // Must print "string"
+    print $str[-6,  0]; print "\n";  // Must print ""
     print $str[1000, 1]; print "\n"; // Must print ""
 }

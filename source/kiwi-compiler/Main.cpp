@@ -1,36 +1,32 @@
 #include "kiwi/Engine.hpp"
 #include "kiwi/Module.hpp"
-using namespace kiwi;
-
+#include "kiwi/Application.hpp"
 #include <boost/program_options.hpp>
-namespace po = boost::program_options;
-
 #include <iostream>
 #include <vector>
 #include <iterator>
 #include <algorithm>
-using namespace std;
 
-// A helper function to simplify the main part.
-template<class T>
-ostream& operator<<(ostream& os, const vector<T>& v)
-{
-    copy(v.begin(), v.end(), ostream_iterator<T>(cout, " "));
-    return os;
+using namespace kiwi;
+namespace po = boost::program_options;
+
+void printVersion() {
+    std::cout << KIWI_NAME        << " v"               << KIWI_VERSION_STRING  << std::endl;
+    std::cout << KIWI_VENDOR_NAME << "; Copyright (C) " << KIWI_COPYRIGHT_YEARS << std::endl;
 }
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
     int  opt = 0;
 
     // Declare the supported options.
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help", "produce help message")
+        ("version", "dump version")
         ("optimization,O", po::value<int>(&opt)->default_value(0), "optimization level [0-3]")
         ("debug", "debug parser and scanner")
         ("ir-dump", "dump generated LLVM module")
-        ("input-file", po::value< vector<string> >(), "input file")
+        ("input-file", po::value< std::vector< std::string > >(), "input file")
     ;
 
     // Add position for files
@@ -44,40 +40,38 @@ int main(int argc, char const *argv[])
     po::notify(vm);
 
     /// Run application
-    //
-    int result = 0;
+    ContextEngine engine;
+    Context* context = engine.get();
+    context->setOptimizationLevel(opt);
+    context->setDebug(vm.count("debug"));
 
-    {
-        ContextEngine engine;
-        Context* context = engine.get();
-        context->setOptimizationLevel(opt);
-        context->setDebug(vm.count("debug"));
+    if (vm.count("input-file")) {
+        std::vector< std::string > files = vm["input-file"].as< std::vector< std::string > >();
 
-        if (vm.count("input-file")) {
-            vector<string> files = vm["input-file"].as< vector<string> >();
-
-            try {
-                // create script module
-                Module* module = Module::create("Kiwi::Script", context);
-                for (vector<string>::iterator i = files.begin(); i != files.end(); ++i) {
-                    module->includeFile(*i);
-                }
-
-                // build module and dump or execute
-                module->build();
-                if (vm.count("ir-dump")) {
-                    module->dump();
-                } else {
-                    result = module->run();
-                }
-            } catch (const char* ex) {
-                std::cerr << ex << "\n";
-                result = 1;
+        try {
+            // create script module
+            Module* module = Module::create("Kiwi::Script", context);
+            for (std::vector< std::string >::iterator i = files.begin(); i != files.end(); ++i) {
+                module->includeFile(*i);
             }
-        } else if (vm.count("help")) {
-            cout << desc << "\n";
-            result = 1;
+
+            // build module and dump or execute
+            module->build();
+            if (vm.count("ir-dump")) {
+                module->dump();
+            } else {
+                return module->run();
+            }
+        } catch (const char* ex) {
+            std::cerr << ex << "\n";
+            return 1;
         }
+    } else if (vm.count("help")) {
+        std::cout << desc << "\n";
+    } else if (vm.count("version")) {
+        printVersion();
+        return 0;
     }
-    return result;
+
+    return 0;
 }
