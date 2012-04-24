@@ -8,6 +8,15 @@ Add submodule for [LLVM](git://github.com/earl/llvm-mirror.git)
 Source code clean up
 --------------------
 * [ ] Unary, minary, multiary and methods abstract base
+    * [ ] Unified emitters
+* [ ] Abstract base for Unary, minary, multiary, calls and e.t.c:
+    * [ ] Unified emit methods
+    * [ ] Resolve callable (e.g. find method or operator from type)
+    * [ ] Types casting, if requested
+* [ ] Build process
+    * [ ] Create types from current file
+    * [ ] Create members (methods, fields) in class from current files
+    * [ ] Create IR from callables
 * [ ] Array type
 * [ ] Range expression
 * [ ] Subtraction and invoke operators

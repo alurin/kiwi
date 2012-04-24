@@ -15,6 +15,7 @@ namespace lang {
     class VariableNode;
     class ArgumentNode;
     class Driver;
+    class TypeNode;
 
     using codegen::ExpressionGen;
     using codegen::StatementGen;
@@ -253,20 +254,7 @@ namespace lang {
         bool        m_value;
     };
 
-    class CallNode : public ExpressionNode {
-    public:
-        CallNode(ExpressionNode* expr, const Identifier& method);
-
-        CallNode(ExpressionNode* expr);
-
-        /// Add named argument
-        void append(const Identifier& name, ExpressionNode* value);
-
-        /// Add positior argument
-        void append(ExpressionNode* value);
-
-        /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+    class CallableNode : public ExpressionNode {
     protected:
         class CallArgument {
         public:
@@ -274,11 +262,46 @@ namespace lang {
             int32_t     Position;
             Identifier  Name;
         };
+
+    public:
+        /// destructor
+        virtual ~CallableNode();
+
+        /// Add named argument
+        void append(const Identifier& name, ExpressionNode* value);
+
+        /// Add positior argument
+        void append(ExpressionNode* value);
+    protected:
+        std::vector<CallArgument>   m_arguments;
+        bool                        m_hasNamed;
+
+        /// constructor
+        CallableNode();
+    };
+
+    class CallNode : public CallableNode {
+    public:
+        CallNode(ExpressionNode* expr, const Identifier& method);
+
+        CallNode(ExpressionNode* expr);
+
+        /// Emit instructions
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
     protected:
         ExpressionNode*             m_calle;
         Identifier                  m_method;
-        std::vector<CallArgument>   m_arguments;
-        bool                        m_hasNamed;
+    };
+
+    class NewNode : public CallableNode {
+    public:
+        /// constructor
+        NewNode(TypeNode* type);
+
+        /// Emit instructions
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+    protected:
+        TypeNode* m_type;
     };
 
     class ThisNode : public ExpressionNode {

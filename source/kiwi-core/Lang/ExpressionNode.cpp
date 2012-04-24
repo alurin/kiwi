@@ -69,12 +69,28 @@ StringConstNode::StringConstNode(Context* context, const String& value)
 CharConstNode::CharConstNode(Context* context, const UChar& value)
 : m_context(context), m_value(value) { }
 
+CallableNode::CallableNode()
+: m_hasNamed(false) {
+}
+
+CallableNode::~CallableNode() {
+    for (std::vector<CallArgument>::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
+        CallArgument node = *i;
+        delete node.Value;
+    }
+}
+
 CallNode::CallNode(ExpressionNode* calle, const Identifier& method)
-: m_calle(calle), m_method(method), m_hasNamed(false) {
+: m_calle(calle), m_method(method) {
 }
 
 CallNode::CallNode(ExpressionNode* calle)
-: m_calle(calle), m_hasNamed(false) {
+: m_calle(calle) {
+}
+
+// constructor
+NewNode::NewNode(TypeNode* type)
+: m_type(type) {
 }
 
 InstanceMutableNode::InstanceMutableNode(const Identifier& name)
@@ -92,12 +108,12 @@ SubtractionNode::SubtractionNode(ExpressionNode* expr)
 
 SubtractionNode::~SubtractionNode() {
     for (std::vector<ExpressionNode*>::iterator i = m_indexes.begin(); i != m_indexes.end(); ++i) {
-        ExpressionNode* node;
+        ExpressionNode* node = *i;
         delete node;
     }
 }
 
-void CallNode::append(const Identifier& name, ExpressionNode* value) {
+void CallableNode::append(const Identifier& name, ExpressionNode* value) {
     CallArgument arg;
     arg.Name     = name;
     arg.Position = m_arguments.size();
@@ -106,7 +122,7 @@ void CallNode::append(const Identifier& name, ExpressionNode* value) {
     m_hasNamed = true;
 }
 
-void CallNode::append(ExpressionNode* value) {
+void CallableNode::append(ExpressionNode* value) {
     CallArgument arg;
     arg.Name     = "";
     arg.Position = m_arguments.size();
@@ -242,6 +258,11 @@ ExpressionGen CallNode::emit(Driver& driver, const StatementGen& gen) {
     } else {
         KIWI_ERROR_AND_EXIT("Method not found", getLocation());
     }
+}
+
+// Emit instructions
+ExpressionGen NewNode::emit(Driver& driver, const StatementGen& gen) {
+
 }
 
 ExpressionGen InstanceMutableNode::emit(Driver& driver, const ExpressionGen& gen) {

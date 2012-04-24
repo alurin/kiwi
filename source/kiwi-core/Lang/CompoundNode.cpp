@@ -41,7 +41,6 @@ void CompoundNode::append(MemberNode* member) {
 
 void ClassNode::generate(Driver& driver) {
     m_type = ObjectType::create(driver.getModule(), m_name);
-
     CompoundNode::generate(driver);
 }
 

@@ -114,6 +114,8 @@
 %token                  INHERIT             "inherit"
 %token                  IMPLEMENT           "implement"
 
+%token                  NEW                 "new"
+
 %token                  THIS                "this"
 %token                  RETURN              "return"
 %token                  IF                  "if"
@@ -267,6 +269,10 @@ call_argument
     | expression                    { driver.call()->append($1); $1 = 0;          }
     ;
 
+named_call_arguments
+    :
+    ;
+
 subtraction_args
     : expression                    { driver.sub()->append($1); $1 = 0; }
         ',' subtraction_args
@@ -317,6 +323,9 @@ expression
     | right '.' IDENT               { driver.call($1, *$3, @1 + @3); yyfree($3); }
         '(' call_arguments ')'      { $$ = driver.callEnd();                     }
 
+    | NEW type                      { driver.newBegin($2, @1);              }
+        '(' call_arguments ')'      { $$ = driver.callEnd();                }
+
     | left       '='   expression   { $$ = driver.createAssign($1, $3, @2); }
     | right
     ;
@@ -355,8 +364,8 @@ class_body
     ;
 
 class_modificator
-    : INHERIT   IDENT ';'               { driver.classTop()->inherit(*$2);   yyfree($2); }
-    | IMPLEMENT IDENT ';'               { driver.classTop()->implement(*$2); yyfree($2); }
+    : INHERIT   IDENT ';'           { driver.classTop()->inherit(*$2);   yyfree($2); }
+    | IMPLEMENT IDENT ';'           { driver.classTop()->implement(*$2); yyfree($2); }
     ;
 
 class_element

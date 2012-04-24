@@ -111,13 +111,13 @@ ExpressionNode* NodeFactory::right(const Identifier& name, const location& loc) 
 }
 
 /// returns current call
-CallNode* NodeFactory::call() {
+CallableNode* NodeFactory::call() {
     assert(!m_calls.empty() && "Calls stack is empty");
     return m_calls.top();
 }
 
 /// declare call
-CallNode* NodeFactory::call(const Identifier& name, const location& loc) {
+CallableNode* NodeFactory::call(const Identifier& name, const location& loc) {
     assert(!m_calls.empty() && "Calls stack is empty");
     CallNode* call = new CallNode(new ThisNode(dyn_cast<ObjectType>(m_this)), name);
     call->setLocation(loc);
@@ -126,7 +126,7 @@ CallNode* NodeFactory::call(const Identifier& name, const location& loc) {
 }
 
 /// declare call
-CallNode* NodeFactory::call(ExpressionNode* expr, const Identifier& name, const location& loc) {
+CallableNode* NodeFactory::call(ExpressionNode* expr, const Identifier& name, const location& loc) {
     CallNode* call = new CallNode(expr, name);
     call->setLocation(loc);
     m_calls.push(call);
@@ -134,17 +134,25 @@ CallNode* NodeFactory::call(ExpressionNode* expr, const Identifier& name, const 
 }
 
 /// declare call
-CallNode* NodeFactory::call(ExpressionNode* expr, const location& loc) {
+CallableNode* NodeFactory::call(ExpressionNode* expr, const location& loc) {
     CallNode* call = new CallNode(expr);
     call->setLocation(loc);
     m_calls.push(call);
     return call;
 }
 
+/// declare call to constructor
+CallableNode* NodeFactory::newBegin(TypeNode* type, const location& loc) {
+    CallableNode* call = new NewNode(type);
+    call->setLocation(loc);
+    m_calls.push(call);
+    return call;
+}
+
 /// end current call
-CallNode* NodeFactory::callEnd() {
+CallableNode* NodeFactory::callEnd() {
     assert(!m_calls.empty() && "Calls stack is empty");
-    CallNode* call = m_calls.top();
+    CallableNode* call = m_calls.top();
     m_calls.pop();
     return call;
 }

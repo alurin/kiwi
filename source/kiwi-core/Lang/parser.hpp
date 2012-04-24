@@ -187,14 +187,15 @@ namespace kiwi { namespace lang {
      CLASS = 292,
      INHERIT = 293,
      IMPLEMENT = 294,
-     THIS = 295,
-     RETURN = 296,
-     IF = 297,
-     ELSE = 298,
-     IFELSE = 299,
-     PRINT = 300,
-     UNARY = 301,
-     PRE = 302
+     NEW = 295,
+     THIS = 296,
+     RETURN = 297,
+     IF = 298,
+     ELSE = 299,
+     IFELSE = 300,
+     PRINT = 301,
+     UNARY = 302,
+     PRE = 303
    };
 
     };
@@ -371,7 +372,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 375 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
+#line 376 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
 
 
 

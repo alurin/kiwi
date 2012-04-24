@@ -257,19 +257,22 @@ namespace lang {
         //===--------------------------------------------------------------===//
 
         /// returns current call
-        CallNode* call();
+        CallableNode* call();
 
         /// declare call
-        CallNode* call(const Identifier& name, const location& loc);
+        CallableNode* call(const Identifier& name, const location& loc);
 
         /// declare call
-        CallNode* call(ExpressionNode* expr, const Identifier& name, const location& loc);
+        CallableNode* call(ExpressionNode* expr, const Identifier& name, const location& loc);
 
         /// declare call
-        CallNode* call(ExpressionNode* expr, const location& loc);
+        CallableNode* call(ExpressionNode* expr, const location& loc);
+
+        /// declare call to constructor
+        CallableNode* newBegin(TypeNode* type, const location& loc);
 
         /// end current call
-        CallNode* callEnd();
+        CallableNode* callEnd();
 
         //===--------------------------------------------------------------===//
         //    Other staff
@@ -316,7 +319,7 @@ namespace lang {
         std::stack<ScopeNode*> m_scopes;
 
         /// Stack of current parse calls
-        std::stack<CallNode*> m_calls;
+        std::stack<CallableNode*> m_calls;
 
         /// Stack of current parse substractions
         std::stack<SubtractionNode*> m_subs;

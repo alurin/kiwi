@@ -106,6 +106,7 @@ typedef kiwi::lang::Parser::token_type token_type;
 "false"         { return token::BOOL_FALSE;                 }
 "$this"         { return token::THIS;                       }
 "this"          { return token::THIS;                       }
+"new"           { return token::NEW;                        }
 
 [A-Za-z][A-Za-z0-9]* {
     yylval->stringVal = new std::string(yytext, yyleng);
