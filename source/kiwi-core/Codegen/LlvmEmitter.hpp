@@ -11,10 +11,20 @@ namespace kiwi {
 namespace codegen {
 
     //==--------------------------------------------------------------------==//
-    /// LLVM unary operators emitter
-    class LlvmUnaryOperator : public UnaryEmitter {
+    /// LLVM emitter for function from source code
+    class LlvmCallEmitter : public CallableEmitter {
     public:
-    }; // class LlvmUnaryOperator
+        LlvmCallEmitter(llvm::Function* func, Type* returnType);
+
+        /// emit IR instruction for binary operation
+        virtual ExpressionGen emit(
+            const StatementGen& gen,
+            const ExpressionVector& values
+        );
+    protected:
+        llvm::Function* m_func;
+        Type* m_returnType;
+    }; // class LlvmCallEmitter
 
     //==--------------------------------------------------------------------==//
     /// LLVM integer unary operators emitter
@@ -163,12 +173,12 @@ namespace codegen {
     }; /// class LlvmStringConcatenate
 
     //==--------------------------------------------------------------------==//
-    class LlvmStringSubtraction : public MultiaryEmitter {
+    class LlvmStringSubtraction : public CallableEmitter {
     public:
         /// emit IR instruction for binary operation
         virtual ExpressionGen emit(
             const StatementGen& gen,
-            const expressions& values
+            const ExpressionVector& values
         );
     }; /// class LlvmStringSubtraction
 } // namesapce codegen

@@ -9,9 +9,9 @@ namespace kiwi
     class Callable;
 
     namespace codegen {
+        class CallableEmitter;
         class UnaryEmitter;
         class BinaryEmitter;
-        class MultiaryEmitter;
     };
 
     //==--------------------------------------------------------------------==//
@@ -63,9 +63,9 @@ namespace kiwi
     /// Callable member, common base for all operators and methods
     class Callable : public Member {
     public:
-        typedef std::vector<Type*>      tlist;
-        typedef std::vector<Argument*>  avector;
-        typedef avector::const_iterator const_iterator;
+        typedef std::vector<Type*>      TypeVector;
+        typedef std::vector<Argument*>  ArgumentVector;
+        typedef ArgumentVector::const_iterator const_iterator;
 
         /// virtual destructo
         virtual ~Callable();
@@ -86,7 +86,20 @@ namespace kiwi
         }
 
         /// Check signature
-        bool hasSignature(const tlist& argTypes, bool isCast = false);
+        bool hasSignature(const TypeVector& types, bool isCast = false);
+
+        /// Return emitter for callable
+        codegen::CallableEmitter* getEmitter() const {
+            return m_emitter;
+        }
+
+        /// returns llvm analog
+        llvm::Function* getFunction() const {
+            return m_func;
+        }
+
+        /// set llvm analog
+        void setFunction(llvm::Function* func);
 
         /// returns pointer to first argument from callable (iterator)
         const_iterator begin() const {
@@ -102,13 +115,28 @@ namespace kiwi
         Type* m_returnType;
 
         /// list of arguments
-        avector m_args;
+        ArgumentVector m_args;
 
-        /// constructor
+        /// Emitter for generate IR code
+        codegen::CallableEmitter* m_emitter;
+
+        /// External or internal IR function
+        llvm::Function* m_func;
+
+        /// constructor with standart emitter
         Callable(Type* ownerType, Type* returnType);
 
         /// constructor
-        Callable(Type* ownerType, Type* returnType, tlist argTypes);
+        Callable(Type* ownerType, Type* returnType, codegen::CallableEmitter* emitter);
+
+        /// constructor with standart emitter
+        Callable(Type* ownerType, Type* returnType, TypeVector types);
+
+        /// constructor
+        Callable(Type* ownerType, Type* returnType, TypeVector types, codegen::CallableEmitter* emitter);
+    private:
+        /// create arguments from types
+        void makeArgumentsFromTypes(TypeVector types);
     };
 
     //==--------------------------------------------------------------------==//
@@ -129,11 +157,6 @@ namespace kiwi
             return m_returnType;
         }
 
-        /// returns IR code emitter
-        codegen::UnaryEmitter* getEmitter() const {
-            return m_emitter;
-        }
-
         /// classof check
         static bool classof(class Member* type) {
             return type->getMemberID() == UnaryOperatorID;
@@ -145,7 +168,6 @@ namespace kiwi
         }
     protected:
         UnaryOpcode             m_opcode;
-        codegen::UnaryEmitter*  m_emitter;
 
         /// constructor
         UnaryOperator(
@@ -169,11 +191,6 @@ namespace kiwi
             return m_opcode;
         }
 
-        /// return IR code emitter
-        codegen::BinaryEmitter* getEmitter() const {
-            return m_emitter;
-        }
-
         /// classof check
         static bool classof(class Member* type) {
             return type->getMemberID() == BinaryOperatorID;
@@ -185,7 +202,6 @@ namespace kiwi
         }
     protected:
         BinaryOpcode             m_opcode;
-        codegen::BinaryEmitter*  m_emitter;
 
         /// constructor
         BinaryOperator(
@@ -209,22 +225,16 @@ namespace kiwi
         MultiaryOpcode getOpcode() const {
             return m_opcode;
         }
-
-        /// return multiary emitter
-        codegen::MultiaryEmitter* getEmitter() const {
-            return m_emitter;
-        }
     protected:
         MultiaryOpcode            m_opcode;
-        codegen::MultiaryEmitter* m_emitter;
 
         // constructor
         MultiaryOperator(
             MultiaryOpcode opcode,
             Type* ownerType,
             Type* resultType,
-            tlist argTypes,
-            codegen::MultiaryEmitter* emitter
+            TypeVector types,
+            codegen::CallableEmitter* emitter
         );
     };
 
@@ -248,16 +258,6 @@ namespace kiwi
             return false;
         }
 
-        /// returns llvm analog
-        llvm::Function* getFunction() const {
-            return m_func;
-        }
-
-        /// set llvm analog
-        void setFunction(llvm::Function* func) {
-            m_func = func;
-        }
-
         /// classof check
         static bool classof(class Member* type) {
             return type->getMemberID() == MethodID;
@@ -269,7 +269,6 @@ namespace kiwi
         }
     protected:
         Identifier          m_name;
-        llvm::Function*     m_func;
 
         Method(const Identifier& name, Type* ownerType, Type* resultType, std::vector<Type*> arguments);
     };

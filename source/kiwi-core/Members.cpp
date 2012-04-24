@@ -1,5 +1,6 @@
 #include "ContextImpl.hpp"
 #include "kiwi/Codegen/Emitter.hpp"
+#include "Codegen/LlvmEmitter.hpp"
 #include "kiwi/Support/Array.hpp"
 #include "kiwi/Type.hpp"
 #include "kiwi/Members.hpp"
@@ -11,18 +12,26 @@ using namespace kiwi::codegen;
 
 /// constructor
 Callable::Callable(Type* ownerType, Type* returnType)
-: Member(ownerType), m_returnType(returnType) {
+: Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(0) {
 
 }
 
 /// constructor
-Callable::Callable(Type* ownerType, Type* returnType, tlist argTypes)
-: Member(ownerType), m_returnType(returnType) {
-    for (tlist::iterator i = argTypes.begin(); i != argTypes.end(); ++i) {
-        Type* type    = *i;
-        Argument* arg = new Argument(this, type, m_args.size());
-        m_args.push_back(arg);
-    }
+Callable::Callable(Type* ownerType, Type* returnType, codegen::CallableEmitter* emitter)
+: Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(emitter) {
+
+}
+
+/// constructor
+Callable::Callable(Type* ownerType, Type* returnType, TypeVector types)
+: Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(0) {
+    makeArgumentsFromTypes(types);
+}
+
+/// constructor
+Callable::Callable(Type* ownerType, Type* returnType, TypeVector types, codegen::CallableEmitter* emitter)
+: Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(emitter) {
+    makeArgumentsFromTypes(types);
 }
 
 Callable::~Callable() {
@@ -30,6 +39,7 @@ Callable::~Callable() {
         Argument* arg = *i;
         delete arg;
     }
+    delete m_emitter;
 }
 
 // constructor
@@ -38,13 +48,8 @@ UnaryOperator::UnaryOperator(
     Type* ownerType,
     Type* resultType,
     codegen::UnaryEmitter* emitter
-) : Callable(ownerType, resultType, makeVector(ownerType, 0)), m_opcode(opcode), m_emitter(emitter) {
+) : Callable(ownerType, resultType, makeVector(ownerType, 0), emitter), m_opcode(opcode) {
     m_memberID = UnaryOperatorID;
-}
-
-// destructor
-UnaryOperator::~UnaryOperator() {
-    delete m_emitter;
 }
 
 // constructor
@@ -54,30 +59,19 @@ BinaryOperator::BinaryOperator(
     Type* resultType,
     Type* operandType,
     codegen::BinaryEmitter* emitter
-) : Callable(ownerType, resultType, makeVector(ownerType, operandType, 0)), m_opcode(opcode), m_emitter(emitter) {
+) : Callable(ownerType, resultType, makeVector(ownerType, operandType, 0), emitter), m_opcode(opcode) {
     m_memberID = BinaryOperatorID;
 }
-
-// destructor
-BinaryOperator::~BinaryOperator() {
-    delete m_emitter;
-}
-
 
 // constructor
 MultiaryOperator::MultiaryOperator(
     Member::MultiaryOpcode opcode,
     Type* ownerType,
     Type* resultType,
-    tlist args,
-    codegen::MultiaryEmitter* emitter
-) : Callable(ownerType, resultType, makeVector(ownerType, args)), m_opcode(opcode), m_emitter(emitter) {
+    TypeVector args,
+    codegen::CallableEmitter* emitter
+) : Callable(ownerType, resultType, makeVector(ownerType, args), emitter), m_opcode(opcode) {
     m_memberID = MultiaryOperatorID;
-}
-
-// destructor
-MultiaryOperator::~MultiaryOperator() {
-    delete m_emitter;
 }
 
 // constructor
@@ -86,12 +80,9 @@ Field::Field(const Identifier& name, Type* ownerType, Type* fieldType)
     m_memberID = FieldID;
 }
 
-// destructor
-Field::~Field() {}
-
 // constructor
-Method::Method(const Identifier& name, Type* ownerType, Type* resultType, tlist argTypes)
-: Callable(ownerType, resultType, argTypes), m_name(name), m_func(0) {
+Method::Method(const Identifier& name, Type* ownerType, Type* resultType, TypeVector types)
+: Callable(ownerType, resultType, types), m_name(name) {
     m_memberID = MethodID;
 }
 
@@ -99,18 +90,31 @@ Method::Method(const Identifier& name, Type* ownerType, Type* resultType, tlist 
 Argument::Argument(Callable* owner, Type* type, int32_t position)
 : m_owner(owner), m_type(type) { }
 
-
-
 /// Check signature
-bool Callable::hasSignature(const tlist& argTypes, bool isCast) {
-    if (argTypes.size() != m_args.size())
+bool Callable::hasSignature(const TypeVector& types, bool isCast) {
+    if (types.size() != m_args.size())
         return false;
 
     for (int i = 0; i < m_args.size(); ++i) {
         /// @todo Replace for simple check
-        if (m_args[i]->getType() != argTypes[i])
+        if (m_args[i]->getType() != types[i])
             return false;
     }
 
     return true;
+}
+
+void Callable::setFunction(llvm::Function* func) {
+    m_func = func;
+    if (!m_emitter) {
+        m_emitter = new codegen::LlvmCallEmitter(func, m_returnType);
+    }
+}
+
+void Callable::makeArgumentsFromTypes(TypeVector types) {
+    for (TypeVector::iterator i = types.begin(); i != types.end(); ++i) {
+        Type* type    = *i;
+        Argument* arg = new Argument(this, type, m_args.size());
+        m_args.push_back(arg);
+    }
 }

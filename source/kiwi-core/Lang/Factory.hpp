@@ -219,18 +219,6 @@ namespace lang {
         }
 
         //===--------------------------------------------------------------===//
-        //    Subtraction expressions
-        //===--------------------------------------------------------------===//
-        // returns current subtraction
-        SubtractionNode* sub();
-
-        // begin new subtraction
-        SubtractionNode* subBegin(ExpressionNode* expr);
-
-        // end current subtraction
-        SubtractionNode* subEnd(const location& loc);
-
-        //===--------------------------------------------------------------===//
         //    Statements
         //===--------------------------------------------------------------===//
         StatementNode* createExpr(ExpressionNode* expr) {
@@ -271,8 +259,11 @@ namespace lang {
         /// declare call to constructor
         CallableNode* newBegin(TypeNode* type, const location& loc);
 
+        // begin new subtraction
+        CallableNode* subBegin(ExpressionNode* expr, const location& loc);
+
         /// end current call
-        CallableNode* callEnd();
+        CallableNode* callEnd(const location& loc);
 
         //===--------------------------------------------------------------===//
         //    Other staff
@@ -320,9 +311,6 @@ namespace lang {
 
         /// Stack of current parse calls
         std::stack<CallableNode*> m_calls;
-
-        /// Stack of current parse substractions
-        std::stack<SubtractionNode*> m_subs;
 
         /// List of parsed classes
         std::vector<CompoundNode*> m_compounds;

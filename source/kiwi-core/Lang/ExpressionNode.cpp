@@ -19,25 +19,23 @@ using namespace kiwi::codegen;
 
 
 BinaryNode::BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic)
-: m_opcode(opcode), m_left(left), m_right(right), m_logic(logic) {
-}
-
-BinaryNode::~BinaryNode() {
-    delete m_left;
-    delete m_right;
+: m_opcode(opcode), m_logic(logic) {
+    append(left);
+    append(right);
 }
 
 UnaryNode::UnaryNode(Member::UnaryOpcode opcode, ExpressionNode* value, bool post)
-: m_opcode(opcode), m_value(value), m_post(post) {
+: m_opcode(opcode), m_post(post) {
+    append(value);
 }
 
-UnaryNode::~UnaryNode() {
-    delete m_value;
+MultiaryNode::MultiaryNode(Member::MultiaryOpcode opcode, ExpressionNode* value)
+: m_opcode(opcode) {
+    append(value);
 }
 
 AssignNode::AssignNode(MutableNode* left, ExpressionNode* right)
 : m_left(left), m_right(right) {
-
 }
 
 AssignNode::~AssignNode() {
@@ -69,14 +67,25 @@ StringConstNode::StringConstNode(Context* context, const String& value)
 CharConstNode::CharConstNode(Context* context, const UChar& value)
 : m_context(context), m_value(value) { }
 
-CallableNode::CallableNode()
-: m_hasNamed(false) {
+CallableArgument::CallableArgument(const Identifier& name, ExpressionNode* value, int32_t position)
+: m_name(name), m_value(value), m_position(position) {
+}
+
+CallableArgument::CallableArgument(ExpressionNode* value, int32_t position)
+: m_value(value), m_position(position) {
+}
+
+CallableArgument::~CallableArgument() {
+    delete m_value;
+}
+
+CallableNode::CallableNode() {
 }
 
 CallableNode::~CallableNode() {
-    for (std::vector<CallArgument>::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
-        CallArgument node = *i;
-        delete node.Value;
+    for (std::vector<CallableArgument*>::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
+        CallableArgument* node = *i;
+        delete node;
     }
 }
 
@@ -102,63 +111,86 @@ InstanceExpressionNode::InstanceExpressionNode(const Identifier& name)
 ThisNode::ThisNode(ObjectType* thisType)
 : m_thisType(thisType) { }
 
-SubtractionNode::SubtractionNode(ExpressionNode* expr)
-: m_expr(expr) {
-}
-
-SubtractionNode::~SubtractionNode() {
-    for (std::vector<ExpressionNode*>::iterator i = m_indexes.begin(); i != m_indexes.end(); ++i) {
-        ExpressionNode* node = *i;
-        delete node;
-    }
-}
-
 void CallableNode::append(const Identifier& name, ExpressionNode* value) {
-    CallArgument arg;
-    arg.Name     = name;
-    arg.Position = m_arguments.size();
-    arg.Value    = value;
-    m_arguments.push_back(arg);
-    m_hasNamed = true;
+    if (value) {
+        m_arguments.push_back(new CallableArgument(name, value, m_arguments.size()));
+        //m_hasNamed = true;
+    }
 }
 
 void CallableNode::append(ExpressionNode* value) {
-    CallArgument arg;
-    arg.Name     = "";
-    arg.Position = m_arguments.size();
-    arg.Value    = value;
-    m_arguments.push_back(arg);
+    if (value)
+        m_arguments.push_back(new CallableArgument(value, m_arguments.size()));
 }
 
-ExpressionGen BinaryNode::emit(Driver& driver, const StatementGen& gen) {
-    // emit operands
-    ExpressionGen left  = m_left->emit(driver, gen);
-    ExpressionGen right = m_right->emit(driver, gen);
-
-    // find emitter
-    Type* type = left.getType();
-    BinaryOperator* op = type->find(m_opcode, right.getType());
-
-    // emit instruction
-    if (op) {
-        return op->getEmitter()->emit(right, left, right);
-    }
-    KIWI_ERROR_AND_EXIT("not found binary operator", getLocation());
+ExpressionGen CallableArgument::emit(Driver& driver, const StatementGen& gen) {
+    return m_value->emit(driver, gen);
 }
 
-ExpressionGen UnaryNode::emit(Driver& driver, const StatementGen& gen) {
-    // emit operand
-    ExpressionGen value  = m_value->emit(driver, gen);
+ExpressionGen CallableNode::emit(Driver& driver, const StatementGen& gen) {
+    std::vector<Type*> types;
+    std::vector<ExpressionGen> args;
 
-    // find emitter
-    Type* type = value.getType();
-    UnaryOperator* op  = type->find(m_opcode);
-
-    // emit instruction
-    if (op) {
-        return op->getEmitter()->emit(value, value);
+    StatementGen current = gen;
+    for (std::vector<CallableArgument*>::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
+        CallableArgument* arg = *i;
+        ExpressionGen expr = arg->emit(driver, current);
+        types.push_back(expr.getType());
+        args.push_back(expr);
+        current = expr;
     }
-    KIWI_ERROR_AND_EXIT("not found unary operator", getLocation());
+
+    Callable* call = findCallable(driver, types);
+    if (call) {
+        CallableEmitter* emitter = call->getEmitter();
+        return emitter->emit(gen, args);
+    }
+    KIWI_ERROR_AND_EXIT("Method or operator for call not found", getLocation());
+}
+
+Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
+    Callable* call = types[0]->find(m_opcode, types[1]);
+    if (!call) {
+        KIWI_ERROR_AND_EXIT("Not found binary operator", getLocation());
+    }
+    return call;
+}
+
+Callable* UnaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
+    Callable* call = types[0]->find(m_opcode);
+    if (!call) {
+        KIWI_ERROR_AND_EXIT("not found unary operator", getLocation());
+    }
+    return call;
+}
+
+Callable* MultiaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
+    std::vector<Type*> args(types.end() + 1, types.end());
+    Callable* call = types[0]->find(m_opcode, args);
+    if (!call) {
+        KIWI_ERROR_AND_EXIT("not found multiary operator", getLocation());
+    }
+    return call;
+}
+
+
+Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) {
+    std::vector<Type*> args(types.end() + 1, types.end());
+    Callable* call = types[0]->find(m_method, args);
+    if (!call) {
+        KIWI_ERROR_AND_EXIT("Method not found", getLocation());
+    }
+    return call;
+}
+
+// Emit instructions
+ExpressionGen NewNode::emit(Driver& driver, const StatementGen& gen) {
+    KIWI_ERROR_AND_EXIT("Constructors not implemented", getLocation());
+    CallableNode::emit(driver, gen);
+}
+
+Callable* NewNode::findCallable(Driver& driver, std::vector<Type*> types) {
+    KIWI_ERROR_AND_EXIT("Constructors not implemented", getLocation());
 }
 
 ExpressionGen AssignNode::emit(Driver& driver, const StatementGen& gen) {
@@ -220,51 +252,6 @@ ExpressionGen CharConstNode::emit(Driver& driver, const StatementGen& gen) {
     return ExpressionGen(gen, CharType::get(m_context), value);
 }
 
-ExpressionGen CallNode::emit(Driver& driver, const StatementGen& gen) {
-    std::vector<Type*>          types;
-    std::vector<llvm::Value*>   args;
-
-    if (m_hasNamed) {
-        KIWI_ERROR_AND_EXIT("Not implement call by named arguments", getLocation());
-    } else if (m_method.empty()) {
-        KIWI_ERROR_AND_EXIT("Not implement call expression", getLocation());
-    }
-
-    ExpressionGen calle = m_calle->emit(driver, gen);
-    StatementGen current = calle;
-    args.push_back(calle.getValue());
-
-    for (std::vector<CallArgument>::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
-        // emit code for argument
-        ExpressionGen expr = i->Value->emit(driver, current);
-        current            = expr;
-
-        // store info
-        types.push_back(expr.getType());
-        args.push_back(expr.getValue());
-    }
-
-    Type* owner    = calle.getType();
-    Method* method = owner->find(m_method, types);
-    if (method) {
-        llvm::Function* func = method->getFunction();
-        if (!func) {
-            KIWI_ERROR_AND_EXIT("Function implementation not found", getLocation());
-        }
-
-        // return result of call
-        llvm::Value* result = llvm::CallInst::Create(func, makeArrayRef(args), "", current.getBlock());
-        return ExpressionGen(current, method->getReturnType(), result);
-    } else {
-        KIWI_ERROR_AND_EXIT("Method not found", getLocation());
-    }
-}
-
-// Emit instructions
-ExpressionGen NewNode::emit(Driver& driver, const StatementGen& gen) {
-
-}
-
 ExpressionGen InstanceMutableNode::emit(Driver& driver, const ExpressionGen& gen) {
     Type* owner = gen.getOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
@@ -294,29 +281,4 @@ ExpressionGen ThisNode::emit(Driver& driver, const StatementGen& gen) {
     }
     llvm::Argument* arg  = func->arg_begin();
     return ExpressionGen(gen, m_thisType, arg);
-}
-
-ExpressionGen SubtractionNode::emit(Driver& driver, const StatementGen& gen) {
-    // emit operand
-    ExpressionGen value  = m_expr->emit(driver, gen);
-    StatementGen current = value;
-    std::vector<ExpressionGen>  values;
-    std::vector<Type*>          types;
-
-    values.push_back(value);
-    for (std::vector<ExpressionNode*>::iterator i = m_indexes.begin(); i != m_indexes.end(); ++i) {
-        ExpressionNode* node = *i;
-        ExpressionGen nodeGen = node->emit(driver, current);
-        current = nodeGen;
-
-        values.push_back(nodeGen);
-        types.push_back(nodeGen.getType());
-    }
-
-    // find emitter
-    Type* type = value.getType();
-    MultiaryOperator* op = type->find(Member::Subtraction, types);
-    if (op)
-        return op->getEmitter()->emit(current, values);
-    KIWI_ERROR_AND_EXIT("not found multiary operator", getLocation());
 }

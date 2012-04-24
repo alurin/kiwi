@@ -269,16 +269,6 @@ call_argument
     | expression                    { driver.call()->append($1); $1 = 0;          }
     ;
 
-named_call_arguments
-    :
-    ;
-
-subtraction_args
-    : expression                    { driver.sub()->append($1); $1 = 0; }
-        ',' subtraction_args
-    | expression                    { driver.sub()->append($1); $1 = 0; }
-    ;
-
 //==------------------------------------------------------------------------==//
 //      Expressions
 //==------------------------------------------------------------------------==//
@@ -314,17 +304,18 @@ expression
     | expression '>'   expression   { $$ = driver.createGt ($1, $3, @2); }
     | expression '<'   expression   { $$ = driver.createLt ($1, $3, @2); }
 
-    | expression                    { driver.subBegin($1);               }
-        '[' subtraction_args ']'    { $$ = driver.subEnd(@3 + @5);       }
+    //==-------- Call and multinary operators ------------------------------==//
+    | expression                        { driver.subBegin($1, @1);           }
+        '[' call_arguments_required ']' { $$ = driver.callEnd(@3 + @5);      }
 
-    | IDENT                         { driver.call(*$1, @1); yyfree($1);  }
-        '(' call_arguments ')'      { $$ = driver.callEnd();             }
+    | IDENT                             { driver.call(*$1, @1); yyfree($1);  }
+        '(' call_arguments ')'          { $$ = driver.callEnd(@1);           }
 
-    | right '.' IDENT               { driver.call($1, *$3, @1 + @3); yyfree($3); }
-        '(' call_arguments ')'      { $$ = driver.callEnd();                     }
+    | right '.' IDENT                   { driver.call($1, *$3, @1 + @3); yyfree($3); }
+        '(' call_arguments ')'          { $$ = driver.callEnd(@1);                   }
 
-    | NEW type                      { driver.newBegin($2, @1);              }
-        '(' call_arguments ')'      { $$ = driver.callEnd();                }
+    | NEW type                          { driver.newBegin($2, @1);              }
+        '(' call_arguments ')'          { $$ = driver.callEnd(@1);              }
 
     | left       '='   expression   { $$ = driver.createAssign($1, $3, @2); }
     | right

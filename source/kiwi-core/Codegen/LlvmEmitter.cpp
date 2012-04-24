@@ -11,6 +11,11 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
+LlvmCallEmitter::LlvmCallEmitter(llvm::Function* func, Type* returnType)
+: m_func(func), m_returnType(returnType) {
+
+}
+
 // constructor
 LlvmZeroUnaryOperator::LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, Type* type)
 : m_opcode(opcode), m_type(type) { }
@@ -219,7 +224,7 @@ ExpressionGen LlvmStringConcatenate::emit(const StatementGen& gen, const Express
 }
 
 /// emit IR instruction for string substraction
-ExpressionGen LlvmStringSubtraction::emit(const StatementGen& gen, const expressions& values) {
+ExpressionGen LlvmStringSubtraction::emit(const StatementGen& gen, const ExpressionVector& values) {
     if (values.size() != 2 && values.size() != 3) {
         throw "Not implemented";
     }
@@ -282,4 +287,16 @@ ExpressionGen LlvmStringSubtraction::emit(const StatementGen& gen, const express
     // compute string compare and return result
     llvm::CallInst* returnValue = llvm::CallInst::Create(substraction, makeArrayRef(args), "", gen.getBlock());
     return ExpressionGen(gen, returnType, returnValue);
+}
+
+/// emit IR instruction for binary operation
+ExpressionGen LlvmCallEmitter::emit(const StatementGen& gen, const ExpressionVector& args ){
+    std::vector<llvm::Value*> largs;
+    for (ExpressionVector::const_iterator i = args.begin(); i != args.end(); ++i) {
+        largs.push_back(i->getValue());
+    }
+
+     // return result of call
+     llvm::Value* result = llvm::CallInst::Create(m_func, llvm::makeArrayRef(largs), "", gen.getBlock());
+     return ExpressionGen(gen, m_returnType, result);
 }

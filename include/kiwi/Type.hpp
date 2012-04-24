@@ -12,7 +12,7 @@ namespace kiwi {
     namespace codegen {
         class UnaryEmitter;
         class BinaryEmitter;
-        class MultiaryEmitter;
+        class CallableEmitter;
     };
     class Context;
     class Module;
@@ -77,7 +77,7 @@ namespace kiwi {
             Member::MultiaryOpcode opcode,
             Type* resultType,
             std::vector<Type*> arguments,
-            codegen::MultiaryEmitter* emitter
+            codegen::CallableEmitter* emitter
         );
 
         /// add field

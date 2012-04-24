@@ -85,9 +85,9 @@ StatementGen PrintStatement::emit(Driver& driver, const StatementGen& gen) {
 
     // emit instruction
     if (op) {
-        return op->getEmitter()->emit(result, result);
+        // return op->getEmitter()->emit(result, result);
     }
-    KIWI_ERROR_AND_EXIT("not found unary operator", getLocation());
+    KIWI_ERROR_AND_EXIT("not found print operator", getLocation());
 }
 
 /// emit instructions for statement

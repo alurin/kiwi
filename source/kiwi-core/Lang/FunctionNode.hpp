@@ -171,10 +171,7 @@ namespace lang {
         virtual ~FieldNode();
 
         /// Generate metadata
-        virtual void generate(Driver& driver, Type* owner);
-
-        /// Emit function code and instruction
-        virtual void emit(Driver& driver, Type* owner);
+        virtual void generateMember(Driver& driver, Type* owner);
     protected:
         // store fields
         Identifier                  m_name;
@@ -204,10 +201,10 @@ namespace lang {
         }
 
         /// Generate metadata
-        virtual void generate(Driver& driver, Type* owner);
+        virtual void generateMember(Driver& driver, Type* owner);
 
         /// Emit function code and instruction
-        virtual void emit(Driver& driver, Type* owner);
+        virtual void generateCode(Driver& driver, Type* owner);
 
         Method* getMethod() const {
             return m_method;

@@ -20,12 +20,6 @@ namespace lang {
         /// append member
         void append(MemberNode* member);
 
-        /// Generate type, only create analogs
-        virtual void generate(Driver& driver);
-
-        /// Emit type structure and methods
-        virtual void emit(Driver& driver);
-
         /// void
         void inherit(const Identifier& name) { }
 
@@ -36,6 +30,15 @@ namespace lang {
         Type* getType() const {
             return m_type;
         }
+
+        /// generate types
+        virtual void generateType(Driver& driver);
+
+        /// generate members
+        virtual void generateMembers(Driver& driver);
+
+        /// generate code
+        virtual void generateCode(Driver& driver);
     protected:
         /// Generated type
         Type* m_type;
@@ -58,7 +61,7 @@ namespace lang {
         ClassNode(const Identifier& name);
 
         /// Generate type, only create analogs
-        virtual void generate(Driver& driver);
+        virtual void generateType(Driver& driver);
     protected:
         /// Class name
         Identifier m_name;

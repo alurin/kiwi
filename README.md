@@ -1,5 +1,32 @@
-Kiwi. Experemental for language
-===============================
+Kiwi 0.1
+========
+
+Description
+-----------
+My hobby. Experemental language used capabilities of parsing generators
+Bison & Flex, code generation from LLVM and unicode support from ICU.
+
+Feel free submit patches and issues. Who knows, maybe in feature...
+
+My current goals
+* Static OOP language
+* Multi inheritance:
+    * Objects as methods and field sets (parent class included only one)
+    * Interfaces as abstract classes
+* Method and fields aliasing, renaming and merging
+* Properties
+* Integration from user-land to language level:
+    * Events
+    * Dependence injection
+    * Plugins
+
+* Direction for application, but not for beginer developers
+* Not simple, not hard.
+
+**WARNING**
+-----------
+This is EXPEREMENTAL and is not known whether it's be PRODUCTION used.
+Tested and development in Ubuntu 64-bit.
 
 Prerequisites
 -------------

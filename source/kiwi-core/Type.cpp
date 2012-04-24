@@ -78,7 +78,7 @@ MultiaryOperator* Type::add(
     Member::MultiaryOpcode opcode,
     Type* resultType,
     std::vector<Type*> arguments,
-    codegen::MultiaryEmitter* emitter
+    codegen::CallableEmitter* emitter
 ) {
     MultiaryOperator* op = new MultiaryOperator(opcode, this, resultType, arguments, emitter);
     m_multiary.push_back(op);

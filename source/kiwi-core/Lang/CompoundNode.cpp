@@ -31,7 +31,8 @@ ClassNode::ClassNode(const Identifier& name) : m_name(name) {
 
 // constructor
 ConcreteClassType::ConcreteClassType(Type* type)
-: CompoundNode(type) { }
+: CompoundNode(type) {
+}
 
 
 // append member
@@ -39,17 +40,20 @@ void CompoundNode::append(MemberNode* member) {
     m_members.push_back(member);
 }
 
-void ClassNode::generate(Driver& driver) {
+void ClassNode::generateType(Driver& driver) {
     m_type = ObjectType::create(driver.getModule(), m_name);
-    CompoundNode::generate(driver);
 }
 
-void CompoundNode::generate(Driver& driver) {
+void CompoundNode::generateType(Driver& driver) {
+    /* empty for default */
+}
+
+void CompoundNode::generateMembers(Driver& driver) {
     assert(m_type && "Type not generated");
 
     /// Generate members
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
-        (*i)->generate(driver, m_type);
+        (*i)->generateMember(driver, m_type);
     }
 
     /// Emit type structure
@@ -57,11 +61,11 @@ void CompoundNode::generate(Driver& driver) {
 }
 
 // Emit type structure and methods
-void CompoundNode::emit(Driver& driver) {
+void CompoundNode::generateCode(Driver& driver) {
     assert(m_type && "Type not generated");
 
     /// Generate members
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
-        (*i)->emit(driver, m_type);
+        (*i)->generateCode(driver, m_type);
     }
 }

@@ -51,14 +51,14 @@ Driver* Driver::createFromString(Context* context, Type* thisType, const std::st
 }
 
 bool Driver::parse() {
-    /// prepare stream
+    // prepare stream
     Scanner      scanner(m_stream);
     scanner.set_debug(trace_scanning);
 
-    /// prepare lexer
+    // prepare lexer
     this->lexer  = &scanner;
 
-    /// prepare parser
+    // prepare parser
     Parser parser(*this);
     parser.set_debug_level(trace_parsing);
 
@@ -107,19 +107,25 @@ bool DriverRef::parse() {
     if (driver.parse()) {
         std::vector<Type*> empty;
 
-        /// first step
+        // create types
         for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
-            (*i)->generate(driver);
+            (*i)->generateType(driver);
+        }
 
+        // create type members
+        for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
+            (*i)->generateMembers(driver);
+
+            // find first main method.
             Type* type = (*i)->getType();
             if (type && !m_mainMethod) {
                 m_mainMethod = type->find("main", empty);
             }
         }
 
-        /// last step
+        /// generate code for members
         for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
-            (*i)->emit(driver);
+            (*i)->generateCode(driver);
         }
     }
 }

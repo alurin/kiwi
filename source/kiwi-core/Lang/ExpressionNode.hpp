@@ -10,6 +10,7 @@
 namespace kiwi {
     class Context;
     class ObjectType;
+    class Callable;
 
 namespace lang {
     class VariableNode;
@@ -38,8 +39,60 @@ namespace lang {
     };
 
     //==--------------------------------------------------------------------==//
+    /// Arument for callable syntax node
+    class CallableArgument {
+        friend class CallableNode;
+    public:
+        virtual ~CallableArgument();
+
+        /// proxy for value
+        ExpressionGen emit(Driver& driver, const StatementGen& gen);
+    protected:
+        /// argument name
+        Identifier m_name;
+
+        /// argument value
+        ExpressionNode* m_value;
+
+        /// argument position
+        int32_t m_position;
+
+        /// named constructor
+        CallableArgument(const Identifier& name, ExpressionNode* value, int32_t position);
+
+        /// position constructor
+        CallableArgument(ExpressionNode* value, int32_t position);
+    };
+
+    //==--------------------------------------------------------------------==//
+    /// Callable syntax node. Base for all callable expression: binary, unary,
+    /// multinary, methods calls, new, invoke object and e.t.c
+    class CallableNode : public ExpressionNode {
+    public:
+        /// destructor
+        virtual ~CallableNode();
+
+        /// Add positior argument
+        void append(ExpressionNode* value);
+
+        /// Add positior argument
+        void append(const Identifier& name, ExpressionNode* value);
+
+        /// Emit instructions
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+
+        /// Find callable for current node
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) =0;
+    protected:
+        std::vector<CallableArgument*> m_arguments;
+
+        /// constructor
+        CallableNode();
+    };
+
+    //==--------------------------------------------------------------------==//
     /// Binary expression syntax node
-    class BinaryNode : public ExpressionNode {
+    class BinaryNode : public CallableNode {
     public:
         /// Constructor
         BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic = false);
@@ -47,17 +100,11 @@ namespace lang {
         /// Destructor
         virtual ~BinaryNode();
 
-        /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        /// Find callable for current node
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
     protected:
         /// Binary operation opcode
         Member::BinaryOpcode m_opcode;
-
-        /// Left expression
-        ExpressionNode* m_left;
-
-        /// Right expression
-        ExpressionNode* m_right;
 
         // Binary operator (`and` or `or`) is logic?
         bool m_logic;
@@ -65,7 +112,7 @@ namespace lang {
 
     //==--------------------------------------------------------------------==//
     /// Unary expression syntax node
-    class UnaryNode : public ExpressionNode {
+    class UnaryNode : public CallableNode {
     public:
         /// Constructor
         UnaryNode(Member::UnaryOpcode opcode, ExpressionNode* value, bool post = false);
@@ -73,18 +120,60 @@ namespace lang {
         /// Destructor
         virtual ~UnaryNode();
 
-        /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        /// Find callable for current node
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
     protected:
         /// Unary operation opcode
         Member::UnaryOpcode m_opcode;
 
-        /// Expression child value
-        ExpressionNode* m_value;
-
         /// Post expression
         /// @todo Remove. ++ -- is operators for mutable expressions
         bool m_post;
+    };
+
+    //==--------------------------------------------------------------------==//
+    /// Multiary expression syntax node
+    class MultiaryNode : public CallableNode {
+    public:
+        /// constructor
+        MultiaryNode(Member::MultiaryOpcode opcode, ExpressionNode* value);
+
+        /// Find callable for current node
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
+    protected:
+        Member::MultiaryOpcode m_opcode;
+    };
+
+    //==--------------------------------------------------------------------==//
+    /// Call expression syntax node.
+    /// @todo Slice to two classes
+    class CallNode : public CallableNode {
+    public:
+        CallNode(ExpressionNode* expr, const Identifier& method);
+
+        CallNode(ExpressionNode* expr);
+
+        /// Find callable for current node
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
+    protected:
+        ExpressionNode*             m_calle;
+        Identifier                  m_method;
+    };
+
+    //==--------------------------------------------------------------------==//
+    // New operator syntax node
+    class NewNode : public CallableNode {
+    public:
+        /// constructor
+        NewNode(TypeNode* type);
+
+        /// Emit instructions
+        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+
+        /// Find callable for current node
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
+    protected:
+        TypeNode* m_type;
     };
 
     //==--------------------------------------------------------------------==//
@@ -163,29 +252,8 @@ namespace lang {
         VariableNode* o_var;
     };
 
-    //==--------------------------------------------------------------------==//
-    /// Subtraction expression syntax node
-    class SubtractionNode : public ExpressionNode {
-    public:
-        /// constructo
-        SubtractionNode(ExpressionNode* expr);
-
-        /// destructor
-        ~SubtractionNode();
-
-        /// append expression
-        void append(ExpressionNode* expr) {
-            m_indexes.push_back(expr);
-        }
-
-        /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
-    protected:
-        ExpressionNode* m_expr;
-        std::vector<ExpressionNode*> m_indexes;
-    };
-
     /// TODO: ADD COMMETS ====================================================//
+    //==--------------------------------------------------------------------==//
     class InstanceMutableNode : public MutableNode {
     public:
         InstanceMutableNode(const Identifier& name);
@@ -196,6 +264,7 @@ namespace lang {
         Identifier m_name;
     };
 
+    //==--------------------------------------------------------------------==//
     class InstanceExpressionNode : public ExpressionNode {
     public:
         InstanceExpressionNode(const Identifier& name);
@@ -206,6 +275,7 @@ namespace lang {
         Identifier m_name;
     };
 
+    //==--------------------------------------------------------------------==//
     class IntegerConstNode : public ExpressionNode
     {
     public:
@@ -218,6 +288,7 @@ namespace lang {
         int32_t     m_value;
     };
 
+    //==--------------------------------------------------------------------==//
     class StringConstNode : public ExpressionNode
     {
     public:
@@ -230,6 +301,7 @@ namespace lang {
         String      m_value;
     };
 
+    //==--------------------------------------------------------------------==//
     class CharConstNode : public ExpressionNode
     {
     public:
@@ -242,6 +314,7 @@ namespace lang {
         UChar     m_value;
     };
 
+    //==--------------------------------------------------------------------==//
     class BoolConstNode : public ExpressionNode
     {
     public:
@@ -254,56 +327,7 @@ namespace lang {
         bool        m_value;
     };
 
-    class CallableNode : public ExpressionNode {
-    protected:
-        class CallArgument {
-        public:
-            ExpressionNode*  Value;
-            int32_t     Position;
-            Identifier  Name;
-        };
-
-    public:
-        /// destructor
-        virtual ~CallableNode();
-
-        /// Add named argument
-        void append(const Identifier& name, ExpressionNode* value);
-
-        /// Add positior argument
-        void append(ExpressionNode* value);
-    protected:
-        std::vector<CallArgument>   m_arguments;
-        bool                        m_hasNamed;
-
-        /// constructor
-        CallableNode();
-    };
-
-    class CallNode : public CallableNode {
-    public:
-        CallNode(ExpressionNode* expr, const Identifier& method);
-
-        CallNode(ExpressionNode* expr);
-
-        /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
-    protected:
-        ExpressionNode*             m_calle;
-        Identifier                  m_method;
-    };
-
-    class NewNode : public CallableNode {
-    public:
-        /// constructor
-        NewNode(TypeNode* type);
-
-        /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
-    protected:
-        TypeNode* m_type;
-    };
-
+    //==--------------------------------------------------------------------==//
     class ThisNode : public ExpressionNode {
     public:
         ThisNode(ObjectType* thisType);

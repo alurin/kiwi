@@ -158,16 +158,12 @@ ExpressionNode* VariableNode::getRight() {
     return new VariableExpressionNode(this);
 }
 
-void FieldNode::generate(Driver& driver, Type* ownerType) {
+void FieldNode::generateMember(Driver& driver, Type* ownerType) {
     Type* resultType = m_type->get(driver);
     ownerType->add(m_name, resultType);
 }
 
-
-void FieldNode::emit(Driver& driver, Type* ownerType) {
-}
-
-void FunctionNode::generate(Driver& driver, Type* ownerType) {
+void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
     Module* module   = ownerType->getModule();
     Type* resultType = m_type->get(driver);
     std::vector<Type*> frontendArgs;
@@ -182,7 +178,7 @@ void FunctionNode::generate(Driver& driver, Type* ownerType) {
 
 }
 
-void FunctionNode::emit(Driver& driver, Type* ownerType) {
+void FunctionNode::generateCode(Driver& driver, Type* ownerType) {
     m_func = MethodEmitter(m_method).emitDefinition();
     llvm::BasicBlock* entry = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
 

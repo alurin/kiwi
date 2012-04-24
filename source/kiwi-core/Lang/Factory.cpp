@@ -128,31 +128,35 @@ CallableNode* NodeFactory::call(const Identifier& name, const location& loc) {
 /// declare call
 CallableNode* NodeFactory::call(ExpressionNode* expr, const Identifier& name, const location& loc) {
     CallNode* call = new CallNode(expr, name);
-    call->setLocation(loc);
     m_calls.push(call);
-    return call;
+    return inject(call, loc);
 }
 
 /// declare call
 CallableNode* NodeFactory::call(ExpressionNode* expr, const location& loc) {
     CallNode* call = new CallNode(expr);
-    call->setLocation(loc);
     m_calls.push(call);
-    return call;
+    return inject(call, loc);
 }
 
 /// declare call to constructor
 CallableNode* NodeFactory::newBegin(TypeNode* type, const location& loc) {
     CallableNode* call = new NewNode(type);
-    call->setLocation(loc);
     m_calls.push(call);
-    return call;
+    return inject(call, loc);
+}
+// begin new subtraction
+CallableNode* NodeFactory::subBegin(ExpressionNode* expr, const location& loc) {
+    CallableNode* call = new MultiaryNode(Member::Subtraction, expr);
+    m_calls.push(call);
+    return inject(call, loc);
 }
 
 /// end current call
-CallableNode* NodeFactory::callEnd() {
+CallableNode* NodeFactory::callEnd(const location& loc) {
     assert(!m_calls.empty() && "Calls stack is empty");
     CallableNode* call = m_calls.top();
+    call->setLocation(loc);
     m_calls.pop();
     return call;
 }
@@ -161,26 +165,4 @@ ExpressionNode* NodeFactory::createThis(const location& loc) {
     ExpressionNode* node = new ThisNode(dyn_cast<ObjectType>(m_this));
     node->setLocation(loc);
     return node;
-}
-
-// returns current subtraction
-SubtractionNode* NodeFactory::sub() {
-    assert(!m_subs.empty() && "Subtractions stack is empty");
-    return m_subs.top();
-}
-
-// begin new subtraction
-SubtractionNode* NodeFactory::subBegin(ExpressionNode* expr) {
-    SubtractionNode* sub = new SubtractionNode(expr);
-    m_subs.push(sub);
-    return sub;
-}
-
-// end current subtraction
-SubtractionNode* NodeFactory::subEnd(const location& loc) {
-    assert(!m_subs.empty() && "Subtractions stack is empty");
-    SubtractionNode* sub = m_subs.top();
-    sub->setLocation(loc);
-    m_subs.pop();
-    return sub;
 }
