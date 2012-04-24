@@ -161,7 +161,7 @@ void StringType::initializate() {
     add(Member::Lt,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLE, context));
 
 
-    add(Member::Add,         stringTy, stringTy,                    new LlvmStringConcatenate()); // a + b
+    // add(Member::Add,         stringTy, stringTy,                    new LlvmStringConcatenate()); // a + b
     add(Member::Subtraction, charTy,   makeVector(intTy, 0),        new LlvmStringSubtraction()); // [a]
     add(Member::Subtraction, stringTy, makeVector(intTy, intTy, 0), new LlvmStringSubtraction()); // [a, b]
 

@@ -9,16 +9,11 @@
 
 // start up runtime
 void kiwi::startup() {
-    kiwi_dummy();                       // Include kiwi-runtime dummy
-
-    // init GC
-    GC_INIT();
-
-    // init ICU
     UErrorCode errorCode;
-    u_init(&errorCode);
 
-    // init LLVM
+    kiwi_dummy();                       // Include kiwi-runtime dummy
+    GC_INIT();                          // GC
+    u_init(&errorCode);                 // ICU
     // llvm_start_multithreaded();      // LLVM as multithreaded
     llvm::InitializeNativeTarget();     // LLVM JIT
 }
@@ -27,4 +22,5 @@ void kiwi::startup() {
 void kiwi::shutdown() {
     llvm::llvm_shutdown();              // LLVM
     u_cleanup();                        // ICU
+    GC_gcollect();                      // GC
 }

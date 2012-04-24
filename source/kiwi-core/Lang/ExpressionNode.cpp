@@ -282,6 +282,7 @@ ExpressionGen SubtractionNode::emit(Driver& driver, const StatementGen& gen) {
     std::vector<ExpressionGen>  values;
     std::vector<Type*>          types;
 
+    values.push_back(value);
     for (std::vector<ExpressionNode*>::iterator i = m_indexes.begin(); i != m_indexes.end(); ++i) {
         ExpressionNode* node = *i;
         ExpressionGen nodeGen = node->emit(driver, current);

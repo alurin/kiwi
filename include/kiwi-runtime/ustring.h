@@ -9,37 +9,39 @@
  * return substring from ustring
  *
  * @param buffer    The input string
- * @param lenght    The number of UChar code units
+ * @param length    The number of UChar code units
  * @param indexAt   The index of character
+ * @return          Character at @b indexAt place
  */
 KIWI_RUNTIME
-int32_t kiwi_subchar(UChar* buffer, int32_t lenght, int32_t indexAt);
+UChar kiwi_subchar(const UChar* buffer, const int32_t length, const int32_t indexAt);
 
 /**
  * return substring from ustring
  *
  * @param buffer    The input string
- * @param lenght    The number of UChar code units
- * @param indexAt   The index of first character
- * @param countAt   The
+ * @param length    The number of UChar code units
+ * @param indexAt   The index of first character in substring, -1 from end of string
+ * @param countAt   The count of characters in substring, -1 to the end of string
+ * @return          Pointer for internal Kiwi string contains result substring
  */
 KIWI_RUNTIME
-int32_t kiwi_substring(UChar* buffer, int32_t lenght, int32_t indexAt, int32_t countAt);
+void* kiwi_substring(const UChar* buffer, const int32_t length, int32_t indexAt, int32_t countAt);
 
 /// Print integer value in output stream
 KIWI_RUNTIME
-void kiwi_print_integer(int32_t value);
+void kiwi_print_integer(const int32_t value);
 
 /// Print unicode character in ouput stream
 KIWI_RUNTIME
-void kiwi_print_char(UChar value);
+void kiwi_print_char(const UChar value);
 
 /// Print boolean value in ouput stream
 KIWI_RUNTIME
-void kiwi_print_bool(int8_t value);
+void kiwi_print_bool(const int8_t value);
 
 /// Print unicode string in output stream
 KIWI_RUNTIME
-void kiwi_print_string(UChar* buffer, int32_t lenght);
+void kiwi_print_string(const UChar* buffer, const int32_t length);
 
 #endif

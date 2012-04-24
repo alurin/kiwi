@@ -110,6 +110,7 @@ UnaryOperator* Type::find(Member::UnaryOpcode opcode) {
     return 0;
 }
 
+
 // find binary operator
 BinaryOperator* Type::find(Member::BinaryOpcode opcode, Type* operandType) {
     for (std::vector<BinaryOperator*>::iterator i = m_binary.begin(); i != m_binary.end(); ++i) {
@@ -125,7 +126,7 @@ BinaryOperator* Type::find(Member::BinaryOpcode opcode, Type* operandType) {
 MultiaryOperator* Type::find(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) {
     for (std::vector<MultiaryOperator*>::iterator i = m_multiary.begin(); i != m_multiary.end(); ++i) {
         MultiaryOperator* op = *i;
-        if (op->getOpcode() == opcode && op->hasSignature(arguments, true)) {
+        if (op->getOpcode() == opcode && op->hasSignature(makeVector(this, arguments), true)) {
             return op;
         }
     }

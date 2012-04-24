@@ -10,15 +10,18 @@ namespace kiwi {
     template<typename E>
     inline std::vector<E*> makeVector(E* first, ...) {
         std::vector<E*> result;
+        if (first != 0) {
+            result.push_back(first);
+        }
         va_list vl;
         va_start( vl, first );
 
         // Step through the list.
         size_t i;
-        while(true) {
-            E* next = va_arg( vl, E* );
-            if (!next) break;
+        E* next = va_arg( vl, E* );
+        while (next != 0) {
             result.push_back(next);
+            next = va_arg( vl, E* );
         }
         va_end( vl );
         return result;

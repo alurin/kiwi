@@ -1,5 +1,6 @@
 #include "LlvmEmitter.hpp"
 #include "kiwi/DerivedTypes.hpp"
+#include "kiwi/Module.hpp"
 #include <llvm/InstrTypes.h>
 #include <llvm/Instructions.h>
 #include <llvm/Constants.h>
@@ -219,18 +220,66 @@ ExpressionGen LlvmStringConcatenate::emit(const StatementGen& gen, const Express
 
 /// emit IR instruction for string substraction
 ExpressionGen LlvmStringSubtraction::emit(const StatementGen& gen, const expressions& values) {
+    if (values.size() != 2 && values.size() != 3) {
+        throw "Not implemented";
+    }
+
+    Context*         t_context = gen.getOwner()->getModule()->getContext();
     llvm::Module*       module = gen.getModule();
     llvm::LLVMContext& context = gen.getContext();
     llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
-    llvm::Type*     charType   = llvm::IntegerType::get(context, 16)->getPointerTo();
+    llvm::Type*     charType   = llvm::IntegerType::get(context, 16);
+    llvm::Type*     bufferType = llvm::IntegerType::get(context, 16)->getPointerTo();
+    llvm::Type*     voidType   = llvm::Type::getVoidTy(context);
 
-    if (values.size() == 1) {
-        /// substraction of character from string
+    LlvmStringEmitter string;
+    string.emit(gen, values[0]);
 
-    } else if (values.size() == 2) {
-        /// substraction of substring from string
+    // collect arguments
+    std::vector<llvm::Value*> args;
+    args.push_back(string.getBufferValue());
+    args.push_back(string.getLengthValue());
 
-    } else {
-        throw "Not implemented";
+    //
+    llvm::Function* substraction = 0;
+    Type* returnType = 0;
+
+    // collect types and functions
+    if (values.size() == 2) {           /// substraction of character from string
+        returnType   = CharType::get(t_context);
+
+        substraction = llvm::dyn_cast<llvm::Function>(
+            module->getOrInsertFunction(
+                "kiwi_subchar",
+                charType,
+                bufferType,
+                lengthType,
+                lengthType,
+                NULL
+            )
+        );
+
+        args.push_back(values[1].getValue());
+    } else if (values.size() == 3) {    /// substraction of substring from string
+        returnType   = StringType::get(t_context);
+
+        substraction = llvm::dyn_cast<llvm::Function>(
+            module->getOrInsertFunction(
+                "kiwi_substring",
+                returnType->getVarType(),
+                bufferType,
+                lengthType,
+                lengthType,
+                lengthType,
+                NULL
+            )
+        );
+
+        args.push_back(values[1].getValue());
+        args.push_back(values[2].getValue());
     }
+
+    // compute string compare and return result
+    llvm::CallInst* returnValue = llvm::CallInst::Create(substraction, makeArrayRef(args), "", gen.getBlock());
+    return ExpressionGen(gen, returnType, returnValue);
 }

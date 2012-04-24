@@ -18,8 +18,8 @@ void kiwi::initRuntimeModule(Module* mod) {
     llvm::Type*       boolType = llvm::IntegerType::get(context, 1);
     llvm::Type*     bufferType = charType->getPointerTo();
 
-    llvm::Function* printInt    = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_integer", voidType, intType, NULL));
-    llvm::Function* printBool   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_bool", voidType, boolType, NULL));
-    llvm::Function* printChar   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_char", voidType, charType, NULL));
-    llvm::Function* printString = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_string", voidType, bufferType, intType, NULL));
+    // llvm::Function* printInt    = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_integer", voidType, intType, NULL));
+    // llvm::Function* printBool   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_bool",    voidType, boolType, NULL));
+    // llvm::Function* printChar   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_char",    voidType, charType, NULL));
+    // llvm::Function* printString = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_string",  voidType, bufferType, intType, NULL));
 }
