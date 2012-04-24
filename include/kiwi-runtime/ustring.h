@@ -1,5 +1,5 @@
-#ifndef KIWI_RUNTIME_USTRING
-#define KIWI_RUNTIME_USTRING
+#ifndef KIWI_RUNTIME_USTRING_INCLUDED
+#define KIWI_RUNTIME_USTRING_INCLUDED
 
 #include "kiwi-runtime/config.h"
 #include <stdint.h>

@@ -1,5 +1,5 @@
-#ifndef KIWI_RUNTIME_CONFIG
-#define KIWI_RUNTIME_CONFIG
+#ifndef KIWI_RUNTIME_CONFIG_INCLUDED
+#define KIWI_RUNTIME_CONFIG_INCLUDED
 
 #ifdef __cplusplus
     #define KIWI_RUNTIME extern "C"

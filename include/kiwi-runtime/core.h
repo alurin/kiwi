@@ -1,5 +1,5 @@
-#ifndef KIWI_RUNTIME_CORE
-#define KIWI_RUNTIME_CORE
+#ifndef KIWI_RUNTIME_CORE_INCLUDED
+#define KIWI_RUNTIME_CORE_INCLUDED
 
 #include "kiwi-runtime/config.h"
 

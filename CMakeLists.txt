@@ -1,10 +1,12 @@
 # Vasiliy Sheredeko. Copyright (C) 2012. MIT license.
 
+CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
+PROJECT (kiwi)
+INCLUDE(ExternalProject)
+
 #
 # Project Properties
 #
-CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
-PROJECT (kiwi)
 SET (KIWI_NAME "Kiwi")
 SET (KIWI_CODENAME "${PROJECT_NAME}")
 SET (KIWI_COPYRIGHT_YEARS "2012")
@@ -17,7 +19,6 @@ SET (KIWI_VENDOR_ID "com.kronverk-studio")
 SET (KIWI_VENDOR_NAME "Vasiliy Sheredeko")
 SET (KIWI_VENDOR_URL "kronverk-studio.ru")
 SET (KIWI_ID "${KIWI_VENDOR_ID}.${PROJECT_NAME}")
-
 
 #
 # Debugging Options
@@ -36,9 +37,14 @@ ELSE( ${DEBUG} )
 ENDIF( ${DEBUG} )
 
 IF (CMAKE_COMPILER_IS_GNUCC AND KIWI_DEBUG)
-    SET(CMAKE_C_FLAGS           ${CMAKE_C_FLAGS}          "-g3 -gdwarf-2 -g -O0")
-    SET(CMAKE_CXX_FLAGS         ${CMAKE_CXX_FLAGS}        "-g3 -gdwarf-2 -g -O0")
+    SET(CMAKE_C_FLAGS           ${CMAKE_C_FLAGS}   "-g3 -gdwarf-2 -g -O0")
+    SET(CMAKE_CXX_FLAGS         ${CMAKE_CXX_FLAGS} "-g3 -gdwarf-2 -g -O0")
 ENDIF (CMAKE_COMPILER_IS_GNUCC AND KIWI_DEBUG)
+
+IF( CMAKE_COMPILER_IS_GNUCC AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+    SET(EXTERNAL_C_FLAGS    "-fPIC")
+    SET(EXTERNAL_CXX_FLAGS  "-fPIC")
+ENDIF( CMAKE_COMPILER_IS_GNUCC AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
 
 #
 # Project Output Paths
@@ -79,8 +85,19 @@ LINK_DIRECTORIES(${LLVM_LIBRARY_DIRS})
 #
 # Locate External Projects
 #
-INCLUDE(ExternalProject)
-EXTERNALPROJECT_ADD(bdwgc PREFIX ${CMAKE_BINARY_DIR}/bdwgc SOURCE_DIR ${MAINFOLDER}/vendor/lib/bdwgc INSTALL_COMMAND "")
+
+EXTERNALPROJECT_ADD(
+    bdwgc
+    PREFIX ${CMAKE_BINARY_DIR}/bdwgc
+    SOURCE_DIR ${MAINFOLDER}/vendor/lib/bdwgc
+    INSTALL_COMMAND ""
+    CMAKE_ARGS
+        -DCMAKE_C_FLAGS=${EXTERNAL_C_FLAGS}
+        -DCMAKE_CXX_FLAGS=${EXTERNAL_CXX_FLAGS}
+)
+ADD_LIBRARY(gc-lib UNKNOWN IMPORTED)
+SET_PROPERTY(TARGET gc-lib PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bdwgc/src/bdwgc-build/libgc-lib.a )
+INCLUDE_DIRECTORIES(${MAINFOLDER}/vendor/lib/bdwgc/include)
 
 #
 # Configure Files

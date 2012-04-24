@@ -17,6 +17,8 @@ distclean:
 	@- $(RM) ./build/Makefile
 	@- $(RM) ./build/source
 	@- $(RM) ./build/test
+	@- $(RM) ./build/vendor
+	@- $(RM) ./build/bdwgc
 	@- $(RM) ./build/CMake*
 	@- $(RM) ./build/cmake.*
 	@- $(RM) ./build/*.cmake
