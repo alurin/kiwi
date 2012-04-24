@@ -1,0 +1,27 @@
+#!/usr/bin/env kiwi
+/* Test script for classes definition */
+
+class Parent {
+    string test() {
+        return "Parent::test";
+    }
+}
+
+class Child {
+    inherit Parent;
+
+    string test() {
+        return "Child::test";
+    }
+}
+
+void test(Parent $obj) {
+    print "Call method: "; print $obj.test(); print "\n";
+}
+
+void main() {
+    auto $parent = new Parent();
+    auto $child  = new Child();
+    test($parent);
+    test($child);
+}
