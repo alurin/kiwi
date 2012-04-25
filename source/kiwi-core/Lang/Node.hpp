@@ -2,6 +2,7 @@
 #define KIWI_LANG_NODE_INTERNAL
 
 #include "kiwi/config.hpp"
+#include "kiwi/types.hpp"
 #include "location.hh"
 
 #define KIWI_ERROR_AND_EXIT(message, location) \

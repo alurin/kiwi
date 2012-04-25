@@ -1,6 +1,7 @@
 #ifndef KIWI_CODEGEN_STRING_INTERNAL
 #define KIWI_CODEGEN_STRING_INTERNAL
 
+#include "kiwi/types.hpp"
 #include "kiwi/Codegen/Expression.hpp"
 
 namespace kiwi {

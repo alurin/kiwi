@@ -2,7 +2,7 @@
 #include "CompoundNode.hpp"
 #include "MemberNode.hpp"
 #include "kiwi/DerivedTypes.hpp"
-#include <assert.h>
+#include "kiwi/assert.hpp"
 
 using namespace kiwi;
 using namespace kiwi::lang;
@@ -49,7 +49,7 @@ void CompoundNode::generateType(Driver& driver) {
 }
 
 void CompoundNode::generateMembers(Driver& driver) {
-    assert(m_type && "Type not generated");
+    kiwi_assert(m_type, "Type not generated");
 
     /// Generate members
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
@@ -62,7 +62,7 @@ void CompoundNode::generateMembers(Driver& driver) {
 
 // Emit IR signature
 void CompoundNode::generateIRSignature(Driver& driver) {
-    assert(m_type && "Type not generated");
+    kiwi_assert(m_type, "Type not generated");
 
     /// Generate members
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
@@ -72,7 +72,7 @@ void CompoundNode::generateIRSignature(Driver& driver) {
 
 // Emit IR bytecode
 void CompoundNode::generateIRCode(Driver& driver) {
-    assert(m_type && "Type not generated");
+    kiwi_assert(m_type, "Type not generated");
 
     /// Generate members
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {

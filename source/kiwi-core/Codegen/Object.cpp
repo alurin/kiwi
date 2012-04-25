@@ -1,3 +1,4 @@
+#include "kiwi/assert.hpp"
 #include "kiwi/Codegen/Object.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/DerivedTypes.hpp"
@@ -60,7 +61,7 @@ ExpressionGen ObjectEmitter::findField(const StatementGen& gen, const Expression
     lengthIdx.push_back(one);
 
     llvm::Value* value = thisValue.getValue();
-    assert(value && "value is null");
+    kiwi_assert(value, "value is null");
 
     llvm::Value* position    = llvm::GetElementPtrInst::Create(addressMap, makeArrayRef(lengthIdx), "", gen.getBlock());
     llvm::Value* fieldOffset = new llvm::LoadInst(position, "", gen.getBlock());

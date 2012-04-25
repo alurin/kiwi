@@ -1,10 +1,6 @@
 #ifndef KIWI_CONFIG_INCLUDED
 #define KIWI_CONFIG_INCLUDED
 
-#include "string.h"
-#include "stdint.h"
-#include <unicode/unistr.h>
-
 #include <boost/preprocessor/stringize.hpp>
 
 /*
@@ -28,13 +24,6 @@
 #cmakedefine KIWI_VENDOR_NAME        "@KIWI_VENDOR_NAME@"
 #cmakedefine KIWI_VENDOR_URL         "@KIWI_VENDOR_URL@"
 #cmakedefine KIWI_ID                 "@KIWI_VENDOR_ID@"
-
-
-namespace kiwi {
-    typedef UnicodeString   String;
-    typedef std::string     Path;
-    typedef std::string     Identifier;
-}
 
 #ifndef KIWI_NAME
 #   error "Please specify the application name in the top-level CMakeLists.txt file."

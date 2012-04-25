@@ -2,6 +2,7 @@
 #define KIWI_MEMBER_INCLUDED
 
 #include "kiwi/config.hpp"
+#include "kiwi/types.hpp"
 
 namespace llvm
 {
