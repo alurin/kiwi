@@ -21,6 +21,7 @@ IntType::IntType(Module* module, int32_t size, bool unsign)
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, size);
     m_typeID  = IntID;
+    m_name    = "int";
 }
 
 BoolType::BoolType(Module* module)
@@ -28,6 +29,7 @@ BoolType::BoolType(Module* module)
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, 1);
     m_typeID  = BoolID;
+    m_name    = "bool";
 }
 
 VoidType::VoidType(Module* module)
@@ -35,6 +37,7 @@ VoidType::VoidType(Module* module)
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::Type::getVoidTy(context);
     m_typeID  = VoidID;
+    m_name    = "void";
 }
 
 CharType::CharType(Module* module)
@@ -42,11 +45,13 @@ CharType::CharType(Module* module)
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_varType = llvm::IntegerType::get(context, 16);
     m_typeID  = CharID;
+    m_name    = "char";
 }
 
 ObjectType::ObjectType(Module* module)
 : Type(module), m_addressMap(0), m_virtualTable(0) {
     m_typeID  = ObjectID;
+    m_name    = "object";
 }
 
 StringType::StringType(Module* module)

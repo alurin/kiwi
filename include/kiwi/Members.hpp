@@ -135,12 +135,6 @@ namespace kiwi
         llvm::Function* m_func;
 
         /// constructor with standart emitter
-        Callable(Type* ownerType, Type* returnType);
-
-        /// constructor
-        Callable(Type* ownerType, Type* returnType, codegen::CallableEmitter* emitter);
-
-        /// constructor with standart emitter
         Callable(Type* ownerType, Type* returnType, TypeVector types);
 
         /// constructor

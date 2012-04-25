@@ -3,32 +3,25 @@
 #include "Codegen/LlvmEmitter.hpp"
 #include "kiwi/Support/Array.hpp"
 #include "kiwi/Members.hpp"
+#include <assert.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;
 
 /// constructor
-Callable::Callable(Type* ownerType, Type* returnType)
-: Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(0) {
-
-}
-
-/// constructor
-Callable::Callable(Type* ownerType, Type* returnType, codegen::CallableEmitter* emitter)
-: Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(emitter) {
-
-}
-
-/// constructor
 Callable::Callable(Type* ownerType, Type* returnType, TypeVector types)
 : Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(0) {
     makeArgumentsFromTypes(types);
+    assert(m_args.size() > 0      && "Callable must have minimum one argument");
+    assert(m_args[0] == ownerType && "First argument for callable must be owner type");
 }
 
 /// constructor
 Callable::Callable(Type* ownerType, Type* returnType, TypeVector types, codegen::CallableEmitter* emitter)
 : Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(emitter) {
     makeArgumentsFromTypes(types);
+    assert(m_args.size() > 0      && "Callable must have minimum one argument");
+    assert(m_args[0] == ownerType && "First argument for callable must be owner type");
 }
 
 Callable::~Callable() {
@@ -79,7 +72,7 @@ Field::Field(const Identifier& name, Type* ownerType, Type* fieldType)
 
 // constructor
 Method::Method(const Identifier& name, Type* ownerType, Type* resultType, TypeVector types)
-: Callable(ownerType, resultType, types), m_name(name) {
+: Callable(ownerType, resultType, makeVector(ownerType, types)), m_name(name) {
     m_memberID = MethodID;
 }
 
@@ -88,7 +81,7 @@ Argument::Argument(Callable* owner, Type* type, int32_t position)
 : m_owner(owner), m_type(type) { }
 
 CastOperator::CastOperator(Type* sourceType, Type* destType)
-: Callable(sourceType, destType) {
+: Callable(sourceType, destType, makeVector(sourceType, 0)) {
     m_memberID = CastID;
 }
 

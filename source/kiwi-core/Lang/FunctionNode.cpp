@@ -184,11 +184,13 @@ void FunctionNode::generateIRSignature(Driver& driver, Type* owner) {
 
 void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
     llvm::BasicBlock* entry = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
+    assert(m_func->arg_size() == m_method->arg_size() && "Argument in function must be actual");
 
     // emit mutable variables for arguments
     size_t j = 0;
     for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
         if (j) {
+            assert(j < m_positions.size() && "Ops... This is not worked");
             ArgumentNode* arg = m_positions[j-1];
 
             // set argument name

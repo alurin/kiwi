@@ -75,6 +75,15 @@ namespace kiwi
         MemberID getMemberID() const {
             return m_memberID;
         }
+
+        /// temp: get name of operator by opcode
+        static Identifier getOperatorName(UnaryOpcode opcode);
+
+        /// temp: get name of operator by opcode
+        static Identifier getOperatorName(BinaryOpcode opcode);
+
+        /// temp: get name of operator by opcode
+        static Identifier getOperatorName(MultiaryOpcode opcode);
     protected:
         /// member class identifier
         MemberID m_memberID;

@@ -20,3 +20,6 @@ install_manifest.txt
 
 # Sublime text editor
 *.sublime-*
+
+#generated files
+include/kiwi/config.hpp
