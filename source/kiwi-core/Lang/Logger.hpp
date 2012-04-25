@@ -1,7 +1,7 @@
 #ifndef KIWI_LANG_LOGGER_INTERNAL
 #define KIWI_LANG_LOGGER_INTERNAL
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 #include <istream>
 
 namespace kiwi {

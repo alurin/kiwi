@@ -1,7 +1,7 @@
 #ifndef KIWI_MODULE_INCLUDED
 #define KIWI_MODULE_INCLUDED
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 #include <vector>
 #include <map>
 

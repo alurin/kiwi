@@ -1,7 +1,7 @@
 #ifndef KIWI_SUPPORT_ARRAY_INCLUDED
 #define KIWI_SUPPORT_ARRAY_INCLUDED
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 #include <vector>
 #include <stdarg.h>
 

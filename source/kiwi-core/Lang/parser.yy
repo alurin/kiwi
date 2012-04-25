@@ -3,7 +3,7 @@
 
 %{ /*** C/C++ Declarations ***/
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 #include <stdio.h>
 #include <string>
 #include <vector>

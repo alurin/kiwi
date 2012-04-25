@@ -1,7 +1,7 @@
 #ifndef KIWI_MEMBER_INCLUDED
 #define KIWI_MEMBER_INCLUDED
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 
 namespace llvm
 {

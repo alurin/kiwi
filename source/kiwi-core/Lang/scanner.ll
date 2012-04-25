@@ -3,7 +3,7 @@
 
 %{ /*** C/C++ Declarations ***/
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 #include <string>
 #include <sstream>
 #include "scanner.h"

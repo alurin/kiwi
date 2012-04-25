@@ -1,7 +1,7 @@
 #ifndef KIWI_CONTEXT_INCLUDED
 #define KIWI_CONTEXT_INCLUDED
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 #include "kiwi/Application.hpp"
 #include <log4cxx/logger.h>
 

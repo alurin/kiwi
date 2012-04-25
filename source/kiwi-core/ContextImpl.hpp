@@ -1,7 +1,7 @@
 #ifndef KIWI_CONTEXTIMPL_INTERNAL
 #define KIWI_CONTEXTIMPL_INTERNAL
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include <vector>
 

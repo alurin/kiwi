@@ -1,7 +1,7 @@
 #ifndef KIWI_LANG_TYPENODE_INTERNAL
 #define KIWI_LANG_TYPENODE_INTERNAL
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 #include "Node.hpp"
 
 namespace kiwi {

@@ -1,7 +1,7 @@
 #ifndef KIWI_SUPPORT_CAST_INCLUDED
 #define KIWI_SUPPORT_CAST_INCLUDED
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 
 namespace kiwi {
     /// simple check if object is instance of class B

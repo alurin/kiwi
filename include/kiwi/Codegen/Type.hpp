@@ -1,7 +1,7 @@
 #ifndef KIWI_CODEGEN_TYPE_INCLUDED
 #define KIWI_CODEGEN_TYPE_INCLUDED
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 
 namespace llvm {
     class Type;

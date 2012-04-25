@@ -4,7 +4,7 @@
 #ifndef EXAMPLE_DRIVER_H
 #define EXAMPLE_DRIVER_H
 
-#include "kiwi/Config.hpp"
+#include "kiwi/config.hpp"
 #include "Factory.hpp"
 #include <string>
 
