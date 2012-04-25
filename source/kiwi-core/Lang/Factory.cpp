@@ -1,6 +1,6 @@
+#include "kiwi/assert.hpp"
 #include "Factory.hpp"
 #include "kiwi/Support/Cast.hpp"
-#include <assert.h>
 
 using namespace kiwi;
 using namespace kiwi::lang;
@@ -38,7 +38,7 @@ void NodeFactory::prepareScript(const location& loc) {
 }
 
 CompoundNode* NodeFactory::classTop() {
-    assert(!m_classes.empty() && "Classes stack is empty");
+    kiwi_assert(!m_classes.empty(), "Classes stack is empty");
     return m_classes.top();
 }
 
@@ -49,7 +49,7 @@ CompoundNode* NodeFactory::classBegin(const Identifier& name, const location& lo
 }
 
 CompoundNode* NodeFactory::classEnd() {
-    assert(!m_classes.empty() && "Classes stack is empty");
+    kiwi_assert(!m_classes.empty(), "Classes stack is empty");
     CompoundNode* compound = m_classes.top();
     m_classes.pop();
     m_compounds.push_back(compound);
@@ -57,7 +57,7 @@ CompoundNode* NodeFactory::classEnd() {
 }
 
 FunctionNode* NodeFactory::func() {
-    assert(!m_funcs.empty() && "Functions stack is empty");
+    kiwi_assert(!m_funcs.empty(), "Functions stack is empty");
     return m_funcs.top();
 }
 
@@ -69,7 +69,7 @@ FunctionNode* NodeFactory::func(const Identifier& name, TypeNode* type) {
 }
 
 FunctionNode* NodeFactory::funcEnd() {
-    assert(!m_funcs.empty() && "Functions stack is empty");
+    kiwi_assert(!m_funcs.empty(), "Functions stack is empty");
     FunctionNode* func = m_funcs.top();
     m_funcs.pop();
     m_scopes.pop();
@@ -78,7 +78,7 @@ FunctionNode* NodeFactory::funcEnd() {
 
 // returns current scope
 ScopeNode* NodeFactory::scope() {
-    assert(!m_scopes.empty() && "Scopes stack is empty");
+    kiwi_assert(!m_scopes.empty(), "Scopes stack is empty");
     return m_scopes.top();
 }
 
@@ -92,7 +92,7 @@ ScopeNode* NodeFactory::scopeBegin() {
 
 // end current scope
 ScopeNode* NodeFactory::scopeEnd() {
-    assert(!m_scopes.empty() && "Scopes stack is empty");
+    kiwi_assert(!m_scopes.empty(), "Scopes stack is empty");
     ScopeNode* scope = m_scopes.top();
     m_scopes.pop();
     return scope;
@@ -112,13 +112,13 @@ ExpressionNode* NodeFactory::right(const Identifier& name, const location& loc) 
 
 /// returns current call
 CallableNode* NodeFactory::call() {
-    assert(!m_calls.empty() && "Calls stack is empty");
+    kiwi_assert(!m_calls.empty(), "Calls stack is empty");
     return m_calls.top();
 }
 
 /// declare call
 CallableNode* NodeFactory::call(const Identifier& name, const location& loc) {
-    assert(!m_calls.empty() && "Calls stack is empty");
+    kiwi_assert(!m_calls.empty(), "Calls stack is empty");
     CallNode* call = new CallNode(new ThisNode(dyn_cast<ObjectType>(m_this)), name);
     call->setLocation(loc);
     m_calls.push(call);
@@ -147,7 +147,7 @@ CallableNode* NodeFactory::subBegin(ExpressionNode* expr, const location& loc) {
 
 /// end current call
 CallableNode* NodeFactory::callEnd(const location& loc) {
-    assert(!m_calls.empty() && "Calls stack is empty");
+    kiwi_assert(!m_calls.empty(), "Calls stack is empty");
     CallableNode* call = m_calls.top();
     call->setLocation(loc);
     m_calls.pop();

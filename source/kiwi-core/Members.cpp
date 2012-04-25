@@ -3,7 +3,7 @@
 #include "Codegen/LlvmEmitter.hpp"
 #include "kiwi/Support/Array.hpp"
 #include "kiwi/Members.hpp"
-#include <assert.h>
+#include "kiwi/assert.hpp"
 
 using namespace kiwi;
 using namespace kiwi::codegen;
@@ -12,16 +12,16 @@ using namespace kiwi::codegen;
 Callable::Callable(Type* ownerType, Type* returnType, TypeVector types)
 : Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(0) {
     makeArgumentsFromTypes(types);
-    assert(m_args.size() > 0      && "Callable must have minimum one argument");
-    assert(m_args[0] == ownerType && "First argument for callable must be owner type");
+    kiwi_assert(m_args.size() > 0, "Callable must have minimum one argument");
+    kiwi_assert(m_args[0] == ownerType, "First argument for callable must be owner type");
 }
 
 /// constructor
 Callable::Callable(Type* ownerType, Type* returnType, TypeVector types, codegen::CallableEmitter* emitter)
 : Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(emitter) {
     makeArgumentsFromTypes(types);
-    assert(m_args.size() > 0      && "Callable must have minimum one argument");
-    assert(m_args[0] == ownerType && "First argument for callable must be owner type");
+    kiwi_assert(m_args.size() > 0, "Callable must have minimum one argument");
+    kiwi_assert(m_args[0] == ownerType, "First argument for callable must be owner type");
 }
 
 Callable::~Callable() {
