@@ -2,10 +2,7 @@
 #include "kiwi/Codegen/Emitter.hpp"
 #include "Codegen/LlvmEmitter.hpp"
 #include "kiwi/Support/Array.hpp"
-#include "kiwi/Type.hpp"
 #include "kiwi/Members.hpp"
-#include "kiwi/Module.hpp"
-#include "kiwi/Context.hpp"
 
 using namespace kiwi;
 using namespace kiwi::codegen;

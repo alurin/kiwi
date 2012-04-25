@@ -3,15 +3,12 @@
 
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
-#include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Support/Array.hpp"
 #include "kiwi/Support/Cast.hpp"
 
 #include <llvm/Constants.h>
 #include <llvm/GlobalVariable.h>
-#include <llvm/DerivedTypes.h>
-#include <llvm/Instruction.h>
 #include <llvm/ADT/ArrayRef.h>
 
 #include <stack>

@@ -1,11 +1,6 @@
 #include "kiwi/Engine.hpp"
 #include "kiwi/Module.hpp"
-#include "kiwi/Application.hpp"
 #include <boost/program_options.hpp>
-#include <iostream>
-#include <vector>
-#include <iterator>
-#include <algorithm>
 
 using namespace kiwi;
 namespace po = boost::program_options;

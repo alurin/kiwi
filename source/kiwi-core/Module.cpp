@@ -2,20 +2,16 @@
 #include "ModuleImpl.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
-#include "kiwi/Type.hpp"
 #include "kiwi/Codegen/Startup.hpp"
 #include "Lang/Driver.hpp"
 #include "llvm/Analysis/Passes.h"
-#include "llvm/Analysis/Verifier.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/ExecutionEngine/JIT.h"
-#include "llvm/Function.h"
 #include "llvm/Module.h"
 #include "llvm/PassManager.h"
 #include "llvm/Target/TargetData.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/IPO.h"
-#include "llvm/Type.h"
 
 using namespace kiwi;
 using namespace kiwi::codegen;

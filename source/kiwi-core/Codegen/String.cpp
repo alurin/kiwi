@@ -1,10 +1,8 @@
 #include "kiwi/Codegen/String.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
-#include "kiwi/Members.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include <llvm/Constants.h>
-#include <llvm/Function.h>
 #include <llvm/GlobalVariable.h>
 #include <llvm/Instructions.h>
 

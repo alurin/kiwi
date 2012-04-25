@@ -1,12 +1,9 @@
 #include "LlvmEmitter.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Module.hpp"
-#include <llvm/InstrTypes.h>
 #include <llvm/Instructions.h>
 #include <llvm/Constants.h>
-#include <llvm/Function.h>
 #include <llvm/Module.h>
-#include <llvm/ADT/ArrayRef.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;

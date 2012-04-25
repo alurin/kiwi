@@ -1,12 +1,9 @@
 #include "kiwi/Codegen/Statement.hpp"
+#include <llvm/Function.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-#include <llvm/BasicBlock.h>
-#include <llvm/DerivedTypes.h>
-#include <llvm/Function.h>
-#include <assert.h>
 
 StatementGen::StatementGen(Type* owner, llvm::BasicBlock* block)
 : m_owner(owner), m_context(&(block->getParent()->getContext())), m_module(block->getParent()->getParent()),

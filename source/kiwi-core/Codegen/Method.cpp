@@ -2,10 +2,8 @@
 #include "kiwi/Module.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Type.hpp"
-#include <llvm/Type.h>
 #include <llvm/Function.h>
 #include <llvm/Instructions.h>
-#include <llvm/ADT/ArrayRef.h>
 #include <vector>
 
 using namespace kiwi;
