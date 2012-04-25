@@ -60,12 +60,22 @@ void CompoundNode::generateMembers(Driver& driver) {
     m_type->emit();
 }
 
-// Emit type structure and methods
-void CompoundNode::generateCode(Driver& driver) {
+// Emit IR signature
+void CompoundNode::generateIRSignature(Driver& driver) {
     assert(m_type && "Type not generated");
 
     /// Generate members
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
-        (*i)->generateCode(driver, m_type);
+        (*i)->generateIRSignature(driver, m_type);
+    }
+}
+
+// Emit IR bytecode
+void CompoundNode::generateIRCode(Driver& driver) {
+    assert(m_type && "Type not generated");
+
+    /// Generate members
+    for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
+        (*i)->generateIRCode(driver, m_type);
     }
 }

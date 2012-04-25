@@ -253,9 +253,6 @@ namespace lang {
         /// declare call
         CallableNode* call(ExpressionNode* expr, const Identifier& name, const location& loc);
 
-        /// declare call
-        CallableNode* call(ExpressionNode* expr, const location& loc);
-
         /// declare call to constructor
         CallableNode* newBegin(TypeNode* type, const location& loc);
 

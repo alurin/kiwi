@@ -6,6 +6,7 @@
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Support/Array.hpp"
+#include "kiwi/Support/Cast.hpp"
 
 #include <llvm/Constants.h>
 #include <llvm/GlobalVariable.h>
@@ -207,14 +208,14 @@ bool ObjectType::inherit(ObjectType* type) {
     return false;
 }
 
-/// inherit type
-bool ObjectType::isInherit(ObjectType* type) {
-    std::stack<ObjectType*> parents;
+/// inherit type?
+bool ObjectType::isInherit(const ObjectType* type) const{
+    std::stack<const ObjectType*> parents;
     parents.push(this);
 
     while(!parents.empty()) {
         // pop element off stack
-        ObjectType* parent = parents.top();
+        const ObjectType* parent = parents.top();
         parents.pop();
 
         if (parent == type)
@@ -227,6 +228,20 @@ bool ObjectType::isInherit(ObjectType* type) {
     return false;
 }
 
+/// implement interface?
+bool ObjectType::isImplement(const InterfaceType* type, bool duckCast) const {
+    return false;
+}
+
+///
+bool ObjectType::isCastableTo(const Type* type, bool duckCast) const {
+    if (const ObjectType* parent = dyn_cast<ObjectType>(type)) {
+        return isInherit(parent);
+    } else if (const InterfaceType* interface = dyn_cast<InterfaceType>(type)) {
+        return isImplement(interface, duckCast);
+    }
+    return Type::isCastableTo(type, duckCast);
+}
 // Emit type structure
 void ObjectType::emit() {
     if (m_varType != 0) {
@@ -287,4 +302,8 @@ void ObjectType::emit() {
         addressMapValue,
         "amap"
     );
+
+    // add simple constructor
+    std::vector<Type*> empty;
+    add(Member::Constructor, VoidType::get(m_module->getContext()), empty, new LlvmCtorEmitter());
 }

@@ -24,27 +24,27 @@ Type::Type(Module* module)
 }
 
 Type::~Type() {
-    for (std::vector<UnaryOperator*>::iterator i = m_unary.begin(); i != m_unary.end(); ++i) {
+    for (std::vector<UnaryOperator*>::const_iterator i = m_unary.begin(); i != m_unary.end(); ++i) {
         UnaryOperator* op = *i;
         delete op;
     }
 
-    for (std::vector<BinaryOperator*>::iterator i = m_binary.begin(); i != m_binary.end(); ++i) {
+    for (std::vector<BinaryOperator*>::const_iterator i = m_binary.begin(); i != m_binary.end(); ++i) {
         BinaryOperator* op = *i;
         delete op;
     }
 
-    for (std::vector<MultiaryOperator*>::iterator i = m_multiary.begin(); i != m_multiary.end(); ++i) {
+    for (std::vector<MultiaryOperator*>::const_iterator i = m_multiary.begin(); i != m_multiary.end(); ++i) {
         MultiaryOperator* op = *i;
         delete op;
     }
 
-    for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i) {
+    for (std::vector<Field*>::const_iterator i = m_fields.begin(); i != m_fields.end(); ++i) {
         Field* field = *i;
         delete field;
     }
 
-    for (std::vector<Method*>::iterator i = m_methods.begin(); i != m_methods.end(); ++i) {
+    for (std::vector<Method*>::const_iterator i = m_methods.begin(); i != m_methods.end(); ++i) {
         Method* method = *i;
         delete method;
     }
@@ -100,10 +100,10 @@ Method* Type::add(const Identifier& name, Type* resultType, std::vector<Type*> a
 }
 
 // find unary operator
-UnaryOperator* Type::find(Member::UnaryOpcode opcode) {
-    for (std::vector<UnaryOperator*>::iterator i = m_unary.begin(); i != m_unary.end(); ++i) {
+UnaryOperator* Type::find(Member::UnaryOpcode opcode) const {
+    for (std::vector<UnaryOperator*>::const_iterator i = m_unary.begin(); i != m_unary.end(); ++i) {
         UnaryOperator* op = *i;
-        if (op->getOpcode() == opcode&& op->hasSignature(makeVector(this, 0), true)) {
+        if (op->getOpcode() == opcode&& op->hasSignature(makeVector(const_cast<Type*>(this), 0), true)) {
             return op;
         }
     }
@@ -112,10 +112,10 @@ UnaryOperator* Type::find(Member::UnaryOpcode opcode) {
 
 
 // find binary operator
-BinaryOperator* Type::find(Member::BinaryOpcode opcode, Type* operandType) {
-    for (std::vector<BinaryOperator*>::iterator i = m_binary.begin(); i != m_binary.end(); ++i) {
+BinaryOperator* Type::find(Member::BinaryOpcode opcode, Type* operandType) const {
+    for (std::vector<BinaryOperator*>::const_iterator i = m_binary.begin(); i != m_binary.end(); ++i) {
         BinaryOperator* op = *i;
-        if (op->getOpcode() == opcode && op->hasSignature(makeVector(this, operandType, 0), true)) {
+        if (op->getOpcode() == opcode && op->hasSignature(makeVector(const_cast<Type*>(this), operandType, 0), true)) {
             return op;
         }
     }
@@ -123,10 +123,10 @@ BinaryOperator* Type::find(Member::BinaryOpcode opcode, Type* operandType) {
 }
 
 // find binary operator
-MultiaryOperator* Type::find(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) {
-    for (std::vector<MultiaryOperator*>::iterator i = m_multiary.begin(); i != m_multiary.end(); ++i) {
+MultiaryOperator* Type::find(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) const {
+    for (std::vector<MultiaryOperator*>::const_iterator i = m_multiary.begin(); i != m_multiary.end(); ++i) {
         MultiaryOperator* op = *i;
-        if (op->getOpcode() == opcode && op->hasSignature(makeVector(this, arguments), true)) {
+        if (op->getOpcode() == opcode && op->hasSignature(makeVector(const_cast<Type*>(this), arguments), true)) {
             return op;
         }
     }
@@ -134,8 +134,8 @@ MultiaryOperator* Type::find(Member::MultiaryOpcode opcode, std::vector<Type*> a
 }
 
 // find field
-Field* Type::find(const Identifier& name) {
-    for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i) {
+Field* Type::find(const Identifier& name) const {
+    for (std::vector<Field*>::const_iterator i = m_fields.begin(); i != m_fields.end(); ++i) {
         Field* field = *i;
         if (field->getName() == name) {
             return field;
@@ -145,14 +145,18 @@ Field* Type::find(const Identifier& name) {
 }
 
 // find method
-Method* Type::find(const Identifier& name, std::vector<Type*> arguments) {
-    for (std::vector<Method*>::iterator i = m_methods.begin(); i != m_methods.end(); ++i) {
+Method* Type::find(const Identifier& name, std::vector<Type*> arguments) const {
+    for (std::vector<Method*>::const_iterator i = m_methods.begin(); i != m_methods.end(); ++i) {
         Method* method = *i;
         if (method->getName() == name && method->hasSignature(arguments, true)) {
             return method;
         }
     }
     return 0;
+}
+
+bool Type::isCastableTo(const Type* type, bool duckCast) const {
+    return false;
 }
 
 // Emit type structure

@@ -204,7 +204,10 @@ namespace lang {
         virtual void generateMember(Driver& driver, Type* owner);
 
         /// Emit function code and instruction
-        virtual void generateCode(Driver& driver, Type* owner);
+        virtual void generateIRSignature(Driver& driver, Type* owner);
+
+        /// Emit function code and instruction
+        virtual void generateIRCode(Driver& driver, Type* owner);
 
         Method* getMethod() const {
             return m_method;

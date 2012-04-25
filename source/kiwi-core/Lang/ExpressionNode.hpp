@@ -6,6 +6,7 @@
 #include "kiwi/Codegen/Expression.hpp"
 #include "kiwi/Codegen/Variable.hpp"
 #include <vector>
+#include <list>
 
 namespace kiwi {
     class Context;
@@ -69,25 +70,35 @@ namespace lang {
     /// multinary, methods calls, new, invoke object and e.t.c
     class CallableNode : public ExpressionNode {
     public:
+        typedef std::list<CallableArgument*> ArgumentList;
+
         /// destructor
         virtual ~CallableNode();
 
-        /// Add positior argument
+        /// Append positioned argument
         void append(ExpressionNode* value);
 
-        /// Add positior argument
+        /// Append names argument
         void append(const Identifier& name, ExpressionNode* value);
+
+        /// Add positioned argument
+        void prepend(ExpressionNode* value);
 
         /// Emit instructions
         virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
 
-        /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) =0;
     protected:
-        std::vector<CallableArgument*> m_arguments;
+        /// list of arguments
+        ArgumentList m_arguments;
 
         /// constructor
         CallableNode();
+
+        /// Find arguments for append before other
+        virtual ExpressionGen emitCall(Driver& driver, const StatementGen& gen, std::vector<ExpressionGen> args);
+
+        /// Find callable for current node
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) =0;
     };
 
     //==--------------------------------------------------------------------==//
@@ -96,9 +107,6 @@ namespace lang {
     public:
         /// Constructor
         BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic = false);
-
-        /// Destructor
-        virtual ~BinaryNode();
 
         /// Find callable for current node
         virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
@@ -117,8 +125,6 @@ namespace lang {
         /// Constructor
         UnaryNode(Member::UnaryOpcode opcode, ExpressionNode* value, bool post = false);
 
-        /// Destructor
-        virtual ~UnaryNode();
 
         /// Find callable for current node
         virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
@@ -142,6 +148,9 @@ namespace lang {
         virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
     protected:
         Member::MultiaryOpcode m_opcode;
+
+        /// constructor for new
+        MultiaryNode(Member::MultiaryOpcode opcode);
     };
 
     //==--------------------------------------------------------------------==//
@@ -151,27 +160,21 @@ namespace lang {
     public:
         CallNode(ExpressionNode* expr, const Identifier& method);
 
-        CallNode(ExpressionNode* expr);
-
         /// Find callable for current node
         virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
     protected:
-        ExpressionNode*             m_calle;
         Identifier                  m_method;
     };
 
     //==--------------------------------------------------------------------==//
     // New operator syntax node
-    class NewNode : public CallableNode {
+    class NewNode : public MultiaryNode {
     public:
         /// constructor
         NewNode(TypeNode* type);
 
         /// Emit instructions
         virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
-
-        /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
     protected:
         TypeNode* m_type;
     };

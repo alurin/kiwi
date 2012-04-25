@@ -91,14 +91,15 @@ Argument::Argument(Callable* owner, Type* type, int32_t position)
 : m_owner(owner), m_type(type) { }
 
 /// Check signature
-bool Callable::hasSignature(const TypeVector& types, bool isCast) {
+bool Callable::hasSignature(const TypeVector& types, bool isCast) const {
     if (types.size() != m_args.size())
         return false;
 
     for (int i = 0; i < m_args.size(); ++i) {
         /// @todo Replace for simple check
         if (m_args[i]->getType() != types[i])
-            return false;
+            if (!types[i]->isCastableTo(m_args[i]->getType()))
+                return false;
     }
 
     return true;
@@ -113,7 +114,7 @@ void Callable::setFunction(llvm::Function* func) {
 
 void Callable::makeArgumentsFromTypes(TypeVector types) {
     for (TypeVector::iterator i = types.begin(); i != types.end(); ++i) {
-        Type* type    = *i;
+        Type* type = *i;
         Argument* arg = new Argument(this, type, m_args.size());
         m_args.push_back(arg);
     }

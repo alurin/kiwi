@@ -132,13 +132,6 @@ CallableNode* NodeFactory::call(ExpressionNode* expr, const Identifier& name, co
     return inject(call, loc);
 }
 
-/// declare call
-CallableNode* NodeFactory::call(ExpressionNode* expr, const location& loc) {
-    CallNode* call = new CallNode(expr);
-    m_calls.push(call);
-    return inject(call, loc);
-}
-
 /// declare call to constructor
 CallableNode* NodeFactory::newBegin(TypeNode* type, const location& loc) {
     CallableNode* call = new NewNode(type);

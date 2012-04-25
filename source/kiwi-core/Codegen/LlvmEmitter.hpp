@@ -181,6 +181,18 @@ namespace codegen {
             const ExpressionVector& values
         );
     }; /// class LlvmStringSubtraction
+
+    //==--------------------------------------------------------------------==//
+    /// LLVM emitter for empty constructors
+    class LlvmCtorEmitter : public CallableEmitter {
+    public:
+        /// emit IR instruction for binary operation
+        virtual ExpressionGen emit(
+            const StatementGen& gen,
+            const ExpressionVector& values
+        );
+    protected:
+    }; // class LlvmCallEmitter
 } // namesapce codegen
 } // namesapce  kiwi
 

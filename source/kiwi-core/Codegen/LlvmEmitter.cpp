@@ -218,12 +218,12 @@ StatementGen LlvmStringEmitter::emit(const StatementGen& gen, const ExpressionGe
     return gen;
 }
 
-/// emit IR instruction for string concatenate
+// emit IR instruction for string concatenate
 ExpressionGen LlvmStringConcatenate::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) {
 
 }
 
-/// emit IR instruction for string substraction
+// emit IR instruction for string substraction
 ExpressionGen LlvmStringSubtraction::emit(const StatementGen& gen, const ExpressionVector& values) {
     if (values.size() != 2 && values.size() != 3) {
         throw "Not implemented";
@@ -289,7 +289,7 @@ ExpressionGen LlvmStringSubtraction::emit(const StatementGen& gen, const Express
     return ExpressionGen(gen, returnType, returnValue);
 }
 
-/// emit IR instruction for binary operation
+// emit IR instruction for binary operation
 ExpressionGen LlvmCallEmitter::emit(const StatementGen& gen, const ExpressionVector& args ){
     std::vector<llvm::Value*> largs;
     for (ExpressionVector::const_iterator i = args.begin(); i != args.end(); ++i) {
@@ -299,4 +299,9 @@ ExpressionGen LlvmCallEmitter::emit(const StatementGen& gen, const ExpressionVec
      // return result of call
      llvm::Value* result = llvm::CallInst::Create(m_func, llvm::makeArrayRef(largs), "", gen.getBlock());
      return ExpressionGen(gen, m_returnType, result);
+}
+
+// emit IR instruction for binary operation
+ExpressionGen LlvmCtorEmitter::emit(const StatementGen& gen, const ExpressionVector& values) {
+    return values[0];
 }

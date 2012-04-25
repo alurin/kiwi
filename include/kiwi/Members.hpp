@@ -63,9 +63,9 @@ namespace kiwi
     /// Callable member, common base for all operators and methods
     class Callable : public Member {
     public:
-        typedef std::vector<Type*>      TypeVector;
-        typedef std::vector<Argument*>  ArgumentVector;
-        typedef ArgumentVector::const_iterator const_iterator;
+        typedef std::vector<Type*>              TypeVector;
+        typedef std::vector<Argument*>          ArgumentVector;
+        typedef ArgumentVector::const_iterator  const_iterator;
 
         /// virtual destructo
         virtual ~Callable();
@@ -86,7 +86,7 @@ namespace kiwi
         }
 
         /// Check signature
-        bool hasSignature(const TypeVector& types, bool isCast = false);
+        bool hasSignature(const TypeVector& types, bool isCast = false) const;
 
         /// Return emitter for callable
         codegen::CallableEmitter* getEmitter() const {
@@ -144,9 +144,6 @@ namespace kiwi
     class UnaryOperator : public Callable {
         friend class Type;
     public:
-        /// virtual destructor
-        virtual ~UnaryOperator();
-
         /// returns binary operator opcode
         UnaryOpcode getOpcode() const {
             return m_opcode;
@@ -158,7 +155,7 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(class Member* type) {
+        static bool classof(const Member* type) {
             return type->getMemberID() == UnaryOperatorID;
         }
 
@@ -183,16 +180,13 @@ namespace kiwi
     class BinaryOperator : public Callable {
         friend class Type;
     public:
-        /// virtual destructor
-        virtual ~BinaryOperator();
-
         /// returns binary opcode
         BinaryOpcode getOpcode() const {
             return m_opcode;
         }
 
         /// classof check
-        static bool classof(class Member* type) {
+        static bool classof(const Member* type) {
             return type->getMemberID() == BinaryOperatorID;
         }
 
@@ -218,9 +212,6 @@ namespace kiwi
     class MultiaryOperator : public Callable {
         friend class Type;
     public:
-        /// destructor
-        ~MultiaryOperator();
-
         /// returns multiary opcode
         MultiaryOpcode getOpcode() const {
             return m_opcode;
@@ -259,7 +250,7 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(class Member* type) {
+        static bool classof(const Member* type) {
             return type->getMemberID() == MethodID;
         }
 
@@ -279,9 +270,6 @@ namespace kiwi
         friend class Type;
         friend class ObjectType;
     public:
-        /// virtual destructor
-        virtual ~Field();
-
         /// returns field name
         Identifier getName() const {
             return m_name;
@@ -298,7 +286,7 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(class Member* type) {
+        static bool classof(const Member* type) {
             return type->getMemberID() == FieldID;
         }
 

@@ -125,7 +125,12 @@ bool DriverRef::parse() {
 
         /// generate code for members
         for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
-            (*i)->generateCode(driver);
+            (*i)->generateIRSignature(driver);
+        }
+
+        /// generate code for members
+        for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
+            (*i)->generateIRCode(driver);
         }
     }
 }

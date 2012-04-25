@@ -56,6 +56,7 @@ namespace kiwi
 
         /// Multiary operation code
         enum MultiaryOpcode {
+            Constructor = 1,
             // Append,      // [   ] =
             Subtraction, // [...]
             Invoke       // (   )

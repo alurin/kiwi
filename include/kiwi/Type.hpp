@@ -36,7 +36,8 @@ namespace kiwi {
             BoolID,
             CharID,
             StringID,
-            ObjectID
+            ObjectID,
+            InterfaceID
         };
 
         /// destructor
@@ -87,19 +88,22 @@ namespace kiwi {
         Method* add(const Identifier& name, Type* resultType, std::vector<Type*> arguments);
 
         /// find unary operator
-        UnaryOperator* find(Member::UnaryOpcode opcode);
+        UnaryOperator* find(Member::UnaryOpcode opcode) const;
 
         /// find binary operator
-        BinaryOperator* find(Member::BinaryOpcode opcode, Type* operandType);
+        BinaryOperator* find(Member::BinaryOpcode opcode, Type* operandType) const;
 
         /// find binary operator
-        MultiaryOperator* find(Member::MultiaryOpcode opcode, std::vector<Type*> arguments);
+        MultiaryOperator* find(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) const;
 
         /// find field operator
-        Field* find(const Identifier& name);
+        Field* find(const Identifier& name) const;
 
         /// find method
-        Method* find(const Identifier& name, std::vector<Type*> arguments);
+        Method* find(const Identifier& name, std::vector<Type*> arguments) const;
+
+        /// Type is castable to other type (up-cast(from child to parent) or implict cast)
+        virtual bool isCastableTo(const Type* type, bool duckCast = true) const;
 
         /// emit type metadata and structure
         virtual void emit();

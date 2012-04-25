@@ -7,10 +7,10 @@ MemberNode::MemberNode() {
     /* empty for default */
 }
 
-void MemberNode::generateMember(Driver& driver, Type* owner) {
+void MemberNode::generateIRSignature(Driver& driver, Type* owner) {
     /* empty for default */
 }
 
-void MemberNode::generateCode(Driver& driver, Type* owner) {
+void MemberNode::generateIRCode(Driver& driver, Type* owner) {
     /* empty for default */
 }

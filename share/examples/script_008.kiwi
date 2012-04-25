@@ -23,5 +23,5 @@ void main() {
     auto $parent = new Parent();
     auto $child  = new Child();
     test($parent);
-    test($child);
+    // test($child); /// < NOT WORKED, CAST!!!
 }

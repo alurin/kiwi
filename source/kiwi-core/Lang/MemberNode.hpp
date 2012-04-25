@@ -12,10 +12,13 @@ namespace lang {
     class MemberNode : public Node {
     public:
         /// Generate metadata (LLVM analog is no aviable)
-        virtual void generateMember(Driver& driver, Type* owner);
+        virtual void generateMember(Driver& driver, Type* owner) =0;
 
         /// Emit function code and instruction
-        virtual void generateCode(Driver& driver, Type* owner);
+        virtual void generateIRSignature(Driver& driver, Type* owner);
+
+        /// Emit function code and instruction
+        virtual void generateIRCode(Driver& driver, Type* owner);
 
     protected:
         /// Internal constructor

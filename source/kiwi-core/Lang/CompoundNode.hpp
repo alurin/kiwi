@@ -35,10 +35,13 @@ namespace lang {
         virtual void generateType(Driver& driver);
 
         /// generate members
-        virtual void generateMembers(Driver& driver);
+        void generateMembers(Driver& driver);
+
+        /// generate IR signature
+        void generateIRSignature(Driver& driver);
 
         /// generate code
-        virtual void generateCode(Driver& driver);
+        void generateIRCode(Driver& driver);
     protected:
         /// Generated type
         Type* m_type;

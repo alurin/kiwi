@@ -144,18 +144,28 @@ namespace kiwi {
     };
 
     //==--------------------------------------------------------------------==//
-    // /// Interfaces metadata
-    // class InterfaceType : public Type {
-    // public:
-    //     /// Inherti other interface
-    //     void inherit(InterfaceType* type);
-    // protected:
-    //     // anonym object constructor
-    //     InterfaceType(Module* module);
+    /// Interfaces metadata
+    class InterfaceType : public Type {
+    public:
+        /// Inherti other interface
+        void inherit(InterfaceType* type);
 
-    //     // constructor
-    //     InterfaceType(Module* module, const Identifier& name);
-    // };
+        /// classof check
+        static bool classof(const Type* type) {
+            return type->getTypeID() == InterfaceID;
+        }
+
+        /// classof check
+        static bool classof(const InterfaceType*) {
+            return true;
+        }
+    protected:
+        // anonym object constructor
+        InterfaceType(Module* module);
+
+        // constructor
+        InterfaceType(Module* module, const Identifier& name);
+    };
     class InterfaceType;
 
     //==--------------------------------------------------------------------==//
@@ -180,10 +190,13 @@ namespace kiwi {
         bool inherit(ObjectType* type);
 
         /// This class implement interface?
-        // void isInherit(InterfaceType* type, bool duckCast = true);
+        bool isImplement(const InterfaceType* type, bool duckCast = true) const;
 
         /// This class inherits from class?
-        bool isInherit(ObjectType* type);
+        bool isInherit(const ObjectType* type) const;
+
+        /// Type is castable to other type (up-cast(from child to parent) or implict cast)
+        virtual bool isCastableTo(const Type* type, bool duckCast = true) const;
 
         /// classof check
         static bool classof(const Type* type) {

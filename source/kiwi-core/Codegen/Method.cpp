@@ -45,9 +45,18 @@ llvm::FunctionType* MethodEmitter::emitType() {
 // emit method definition
 llvm::Function* MethodEmitter::emitDefinition() {
     if (!m_method->getFunction()) {
-        Module* module             = m_method->getOwnerType()->getModule();
+        Identifier fullName;
+
+        fullName = m_method->getOwnerType()->getName() + "::" + m_method->getName();
+
+        Module* module = m_method->getOwnerType()->getModule();
         llvm::FunctionType* funcType = emitType();
-        llvm::Function* func         = llvm::Function::Create(funcType, llvm::GlobalValue::ExternalLinkage, m_method->getName(), module->getModule());
+        llvm::Function* func = llvm::Function::Create(
+            funcType,
+            llvm::GlobalValue::ExternalLinkage,
+            fullName,
+            module->getModule()
+        );
         m_method->setFunction(func);
 
         std::vector<Identifier> argNames;

@@ -178,8 +178,11 @@ void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
 
 }
 
-void FunctionNode::generateCode(Driver& driver, Type* ownerType) {
+void FunctionNode::generateIRSignature(Driver& driver, Type* owner) {
     m_func = MethodEmitter(m_method).emitDefinition();
+}
+
+void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
     llvm::BasicBlock* entry = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
 
     // emit mutable variables for arguments
