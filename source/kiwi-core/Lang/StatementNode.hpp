@@ -6,6 +6,8 @@
 
 namespace kiwi
 {
+    class BlockBuilder;
+
 namespace lang
 {
     class TypeNode;
@@ -14,13 +16,11 @@ namespace lang
     class ExpressionNode;
     class Driver;
 
-    using codegen::StatementGen;
-
     /// Statement syntax node
     class StatementNode : public Node {
     public:
         /// emit instructions for statement
-        virtual StatementGen emit(Driver& driver, const StatementGen& gen) =0;
+        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const =0;
 
         /// returns parent function node
         FunctionNode* getOwner() const {
@@ -55,7 +55,7 @@ namespace lang
         ~ReturnStatement();
 
         /// emit instructions for statement
-        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
+        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         ExpressionNode* m_return;
     };
@@ -70,7 +70,7 @@ namespace lang
         ~PrintStatement();
 
         /// emit instructions for statement
-        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
+        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         ExpressionNode* m_return;
     };
@@ -85,7 +85,7 @@ namespace lang
         ~ConditionalNode();
 
         /// emit instructions for statement
-        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
+        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         ExpressionNode* m_cond;
         StatementNode*  m_trueStmt;

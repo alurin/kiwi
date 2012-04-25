@@ -12,6 +12,8 @@ namespace kiwi {
     class Context;
     class ObjectType;
     class Callable;
+    class ValueBuilder;
+    class BlockBuilder;
 
 namespace lang {
     class VariableNode;
@@ -19,8 +21,6 @@ namespace lang {
     class Driver;
     class TypeNode;
 
-    using codegen::ExpressionGen;
-    using codegen::StatementGen;
     using codegen::VariableGen;
 
     //==--------------------------------------------------------------------==//
@@ -28,7 +28,7 @@ namespace lang {
     class MutableNode : public Node {
     public:
         /// Emit instructions for store value
-        virtual ExpressionGen emit(Driver& driver, const ExpressionGen& gen) =0;
+        virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const =0;
     };
 
     //==--------------------------------------------------------------------==//
@@ -36,7 +36,7 @@ namespace lang {
     class ExpressionNode : public Node {
     public:
         /// Emit instruction for receive value
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& value) =0;
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const =0;
     };
 
     //==--------------------------------------------------------------------==//
@@ -47,7 +47,7 @@ namespace lang {
         virtual ~CallableArgument();
 
         /// proxy for value
-        ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         /// argument name
         Identifier m_name;
@@ -85,7 +85,7 @@ namespace lang {
         void prepend(ExpressionNode* value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
 
     protected:
         /// list of arguments
@@ -95,10 +95,10 @@ namespace lang {
         CallableNode();
 
         /// Find arguments for append before other
-        virtual ExpressionGen emitCall(Driver& driver, const StatementGen& gen, std::vector<ExpressionGen> args);
+        virtual ValueBuilder emitCall(Driver& driver, BlockBuilder block, std::vector<ValueBuilder> args) const;
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) =0;
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const =0;
     };
 
     //==--------------------------------------------------------------------==//
@@ -109,7 +109,7 @@ namespace lang {
         BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic = false);
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const;
     protected:
         /// Binary operation opcode
         Member::BinaryOpcode m_opcode;
@@ -127,7 +127,7 @@ namespace lang {
 
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const;
     protected:
         /// Unary operation opcode
         Member::UnaryOpcode m_opcode;
@@ -145,7 +145,7 @@ namespace lang {
         MultiaryNode(Member::MultiaryOpcode opcode, ExpressionNode* value);
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const;
     protected:
         Member::MultiaryOpcode m_opcode;
 
@@ -161,7 +161,7 @@ namespace lang {
         CallNode(ExpressionNode* expr, const Identifier& method);
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types);
+        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const;
     protected:
         Identifier                  m_method;
     };
@@ -174,7 +174,7 @@ namespace lang {
         NewNode(TypeNode* type);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         TypeNode* m_type;
     };
@@ -190,7 +190,7 @@ namespace lang {
         virtual ~AssignNode();
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         /// Left expression node
         MutableNode* m_left;
@@ -207,7 +207,7 @@ namespace lang {
         ArgumentMutableNode(ArgumentNode* arg);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const ExpressionGen& gen);
+        virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const;
     protected:
         /// Argument node
         ArgumentNode* o_arg;
@@ -221,7 +221,7 @@ namespace lang {
         ArgumentExpressionNode(ArgumentNode* arg);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         /// Argument node
         ArgumentNode* o_arg;
@@ -235,7 +235,7 @@ namespace lang {
         VariableMutableNode(VariableNode* var);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const ExpressionGen& gen);
+        virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const;
     protected:
         /// Varaible node
         VariableNode* o_var;
@@ -249,7 +249,7 @@ namespace lang {
         VariableExpressionNode(VariableNode* var);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         /// Varaible node
         VariableNode* o_var;
@@ -262,7 +262,7 @@ namespace lang {
         InstanceMutableNode(const Identifier& name);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const ExpressionGen& gen);
+        virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const;
     protected:
         Identifier m_name;
     };
@@ -273,7 +273,7 @@ namespace lang {
         InstanceExpressionNode(const Identifier& name);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         Identifier m_name;
     };
@@ -285,7 +285,7 @@ namespace lang {
         IntegerConstNode(Context* context, int32_t value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         Context*  m_context;
         int32_t     m_value;
@@ -298,7 +298,7 @@ namespace lang {
         StringConstNode(Context* context, const String& value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         Context*  m_context;
         String      m_value;
@@ -311,7 +311,7 @@ namespace lang {
         CharConstNode(Context* context, const UChar& value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         Context*  m_context;
         UChar     m_value;
@@ -324,7 +324,7 @@ namespace lang {
         BoolConstNode(Context* context, bool value);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         Context*  m_context;
         bool        m_value;
@@ -336,7 +336,7 @@ namespace lang {
         ThisNode(ObjectType* thisType);
 
         /// Emit instructions
-        virtual ExpressionGen emit(Driver& driver, const StatementGen& gen);
+        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         ObjectType* m_thisType;
     };

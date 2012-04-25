@@ -1,17 +1,12 @@
 #include "kiwi/assert.hpp"
+#include "Driver.hpp"
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
 #include "TypeNode.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Type.hpp"
-#include "kiwi/Codegen/Method.hpp"
-#include <llvm/ADT/ArrayRef.h>
-#include <llvm/BasicBlock.h>
-#include <llvm/Constant.h>
-#include <llvm/DerivedTypes.h>
-#include <llvm/Function.h>
-#include <llvm/Instructions.h>
+#include "../Codegen/Builder.hpp"
 #include <vector>
 
 using namespace kiwi;
@@ -32,7 +27,6 @@ ArgumentNode::~ArgumentNode() { }
 
 VariableNode::VariableNode(ScopeNode* owner, const Identifier& name, TypeNode* type, ExpressionNode* expr)
 : NamedNode(owner->getOwner(), type), o_owner(owner), m_name(name), m_init(expr) {
-
 }
 
 VariableNode::~VariableNode() {
@@ -165,105 +159,110 @@ void FieldNode::generateMember(Driver& driver, Type* ownerType) {
 }
 
 void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
-    Module* module   = ownerType->getModule();
-    Type* resultType = m_type->get(driver);
-    std::vector<Type*> frontendArgs;
+    KIWI_NOT_IMPLEMENTED();
+    // Module* module   = ownerType->getModule();
+    // Type* resultType = m_type->get(driver);
+    // std::vector<Type*> frontendArgs;
 
-    // collect arguments
-    for (std::vector<ArgumentNode*>::iterator i = m_positions.begin(); i != m_positions.end(); ++i) {
-        ArgumentNode* arg           = *i;
-        Type*         frontend_type = arg->getType()->get(driver);
-        frontendArgs.push_back(frontend_type);
-    }
-    m_method = ownerType->addMethod(m_name, resultType, frontendArgs);
+    // // collect arguments
+    // for (std::vector<ArgumentNode*>::iterator i = m_positions.begin(); i != m_positions.end(); ++i) {
+    //     ArgumentNode* arg           = *i;
+    //     Type*         frontend_type = arg->getType()->get(driver);
+    //     frontendArgs.push_back(frontend_type);
+    // }
+    // m_method = ownerType->addMethod(m_name, resultType, frontendArgs);
 }
 
 void FunctionNode::generateIRSignature(Driver& driver, Type* owner) {
-    m_func = MethodEmitter(m_method).emitDefinition();
+    KIWI_NOT_IMPLEMENTED();
+    ///m_func = FunctionBuilder(m_method).emitDefinition();
 }
 
 void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
-    llvm::BasicBlock* entry = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
-    kiwi_assert(m_func->arg_size() == m_method->size(),"Argument in function must be actual");
+    KIWI_NOT_IMPLEMENTED();
+    // llvm::BasicBlock* entry = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
+    // kiwi_assert(m_func->arg_size() == m_method->size(),"Argument in function must be actual");
 
-    // emit mutable variables for arguments
-    size_t j = 0;
-    for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
-        if (j) {
-            kiwi_assert(j-1 < m_positions.size(), "Ops... This is not worked");
-            ArgumentNode* arg = m_positions[j-1];
+    // // emit mutable variables for arguments
+    // size_t j = 0;
+    // for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
+    //     if (j) {
+    //         kiwi_assert(j-1 < m_positions.size(), "Ops... This is not worked");
+    //         ArgumentNode* arg = m_positions[j-1];
 
-            // set argument name
-            i->setName(arg->getName());
+    //         // set argument name
+    //         i->setName(arg->getName());
 
-            // add mutable for arguments
-            llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
-            llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
+    //         // add mutable for arguments
+    //         llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
+    //         llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
 
-            // save information
-            VariableGen vargen(arg->getType()->get(driver), value);
-            arg->setGenerator(vargen);
-        } else {
-            i->setName("this");
-        }
-    }
+    //         // save information
+    //         VariableGen vargen(arg->getType()->get(driver), value);
+    //         arg->setGenerator(vargen);
+    //     } else {
+    //         i->setName("this");
+    //     }
+    // }
 
-    // emit instructions
-    StatementGen gen(ownerType, entry);
-    gen = m_root->emit(driver, gen);
+    // // emit instructions
+    // BlockBuilder gen(ownerType, entry);
+    // gen = m_root->emit(driver, gen);
 
-    /// emit terminator for last block
-    if (!gen.getBlock()->getTerminator()) {
-        llvm::Type* resultType = m_func->getFunctionType()->getReturnType();
-        if (resultType->isVoidTy()) {
-            llvm::ReturnInst::Create(gen.getContext(), gen.getBlock());
-        } else {
-            llvm::Value* result = llvm::Constant::getNullValue(resultType);
-            llvm::ReturnInst::Create(gen.getContext(), result, gen.getBlock());
-        }
-    }
+    // /// emit terminator for last block
+    // if (!gen.getBlock()->getTerminator()) {
+    //     llvm::Type* resultType = m_func->getFunctionType()->getReturnType();
+    //     if (resultType->isVoidTy()) {
+    //         llvm::ReturnInst::Create(gen.getContext(), gen.getBlock());
+    //     } else {
+    //         llvm::Value* result = llvm::Constant::getNullValue(resultType);
+    //         llvm::ReturnInst::Create(gen.getContext(), result, gen.getBlock());
+    //     }
+    // }
 }
 
-StatementGen ScopeNode::emit(Driver& driver, const StatementGen& gen) {
-    StatementGen current = gen;
-    // emit mutable variables
-    for (std::map<Identifier, VariableNode*>::iterator i = m_vars.begin(); i != m_vars.end(); ++i) {
-        VariableNode* var = i->second;
+BlockBuilder ScopeNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // BlockBuilder current = gen;
+    // // emit mutable variables
+    // for (std::map<Identifier, VariableNode*>::iterator i = m_vars.begin(); i != m_vars.end(); ++i) {
+    //     VariableNode* var = i->second;
 
-        Type* type               = 0;
-        llvm::Value* var_default = 0;
+    //     Type* type               = 0;
+    //     llvm::Value* var_default = 0;
 
-        if (var->getInitilizator()) {
-            ExpressionNode* init = var->getInitilizator();
-            ExpressionGen value  = init->emit(driver, current);
-            current = value;
+    //     if (var->getInitilizator()) {
+    //         ExpressionNode* init = var->getInitilizator();
+    //         ValueBuilder value  = init->emit(driver, current);
+    //         current = value;
 
-            // store information about auto type
-            type        = value.getType();
-            var_default = value.getValue();
-            var->setType(new ConcreteTypeNode(type));
-        } else {
-            type        = var->getType()->get(driver);
-            var_default = llvm::Constant::getNullValue(type->getVarType());
-        }
-        llvm::Type* var_type = type->getVarType();
+    //         // store information about auto type
+    //         type        = value.getType();
+    //         var_default = value.getValue();
+    //         var->setType(new ConcreteTypeNode(type));
+    //     } else {
+    //         type        = var->getType()->get(driver);
+    //         var_default = llvm::Constant::getNullValue(type->getVarType());
+    //     }
+    //     llvm::Type* var_type = type->getVarType();
 
-        // initilizate variable
-        llvm::AllocaInst* value  = new llvm::AllocaInst(var_type, i->first, current.getBlock());
-        new llvm::StoreInst(var_default, value, current.getBlock());
+    //     // initilizate variable
+    //     llvm::AllocaInst* value  = new llvm::AllocaInst(var_type, i->first, current.getBlock());
+    //     new llvm::StoreInst(var_default, value, current.getBlock());
 
-        VariableGen vargen(type, value);
-        var->setGenerator(vargen);
-    }
+    //     VariableGen vargen(type, value);
+    //     var->setGenerator(vargen);
+    // }
 
-    // emit statements and expressions
-    for (std::vector<StatementNode*>::iterator i = m_stmts.begin(); i != m_stmts.end(); ++i) {
-        StatementNode* stmt = *i;
-        current = stmt->emit(driver, current);
-    }
-    return current;
+    // // emit statements and expressions
+    // for (std::vector<StatementNode*>::iterator i = m_stmts.begin(); i != m_stmts.end(); ++i) {
+    //     StatementNode* stmt = *i;
+    //     current = stmt->emit(driver, current);
+    // }
+    // return current;
 }
 
-StatementGen ExpressionStatementNode::emit(Driver& driver, const StatementGen& gen) {
-    return m_expr->emit(driver, gen);
+BlockBuilder ExpressionStatementNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    //return m_expr->emit(driver, block);
 }

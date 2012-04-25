@@ -4,12 +4,7 @@
 #include "ExpressionNode.hpp"
 #include "kiwi/Type.hpp"
 #include "kiwi/Members.hpp"
-#include "kiwi/Codegen/Emitter.hpp"
-#include "kiwi/Codegen/Expression.hpp"
-#include "kiwi/Codegen/Variable.hpp"
-#include <llvm/Instructions.h>
-#include <llvm/BasicBlock.h>
-#include <llvm/Support/IRBuilder.h>
+#include "../Codegen/Builder.hpp"
 
 using namespace kiwi;
 using namespace kiwi::lang;
@@ -61,60 +56,63 @@ ConditionalNode::~ConditionalNode() {
 }
 
 // emit instructions for return statement
-StatementGen ReturnStatement::emit(Driver& driver, const StatementGen& gen) {
-    if (m_return) {
-        /// @todo check equals of return type
-        ExpressionGen result = m_return->emit(driver, gen);
-        llvm::ReturnInst::Create(gen.getContext(), result.getValue(), result.getBlock());
-        return result;
-    } else {
-        /// @todo check equals of return type
-        llvm::ReturnInst::Create(gen.getContext(), gen.getBlock());
-    }
-    return gen;
+BlockBuilder ReturnStatement::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // if (m_return) {
+    //     /// @todo check equals of return type
+    //     ValueBuilder result = m_return->emit(driver, gen);
+    //     llvm::ReturnInst::Create(gen.getContext(), result.getValue(), result.getBlock());
+    //     return result;
+    // } else {
+    //     /// @todo check equals of return type
+    //     llvm::ReturnInst::Create(gen.getContext(), gen.getBlock());
+    // }
+    // return gen;
 }
 
 // emit instructions for print statement
-StatementGen PrintStatement::emit(Driver& driver, const StatementGen& gen) {
-    // emit operand
-    ExpressionGen result = m_return->emit(driver, gen);
+BlockBuilder PrintStatement::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // // emit operand
+    // ValueBuilder result = m_return->emit(driver, gen);
 
-    // find emitter
-    Type* type = result.getType();
-    UnaryOperator* op = type->findUnary(UnaryOperator::Print);
+    // // find emitter
+    // Type* type = result.getType();
+    // UnaryOperator* op = type->findUnary(UnaryOperator::Print);
 
-    // emit instruction
-    if (op) {
-        std::vector<ExpressionGen> args;
-        args.push_back(result);
-        return op->getEmitter()->emit(result, args);
-    }
-    KIWI_ERROR_AND_EXIT("not found print operator", getLocation());
+    // // emit instruction
+    // if (op) {
+    //     std::vector<ValueBuilder> args;
+    //     args.push_back(result);
+    //     return op->getEmitter()->emit(result, args);
+    // }
+    // KIWI_ERROR_AND_EXIT("not found print operator", getLocation());
 }
 
 /// emit instructions for statement
-StatementGen ConditionalNode::emit(Driver& driver, const StatementGen& gen) {
-    llvm::BasicBlock* blockTrue  = llvm::BasicBlock::Create(gen.getContext(), "true",  gen.getFunction());
-    llvm::BasicBlock* blockFalse = llvm::BasicBlock::Create(gen.getContext(), "false", gen.getFunction());
-    llvm::BasicBlock* blockNext  = llvm::BasicBlock::Create(gen.getContext(), "next",  gen.getFunction());
+BlockBuilder ConditionalNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // llvm::BasicBlock* blockTrue  = llvm::BasicBlock::Create(gen.getContext(), "true",  gen.getFunction());
+    // llvm::BasicBlock* blockFalse = llvm::BasicBlock::Create(gen.getContext(), "false", gen.getFunction());
+    // llvm::BasicBlock* blockNext  = llvm::BasicBlock::Create(gen.getContext(), "next",  gen.getFunction());
 
-    StatementGen genTrue(gen.getOwner(), blockTrue);
-    StatementGen genFalse(gen.getOwner(), blockFalse);
-    StatementGen genNext(gen.getOwner(), blockNext);
+    // BlockBuilder genTrue(gen.getOwner(), blockTrue);
+    // BlockBuilder genFalse(gen.getOwner(), blockFalse);
+    // BlockBuilder genNext(gen.getOwner(), blockNext);
 
-    ExpressionGen result = m_cond->emit(driver, gen);
-    llvm::Value* cond = result.getValue();
-    if (!cond->getType()->isIntegerTy(1)) {
-        KIWI_ERROR_AND_EXIT("Condition must be boolean", m_cond->getLocation());
-    }
+    // ValueBuilder result = m_cond->emit(driver, gen);
+    // llvm::Value* cond = result.getValue();
+    // if (!cond->getType()->isIntegerTy(1)) {
+    //     KIWI_ERROR_AND_EXIT("Condition must be boolean", m_cond->getLocation());
+    // }
 
-    /// Emit branches
-    if (m_trueStmt)  genTrue  = m_trueStmt->emit(driver, genTrue);
-    if (m_falseStmt) genFalse = m_falseStmt->emit(driver, genFalse);
+    // /// Emit branches
+    // if (m_trueStmt)  genTrue  = m_trueStmt->emit(driver, genTrue);
+    // if (m_falseStmt) genFalse = m_falseStmt->emit(driver, genFalse);
 
-    llvm::IRBuilder<>(result.getBlock()).CreateCondBr(cond, blockTrue, blockFalse);
-    llvm::IRBuilder<>(genFalse.getBlock()).CreateBr(blockNext);
-    llvm::IRBuilder<>(genTrue.getBlock()).CreateBr(blockNext);
+    // llvm::IRBuilder<>(result.getBlock()).CreateCondBr(cond, blockTrue, blockFalse);
+    // llvm::IRBuilder<>(genFalse.getBlock()).CreateBr(blockNext);
+    // llvm::IRBuilder<>(genTrue.getBlock()).CreateBr(blockNext);
 
-    return genNext;
+    // return genNext;
 }

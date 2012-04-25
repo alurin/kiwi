@@ -11,6 +11,12 @@
         throw message;                   \
     } while (0)
 
+#define KIWI_NOT_IMPLEMENTED() \
+    do {                                 \
+        driver.error(getLocation(), "Yet not implemented"); \
+        throw "Yet not implemented";                   \
+    } while (0)
+
 namespace kiwi { namespace lang {
 
     /// Root for all statements nodes
@@ -28,7 +34,7 @@ namespace kiwi { namespace lang {
         }
 
         /// returns node location
-        location getLocation() {
+        location getLocation() const {
             return m_location;
         }
     protected:

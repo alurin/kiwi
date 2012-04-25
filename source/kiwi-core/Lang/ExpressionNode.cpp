@@ -5,14 +5,8 @@
 #include "kiwi/Type.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/DerivedTypes.hpp"
-#include "kiwi/Codegen/Emitter.hpp"
-#include "kiwi/Codegen/Object.hpp"
-#include "kiwi/Codegen/String.hpp"
 #include "kiwi/Support/Cast.hpp"
-#include <llvm/Constants.h>
-#include <llvm/Function.h>
-#include <llvm/GlobalVariable.h>
-#include <llvm/Instructions.h>
+#include "../Codegen/Builder.hpp"
 
 using namespace kiwi;
 using namespace kiwi::lang;
@@ -129,58 +123,59 @@ void CallableNode::prepend(ExpressionNode* value) {
         m_arguments.push_front(new CallableArgument(value, m_arguments.size()));
 }
 
-ExpressionGen CallableArgument::emit(Driver& driver, const StatementGen& gen) {
-    return m_value->emit(driver, gen);
+ValueBuilder CallableArgument::emit(Driver& driver, BlockBuilder block) const {
+    return m_value->emit(driver, block);
 }
 
-ExpressionGen CallableNode::emit(Driver& driver, const StatementGen& gen) {
-    std::vector<ExpressionGen> args;
-    return emitCall(driver ,gen, args);
+ValueBuilder CallableNode::emit(Driver& driver, BlockBuilder block) const {
+    std::vector<ValueBuilder> args;
+    return emitCall(driver, block, args);
 }
 
 // Find arguments for append before other
-ExpressionGen CallableNode::emitCall(Driver& driver, const StatementGen& gen, std::vector<ExpressionGen> args) {
-    /// collect other arguments
-    StatementGen current = gen;
-    for (ArgumentList::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
-        CallableArgument* arg = *i;
-        ExpressionGen expr = arg->emit(driver, current);
-        args.push_back(expr);
-        current = expr;
-    }
+ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vector<ValueBuilder> args) const {
+    KIWI_NOT_IMPLEMENTED();
+    // /// collect other arguments
+    // BlockBuilder current = block;
+    // for (ArgumentList::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
+    //     CallableArgument* arg = *i;
+    //     ValueBuilder expr = arg->emit(driver, current);
+    //     args.push_back(expr);
+    //     current = expr;
+    // }
 
-    /// find call
-    Callable* call = 0; {
-        std::vector<Type*> types;
-        int j = 0;
-        for (std::vector<ExpressionGen>::iterator i = args.begin(); i != args.end(); ++i, ++j) {
-            Type* type = i->getType();
-            types.push_back(type);
-        }
-        call = findCallable(driver, types);
-    }
+    // /// find call
+    // Callable* call = 0; {
+    //     std::vector<Type*> types;
+    //     int j = 0;
+    //     for (std::vector<ValueBuilder>::iterator i = args.begin(); i != args.end(); ++i, ++j) {
+    //         Type* type = i->getType();
+    //         types.push_back(type);
+    //     }
+    //     call = findCallable(driver, types);
+    // }
 
-    if (!call) KIWI_ERROR_AND_EXIT("Method or operator for call not found", getLocation());
+    // if (!call) KIWI_ERROR_AND_EXIT("Method or operator for call not found", getLocation());
 
-    // emit casts
-    int j = 0;
-    for (std::vector<ExpressionGen>::iterator i = args.begin(); i != args.end(); ++i, ++j) {
-        // Argument* arg    = call->getArgument(j);
-        // Type* targetType = arg->getType();
-        // Type* sourceType = i->getType();
-        // if (targetType != sourceType) {
-        //     KIWI_ERROR_AND_EXIT("Cast not implemented", getLocation());
-        // }
-    }
+    // // emit casts
+    // int j = 0;
+    // for (std::vector<ValueBuilder>::iterator i = args.begin(); i != args.end(); ++i, ++j) {
+    //     // Argument* arg    = call->getArgument(j);
+    //     // Type* targetType = arg->getType();
+    //     // Type* sourceType = i->getType();
+    //     // if (targetType != sourceType) {
+    //     //     KIWI_ERROR_AND_EXIT("Cast not implemented", getLocation());
+    //     // }
+    // }
 
-    // emit call
-    CallableEmitter* emitter = call->getEmitter();
-    if (emitter) {
-        return emitter->emit(current, args);
-    }
+    // // emit call
+    // CallableEmitter* emitter = call->getEmitter();
+    // if (emitter) {
+    //     return emitter->emit(current, args);
+    // }
 }
 
-Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
+Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) const {
     Callable* call = types[0]->findBinary(m_opcode, types[1]);
     if (!call) {
         KIWI_ERROR_AND_EXIT("Not found binary operator", getLocation());
@@ -188,7 +183,7 @@ Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
     return call;
 }
 
-Callable* UnaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
+Callable* UnaryNode::findCallable(Driver& driver, std::vector<Type*> types) const {
     Callable* call = types[0]->findUnary(m_opcode);
     if (!call) {
         KIWI_ERROR_AND_EXIT("not found unary operator", getLocation());
@@ -196,7 +191,7 @@ Callable* UnaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
     return call;
 }
 
-Callable* MultiaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
+Callable* MultiaryNode::findCallable(Driver& driver, std::vector<Type*> types) const {
     kiwi_assert(types.size() > 0, "MultiaryNode::findCallable must recive at last one argument");
     std::vector<Type*> args(types.begin() + 1, types.end());
     Callable* call = types[0]->findMultiary(m_opcode, args);
@@ -206,7 +201,7 @@ Callable* MultiaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
     return call;
 }
 
-Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) {
+Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) const {
     std::vector<Type*> args(types.begin() + 1, types.end());
     Callable* call = types[0]->findMethod(m_method, args);
     if (!call) {
@@ -216,103 +211,114 @@ Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) {
 }
 
 // Emit instructions
-ExpressionGen NewNode::emit(Driver& driver, const StatementGen& gen) {
-    std::vector<ExpressionGen> args;
-    Type* type = m_type->get(driver);
-    if (ObjectType* objType = dyn_cast<ObjectType>(type)) {
-        ExpressionGen expr   = ObjectEmitter(objType).emitNew(gen);
-        args.push_back(expr);
-        ExpressionGen result = emitCall(driver, expr, args);
-        return ExpressionGen(result, expr.getType(), expr.getValue());
-    }
-    KIWI_ERROR_AND_EXIT("Type has not constructed", m_type->getLocation());
+ValueBuilder NewNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // std::vector<ValueBuilder> args;
+    // Type* type = m_type->get(driver);
+    // if (ObjectType* objType = dyn_cast<ObjectType>(type)) {
+    //     ValueBuilder expr   = ObjectEmitter(objType).emitNew(gen);
+    //     args.push_back(expr);
+    //     ValueBuilder result = emitCall(driver, expr, args);
+    //     return ValueBuilder(result, expr.getType(), expr.getValue());
+    // }
+    // KIWI_ERROR_AND_EXIT("Type has not constructed", m_type->getLocation());
 }
 
-ExpressionGen AssignNode::emit(Driver& driver, const StatementGen& gen) {
-    ExpressionGen value = m_right->emit(driver, gen);
+ValueBuilder AssignNode::emit(Driver& driver, BlockBuilder block) const {
+    ValueBuilder value = m_right->emit(driver, block);
     return m_left->emit(driver, value);
 }
 
-ExpressionGen ArgumentMutableNode::emit(Driver& driver, const ExpressionGen& gen) {
-    VariableGen var = o_arg->getGenerator();
-    if (var.getType() == gen.getType()) {
-        llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
-        return gen;
-    }
-    KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
+ValueBuilder ArgumentMutableNode::emit(Driver& driver, ValueBuilder value) const {
+    KIWI_NOT_IMPLEMENTED();
+    // VariableGen var = o_arg->getGenerator();
+    // if (var.getType() == gen.getType()) {
+    //     llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
+    //     return gen;
+    // }
+    // KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
 }
 
-ExpressionGen ArgumentExpressionNode::emit(Driver& driver, const StatementGen& gen) {
-    VariableGen var      = o_arg->getGenerator();
-    llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
-    return ExpressionGen(gen, var.getType(), inst);
+ValueBuilder ArgumentExpressionNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // VariableGen var      = o_arg->getGenerator();
+    // llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
+    // return ValueBuilder(gen, var.getType(), inst);
 }
 
-ExpressionGen VariableMutableNode::emit(Driver& driver, const ExpressionGen& gen) {
-    VariableGen var = o_var->getGenerator();
-    if (var.getType() == gen.getType()) {
-        llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
-        return gen;
-    }
-
-    KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
+ValueBuilder VariableMutableNode::emit(Driver& driver, ValueBuilder value) const {
+    KIWI_NOT_IMPLEMENTED();
+    // VariableGen var = o_var->getGenerator();
+    // if (var.getType() == gen.getType()) {
+    //     llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
+    //     return gen;
+    // }
+    // KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
 }
 
-ExpressionGen VariableExpressionNode::emit(Driver& driver, const StatementGen& gen) {
-    VariableGen var      = o_var->getGenerator();
-    llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
-    return ExpressionGen(gen, var.getType(), inst);
+ValueBuilder VariableExpressionNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // VariableGen var      = o_var->getGenerator();
+    // llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
+    // return ValueBuilder(gen, var.getType(), inst);
 }
 
-ExpressionGen IntegerConstNode::emit(Driver& driver, const StatementGen& gen) {
-    llvm::APInt cst(32, m_value, false);
-    llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
-    return ExpressionGen(gen, IntType::get32(m_context), value);
+ValueBuilder IntegerConstNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // llvm::APInt cst(32, m_value, false);
+    // llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
+    // return ValueBuilder(gen, IntType::get32(m_context), value);
 }
 
-ExpressionGen BoolConstNode::emit(Driver& driver, const StatementGen& gen) {
-    llvm::APInt cst(1, m_value, false);
-    llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
-    return ExpressionGen(gen, BoolType::get(m_context), value);
+ValueBuilder BoolConstNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // llvm::APInt cst(1, m_value, false);
+    // llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
+    // return ValueBuilder(gen, BoolType::get(m_context), value);
 }
 
-ExpressionGen StringConstNode::emit(Driver& driver, const StatementGen& gen) {
-    return StringEmitter(StringType::get(m_context)).emit(gen, m_value);
+ValueBuilder StringConstNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // return StringEmitter(StringType::get(m_context)).emit(gen, m_value);
 }
 
-ExpressionGen CharConstNode::emit(Driver& driver, const StatementGen& gen) {
-    llvm::APInt cst(16, m_value, true);
-    llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
-    return ExpressionGen(gen, CharType::get(m_context), value);
+ValueBuilder CharConstNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // llvm::APInt cst(16, m_value, true);
+    // llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
+    // return ValueBuilder(gen, CharType::get(m_context), value);
 }
 
-ExpressionGen InstanceMutableNode::emit(Driver& driver, const ExpressionGen& gen) {
-    Type* owner = gen.getOwner();
-    ObjectType* type = dyn_cast<ObjectType>(owner);
-    if (type) {
-        ExpressionGen thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
-        return ObjectEmitter(type).emitStore(gen, thisValue, m_name, gen);
-    } else {
-        KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
-    }
+ValueBuilder InstanceMutableNode::emit(Driver& driver, ValueBuilder value) const {
+    KIWI_NOT_IMPLEMENTED();
+    // Type* owner = gen.getOwner();
+    // ObjectType* type = dyn_cast<ObjectType>(owner);
+    // if (type) {
+    //     ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
+    //     return ObjectEmitter(type).emitStore(gen, thisValue, m_name, gen);
+    // } else {
+    //     KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
+    // }
 }
 
-ExpressionGen InstanceExpressionNode::emit(Driver& driver, const StatementGen& gen) {
-    Type* owner = gen.getOwner();
-    ObjectType* type = dyn_cast<ObjectType>(owner);
-    if (type) {
-        ExpressionGen thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
-        return ObjectEmitter(type).emitLoad(gen, thisValue, m_name);
-    } else {
-        KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
-    }
+ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // Type* owner = gen.getOwner();
+    // ObjectType* type = dyn_cast<ObjectType>(owner);
+    // if (type) {
+    //     ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
+    //     return ObjectEmitter(type).emitLoad(gen, thisValue, m_name);
+    // } else {
+    //     KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
+    // }
 }
 
-ExpressionGen ThisNode::emit(Driver& driver, const StatementGen& gen) {
-    llvm::Function* func = gen.getFunction();
-    if (func->arg_empty()) {
-        KIWI_ERROR_AND_EXIT("Not found this", getLocation());
-    }
-    llvm::Argument* arg  = func->arg_begin();
-    return ExpressionGen(gen, m_thisType, arg);
+ValueBuilder ThisNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_NOT_IMPLEMENTED();
+    // llvm::Function* func = gen.getFunction();
+    // if (func->arg_empty()) {
+    //     KIWI_ERROR_AND_EXIT("Not found this", getLocation());
+    // }
+    // llvm::Argument* arg  = func->arg_begin();
+    // return ValueBuilder(gen, m_thisType, arg);
 }

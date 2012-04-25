@@ -124,7 +124,7 @@ namespace lang {
         virtual ~ExpressionStatementNode();
 
         /// Emit instructions for expression
-        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
+        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         ExpressionNode* m_expr;
     };
@@ -156,7 +156,7 @@ namespace lang {
         void append(ExpressionNode* expr);
 
         /// Emit instructions for scope statement
-        virtual StatementGen emit(Driver& driver, const StatementGen& gen);
+        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
         std::map<Identifier, VariableNode*> m_vars;
         std::vector<StatementNode*>         m_stmts;
