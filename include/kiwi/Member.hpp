@@ -21,9 +21,10 @@ namespace kiwi
         enum MemberID {
             FieldID = 1,
             MethodID,
-            BinaryOperatorID,
-            UnaryOperatorID,
-            MultiaryOperatorID,
+            BinaryID,
+            UnaryID,
+            MultiaryID,
+            CastID
         };
 
         /// Unary operation code

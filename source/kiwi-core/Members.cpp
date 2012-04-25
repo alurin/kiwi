@@ -46,7 +46,7 @@ UnaryOperator::UnaryOperator(
     Type* resultType,
     codegen::UnaryEmitter* emitter
 ) : Callable(ownerType, resultType, makeVector(ownerType, 0), emitter), m_opcode(opcode) {
-    m_memberID = UnaryOperatorID;
+    m_memberID = UnaryID;
 }
 
 // constructor
@@ -57,7 +57,7 @@ BinaryOperator::BinaryOperator(
     Type* operandType,
     codegen::BinaryEmitter* emitter
 ) : Callable(ownerType, resultType, makeVector(ownerType, operandType, 0), emitter), m_opcode(opcode) {
-    m_memberID = BinaryOperatorID;
+    m_memberID = BinaryID;
 }
 
 // constructor
@@ -68,7 +68,7 @@ MultiaryOperator::MultiaryOperator(
     TypeVector args,
     codegen::CallableEmitter* emitter
 ) : Callable(ownerType, resultType, makeVector(ownerType, args), emitter), m_opcode(opcode) {
-    m_memberID = MultiaryOperatorID;
+    m_memberID = MultiaryID;
 }
 
 // constructor
@@ -86,6 +86,11 @@ Method::Method(const Identifier& name, Type* ownerType, Type* resultType, TypeVe
 // constructor
 Argument::Argument(Callable* owner, Type* type, int32_t position)
 : m_owner(owner), m_type(type) { }
+
+CastOperator::CastOperator(Type* sourceType, Type* destType)
+: Callable(sourceType, destType) {
+    m_memberID = CastID;
+}
 
 /// Check signature
 bool Callable::hasSignature(const TypeVector& types, bool isCast) const {

@@ -23,6 +23,7 @@ namespace kiwi {
     class MultiaryOperator;
     class Method;
     class Field;
+    class CastOperator;
 
     /// Type metadata
     class Type {
@@ -59,14 +60,14 @@ namespace kiwi {
         }
 
         /// add unary operator
-        UnaryOperator* add(
+        UnaryOperator* addUnary(
             Member::UnaryOpcode opcode,
             Type* resultType,
             codegen::UnaryEmitter* emitter
         );
 
         /// add binary operator
-        BinaryOperator* add(
+        BinaryOperator* addBinary(
             Member::BinaryOpcode opcode,
             Type* resultType,
             Type* operandType,
@@ -74,7 +75,7 @@ namespace kiwi {
         );
 
         /// add binary operator
-        MultiaryOperator* add(
+        MultiaryOperator* addMultiary(
             Member::MultiaryOpcode opcode,
             Type* resultType,
             std::vector<Type*> arguments,
@@ -82,25 +83,28 @@ namespace kiwi {
         );
 
         /// add field
-        Field* add(const Identifier& name, Type* type);
+        Field* addField(const Identifier& name, Type* type);
 
         /// add method
-        Method* add(const Identifier& name, Type* resultType, std::vector<Type*> arguments);
+        Method* addMethod(const Identifier& name, Type* resultType, std::vector<Type*> arguments);
 
         /// find unary operator
-        UnaryOperator* find(Member::UnaryOpcode opcode) const;
+        UnaryOperator* findUnary(Member::UnaryOpcode opcode) const;
 
         /// find binary operator
-        BinaryOperator* find(Member::BinaryOpcode opcode, Type* operandType) const;
+        BinaryOperator* findBinary(Member::BinaryOpcode opcode, Type* operandType) const;
 
         /// find binary operator
-        MultiaryOperator* find(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) const;
+        MultiaryOperator* findMultiary(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) const;
 
         /// find field operator
-        Field* find(const Identifier& name) const;
+        Field* findField(const Identifier& name) const;
 
         /// find method
-        Method* find(const Identifier& name, std::vector<Type*> arguments) const;
+        Method* findMethod(const Identifier& name, std::vector<Type*> arguments) const;
+
+        /// find cast operator
+        virtual CastOperator* findCastTo(const Type* type) const;
 
         /// Type is castable to other type (up-cast(from child to parent) or implict cast)
         virtual bool isCastableTo(const Type* type, bool duckCast = true) const;

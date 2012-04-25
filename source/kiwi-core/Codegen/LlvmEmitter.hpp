@@ -193,6 +193,16 @@ namespace codegen {
         );
     protected:
     }; // class LlvmCallEmitter
+
+    /// Llvm emitter for up cast
+    class LlvmUpcast : public CallableEmitter {
+    public:
+        /// emit IR instruction for binary operation
+        virtual ExpressionGen emit(
+            const StatementGen& gen,
+            const ExpressionVector& values
+        );
+    };
 } // namesapce codegen
 } // namesapce  kiwi
 

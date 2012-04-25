@@ -160,7 +160,7 @@ ExpressionNode* VariableNode::getRight() {
 
 void FieldNode::generateMember(Driver& driver, Type* ownerType) {
     Type* resultType = m_type->get(driver);
-    ownerType->add(m_name, resultType);
+    ownerType->addField(m_name, resultType);
 }
 
 void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
@@ -174,7 +174,7 @@ void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
         Type*         frontend_type = arg->getType()->get(driver);
         frontendArgs.push_back(frontend_type);
     }
-    m_method = ownerType->add(m_name, resultType, frontendArgs);
+    m_method = ownerType->addMethod(m_name, resultType, frontendArgs);
 
 }
 

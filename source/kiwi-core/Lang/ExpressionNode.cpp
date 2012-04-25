@@ -158,16 +158,29 @@ ExpressionGen CallableNode::emitCall(Driver& driver, const StatementGen& gen, st
     }
 
     if (call) {
+        // emit casts
+        int j = 0;
+        for (std::vector<ExpressionGen>::iterator i = args.begin(); i != args.end(); ++i, ++j) {
+            Argument* arg    = call->getArgument(j);
+            Type* targetType = arg->getType();
+            Type* sourceType = i->getType();
+
+            if (targetType != sourceType) {
+                KIWI_ERROR_AND_EXIT("Cast not implemented", getLocation());
+            }
+        }
+
+        // emit call
         CallableEmitter* emitter = call->getEmitter();
         if (emitter) {
-            return emitter->emit(gen, args);
+            return emitter->emit(current, args);
         }
     }
     KIWI_ERROR_AND_EXIT("Method or operator for call not found", getLocation());
 }
 
 Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
-    Callable* call = types[0]->find(m_opcode, types[1]);
+    Callable* call = types[0]->findBinary(m_opcode, types[1]);
     if (!call) {
         KIWI_ERROR_AND_EXIT("Not found binary operator", getLocation());
     }
@@ -175,7 +188,7 @@ Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
 }
 
 Callable* UnaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
-    Callable* call = types[0]->find(m_opcode);
+    Callable* call = types[0]->findUnary(m_opcode);
     if (!call) {
         KIWI_ERROR_AND_EXIT("not found unary operator", getLocation());
     }
@@ -185,7 +198,7 @@ Callable* UnaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
 Callable* MultiaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
     assert(types.size() >= 1 && "MultiaryNode::findCallable must recive at last one argument");
     std::vector<Type*> args(types.begin() + 1, types.end());
-    Callable* call = types[0]->find(m_opcode, args);
+    Callable* call = types[0]->findMultiary(m_opcode, args);
     if (!call) {
         KIWI_ERROR_AND_EXIT("not found multiary operator", getLocation());
     }
@@ -194,7 +207,7 @@ Callable* MultiaryNode::findCallable(Driver& driver, std::vector<Type*> types) {
 
 Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) {
     std::vector<Type*> args(types.begin() + 1, types.end());
-    Callable* call = types[0]->find(m_method, args);
+    Callable* call = types[0]->findMethod(m_method, args);
     if (!call) {
         KIWI_ERROR_AND_EXIT("Method not found", getLocation());
     }

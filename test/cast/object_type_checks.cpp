@@ -7,6 +7,33 @@
 
 using namespace kiwi;
 
+TEST(object_methods_check) // Declares a test named "types_cast_check"
+{
+    Context* context = Context::create();
+    Module*  module  = Module::create("script", context);
+    ObjectType* type = ObjectType::create(module);
+    VoidType* type1  = VoidType::get(context);
+    BoolType* type2  = BoolType::get(context);
+
+    std::vector<Type*> args;
+
+    // create method "method" without argument
+    {
+        Method* created = type->addMethod("method", type1, args); // method();
+        Method* method  = type->findMethod("method", args);
+        CHECK_EQUAL(method, created);
+    }
+
+    // create another method with name "method" with argument
+    {
+        args.clear();
+        args.push_back(type2);
+        Method* created = type->addMethod("method", type1, args); // method();
+        Method* method  = type->findMethod("method", args);
+        CHECK_EQUAL(method, created);
+    }
+}
+
 TEST(object_inheritance_check) // Declares a test named "types_cast_check"
 {
     Context* context = Context::create();

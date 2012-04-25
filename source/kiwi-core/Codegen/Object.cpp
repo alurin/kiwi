@@ -36,7 +36,7 @@ ExpressionGen ObjectEmitter::emitNew(const StatementGen& gen) {
 // Returns pointer to value of field obkect
 ExpressionGen ObjectEmitter::findField(const StatementGen& gen, const ExpressionGen& thisValue, const Identifier& name) {
     // Find field
-    Field* field = m_type->find(name);
+    Field* field = m_type->findField(name);
     if (!field) {
         throw "Field not found";
     }

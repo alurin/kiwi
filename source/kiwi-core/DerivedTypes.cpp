@@ -63,6 +63,16 @@ StringType::StringType(Module* module)
     m_typeID                   = StringID;
 }
 
+template<typename Type>
+InheritanceMetadata<Type>::InheritanceMetadata(Type* type, codegen::CallableEmitter* emitter)
+: m_type(type), m_emitter(emitter) {
+}
+
+template<typename Type>
+InheritanceMetadata<Type>::~InheritanceMetadata() {
+    delete m_emitter;
+}
+
 IntType* IntType::create(Module* module, int32_t size, bool unsign) {
     IntType* type = new IntType(module, size, unsign);
     type->initializate();
@@ -110,21 +120,21 @@ void IntType::initializate() {
     Type* voidTy = VoidType::get(context);
     Type* intTy = this;
 
-    add(Member::Pos,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Add, intTy));
-    add(Member::Neg,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Sub, intTy));
+    addUnary(Member::Pos,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Add, intTy));
+    addUnary(Member::Neg,  intTy,         new LlvmZeroUnaryOperator(llvm::Instruction::Sub, intTy));
 
-    add(Member::Add, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Add, intTy));
-    add(Member::Sub, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Sub, intTy));
-    add(Member::Mul, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Mul, intTy));
+    addBinary(Member::Add, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Add, intTy));
+    addBinary(Member::Sub, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Sub, intTy));
+    addBinary(Member::Mul, intTy, intTy,  new LlvmBinaryOperator(llvm::Instruction::Mul, intTy));
 
-    add(Member::Eq,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
-    add(Member::Neq, boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
-    add(Member::Gt,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGT, context));
-    add(Member::Ge,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGE, context));
-    add(Member::Le,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLT, context));
-    add(Member::Lt,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLE, context));
+    addBinary(Member::Eq,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
+    addBinary(Member::Neq, boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
+    addBinary(Member::Gt,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGT, context));
+    addBinary(Member::Ge,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SGE, context));
+    addBinary(Member::Le,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLT, context));
+    addBinary(Member::Lt,  boolTy, intTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_SLE, context));
 
-    add(Member::Print, voidTy, new LlvmIntegerPrintOperator());
+    addUnary(Member::Print, voidTy, new LlvmIntegerPrintOperator());
 }
 
 void BoolType::initializate() {
@@ -132,10 +142,10 @@ void BoolType::initializate() {
     Type*     voidTy = VoidType::get(context);
     Type*     boolTy = this;
 
-    add(Member::Eq,  boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
-    add(Member::Neq, boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
+    addBinary(Member::Eq,  boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
+    addBinary(Member::Neq, boolTy, boolTy, new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
 
-    add(Member::Print, voidTy, new LlvmBoolPrintOperator());
+    addUnary(Member::Print, voidTy, new LlvmBoolPrintOperator());
 }
 
 void CharType::initializate() {
@@ -144,7 +154,7 @@ void CharType::initializate() {
     Type*     voidTy = VoidType::get(context);
     Type*     charTy = this;
 
-    add(Member::Print, voidTy, new LlvmCharPrintOperator());
+    addUnary(Member::Print, voidTy, new LlvmCharPrintOperator());
 }
 
 void StringType::initializate() {
@@ -155,19 +165,19 @@ void StringType::initializate() {
     Type*      intTy = IntType::get32(context);
     Type*   stringTy = this;
 
-    add(Member::Eq,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_EQ, context));
-    add(Member::Neq, boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_NE, context));
-    add(Member::Gt,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGT, context));
-    add(Member::Ge,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGE, context));
-    add(Member::Le,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLT, context));
-    add(Member::Lt,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLE, context));
+    addBinary(Member::Eq,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_EQ, context));
+    addBinary(Member::Neq, boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_NE, context));
+    addBinary(Member::Gt,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGT, context));
+    addBinary(Member::Ge,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SGE, context));
+    addBinary(Member::Le,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLT, context));
+    addBinary(Member::Lt,  boolTy, stringTy, new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLE, context));
 
 
     // add(Member::Add,         stringTy, stringTy,                    new LlvmStringConcatenate()); // a + b
-    add(Member::Subtraction, charTy,   makeVector(intTy, 0),        new LlvmStringSubtraction()); // [a]
-    add(Member::Subtraction, stringTy, makeVector(intTy, intTy, 0), new LlvmStringSubtraction()); // [a, b]
+    addMultiary(Member::Subtraction, charTy,   makeVector(intTy, 0),        new LlvmStringSubtraction()); // [a]
+    addMultiary(Member::Subtraction, stringTy, makeVector(intTy, intTy, 0), new LlvmStringSubtraction()); // [a, b]
 
-    add(Member::Print, voidTy, new LlvmStringPrintOperator());
+    addUnary(Member::Print, voidTy, new LlvmStringPrintOperator());
 }
 
 IntType* IntType::get32(Context* context) {
@@ -198,8 +208,8 @@ StringType* StringType::get(Context* context) {
 /// add parent type
 bool ObjectType::inherit(ObjectType* type) {
     if (type != this && !isInherit(type)) {
-        m_parents.push_back(type);
-        /// @todo Add dependence to module
+        InheritanceMetadata<ObjectType>* meta = new InheritanceMetadata<ObjectType>(type, new codegen::LlvmUpcast());
+        m_parents.push_back(meta);
         return true;
     }
     return false;
@@ -219,7 +229,7 @@ bool ObjectType::isInherit(const ObjectType* type) const{
             return true;
 
         for (parent_iterator i = parent->parent_begin(); i != parent->parent_end(); ++i) {
-            parents.push(*i);
+            parents.push((*i)->getType());
         }
     }
     return false;
@@ -302,5 +312,5 @@ void ObjectType::emit() {
 
     // add simple constructor
     std::vector<Type*> empty;
-    add(Member::Constructor, VoidType::get(m_module->getContext()), empty, new LlvmCtorEmitter());
+    addMultiary(Member::Constructor, VoidType::get(m_module->getContext()), empty, new LlvmCtorEmitter());
 }

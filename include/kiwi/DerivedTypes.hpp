@@ -166,16 +166,43 @@ namespace kiwi {
         // constructor
         InterfaceType(Module* module, const Identifier& name);
     };
-    class InterfaceType;
+
+    //==--------------------------------------------------------------------==//
+    /// Metadata for information about inheritance
+    template<typename Type>
+    class InheritanceMetadata {
+    public:
+        /// constructor
+        InheritanceMetadata(Type* type, codegen::CallableEmitter* emitter);
+
+        /// destructor
+        virtual ~InheritanceMetadata();
+
+        /// returns type
+        Type* getType() const {
+            return m_type;
+        }
+
+        /// returns emitter for casting operator
+        codegen::CallableEmitter* getEmitter() const {
+            return m_emitter;
+        }
+    protected:
+        /// Parent class, implemented interface and e.t.c
+        Type* m_type;
+
+        /// Emiiter for casting
+        codegen::CallableEmitter* m_emitter;
+    };
 
     //==--------------------------------------------------------------------==//
     /// Object type
     class ObjectType : public Type {
     public:
-        typedef std::vector<InterfaceType*>     InterfaceVector;
-        typedef std::vector<ObjectType*>        ParentVector;
-        typedef InterfaceVector::const_iterator interface_iterator;
-        typedef ParentVector::const_iterator    parent_iterator;
+        typedef std::vector< InheritanceMetadata<InterfaceType>* >  InterfaceVector;
+        typedef std::vector< InheritanceMetadata<ObjectType>* >     ParentVector;
+        typedef InterfaceVector::const_iterator                     interface_iterator;
+        typedef ParentVector::const_iterator                        parent_iterator;
 
         /// Create anonym object type in module
         static ObjectType* create(Module* module);

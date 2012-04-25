@@ -44,9 +44,10 @@ TEST(members_cast_check) // Declares a test named "members_cast_check"
 
     std::vector<Type*> args;
 
-    cast_checker<Field, Member>::check(type->add("field", type));
-    cast_checker<Method, Member>::check(type->add("method", type, args));
-    cast_checker<UnaryOperator, Member>::check(type->add(Member::Not, type, 0));
-    cast_checker<BinaryOperator, Member>::check(type->add(Member::Add, type, type, 0));
+    cast_checker<Field, Member>::check(type->addField("field", type));
+    cast_checker<Method, Member>::check(type->addMethod("method", type, args));
+    cast_checker<UnaryOperator, Member>::check(type->addUnary(Member::Not, type, 0));
+    cast_checker<BinaryOperator, Member>::check(type->addBinary(Member::Add, type, type, 0));
+    cast_checker<MultiaryOperator, Member>::check(type->addMultiary(Member::Constructor, type, args, 0));
     delete context;
 }

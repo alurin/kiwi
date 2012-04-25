@@ -75,16 +75,6 @@ namespace kiwi
             return m_returnType;
         }
 
-        /// returns size of arguments
-        size_t size() const {
-            return m_args.size();
-        }
-
-        /// empty arguments?
-        bool empty() const {
-            return m_args.empty();
-        }
-
         /// Check signature
         bool hasSignature(const TypeVector& types, bool isCast = false) const;
 
@@ -100,6 +90,27 @@ namespace kiwi
 
         /// set llvm analog
         void setFunction(llvm::Function* func);
+
+        /// returns argument by index
+        Argument* getArgument(int32_t indexAt) {
+            if (indexAt < 0 || size() <= indexAt) {
+                return 0;
+            }
+            return m_args[indexAt];
+        }
+
+        /// returns argument by name [not implemented]
+        Argument* getArgument(const Identifier& name);
+
+        /// returns size of arguments
+        size_t size() const {
+            return m_args.size();
+        }
+
+        /// empty arguments?
+        bool empty() const {
+            return m_args.empty();
+        }
 
         /// returns pointer to first argument from callable (iterator)
         const_iterator begin() const {
@@ -156,7 +167,7 @@ namespace kiwi
 
         /// classof check
         static bool classof(const Member* type) {
-            return type->getMemberID() == UnaryOperatorID;
+            return type->getMemberID() == UnaryID;
         }
 
         /// classof check
@@ -187,11 +198,11 @@ namespace kiwi
 
         /// classof check
         static bool classof(const Member* type) {
-            return type->getMemberID() == BinaryOperatorID;
+            return type->getMemberID() == BinaryID;
         }
 
         /// classof check
-        static bool classof(const BinaryOperator&) {
+        static bool classof(const BinaryOperator*) {
             return true;
         }
     protected:
@@ -215,6 +226,15 @@ namespace kiwi
         /// returns multiary opcode
         MultiaryOpcode getOpcode() const {
             return m_opcode;
+        }
+                /// classof check
+        static bool classof(const Member* type) {
+            return type->getMemberID() == MultiaryID;
+        }
+
+        /// classof check
+        static bool classof(const MultiaryOperator*) {
+            return true;
         }
     protected:
         MultiaryOpcode            m_opcode;
@@ -306,6 +326,15 @@ namespace kiwi
         void setPosition(int32_t position) {
             m_position = position;
         }
+    };
+
+    //==--------------------------------------------------------------------==//
+    /// Cast operator
+    class CastOperator : public Callable {
+        friend class Type;
+    protected:
+        /// constructor
+        CastOperator(Type* sourceType, Type* destType);
     };
 }
 

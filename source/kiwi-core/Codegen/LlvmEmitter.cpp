@@ -302,3 +302,9 @@ ExpressionGen LlvmCallEmitter::emit(const StatementGen& gen, const ExpressionVec
 ExpressionGen LlvmCtorEmitter::emit(const StatementGen& gen, const ExpressionVector& values) {
     return values[0];
 }
+
+
+/// emit IR instruction for binary operation
+ExpressionGen LlvmUpcast::emit(const StatementGen& gen, const ExpressionVector& values) {
+    throw "Not implemented";
+}

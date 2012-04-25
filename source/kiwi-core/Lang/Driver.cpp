@@ -119,7 +119,7 @@ bool DriverRef::parse() {
             // find first main method.
             Type* type = (*i)->getType();
             if (type && !m_mainMethod) {
-                m_mainMethod = type->find("main", empty);
+                m_mainMethod = type->findMethod("main", empty);
             }
         }
 
