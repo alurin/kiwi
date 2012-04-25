@@ -50,6 +50,10 @@ Type::~Type() {
     }
 }
 
+Context* Type::getContext() const {
+    return m_module->getContext();
+}
+
 // add binary operator
 UnaryOperator* Type::addUnary(
     Member::UnaryOpcode opcode,

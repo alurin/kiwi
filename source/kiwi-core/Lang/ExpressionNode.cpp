@@ -232,8 +232,8 @@ ValueBuilder AssignNode::emit(Driver& driver, BlockBuilder block) const {
 ValueBuilder ArgumentMutableNode::emit(Driver& driver, ValueBuilder value) const {
     KIWI_NOT_IMPLEMENTED();
     // VariableGen var = o_arg->getGenerator();
-    // if (var.getType() == gen.getType()) {
-    //     llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
+    // if (var.getType() == block.getType()) {
+    //     llvm::StoreInst* inst = new llvm::StoreInst(block.getValue(), var.getValue(), block.getBlock());
     //     return gen;
     // }
     // KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
@@ -242,15 +242,15 @@ ValueBuilder ArgumentMutableNode::emit(Driver& driver, ValueBuilder value) const
 ValueBuilder ArgumentExpressionNode::emit(Driver& driver, BlockBuilder block) const {
     KIWI_NOT_IMPLEMENTED();
     // VariableGen var      = o_arg->getGenerator();
-    // llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
-    // return ValueBuilder(gen, var.getType(), inst);
+    // llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", block.getBlock());
+    // return ValueBuilder(block, var.getType(), inst);
 }
 
 ValueBuilder VariableMutableNode::emit(Driver& driver, ValueBuilder value) const {
     KIWI_NOT_IMPLEMENTED();
     // VariableGen var = o_var->getGenerator();
-    // if (var.getType() == gen.getType()) {
-    //     llvm::StoreInst* inst = new llvm::StoreInst(gen.getValue(), var.getValue(), gen.getBlock());
+    // if (var.getType() == value.getType()) {
+    //     llvm::StoreInst* inst = new llvm::StoreInst(value.getValue(), var.getValue(), value.getBlock());
     //     return gen;
     // }
     // KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
@@ -259,43 +259,33 @@ ValueBuilder VariableMutableNode::emit(Driver& driver, ValueBuilder value) const
 ValueBuilder VariableExpressionNode::emit(Driver& driver, BlockBuilder block) const {
     KIWI_NOT_IMPLEMENTED();
     // VariableGen var      = o_var->getGenerator();
-    // llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", gen.getBlock());
-    // return ValueBuilder(gen, var.getType(), inst);
+    // llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", block.getBlock());
+    // return ValueBuilder(block, var.getType(), inst);
 }
 
 ValueBuilder IntegerConstNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // llvm::APInt cst(32, m_value, false);
-    // llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
-    // return ValueBuilder(gen, IntType::get32(m_context), value);
+    return block.createIntConst(m_value);
 }
 
 ValueBuilder BoolConstNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // llvm::APInt cst(1, m_value, false);
-    // llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
-    // return ValueBuilder(gen, BoolType::get(m_context), value);
+    return block.createBoolConst(m_value);
 }
 
 ValueBuilder StringConstNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // return StringEmitter(StringType::get(m_context)).emit(gen, m_value);
+    return block.createStringConst(m_value);
 }
 
 ValueBuilder CharConstNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // llvm::APInt cst(16, m_value, true);
-    // llvm::ConstantInt* value = llvm::ConstantInt::get(gen.getContext(), cst);
-    // return ValueBuilder(gen, CharType::get(m_context), value);
+    return block.createCharConst(m_value);
 }
 
 ValueBuilder InstanceMutableNode::emit(Driver& driver, ValueBuilder value) const {
     KIWI_NOT_IMPLEMENTED();
-    // Type* owner = gen.getOwner();
+    // Type* owner = block.getOwner();
     // ObjectType* type = dyn_cast<ObjectType>(owner);
     // if (type) {
     //     ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
-    //     return ObjectEmitter(type).emitStore(gen, thisValue, m_name, gen);
+    //     return ObjectEmitter(type).emitStore(block, thisValue, m_name, gen);
     // } else {
     //     KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
     // }
@@ -303,11 +293,11 @@ ValueBuilder InstanceMutableNode::emit(Driver& driver, ValueBuilder value) const
 
 ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) const {
     KIWI_NOT_IMPLEMENTED();
-    // Type* owner = gen.getOwner();
+    // Type* owner = block.getOwner();
     // ObjectType* type = dyn_cast<ObjectType>(owner);
     // if (type) {
     //     ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
-    //     return ObjectEmitter(type).emitLoad(gen, thisValue, m_name);
+    //     return ObjectEmitter(type).emitLoad(block, thisValue, m_name);
     // } else {
     //     KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
     // }
@@ -315,10 +305,10 @@ ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) co
 
 ValueBuilder ThisNode::emit(Driver& driver, BlockBuilder block) const {
     KIWI_NOT_IMPLEMENTED();
-    // llvm::Function* func = gen.getFunction();
+    // llvm::Function* func = block.getFunction();
     // if (func->arg_empty()) {
     //     KIWI_ERROR_AND_EXIT("Not found this", getLocation());
     // }
     // llvm::Argument* arg  = func->arg_begin();
-    // return ValueBuilder(gen, m_thisType, arg);
+    // return ValueBuilder(block, m_thisType, arg);
 }

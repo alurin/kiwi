@@ -222,7 +222,9 @@ namespace lang {
         //    Statements
         //===--------------------------------------------------------------===//
         StatementNode* createExpr(ExpressionNode* expr) {
-            return inject(new ExpressionStatementNode(scope(), expr), expr->getLocation());
+            if (expr)
+                return inject(new ExpressionStatementNode(scope(), expr), expr->getLocation());
+            return 0;
         }
         StatementNode* createReturn(const location& loc) {
             return inject(new ReturnStatement(scope()), loc);

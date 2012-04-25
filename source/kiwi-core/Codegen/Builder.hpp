@@ -1,6 +1,8 @@
 #ifndef KIWI_CODEGEN_BUILDER_INTERNAL
 #define KIWI_CODEGEN_BUILDER_INTERNAL
 
+#include "kiwi/types.hpp"
+
 namespace llvm {
     class LLVMContext;
     class Module;
@@ -10,8 +12,10 @@ namespace llvm {
 }
 
 namespace kiwi {
+    class Context;
     class Module;
     class Type;
+    class Callable;
 
     class FunctionBuilder;
     class BlockBuilder;
@@ -22,7 +26,7 @@ namespace kiwi {
     class Builder {
     public:
         /// Constructor from function. Created first block for function
-        Builder(Module* module);
+        Builder(llvm::Module* module);
 
         /// Copy constructor
         Builder(const Builder& builder);
@@ -39,12 +43,6 @@ namespace kiwi {
         llvm::Module* getModule() const {
             return m_module;
         }
-
-        /// emit method type
-        FunctionBuilder emitType(Method* method);
-
-        /// emit method definition
-        FunctionBuilder emitDefinition(Method* method);
     protected:
         /// Current LLVM context
         llvm::LLVMContext* m_context;
@@ -68,25 +66,16 @@ namespace kiwi {
         /// Assigment
         FunctionBuilder& operator=(const FunctionBuilder& builder);
 
-        /// Append instructions for create new structure
-        void createNew();
-
-        /// Append instructions for call method from object
-        void createCall();
-
-        /// Append instructions for store value in structure field
-        void createFieldStore();
-
-        /// Append instructions for load value from structure field
-        void createFieldLoad();
-
-        /// Create constant string
-        void createConstantString();
+        /// Create new basic block and return builder pointed to this block
+        BlockBuilder createBlock(const Identifier& name);
 
         /// return function
         llvm::Function* getFunction() const {
-            return m_function;
+            return m_func;
         }
+
+        /// return native context
+        Context* getNativeContext() const;
 
         /// return callable
         Callable* getCallable() const {
@@ -94,7 +83,7 @@ namespace kiwi {
         }
     protected:
         /// Current LLVM function
-        llvm::Function* m_function;
+        llvm::Function* m_func;
 
         /// Cullable analog
         Callable* m_analog;
@@ -105,13 +94,31 @@ namespace kiwi {
     class BlockBuilder : public FunctionBuilder {
     public:
         /// constructor
-        BlockBuilder(llvm::BasicBlock* block);
+        BlockBuilder(const FunctionBuilder& builder, llvm::BasicBlock* block);
 
         /// Copy constructor
         BlockBuilder(const BlockBuilder& builder);
 
         /// Assigment
         BlockBuilder& operator=(const BlockBuilder& builder);
+
+        /// Create return, if basic block has not terminator instruction
+        void createTrailReturn();
+
+        /// Allocate memory in stack for mutable varaible
+        ValueBuilder createVariable(const Identifier& name, Type* type, bool autoInit = true);
+
+        /// Create integer constant
+        ValueBuilder createIntConst(int32_t value);
+
+        /// Create boolean constant
+        ValueBuilder createBoolConst(bool value);
+
+        /// Create string constant
+        ValueBuilder createStringConst(const String& value);
+
+        /// Create char constant
+        ValueBuilder createCharConst(UChar value);
 
         /// returns LLVM basic block
         llvm::BasicBlock* getBlock() const {
@@ -127,7 +134,7 @@ namespace kiwi {
     class ValueBuilder : public BlockBuilder {
     public:
         /// constructor
-        ValueBuilder(llvm::BasicBlock& block, llvm::Value* value, Type* type);
+        ValueBuilder(const BlockBuilder& builder, llvm::Value* value, Type* type);
 
         /// Copy constructor
         ValueBuilder(const ValueBuilder& builder);

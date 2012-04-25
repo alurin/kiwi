@@ -16,11 +16,11 @@ namespace codegen {
     public:
         LlvmCallEmitter(llvm::Function* func, Type* returnType);
 
-        /// emit IR instruction for binary operation
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionVector& values
-        );
+        // /// emit IR instruction for binary operation
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionVector& values
+        // );
     protected:
         llvm::Function* m_func;
         Type* m_returnType;
@@ -33,11 +33,11 @@ namespace codegen {
         /// constructor
         LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, Type* type);
 
-        /// emit llvm operator
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionGen& value
-        );
+        // /// emit llvm operator
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionGen& value
+        // );
     protected:
         llvm::Instruction::BinaryOps m_opcode;
         Type*  m_type;
@@ -50,12 +50,12 @@ namespace codegen {
         /// constructor
         LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, Type* type);
 
-        /// emit llvm operator
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionGen& left,
-            const ExpressionGen& right
-     );
+        // /// emit llvm operator
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionGen& left,
+        //     const ExpressionGen& right
+        // );
     protected:
         llvm::Instruction::BinaryOps m_opcode;
         Type* m_type;
@@ -71,12 +71,12 @@ namespace codegen {
             Context* context
         );
 
-        /// emit llvm operator
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionGen& left,
-            const ExpressionGen& right
-        );
+        // /// emit llvm operator
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionGen& left,
+        //     const ExpressionGen& right
+        // );
     protected:
         llvm::CmpInst::Predicate m_predicate;
         Context* m_context;
@@ -93,11 +93,11 @@ namespace codegen {
         );
 
         /// emit llvm operator
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionGen& left,
-            const ExpressionGen& right
-        );
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionGen& left,
+        //     const ExpressionGen& right
+        // );
     protected:
         llvm::CmpInst::Predicate m_predicate;
         Context* m_context;
@@ -106,48 +106,48 @@ namespace codegen {
     //==--------------------------------------------------------------------==//
     class LlvmIntegerPrintOperator : public UnaryEmitter {
     public:
-        /// emit llvm operator
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionGen& value
-        );
+        // /// emit llvm operator
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionGen& value
+        // );
     }; // class LlvmIntegerPrintOperator
 
     //==--------------------------------------------------------------------==//
     class LlvmBoolPrintOperator : public UnaryEmitter {
     public:
-        /// emit llvm operator
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionGen& value
-        );
+        // /// emit llvm operator
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionGen& value
+        // );
     }; // class LlvmBoolPrintOperator
 
     //==--------------------------------------------------------------------==//
     class LlvmCharPrintOperator : public UnaryEmitter {
     public:
-        /// emit llvm operator
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionGen& value
-        );
+        // /// emit llvm operator
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionGen& value
+        // );
     }; // class LlvmCharPrintOperator
 
     //==--------------------------------------------------------------------==//
     class LlvmStringPrintOperator : public UnaryEmitter {
     public:
-        /// emit llvm operator
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionGen& value
-        );
+        // /// emit llvm operator
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionGen& value
+        // );
     }; // class LlvmStringPrintOperator
 
     //==--------------------------------------------------------------------==//
     class LlvmStringEmitter {
     public:
         /// emit llvm operator
-        StatementGen emit(const StatementGen& gen, const ExpressionGen& value);
+        // StatementGen emit(const StatementGen& gen, const ExpressionGen& value);
 
         llvm::Value* getLengthValue() const {
             return m_lengthValue;
@@ -164,44 +164,44 @@ namespace codegen {
     //==--------------------------------------------------------------------==//
     class LlvmStringConcatenate : public BinaryEmitter {
     public:
-        /// emit llvm operator
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionGen& left,
-            const ExpressionGen& right
-        );
+        // /// emit llvm operator
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionGen& left,
+        //     const ExpressionGen& right
+        // );
     }; /// class LlvmStringConcatenate
 
     //==--------------------------------------------------------------------==//
     class LlvmStringSubtraction : public CallableEmitter {
     public:
-        /// emit IR instruction for binary operation
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionVector& values
-        );
+        // /// emit IR instruction for binary operation
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionVector& values
+        // );
     }; /// class LlvmStringSubtraction
 
     //==--------------------------------------------------------------------==//
     /// LLVM emitter for empty constructors
     class LlvmCtorEmitter : public CallableEmitter {
     public:
-        /// emit IR instruction for binary operation
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionVector& values
-        );
+        // /// emit IR instruction for binary operation
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionVector& values
+        // );
     protected:
     }; // class LlvmCallEmitter
 
     /// Llvm emitter for up cast
     class LlvmUpcast : public CallableEmitter {
     public:
-        /// emit IR instruction for binary operation
-        virtual ExpressionGen emit(
-            const StatementGen& gen,
-            const ExpressionVector& values
-        );
+        // /// emit IR instruction for binary operation
+        // virtual ExpressionGen emit(
+        //     const StatementGen& gen,
+        //     const ExpressionVector& values
+        // );
     };
 } // namesapce codegen
 } // namesapce  kiwi

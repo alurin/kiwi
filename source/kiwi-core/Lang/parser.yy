@@ -4,6 +4,7 @@
 %{ /*** C/C++ Declarations ***/
 
 #include "kiwi/config.hpp"
+#include "kiwi/assert.hpp"
 #include <stdio.h>
 #include <string>
 #include <vector>
@@ -141,6 +142,7 @@
 %type   <rightnode>     expression right
 %type   <leftnode>      left
 %type   <stmtnode>      statement scope scope_end return_statement print_statement conditional_statement
+%type   <stmtnode>      variable_declare
 %type   <membernode>    function field class_element
 %type   <stringVal>     qualified_identifier
 
@@ -148,6 +150,7 @@
 %destructor { delete $$; } expression right
 %destructor { delete $$; } type type_complex type_primary
 %destructor { delete $$; } statement scope scope_end return_statement print_statement conditional_statement
+%destructor { delete $$; } variable_declare
 %destructor { delete $$; } STRING qualified_identifier
 %destructor { delete $$; } function field class_element
 
@@ -223,7 +226,7 @@ statement
     | conditional_statement
     | return_statement ';'
     | print_statement  ';'
-    | variable_declare ';'       { $$ = 0; }
+    | variable_declare ';'
     ;
 
 scope
@@ -274,9 +277,23 @@ call_argument
 //==------------------------------------------------------------------------==//
 
 variable_declare
-    : type      VAR_LOCAL                { driver.scope()->declare(*$2, $1);     yyfree($2); }
-    | type      VAR_LOCAL '=' expression { driver.scope()->declare(*$2, $1, $4); yyfree($2); }
-    | TYPE_AUTO VAR_LOCAL '=' expression { driver.scope()->declare(*$2, $4);     yyfree($2); }
+    : type      VAR_LOCAL                   {
+                                                driver.scope()->declare(*$2, $1);
+                                                $$ = 0;
+                                                yyfree($2);
+                                            }
+    | type      VAR_LOCAL '=' expression    {
+                                                driver.scope()->declare(*$2, $1, $4);
+                                                KIWI_DUMP("Not implement!!! Variable init expression");
+                                                $$ = 0;
+                                                yyfree($2);
+                                            }
+    | TYPE_AUTO VAR_LOCAL '=' expression    {
+                                                driver.scope()->declare(*$2, $4);
+                                                KIWI_DUMP("Not implement!!! Variable init expression");
+                                                $$ = 0;
+                                                yyfree($2);
+                                            }
     ;
 
 expression

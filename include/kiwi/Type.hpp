@@ -49,6 +49,9 @@ namespace kiwi {
             return m_typeID;
         }
 
+        /// returns type owner context
+        Context* getContext() const;
+
         /// returns type owner module
         Module* getModule() const {
             return m_module;

@@ -1,7 +1,6 @@
 #ifndef KIWI_LANG_FUNCTIONNODE_INTERNAL
 #define KIWI_LANG_FUNCTIONNODE_INTERNAL
 
-#include "kiwi/Codegen/Variable.hpp"
 #include "StatementNode.hpp"
 #include "MemberNode.hpp"
 #include "boost/shared_ptr.hpp"
@@ -23,8 +22,6 @@ namespace lang {
     class ExpressionNode;
     class ScopeNode;
 
-    using codegen::VariableGen;
-
     //==--------------------------------------------------------------------==//
     /// Named parameter syntax node
     class NamedNode : public Node {
@@ -43,17 +40,17 @@ namespace lang {
         /// create right node for this named node
         virtual ExpressionNode* getRight() =0;
 
-        VariableGen getGenerator() const {
-            return m_gen;
-        }
+        //VariableGen getGenerator() const {
+        //    return m_gen;
+        //}
 
-        void setGenerator(VariableGen gen) {
-            m_gen = gen;
-        }
+        //void setGenerator(VariableGen gen) {
+        //    m_gen = gen;
+        //}
     protected:
         FunctionNode*   o_owner;
         TypeNode*       m_type;
-        VariableGen     m_gen;
+        //VariableGen     m_gen;
 
         NamedNode(FunctionNode* owner, TypeNode* type);
     };

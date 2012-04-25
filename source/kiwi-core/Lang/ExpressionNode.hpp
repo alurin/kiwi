@@ -3,8 +3,6 @@
 
 #include "Node.hpp"
 #include "kiwi/Member.hpp"
-#include "kiwi/Codegen/Expression.hpp"
-#include "kiwi/Codegen/Variable.hpp"
 #include <vector>
 #include <list>
 
@@ -12,16 +10,16 @@ namespace kiwi {
     class Context;
     class ObjectType;
     class Callable;
+
     class ValueBuilder;
     class BlockBuilder;
+    class VariableBuilder;
 
 namespace lang {
     class VariableNode;
     class ArgumentNode;
     class Driver;
     class TypeNode;
-
-    using codegen::VariableGen;
 
     //==--------------------------------------------------------------------==//
     /// Mutable synatax node
