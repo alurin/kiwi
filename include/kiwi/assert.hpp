@@ -4,9 +4,6 @@
 #include "kiwi/config.hpp"
 
 #ifdef KIWI_DEBUG
-#   ifndef NDEBUG
-#       define NDEBUG
-#   endif
 #   include <assert.h>
     /// Assertion
 #   define kiwi_assert(_expr, _message) assert((_expr) && _message);

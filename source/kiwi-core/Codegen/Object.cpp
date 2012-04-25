@@ -30,7 +30,8 @@ ExpressionGen ObjectEmitter::emitStore(const StatementGen& gen, const Expression
 
 // emit instruction for create new instance of class
 ExpressionGen ObjectEmitter::emitNew(const StatementGen& gen) {
-    llvm::Value* value = new llvm::AllocaInst(m_type->getVarType(), "this", gen.getBlock());
+    llvm::PointerType* type = llvm::dyn_cast<llvm::PointerType>(m_type->getVarType());
+    llvm::Value* value = new llvm::AllocaInst(type->getElementType(), "this", gen.getBlock());
     return ExpressionGen(gen, m_type, value);
 }
 

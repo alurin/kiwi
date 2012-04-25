@@ -1,6 +1,7 @@
 #include "kiwi/Engine.hpp"
 #include "kiwi/Module.hpp"
 #include <boost/program_options.hpp>
+#include <iostream>
 
 using namespace kiwi;
 namespace po = boost::program_options;

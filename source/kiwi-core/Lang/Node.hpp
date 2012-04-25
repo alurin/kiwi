@@ -6,8 +6,10 @@
 #include "location.hh"
 
 #define KIWI_ERROR_AND_EXIT(message, location) \
-    driver.error(location, message); \
-    throw message
+    do {                                 \
+        driver.error(location, message); \
+        throw message;                   \
+    } while (0)
 
 namespace kiwi { namespace lang {
 

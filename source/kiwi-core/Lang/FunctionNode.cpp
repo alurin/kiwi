@@ -171,12 +171,11 @@ void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
 
     // collect arguments
     for (std::vector<ArgumentNode*>::iterator i = m_positions.begin(); i != m_positions.end(); ++i) {
-        ArgumentNode* arg = *i;
+        ArgumentNode* arg           = *i;
         Type*         frontend_type = arg->getType()->get(driver);
         frontendArgs.push_back(frontend_type);
     }
     m_method = ownerType->addMethod(m_name, resultType, frontendArgs);
-
 }
 
 void FunctionNode::generateIRSignature(Driver& driver, Type* owner) {
@@ -185,13 +184,13 @@ void FunctionNode::generateIRSignature(Driver& driver, Type* owner) {
 
 void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
     llvm::BasicBlock* entry = llvm::BasicBlock::Create(m_func->getContext(), "entry", m_func);
-    kiwi_assert(m_func->arg_size() == m_method->arg_size(),"Argument in function must be actual");
+    kiwi_assert(m_func->arg_size() == m_method->size(),"Argument in function must be actual");
 
     // emit mutable variables for arguments
     size_t j = 0;
     for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
         if (j) {
-            kiwi_assert(j < m_positions.size(), "Ops... This is not worked");
+            kiwi_assert(j-1 < m_positions.size(), "Ops... This is not worked");
             ArgumentNode* arg = m_positions[j-1];
 
             // set argument name
@@ -215,7 +214,7 @@ void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
 
     /// emit terminator for last block
     if (!gen.getBlock()->getTerminator()) {
-        llvm::Type* resultType = llvm::cast<llvm::FunctionType>(m_func->getType())->getReturnType();
+        llvm::Type* resultType = m_func->getFunctionType()->getReturnType();
         if (resultType->isVoidTy()) {
             llvm::ReturnInst::Create(gen.getContext(), gen.getBlock());
         } else {

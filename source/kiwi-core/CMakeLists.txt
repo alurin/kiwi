@@ -16,9 +16,6 @@ SET (core_SOURCES ${core_SOURCES} ${BISON_KiwiParser_OUTPUTS} ${FLEX_KiwiScanner
 SET (core_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${LLVM_LIBRARIES} "${PROJECT_NAME}-runtime")
 SET (core_LIB "lib${PROJECT_NAME}")
 
-# Remove no exception from LLVM flags
-STRING(REPLACE "-fno-exceptions" "" LLVM_CXXFLAGS ${LLVM_CXXFLAGS})
-
 ADD_LIBRARY(${core_LIB} SHARED ${core_SOURCES})
 TARGET_LINK_LIBRARIES(${core_LIB} ${core_LIBS})
 SET_TARGET_PROPERTIES(

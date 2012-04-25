@@ -118,7 +118,6 @@ CallableNode* NodeFactory::call() {
 
 /// declare call
 CallableNode* NodeFactory::call(const Identifier& name, const location& loc) {
-    kiwi_assert(!m_calls.empty(), "Calls stack is empty");
     CallNode* call = new CallNode(new ThisNode(dyn_cast<ObjectType>(m_this)), name);
     call->setLocation(loc);
     m_calls.push(call);

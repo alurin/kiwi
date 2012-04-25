@@ -14,7 +14,7 @@
 SET(LLVM_FOUND FALSE)
 FIND_PROGRAM(LLVM_CONFIG llvm-config)
 
-macro(_llvm_config output separate flags)
+MACRO(_llvm_config output separate flags)
     EXECUTE_PROCESS(
         COMMAND                     ${LLVM_CONFIG} ${flags}
         OUTPUT_VARIABLE             ${output}
@@ -23,7 +23,19 @@ macro(_llvm_config output separate flags)
     IF(${separate})
         SEPARATE_ARGUMENTS(${output})
     ENDIF(${separate})
-endmacro()
+ENDMACRO()
+
+
+# Clean up LLVM flags
+MACRO(_llvm_clean varaible)
+    STRING(REPLACE "-fno-exceptions"      "" ${varaible} ${${varaible}})
+    STRING(REPLACE "-Woverloaded-virtual" "" ${varaible} ${${varaible}})
+    STRING(REPLACE "-O0"                  "" ${varaible} ${${varaible}})
+    STRING(REPLACE "-O1"                  "" ${varaible} ${${varaible}})
+    STRING(REPLACE "-O2"                  "" ${varaible} ${${varaible}})
+    STRING(REPLACE "-O3"                  "" ${varaible} ${${varaible}})
+    STRING(REPLACE "-DNDEBUG"             "" ${varaible} ${${varaible}})
+ENDMACRO()
 
 IF("${LLVM_FIND_COMPONENTS}" STREQUAL "")
     SET(LLVM_FIND_COMPONENTS "all")
@@ -31,9 +43,12 @@ ELSE("${LLVM_FIND_COMPONENTS}" STREQUAL "")
     SEPARATE_ARGUMENTS(LLVM_FIND_COMPONENTS)
 ENDIF("${LLVM_FIND_COMPONENTS}" STREQUAL "")
 
+IF (LLVM_FOUND)
+    RETURN()
+ENDIF (LLVM_FOUND)
 
 IF (LLVM_CONFIG)
-    SET(LLVM_FOUND TRUE)
+    SET(LLVM_FOUND TRUE CACHE INTERNAL "")
 
     # Retrive LLVM version
     _llvm_config(_LLVM_VERSION_ 0 --version)
@@ -45,15 +60,27 @@ IF (LLVM_CONFIG)
         SET(LLVM_SUBMINOR_VERSION 0)
     ENDIF("${LLVM_SUBMINOR_VERSION}" STREQUAL "")
 
-    _llvm_config(LLVM_INCLUDE_DIRS 1  --includedir)
-    _llvm_config(LLVM_LIBRARY_DIRS 1  --libdir    )
-    _llvm_config(LLVM_CPPFLAGS     0  --cppflags  )
-    _llvm_config(LLVM_CFLAGS       0  --cflags    )
-    _llvm_config(LLVM_CXXFLAGS     0  --cxxflags  )
-    _llvm_config(LLVM_LDFLAGS      1   --ldflags   )
-    _llvm_config(LLVM_LIBRARIES    1   --libs ${LLVM_FIND_COMPONENTS})
+    _llvm_config(_LLVM_INCLUDE_DIRS 1  --includedir)
+    _llvm_config(_LLVM_LIBRARY_DIRS 1  --libdir    )
+    _llvm_config(_LLVM_CPPFLAGS     0  --cppflags  )
+    _llvm_config(_LLVM_CFLAGS       0  --cflags    )
+    _llvm_config(_LLVM_CXXFLAGS     0  --cxxflags  )
+    _llvm_config(_LLVM_LDFLAGS      1  --ldflags   )
+    _llvm_config(_LLVM_LIBRARIES    1  --libs ${LLVM_FIND_COMPONENTS})
 
-    list(APPEND LLVM_LIBRARIES ${LLVM_LDFLAGS})
+    _llvm_clean(_LLVM_CPPFLAGS)
+    _llvm_clean(_LLVM_CFLAGS)
+    _llvm_clean(_LLVM_CXXFLAGS)
+
+    SET(LLVM_INCLUDE_DIRS ${_LLVM_INCLUDE_DIRS} CACHE INTERNAL "LLVM include dirs")
+    SET(LLVM_LIBRARY_DIRS ${_LLVM_LIBRARY_DIRS} CACHE INTERNAL "LLVM library dirs")
+    SET(LLVM_CPPFLAGS     ${_LLVM_CPPFLAGS}     CACHE INTERNAL "LLVM cppflags")
+    SET(LLVM_CFLAGS       ${_LLVM_CFLAGS}       CACHE INTERNAL "LLVM cflags")
+    SET(LLVM_CXXFLAGS     ${_LLVM_CXXFLAGS}     CACHE INTERNAL "LLVM cxxflags")
+    SET(LLVM_LDFLAGS      ${_LLVM_LDFLAGS}      CACHE INTERNAL "LLVM ldflags")
+    SET(LLVM_LIBRARIES    ${_LLVM_LIBRARIES}    CACHE INTERNAL "LLVM libraries")
+
+    LIST(APPEND LLVM_LIBRARIES ${LLVM_LDFLAGS})
 ENDIF (LLVM_CONFIG)
 
 IF(LLVM_FOUND)

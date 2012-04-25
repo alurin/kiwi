@@ -47,7 +47,9 @@ llvm::Function* StartupEmitter::emitJIT() {
         if (resultType->isIntegerTy(32)) {
             llvm::ReturnInst::Create(context, call, block);
         } else {
-            llvm::ReturnInst::Create(context, block);
+            llvm::APInt cst(32, 0, false);
+            llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
+            llvm::ReturnInst::Create(context, zero, block);
         }
     }
     return startFunc;

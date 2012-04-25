@@ -10,7 +10,6 @@
  */
 
 #cmakedefine KIWI_DEBUG
-#cmakedefine KIWI_TRACE
 #cmakedefine KIWI_RELEASE
 #cmakedefine KIWI_NAME               "@KIWI_NAME@"
 #cmakedefine KIWI_CODENAME           "@KIWI_CODENAME@"

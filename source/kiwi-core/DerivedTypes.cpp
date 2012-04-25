@@ -275,16 +275,18 @@ void ObjectType::emit() {
     // emit llvm type analog
     llvm::LLVMContext& context = m_module->getContext()->getContext();
     llvm::Module* module       = m_module->getModule();
+    llvm::StructType* type = 0;
     if (types.size()) {
-        m_varType = llvm::StructType::create(types);
+        type = llvm::StructType::create(types);
     } else {
-        m_varType = llvm::StructType::create(context);
+        type = llvm::StructType::create(context);
     }
+    m_varType = type->getPointerTo();
 
     // emit address map
     std::vector<llvm::Constant*> addresses;
     std::vector<llvm::Constant*> buffer;
-    llvm::Constant* nullCst = llvm::Constant::getNullValue(m_varType->getPointerTo());
+    llvm::Constant* nullCst = llvm::Constant::getNullValue(m_varType);
     llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(32, 0, false));
     j = 0;
     for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {

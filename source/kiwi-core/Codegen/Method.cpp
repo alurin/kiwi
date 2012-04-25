@@ -21,15 +21,6 @@ llvm::FunctionType* MethodEmitter::emitType() {
     std::vector<llvm::Type*> args;
     llvm::Type* resultType = m_method->getReturnType()->getVarType();
 
-    // collect implicit arguments
-    if (m_method->isStatic()) {
-        throw "Static methods not implemented";
-    } else {
-        /// @todo remove pointer to
-        llvm::Type* argType = m_method->getOwnerType()->getVarType();
-        args.push_back(argType->getPointerTo());
-    }
-
     // collect explicit arguments
     for (std::vector<Argument*>::const_iterator i = m_method->begin(); i != m_method->end(); ++i) {
         Argument* arg = *i;

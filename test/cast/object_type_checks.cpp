@@ -20,9 +20,6 @@ TEST(object_methods_check) // Declares a test named "types_cast_check"
     // create method "method" without argument
     {
         Method* created = type->addMethod("method", type1, args); // method();
-
-        args.clear();
-        args.push_back(type);
         Method* method  = type->findMethod("method", args);
         CHECK_EQUAL(method, created);
     }
@@ -32,10 +29,6 @@ TEST(object_methods_check) // Declares a test named "types_cast_check"
         args.clear();
         args.push_back(type2);
         Method* created = type->addMethod("method", type1, args); // method();
-
-        args.clear();
-        args.push_back(type);
-        args.push_back(type2);
         Method* method  = type->findMethod("method", args);
         CHECK_EQUAL(method, created);
     }

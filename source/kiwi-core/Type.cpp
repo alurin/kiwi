@@ -142,12 +142,11 @@ Field* Type::findField(const Identifier& name) const {
     }
     return 0;
 }
-
 // find method
 Method* Type::findMethod(const Identifier& name, std::vector<Type*> arguments) const {
     for (std::vector<Method*>::const_iterator i = m_methods.begin(); i != m_methods.end(); ++i) {
         Method* method = *i;
-        if (method->getName() == name && method->hasSignature(arguments, true)) {
+        if (method->getName() == name && method->hasSignature(makeVector(const_cast<Type*>(this), arguments), true)) {
             return method;
         }
     }
