@@ -331,15 +331,7 @@ ValueBuilder BlockBuilder::createStringConst(const String& value) {
     llvm::Type* sizeType = llvm::IntegerType::get(*m_context, 32);
     llvm::ArrayType* bufferType = llvm::ArrayType::get(charType, value.length());
 
-    // generate string type
-    std::vector<llvm::Type*> elements;
-    elements.push_back(sizeType);
-    elements.push_back(bufferType);
-
-    llvm::Type* elementType = llvm::dyn_cast<llvm::PointerType>(type->getVarType())->getElementType();
-    llvm::StructType* stringType = llvm::dyn_cast<llvm::StructType>(elementType);
-
-    // generate size
+        // generate size
     llvm::Constant* size = llvm::ConstantInt::get(*m_context, llvm::APInt(32, value.length(), false));
 
     // generate buffer
@@ -353,17 +345,26 @@ ValueBuilder BlockBuilder::createStringConst(const String& value) {
         buffer = llvm::ConstantArray::get(bufferType, bufferConst);
     }
 
+    // generate string type
+    std::vector<llvm::Type*> elements;
+    elements.push_back(sizeType);
+    elements.push_back(bufferType);
+
+    llvm::StructType* stringCstType = llvm::StructType::get(*m_context, elements);
+
     // generate string
-    llvm::Constant* string = llvm::ConstantStruct::get(stringType, size, buffer, NULL);
-    llvm::GlobalVariable* result = new llvm::GlobalVariable(
+    llvm::Constant* string = llvm::ConstantStruct::get(stringCstType, size, buffer, NULL);
+    llvm::GlobalVariable* stringCst = new llvm::GlobalVariable(
         *m_module,
-        stringType,
+        stringCstType,
         true,
         llvm::GlobalValue::PrivateLinkage,
         string,
-        "string"
+        "string.cst"
      );
-    result->setUnnamedAddr(true); // Binary equal strings must be merged
+    stringCst->setUnnamedAddr(true); // Binary equal strings must be merged
+    llvm::Type* stringType = type->getVarType();
+    llvm::Value* result = new llvm::BitCastInst(stringCst, stringType, "string.val", m_block);
     return ValueBuilder(*this, result, type);
 }
 
