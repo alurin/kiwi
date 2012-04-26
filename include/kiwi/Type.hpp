@@ -16,8 +16,6 @@ namespace llvm {
 
 namespace kiwi {
     namespace codegen {
-        class UnaryEmitter;
-        class BinaryEmitter;
         class CallableEmitter;
     };
     class Context;
@@ -72,7 +70,7 @@ namespace kiwi {
         UnaryOperator* addUnary(
             Member::UnaryOpcode opcode,
             Type* resultType,
-            codegen::UnaryEmitter* emitter
+            codegen::CallableEmitter* emitter
         );
 
         /// add binary operator
@@ -80,7 +78,7 @@ namespace kiwi {
             Member::BinaryOpcode opcode,
             Type* resultType,
             Type* operandType,
-            codegen::BinaryEmitter* emitter
+            codegen::CallableEmitter* emitter
         );
 
         /// add binary operator

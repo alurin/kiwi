@@ -4,7 +4,7 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-#include "kiwi/Codegen/Emitter.hpp"
+#include "Emitter.hpp"
 
 using namespace kiwi;
 using namespace kiwi::codegen;

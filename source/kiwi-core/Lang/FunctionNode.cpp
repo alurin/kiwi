@@ -197,31 +197,31 @@ void FunctionNode::generateIRSignature(Driver& driver, Type* owner) {
     m_func = MethodEmitter(m_method).emitDefinition();
 }
 
+#include <llvm/Instructions.h>
+#include <llvm/Function.h>
 void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
-    //KIWI_NOT_IMPLEMENTED();
     FunctionBuilder func(m_func, m_method);
     BlockBuilder entry = func.createBlock("entry");
-    // // emit mutable variables for arguments
-    // size_t j = 0;
-    // for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
-    //     if (j) {
-    //         kiwi_assert(j-1 < m_positions.size(), "Ops... This is not worked");
-    //         ArgumentNode* arg = m_positions[j-1];
+    // emit mutable variables for arguments
+    size_t j = 0;
+    for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
+        if (j) {
+            kiwi_assert(j-1 < m_positions.size(), "Ops... This is not worked");
+            ArgumentNode* arg = m_positions[j-1];
 
-    //         // set argument name
-    //         i->setName(arg->getName());
+            // add mutable for arguments
+            Type* type = arg->getType()->get(driver);
+            ValueBuilder variable = entry.createVariable(arg->getName(), type, false);
+            /// @todo move store to builder
+            llvm::StoreInst*  store = new llvm::StoreInst(i, variable.getValue(), entry.getBlock());
 
-    //         // add mutable for arguments
-    //         llvm::AllocaInst* value = new llvm::AllocaInst(i->getType(), arg->getName(), entry);
-    //         llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
-
-    //         // save information
-    //         ValueBuilder vargen(arg->getType()->get(driver), value);
-    //         arg->setGenerator(vargen);
-    //     } else {
-    //         i->setName("this");
-    //     }
-    // }
+            // save information
+            arg->insertBuilder(m_func, new ValueBuilder(variable));
+        } else {
+            /// this or self is special arguments: not mutable
+            i->setName("this");
+        }
+    }
 
     // // emit instructions
     entry = m_root->emit(driver, entry);

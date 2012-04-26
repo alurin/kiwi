@@ -4,10 +4,10 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-#ifndef KIWI_CODEGEN_EMITTER_INTERNAL
-#define KIWI_CODEGEN_EMITTER_INTERNAL
+#ifndef KIWI_CODEGEN_LLVMEMITTER_INTERNAL
+#define KIWI_CODEGEN_LLVMEMITTER_INTERNAL
 
-#include "kiwi/Codegen/Emitter.hpp"
+#include "Emitter.hpp"
 #include <llvm/Instruction.h>
 #include <llvm/InstrTypes.h>
 
@@ -84,7 +84,7 @@ namespace codegen {
             Context* context
         );
 
-         emit llvm operator
+        /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::CmpInst::Predicate m_predicate;
@@ -123,7 +123,7 @@ namespace codegen {
     class LlvmStringEmitter {
     public:
         /// emit llvm operator
-        // StatementGen emit(const StatementGen& gen, const ExpressionGen& value);
+        BlockBuilder emit(BlockBuilder block, ValueBuilder value);
 
         llvm::Value* getLengthValue() const {
             return m_lengthValue;

@@ -37,279 +37,279 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 // emit instruction for interger unary operator
 ValueBuilder LlvmZeroUnaryOperator::emit(BlockBuilder block, const ExpressionVector& values) {
     llvm::APInt cst(32, 0, false);
-    llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
-    llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, zero, value.getValue(), "", gen.getBlock());
+    llvm::ConstantInt* zero = llvm::ConstantInt::get(block.getContext(), cst);
+    llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, zero, values[0].getValue(), "", block.getBlock());
     return ValueBuilder(block, result, m_type);
 }
 
-// // emit instruction for binary operator
-// ValueBuilder LlvmBinaryOperator::emit(BlockBuilder block, const ExpressionVector& values) {
-//     llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, left.getValue(), right.getValue(), "", gen.getBlock());
-//     return ValueBuilder(block, result, m_type);
-// }
+// emit instruction for binary operator
+ValueBuilder LlvmBinaryOperator::emit(BlockBuilder block, const ExpressionVector& values) {
+    llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, values[0].getValue(), values[1].getValue(), "", block.getBlock());
+    return ValueBuilder(block, result, m_type);
+}
 
-// // emit instruction for binary operator
-// ValueBuilder LlvmIntegerCompareOperator::emit(BlockBuilder block, const ExpressionVector& values) {
-//     llvm::Value* result = new llvm::ICmpInst(*(gen.getBlock()), m_predicate, left.getValue(), right.getValue(), "");
-//     return ValueBuilder(block, result, BoolType::get(m_context));
-// }
+// emit instruction for binary operator
+ValueBuilder LlvmIntegerCompareOperator::emit(BlockBuilder block, const ExpressionVector& values) {
+    llvm::Value* result = new llvm::ICmpInst(*(block.getBlock()), m_predicate, values[0].getValue(), values[1].getValue(), "");
+    return ValueBuilder(block, result, BoolType::get(m_context));
+}
 
-// // emit instruction for binary operator
-// ValueBuilder LlvmStringCompareOperator::emit(BlockBuilder block, const ExpressionVector& values) {
-//     // create stub for u_strCompare
-//     llvm::Module*       module = gen.getModule();
-//     llvm::LLVMContext& context = gen.getContext();
-//     llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
-//     llvm::Type*     charType   = llvm::IntegerType::get(context, 16)->getPointerTo();
-//     llvm::Type*     boolType   = llvm::IntegerType::get(context, 8);
+// emit instruction for binary operator
+ValueBuilder LlvmStringCompareOperator::emit(BlockBuilder block, const ExpressionVector& values) {
+    // create stub for u_strCompare
+    llvm::Module*       module = block.getModule();
+    llvm::LLVMContext& context = block.getContext();
+    llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
+    llvm::Type*     charType   = llvm::IntegerType::get(context, 16)->getPointerTo();
+    llvm::Type*     boolType   = llvm::IntegerType::get(context, 8);
 
-//     /// u_strCompare(const UChar *s1, int32_t length1, const UChar *s2, int32_t length2, UBool codePointOrder);
-//     llvm::Function* compare  = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("u_strCompare", lengthType, charType, lengthType, charType, lengthType, boolType, NULL));
+    /// u_strCompare(const UChar *s1, int32_t length1, const UChar *s2, int32_t length2, UBool codePointOrder);
+    llvm::Function* compare  = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("u_strCompare", lengthType, charType, lengthType, charType, lengthType, boolType, NULL));
 
-//     // create variable for compare
-//     llvm::APInt cst(32, 0, false);
-//     llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
+    // create variable for compare
+    llvm::APInt cst(32, 0, false);
+    llvm::ConstantInt* zero = llvm::ConstantInt::get(block.getContext(), cst);
 
-//     cst = llvm::APInt(32, 1, false);
-//     llvm::ConstantInt* one = llvm::ConstantInt::get(gen.getContext(), cst);
+    cst = llvm::APInt(32, 1, false);
+    llvm::ConstantInt* one = llvm::ConstantInt::get(block.getContext(), cst);
 
-//     cst = llvm::APInt(8, 0, false);
-//     llvm::ConstantInt* falseBool = llvm::ConstantInt::get(gen.getContext(), cst);
+    cst = llvm::APInt(8, 0, false);
+    llvm::ConstantInt* falseBool = llvm::ConstantInt::get(block.getContext(), cst);
 
-//     // prepare GetElementPtrInst indexes
-//     std::vector<llvm::Value*> lengthIdx; // length
-//     lengthIdx.push_back(zero);
-//     lengthIdx.push_back(zero);
+    // prepare GetElementPtrInst indexes
+    std::vector<llvm::Value*> lengthIdx; // length
+    lengthIdx.push_back(zero);
+    lengthIdx.push_back(zero);
 
-//     std::vector<llvm::Value*> bufferIdx; // buffer
-//     bufferIdx.push_back(zero);
-//     bufferIdx.push_back(one);
+    std::vector<llvm::Value*> bufferIdx; // buffer
+    bufferIdx.push_back(zero);
+    bufferIdx.push_back(one);
 
-//     // find first string for method
-//     llvm::Value* string1   = llvm::GetElementPtrInst::CreateInBounds(left.getValue(), makeArrayRef(bufferIdx), "string1", gen.getBlock());
-//     llvm::Value* position1 = llvm::GetElementPtrInst::CreateInBounds(left.getValue(), makeArrayRef(lengthIdx), "", gen.getBlock());
-//     llvm::Value* length1   = new llvm::LoadInst(position1, "length1", gen.getBlock());
-//     string1                = new llvm::BitCastInst(string1, charType, "", gen.getBlock());
+    // find first string for method
+    llvm::Value* string1   = llvm::GetElementPtrInst::CreateInBounds(values[0].getValue(), makeArrayRef(bufferIdx), "string1", block.getBlock());
+    llvm::Value* position1 = llvm::GetElementPtrInst::CreateInBounds(values[0].getValue(), makeArrayRef(lengthIdx), "", block.getBlock());
+    llvm::Value* length1   = new llvm::LoadInst(position1, "length1", block.getBlock());
+    string1                = new llvm::BitCastInst(string1, charType, "", block.getBlock());
 
-//     // find first string for method
-//     llvm::Value* string2   = llvm::GetElementPtrInst::CreateInBounds(right.getValue(), makeArrayRef(bufferIdx), "string2", gen.getBlock());
-//     llvm::Value* position2 = llvm::GetElementPtrInst::CreateInBounds(right.getValue(), makeArrayRef(lengthIdx), "", gen.getBlock());
-//     llvm::Value* length2   = new llvm::LoadInst(position2, "length2", gen.getBlock());
-//     string2                = new llvm::BitCastInst(string2, charType, "", gen.getBlock());
+    // find first string for method
+    llvm::Value* string2   = llvm::GetElementPtrInst::CreateInBounds(values[1].getValue(), makeArrayRef(bufferIdx), "string2", block.getBlock());
+    llvm::Value* position2 = llvm::GetElementPtrInst::CreateInBounds(values[1].getValue(), makeArrayRef(lengthIdx), "", block.getBlock());
+    llvm::Value* length2   = new llvm::LoadInst(position2, "length2", block.getBlock());
+    string2                = new llvm::BitCastInst(string2, charType, "", block.getBlock());
 
-//     // collect arguments
-//     std::vector<llvm::Value*> args;
-//     args.push_back(string1);
-//     args.push_back(length1);
-//     args.push_back(string2);
-//     args.push_back(length2);
-//     args.push_back(falseBool);
+    // collect arguments
+    std::vector<llvm::Value*> args;
+    args.push_back(string1);
+    args.push_back(length1);
+    args.push_back(string2);
+    args.push_back(length2);
+    args.push_back(falseBool);
 
-//     // compute string compare and return result
-//     llvm::Value* value  = llvm::CallInst::Create(compare, makeArrayRef(args), "", gen.getBlock());
-//     llvm::Value* result = new llvm::ICmpInst(*(gen.getBlock()), m_predicate, zero, value, "");
-//     return ValueBuilder(block, result, BoolType::get(m_context));
-// }
+    // compute string compare and return result
+    llvm::Value* value  = llvm::CallInst::Create(compare, makeArrayRef(args), "", block.getBlock());
+    llvm::Value* result = new llvm::ICmpInst(*(block.getBlock()), m_predicate, zero, value, "");
+    return ValueBuilder(block, result, BoolType::get(m_context));
+}
 
-// ValueBuilder LlvmIntegerPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
-//     llvm::Module*       module = gen.getModule();
-//     llvm::LLVMContext& context = gen.getContext();
-//     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
-//     llvm::Type*           type = value.getType()->getVarType();
+ValueBuilder LlvmIntegerPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
+    llvm::Module*       module = block.getModule();
+    llvm::LLVMContext& context = block.getContext();
+    llvm::Type*       voidType = llvm::Type::getVoidTy(context);
+    llvm::Type*           type = values[0].getType()->getVarType();
 
-//     llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_integer", voidType, type, NULL));
+    llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_integer", voidType, type, NULL));
 
-//     std::vector<llvm::Value*> args;
-//     args.push_back(value.getValue());
+    std::vector<llvm::Value*> args;
+    args.push_back(values[0].getValue());
 
-//     llvm::CallInst::Create(print, makeArrayRef(args), "", gen.getBlock());
+    llvm::CallInst::Create(print, makeArrayRef(args), "", block.getBlock());
 
-//     return ValueBuilder(block, value.getType(), value.getValue());
-// }
+    return ValueBuilder(block, values[0].getValue(), values[0].getType());
+}
 
-// ValueBuilder LlvmBoolPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
-//     llvm::Module*       module = gen.getModule();
-//     llvm::LLVMContext& context = gen.getContext();
-//     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
-//     llvm::Type*           type = value.getType()->getVarType();
+ValueBuilder LlvmBoolPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
+    llvm::Module*       module = block.getModule();
+    llvm::LLVMContext& context = block.getContext();
+    llvm::Type*       voidType = llvm::Type::getVoidTy(context);
+    llvm::Type*           type = values[0].getType()->getVarType();
 
-//     llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_bool", voidType, type, NULL));
+    llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_bool", voidType, type, NULL));
 
-//     std::vector<llvm::Value*> args;
-//     args.push_back(value.getValue());
+    std::vector<llvm::Value*> args;
+    args.push_back(values[0].getValue());
 
-//     llvm::CallInst::Create(print, makeArrayRef(args), "", gen.getBlock());
+    llvm::CallInst::Create(print, makeArrayRef(args), "", block.getBlock());
 
-//     return ValueBuilder(block, value.getType(), value.getValue());
-// }
+    return ValueBuilder(block, values[0].getValue(), values[0].getType());
+}
 
-// ValueBuilder LlvmCharPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
-//     llvm::Module*       module = gen.getModule();
-//     llvm::LLVMContext& context = gen.getContext();
-//     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
-//     llvm::Type*           type = value.getType()->getVarType();
+ValueBuilder LlvmCharPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
+    llvm::Module*       module = block.getModule();
+    llvm::LLVMContext& context = block.getContext();
+    llvm::Type*       voidType = llvm::Type::getVoidTy(context);
+    llvm::Type*           type = values[0].getType()->getVarType();
 
-//     llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_char", voidType, type, NULL));
+    llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_char", voidType, type, NULL));
 
-//     std::vector<llvm::Value*> args;
-//     args.push_back(value.getValue());
+    std::vector<llvm::Value*> args;
+    args.push_back(values[0].getValue());
 
-//     llvm::CallInst::Create(print, makeArrayRef(args), "", gen.getBlock());
+    llvm::CallInst::Create(print, makeArrayRef(args), "", block.getBlock());
 
-//     return ValueBuilder(block, value.getType(), value.getValue());
-// }
+    return ValueBuilder(block, values[0].getValue(), values[0].getType());
+}
 
-// // emit print for string
-// ValueBuilder LlvmStringPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
-//     // create stub for u_strCompare
-//     llvm::Module*       module = gen.getModule();
-//     llvm::LLVMContext& context = gen.getContext();
-//     llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
-//     llvm::Type*     charType   = llvm::IntegerType::get(context, 16)->getPointerTo();
-//     llvm::Type*     voidType   = llvm::Type::getVoidTy(context);
+// emit print for string
+ValueBuilder LlvmStringPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
+    // create stub for u_strCompare
+    llvm::Module*       module = block.getModule();
+    llvm::LLVMContext& context = block.getContext();
+    llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
+    llvm::Type*     charType   = llvm::IntegerType::get(context, 16)->getPointerTo();
+    llvm::Type*     voidType   = llvm::Type::getVoidTy(context);
 
-//     /// kiwi_print_string(const UChar *s, int32_t length);
-//     llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_string", voidType, charType, lengthType, NULL));
+    /// kiwi_print_string(const UChar *s, int32_t length);
+    llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_string", voidType, charType, lengthType, NULL));
 
-//     LlvmStringEmitter string;
-//     string.emit(gen, value);
+    LlvmStringEmitter string;
+    block = string.emit(block, values[0]);
 
-//     // collect arguments
-//     std::vector<llvm::Value*> args;
-//     args.push_back(string.getBufferValue());
-//     args.push_back(string.getLengthValue());
+    // collect arguments
+    std::vector<llvm::Value*> args;
+    args.push_back(string.getBufferValue());
+    args.push_back(string.getLengthValue());
 
-//     // compute string compare and return result
-//     llvm::CallInst::Create(print, makeArrayRef(args), "", gen.getBlock());
-//     return ValueBuilder(block, value.getType(), value.getValue());
-// }
+    // compute string compare and return result
+    llvm::CallInst::Create(print, makeArrayRef(args), "", block.getBlock());
+    return ValueBuilder(block, values[0].getValue(), values[0].getType());
+}
 
-// /// emit reduce string as size and buffer
-// StatementGen LlvmStringEmitter::emit(BlockBuilder block, const ExpressionVector& values) {
-//     llvm::Module*       module = gen.getModule();
-//     llvm::LLVMContext& context = gen.getContext();
-//     llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
-//     llvm::Type*     charType   = llvm::IntegerType::get(context, 16)->getPointerTo();
+/// emit reduce string as size and buffer
+BlockBuilder LlvmStringEmitter::emit(BlockBuilder block, const ValueBuilder value) {
+    llvm::Module*       module = block.getModule();
+    llvm::LLVMContext& context = block.getContext();
+    llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
+    llvm::Type*     charType   = llvm::IntegerType::get(context, 16)->getPointerTo();
 
-//     // create variable for compare
-//     llvm::APInt cst(32, 0, false);
-//     llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
+    // create variable for compare
+    llvm::APInt cst(32, 0, false);
+    llvm::ConstantInt* zero = llvm::ConstantInt::get(block.getContext(), cst);
 
-//     cst = llvm::APInt(32, 1, false);
-//     llvm::ConstantInt* one = llvm::ConstantInt::get(gen.getContext(), cst);
+    cst = llvm::APInt(32, 1, false);
+    llvm::ConstantInt* one = llvm::ConstantInt::get(block.getContext(), cst);
 
-//     // prepare GetElementPtrInst indexes
-//     std::vector<llvm::Value*> lengthIdx; // length
-//     lengthIdx.push_back(zero);
-//     lengthIdx.push_back(zero);
+    // prepare GetElementPtrInst indexes
+    std::vector<llvm::Value*> lengthIdx; // length
+    lengthIdx.push_back(zero);
+    lengthIdx.push_back(zero);
 
-//     std::vector<llvm::Value*> bufferIdx; // buffer
-//     bufferIdx.push_back(zero);
-//     bufferIdx.push_back(one);
-//     // bufferIdx.push_back(zero);
+    std::vector<llvm::Value*> bufferIdx; // buffer
+    bufferIdx.push_back(zero);
+    bufferIdx.push_back(one);
+    // bufferIdx.push_back(zero);
 
-//     // find first string for method
-//     llvm::Value* length = llvm::GetElementPtrInst::Create(value.getValue(), makeArrayRef(lengthIdx), "", gen.getBlock());
-//     length              = new llvm::LoadInst(length, "length", gen.getBlock());
-//     llvm::Value* buffer = llvm::GetElementPtrInst::Create(value.getValue(), makeArrayRef(bufferIdx), "", gen.getBlock());
-//     buffer              = new llvm::BitCastInst(buffer, charType, "buffer", gen.getBlock());
+    // find first string for method
+    llvm::Value* length = llvm::GetElementPtrInst::Create(value.getValue(), makeArrayRef(lengthIdx), "", block.getBlock());
+    length              = new llvm::LoadInst(length, "length", block.getBlock());
+    llvm::Value* buffer = llvm::GetElementPtrInst::Create(value.getValue(), makeArrayRef(bufferIdx), "", block.getBlock());
+    buffer              = new llvm::BitCastInst(buffer, charType, "buffer", block.getBlock());
 
-//     // store and return
-//     m_lengthValue = length;
-//     m_bufferValue = buffer;
-//     return gen;
-// }
+    // store and return
+    m_lengthValue = length;
+    m_bufferValue = buffer;
+    return block;
+}
 
-// // emit IR instruction for string concatenate
-// ValueBuilder LlvmStringConcatenate::emit(BlockBuilder block, const ExpressionVector& values) {
+// emit IR instruction for string concatenate
+ValueBuilder LlvmStringConcatenate::emit(BlockBuilder block, const ExpressionVector& values) {
 
-// }
+}
 
-// // emit IR instruction for string substraction
-// ValueBuilder LlvmStringSubtraction::emit(BlockBuilder bloc, const ExpressionVector& values) {
-//     if (values.size() != 2 && values.size() != 3) {
-//         throw "Not implemented";
-//     }
+// emit IR instruction for string substraction
+ValueBuilder LlvmStringSubtraction::emit(BlockBuilder block, const ExpressionVector& values) {
+    if (values.size() != 2 && values.size() != 3) {
+        throw "Not implemented";
+    }
 
-//     Context*         t_context = gen.getOwner()->getModule()->getContext();
-//     llvm::Module*       module = gen.getModule();
-//     llvm::LLVMContext& context = gen.getContext();
-//     llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
-//     llvm::Type*     charType   = llvm::IntegerType::get(context, 16);
-//     llvm::Type*     bufferType = llvm::IntegerType::get(context, 16)->getPointerTo();
-//     llvm::Type*     voidType   = llvm::Type::getVoidTy(context);
+    Context*         t_context = block.getNativeContext();
+    llvm::Module*       module = block.getModule();
+    llvm::LLVMContext& context = block.getContext();
+    llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
+    llvm::Type*     charType   = llvm::IntegerType::get(context, 16);
+    llvm::Type*     bufferType = llvm::IntegerType::get(context, 16)->getPointerTo();
+    llvm::Type*     voidType   = llvm::Type::getVoidTy(context);
 
-//     LlvmStringEmitter string;
-//     string.emit(gen, values[0]);
+    LlvmStringEmitter string;
+    block = string.emit(block, values[0]);
 
-//     // collect arguments
-//     std::vector<llvm::Value*> args;
-//     args.push_back(string.getBufferValue());
-//     args.push_back(string.getLengthValue());
+    // collect arguments
+    std::vector<llvm::Value*> args;
+    args.push_back(string.getBufferValue());
+    args.push_back(string.getLengthValue());
 
-//     //
-//     llvm::Function* substraction = 0;
-//     Type* returnType = 0;
+    //
+    llvm::Function* substraction = 0;
+    Type* returnType = 0;
 
-//     // collect types and functions
-//     if (values.size() == 2) {           /// substraction of character from string
-//         returnType   = CharType::get(t_context);
+    // collect types and functions
+    if (values.size() == 2) {           /// substraction of character from string
+        returnType   = CharType::get(t_context);
 
-//         substraction = llvm::dyn_cast<llvm::Function>(
-//             module->getOrInsertFunction(
-//                 "kiwi_subchar",
-//                 charType,
-//                 bufferType,
-//                 lengthType,
-//                 lengthType,
-//                 NULL
-//             )
-//         );
+        substraction = llvm::dyn_cast<llvm::Function>(
+            module->getOrInsertFunction(
+                "kiwi_subchar",
+                charType,
+                bufferType,
+                lengthType,
+                lengthType,
+                NULL
+            )
+        );
 
-//         args.push_back(values[1].getValue());
-//     } else if (values.size() == 3) {    /// substraction of substring from string
-//         returnType   = StringType::get(t_context);
+        args.push_back(values[1].getValue());
+    } else if (values.size() == 3) {    /// substraction of substring from string
+        returnType   = StringType::get(t_context);
 
-//         substraction = llvm::dyn_cast<llvm::Function>(
-//             module->getOrInsertFunction(
-//                 "kiwi_substring",
-//                 returnType->getVarType(),
-//                 bufferType,
-//                 lengthType,
-//                 lengthType,
-//                 lengthType,
-//                 NULL
-//             )
-//         );
+        substraction = llvm::dyn_cast<llvm::Function>(
+            module->getOrInsertFunction(
+                "kiwi_substring",
+                returnType->getVarType(),
+                bufferType,
+                lengthType,
+                lengthType,
+                lengthType,
+                NULL
+            )
+        );
 
-//         args.push_back(values[1].getValue());
-//         args.push_back(values[2].getValue());
-//     }
+        args.push_back(values[1].getValue());
+        args.push_back(values[2].getValue());
+    }
 
-//     // compute string compare and return result
-//     llvm::CallInst* returnValue = llvm::CallInst::Create(substraction, makeArrayRef(args), "", gen.getBlock());
-//     return ValueBuilder(block, returnType, returnValue);
-// }
+    // compute string compare and return result
+    llvm::CallInst* returnValue = llvm::CallInst::Create(substraction, makeArrayRef(args), "", block.getBlock());
+    return ValueBuilder(block, returnValue, returnType);
+}
 
-// // emit IR instruction for binary operation
-// ValueBuilder LlvmCallEmitter::emitemit(BlockBuilder block, const ExpressionVector& values) {
-//     std::vector<llvm::Value*> largs;
-//     for (ExpressionVector::const_iterator i = args.begin(); i != args.end(); ++i) {
-//         largs.push_back(i->getValue());
-//     }
+// emit IR instruction for binary operation
+ValueBuilder LlvmCallEmitter::emit(BlockBuilder block, const ExpressionVector& values) {
+    std::vector<llvm::Value*> largs;
+    for (ExpressionVector::const_iterator i = values.begin(); i != values.end(); ++i) {
+        largs.push_back(i->getValue());
+    }
 
-//      // return result of call
-//      llvm::Value* result = llvm::CallInst::Create(m_func, llvm::makeArrayRef(largs), "", gen.getBlock());
-//      return ValueBuilder(block, result, m_returnType);
-// }
+     // return result of call
+     llvm::Value* result = llvm::CallInst::Create(m_func, llvm::makeArrayRef(largs), "", block.getBlock());
+     return ValueBuilder(block, result, m_returnType);
+}
 
-// // emit IR instruction for binary operation
-// ValueBuilder LlvmCtorEmitter::emit(BlockBuilder bloc, const ExpressionVector& values) {
-//     return values[0];
-// }
+// emit IR instruction for binary operation
+ValueBuilder LlvmCtorEmitter::emit(BlockBuilder bloc, const ExpressionVector& values) {
+    return values[0];
+}
 
 
-// /// emit IR instruction for binary operation
-// ValueBuilder LlvmUpcast::emit(BlockBuilder bloc, const ExpressionVector& values) {
-//     throw "Not implemented";
-// }
+/// emit IR instruction for binary operation
+ValueBuilder LlvmUpcast::emit(BlockBuilder bloc, const ExpressionVector& values) {
+    throw "Not implemented";
+}

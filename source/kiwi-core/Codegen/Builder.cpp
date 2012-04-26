@@ -5,9 +5,9 @@
  *******************************************************************************
  */
 #include "Builder.hpp"
+#include "Emitter.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/DerivedTypes.hpp"
-#include "kiwi/Codegen/Emitter.hpp"
 #include "llvm/Module.h"
 #include "llvm/Function.h"
 #include "llvm/BasicBlock.h"
@@ -141,6 +141,10 @@ Context* FunctionBuilder::getNativeContext() const {
     return m_analog->getOwnerType()->getContext();
 }
 
+Module* FunctionBuilder::getNativeModule() const {
+    return m_analog->getOwnerType()->getModule();
+}
+
 BlockBuilder FunctionBuilder::createBlock(const Identifier& name) {
     llvm::BasicBlock* block = llvm::BasicBlock::Create(*m_context, name, m_func);
     return BlockBuilder(*this, block);
@@ -159,6 +163,17 @@ void BlockBuilder::createTrailReturn() {
             llvm::ReturnInst::Create(*m_context, result, m_block);
         }
     }
+}
+
+/// Create void return
+void BlockBuilder::createReturn() {
+    /// @todo check equals of return type
+    llvm::ReturnInst::Create(*m_context, m_block);
+}
+
+/// Create return result of callable
+void BlockBuilder::createReturn(ValueBuilder value) {
+    llvm::ReturnInst::Create(*m_context, value.getValue(), m_block);
 }
 
 // Allocate memory in stack for mutable varaible

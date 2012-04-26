@@ -16,8 +16,6 @@ namespace kiwi
 
     namespace codegen {
         class CallableEmitter;
-        class UnaryEmitter;
-        class BinaryEmitter;
     };
 
     //==--------------------------------------------------------------------==//
@@ -182,7 +180,7 @@ namespace kiwi
             UnaryOpcode opcode,
             Type* ownerType,
             Type* resultType,
-            codegen::UnaryEmitter* emitter
+            codegen::CallableEmitter* emitter
         );
     };
 
@@ -214,7 +212,7 @@ namespace kiwi
             Type* ownerType,
             Type* resultType,
             Type* operandType,
-            codegen::BinaryEmitter* emitter
+            codegen::CallableEmitter* emitter
         );
     };
 

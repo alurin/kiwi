@@ -4,15 +4,13 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-#ifndef KIWI_CODEGEN_EMITTER_INCLUDED
-#define KIWI_CODEGEN_EMITTER_INCLUDED
+#ifndef KIWI_CODEGEN_EMITTER_INTERNAL
+#define KIWI_CODEGEN_EMITTER_INTERNAL
 
+#include "Builder.hpp"
 #include <vector>
 
 namespace kiwi {
-    class BlockBuilder;
-    class ValueBuilder;
-
 namespace codegen {
     /// Abstract emmiter for unary operators
     class CallableEmitter {

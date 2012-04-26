@@ -64,7 +64,7 @@ Context* Type::getContext() const {
 UnaryOperator* Type::addUnary(
     Member::UnaryOpcode opcode,
     Type* resultType,
-    codegen::UnaryEmitter* emitter
+    codegen::CallableEmitter* emitter
 ) {
     UnaryOperator* op = new UnaryOperator(opcode, this, resultType, emitter);
     m_unary.push_back(op);
@@ -76,7 +76,7 @@ BinaryOperator* Type::addBinary(
     Member::BinaryOpcode opcode,
     Type* resultType,
     Type* operandType,
-    codegen::BinaryEmitter* emitter
+    codegen::CallableEmitter* emitter
 ) {
     BinaryOperator* op = new BinaryOperator(opcode, this, resultType, operandType, emitter);
     m_binary.push_back(op);

@@ -5,7 +5,6 @@
  *******************************************************************************
  */
 #include "ContextImpl.hpp"
-#include "kiwi/Codegen/Emitter.hpp"
 #include "Codegen/LlvmEmitter.hpp"
 #include "kiwi/Support/Array.hpp"
 #include "kiwi/Members.hpp"
@@ -42,9 +41,9 @@ Callable::~Callable() {
 UnaryOperator::UnaryOperator(
     Member::UnaryOpcode opcode,
     Type* ownerType,
-    Type* resultType,
-    codegen::UnaryEmitter* emitter
-) : Callable(ownerType, resultType, makeVector(ownerType, 0), emitter), m_opcode(opcode) {
+    Type* returnType,
+    codegen::CallableEmitter* emitter
+) : Callable(ownerType, returnType, makeVector(ownerType, 0), emitter), m_opcode(opcode) {
     m_memberID = UnaryID;
 }
 
@@ -52,10 +51,10 @@ UnaryOperator::UnaryOperator(
 BinaryOperator::BinaryOperator(
     Member::BinaryOpcode opcode,
     Type* ownerType,
-    Type* resultType,
+    Type* returnType,
     Type* operandType,
-    codegen::BinaryEmitter* emitter
-) : Callable(ownerType, resultType, makeVector(ownerType, operandType, 0), emitter), m_opcode(opcode) {
+    codegen::CallableEmitter* emitter
+) : Callable(ownerType, returnType, makeVector(ownerType, operandType, 0), emitter), m_opcode(opcode) {
     m_memberID = BinaryID;
 }
 
@@ -63,10 +62,10 @@ BinaryOperator::BinaryOperator(
 MultiaryOperator::MultiaryOperator(
     Member::MultiaryOpcode opcode,
     Type* ownerType,
-    Type* resultType,
+    Type* returnType,
     TypeVector args,
     codegen::CallableEmitter* emitter
-) : Callable(ownerType, resultType, makeVector(ownerType, args), emitter), m_opcode(opcode) {
+) : Callable(ownerType, returnType, makeVector(ownerType, args), emitter), m_opcode(opcode) {
     m_memberID = MultiaryID;
 }
 
@@ -77,8 +76,8 @@ Field::Field(const Identifier& name, Type* ownerType, Type* fieldType)
 }
 
 // constructor
-Method::Method(const Identifier& name, Type* ownerType, Type* resultType, TypeVector types)
-: Callable(ownerType, resultType, makeVector(ownerType, types)), m_name(name) {
+Method::Method(const Identifier& name, Type* ownerType, Type* returnType, TypeVector types)
+: Callable(ownerType, returnType, makeVector(ownerType, types)), m_name(name) {
     m_memberID = MethodID;
 }
 

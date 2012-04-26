@@ -84,6 +84,9 @@ namespace kiwi {
         /// return native context
         Context* getNativeContext() const;
 
+        /// return native context
+        Module* getNativeModule() const;
+
         /// return callable
         Callable* getCallable() const {
             return m_analog;
@@ -111,6 +114,12 @@ namespace kiwi {
 
         /// Create return, if basic block has not terminator instruction
         void createTrailReturn();
+
+        /// Create void return
+        void createReturn();
+
+        /// Create return result of callable
+        void createReturn(ValueBuilder value);
 
         /// Allocate memory in stack for mutable variable
         ValueBuilder createVariable(const Identifier& name, Type* type, bool autoInit = true);

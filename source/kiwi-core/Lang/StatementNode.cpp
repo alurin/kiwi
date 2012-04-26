@@ -68,36 +68,31 @@ InitStatement::InitStatement(ScopeNode* parent, VariableNode* var)
 
 // emit instructions for return statement
 BlockBuilder ReturnStatement::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // if (m_return) {
-    //     /// @todo check equals of return type
-    //     ValueBuilder result = m_return->emit(driver, gen);
-    //     llvm::ReturnInst::Create(gen.getContext(), result.getValue(), result.getBlock());
-    //     return result;
-    // } else {
-    //     /// @todo check equals of return type
-    //     llvm::ReturnInst::Create(gen.getContext(), gen.getBlock());
-    // }
-    // return gen;
+    if (m_return) {
+        ValueBuilder result = m_return->emit(driver, block);
+        block.createReturn(result);
+    } else {
+        block.createReturn();
+    }
+    return block;
 }
 
 // emit instructions for print statement
 BlockBuilder PrintStatement::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // // emit operand
-    // ValueBuilder result = m_return->emit(driver, gen);
+    // emit operand
+    ValueBuilder result = m_return->emit(driver, block);
 
-    // // find emitter
-    // Type* type = result.getType();
-    // UnaryOperator* op = type->findUnary(UnaryOperator::Print);
+    // find emitter
+    Type* type = result.getType();
+    UnaryOperator* op = type->findUnary(UnaryOperator::Print);
 
-    // // emit instruction
-    // if (op) {
-    //     std::vector<ValueBuilder> args;
-    //     args.push_back(result);
-    //     return op->getEmitter()->emit(result, args);
-    // }
-    // KIWI_ERROR_AND_EXIT("not found print operator", getLocation());
+    // emit instruction
+    if (op) {
+        std::vector<ValueBuilder> args;
+        args.push_back(result);
+        return block.createCall(op, args);
+    }
+    KIWI_ERROR_AND_EXIT("not found print operator", getLocation());
 }
 
 /// emit instructions for statement
