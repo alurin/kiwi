@@ -135,45 +135,27 @@ ValueBuilder CallableNode::emit(Driver& driver, BlockBuilder block) const {
 
 // Find arguments for append before other
 ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vector<ValueBuilder> args) const {
-    KIWI_NOT_IMPLEMENTED();
-    // /// collect other arguments
-    // BlockBuilder current = block;
-    // for (ArgumentList::iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
-    //     CallableArgument* arg = *i;
-    //     ValueBuilder expr = arg->emit(driver, current);
-    //     args.push_back(expr);
-    //     current = expr;
-    // }
+    std::vector<Type*> types;
+    int j = 0;
+    for (std::vector<ValueBuilder>::const_iterator i = args.begin(); i != args.end(); ++i, ++j) {
+        types.push_back(i->getType());
+    }
 
-    // /// find call
-    // Callable* call = 0; {
-    //     std::vector<Type*> types;
-    //     int j = 0;
-    //     for (std::vector<ValueBuilder>::iterator i = args.begin(); i != args.end(); ++i, ++j) {
-    //         Type* type = i->getType();
-    //         types.push_back(type);
-    //     }
-    //     call = findCallable(driver, types);
-    // }
+    /// collect arguments
+    for (ArgumentList::const_iterator i = m_arguments.begin(); i != m_arguments.end(); ++i) {
+        CallableArgument* arg = *i;
+        ValueBuilder expr = arg->emit(driver, block);
+        args.push_back(expr);
+        types.push_back(expr.getType());
+        block = expr;
+    }
 
-    // if (!call) KIWI_ERROR_AND_EXIT("Method or operator for call not found", getLocation());
+    /// find call
+    Callable* call = call = findCallable(driver, types);
 
-    // // emit casts
-    // int j = 0;
-    // for (std::vector<ValueBuilder>::iterator i = args.begin(); i != args.end(); ++i, ++j) {
-    //     // Argument* arg    = call->getArgument(j);
-    //     // Type* targetType = arg->getType();
-    //     // Type* sourceType = i->getType();
-    //     // if (targetType != sourceType) {
-    //     //     KIWI_ERROR_AND_EXIT("Cast not implemented", getLocation());
-    //     // }
-    // }
-
-    // // emit call
-    // CallableEmitter* emitter = call->getEmitter();
-    // if (emitter) {
-    //     return emitter->emit(current, args);
-    // }
+    if (!call)
+        KIWI_ERROR_AND_EXIT("Method or operator for call not found", getLocation());
+    return block.createCall(call, args);
 }
 
 Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) const {

@@ -8,6 +8,7 @@
 #define KIWI_CODEGEN_BUILDER_INTERNAL
 
 #include "kiwi/types.hpp"
+#include <vector>
 
 namespace llvm {
     class LLVMContext;
@@ -119,6 +120,9 @@ namespace kiwi {
 
         /// Create load from mutable variable
         ValueBuilder createLoad(ValueBuilder variable);
+
+        /// Create call for callable with arguments
+        ValueBuilder createCall(Callable* call, std::vector<ValueBuilder> args);
 
         /// Create integer constant
         ValueBuilder createIntConst(int32_t value);

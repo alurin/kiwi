@@ -8,3 +8,6 @@
 
 using namespace kiwi;
 using namespace kiwi::codegen;
+
+CallableEmitter::~CallableEmitter() {
+}

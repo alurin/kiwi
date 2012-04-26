@@ -34,29 +34,28 @@ LlvmIntegerCompareOperator::LlvmIntegerCompareOperator(llvm::CmpInst::Predicate 
 LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate predicate, Context* context)
 : m_predicate(predicate), m_context(context) { }
 
-// // emit instruction for interger unary operator
-// ExpressionGen LlvmZeroUnaryOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
-//     llvm::APInt cst(32, 0, false);
-//     llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
-
-//     llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, zero, value.getValue(), "", gen.getBlock());
-//     return ExpressionGen(gen, m_type, result);
-// }
+// emit instruction for interger unary operator
+ValueBuilder LlvmZeroUnaryOperator::emit(BlockBuilder block, const ExpressionVector& values) {
+    llvm::APInt cst(32, 0, false);
+    llvm::ConstantInt* zero = llvm::ConstantInt::get(gen.getContext(), cst);
+    llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, zero, value.getValue(), "", gen.getBlock());
+    return ValueBuilder(block, result, m_type);
+}
 
 // // emit instruction for binary operator
-// ExpressionGen LlvmBinaryOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) {
+// ValueBuilder LlvmBinaryOperator::emit(BlockBuilder block, const ExpressionVector& values) {
 //     llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, left.getValue(), right.getValue(), "", gen.getBlock());
-//     return ExpressionGen(gen, m_type, result);
+//     return ValueBuilder(block, result, m_type);
 // }
 
 // // emit instruction for binary operator
-// ExpressionGen LlvmIntegerCompareOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) {
+// ValueBuilder LlvmIntegerCompareOperator::emit(BlockBuilder block, const ExpressionVector& values) {
 //     llvm::Value* result = new llvm::ICmpInst(*(gen.getBlock()), m_predicate, left.getValue(), right.getValue(), "");
-//     return ExpressionGen(gen, BoolType::get(m_context), result);
+//     return ValueBuilder(block, result, BoolType::get(m_context));
 // }
 
 // // emit instruction for binary operator
-// ExpressionGen LlvmStringCompareOperator::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) {
+// ValueBuilder LlvmStringCompareOperator::emit(BlockBuilder block, const ExpressionVector& values) {
 //     // create stub for u_strCompare
 //     llvm::Module*       module = gen.getModule();
 //     llvm::LLVMContext& context = gen.getContext();
@@ -109,10 +108,10 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 //     // compute string compare and return result
 //     llvm::Value* value  = llvm::CallInst::Create(compare, makeArrayRef(args), "", gen.getBlock());
 //     llvm::Value* result = new llvm::ICmpInst(*(gen.getBlock()), m_predicate, zero, value, "");
-//     return ExpressionGen(gen, BoolType::get(m_context), result);
+//     return ValueBuilder(block, result, BoolType::get(m_context));
 // }
 
-// ExpressionGen LlvmIntegerPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
+// ValueBuilder LlvmIntegerPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
 //     llvm::Module*       module = gen.getModule();
 //     llvm::LLVMContext& context = gen.getContext();
 //     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
@@ -125,10 +124,10 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 
 //     llvm::CallInst::Create(print, makeArrayRef(args), "", gen.getBlock());
 
-//     return ExpressionGen(gen, value.getType(), value.getValue());
+//     return ValueBuilder(block, value.getType(), value.getValue());
 // }
 
-// ExpressionGen LlvmBoolPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
+// ValueBuilder LlvmBoolPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
 //     llvm::Module*       module = gen.getModule();
 //     llvm::LLVMContext& context = gen.getContext();
 //     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
@@ -141,10 +140,10 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 
 //     llvm::CallInst::Create(print, makeArrayRef(args), "", gen.getBlock());
 
-//     return ExpressionGen(gen, value.getType(), value.getValue());
+//     return ValueBuilder(block, value.getType(), value.getValue());
 // }
 
-// ExpressionGen LlvmCharPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
+// ValueBuilder LlvmCharPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
 //     llvm::Module*       module = gen.getModule();
 //     llvm::LLVMContext& context = gen.getContext();
 //     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
@@ -157,11 +156,11 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 
 //     llvm::CallInst::Create(print, makeArrayRef(args), "", gen.getBlock());
 
-//     return ExpressionGen(gen, value.getType(), value.getValue());
+//     return ValueBuilder(block, value.getType(), value.getValue());
 // }
 
 // // emit print for string
-// ExpressionGen LlvmStringPrintOperator::emit(const StatementGen& gen, const ExpressionGen& value) {
+// ValueBuilder LlvmStringPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
 //     // create stub for u_strCompare
 //     llvm::Module*       module = gen.getModule();
 //     llvm::LLVMContext& context = gen.getContext();
@@ -182,11 +181,11 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 
 //     // compute string compare and return result
 //     llvm::CallInst::Create(print, makeArrayRef(args), "", gen.getBlock());
-//     return ExpressionGen(gen, value.getType(), value.getValue());
+//     return ValueBuilder(block, value.getType(), value.getValue());
 // }
 
 // /// emit reduce string as size and buffer
-// StatementGen LlvmStringEmitter::emit(const StatementGen& gen, const ExpressionGen& value) {
+// StatementGen LlvmStringEmitter::emit(BlockBuilder block, const ExpressionVector& values) {
 //     llvm::Module*       module = gen.getModule();
 //     llvm::LLVMContext& context = gen.getContext();
 //     llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
@@ -222,12 +221,12 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 // }
 
 // // emit IR instruction for string concatenate
-// ExpressionGen LlvmStringConcatenate::emit(const StatementGen& gen, const ExpressionGen& left, const ExpressionGen& right) {
+// ValueBuilder LlvmStringConcatenate::emit(BlockBuilder block, const ExpressionVector& values) {
 
 // }
 
 // // emit IR instruction for string substraction
-// ExpressionGen LlvmStringSubtraction::emit(const StatementGen& gen, const ExpressionVector& values) {
+// ValueBuilder LlvmStringSubtraction::emit(BlockBuilder bloc, const ExpressionVector& values) {
 //     if (values.size() != 2 && values.size() != 3) {
 //         throw "Not implemented";
 //     }
@@ -289,11 +288,11 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 
 //     // compute string compare and return result
 //     llvm::CallInst* returnValue = llvm::CallInst::Create(substraction, makeArrayRef(args), "", gen.getBlock());
-//     return ExpressionGen(gen, returnType, returnValue);
+//     return ValueBuilder(block, returnType, returnValue);
 // }
 
 // // emit IR instruction for binary operation
-// ExpressionGen LlvmCallEmitter::emit(const StatementGen& gen, const ExpressionVector& args ){
+// ValueBuilder LlvmCallEmitter::emitemit(BlockBuilder block, const ExpressionVector& values) {
 //     std::vector<llvm::Value*> largs;
 //     for (ExpressionVector::const_iterator i = args.begin(); i != args.end(); ++i) {
 //         largs.push_back(i->getValue());
@@ -301,16 +300,16 @@ LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate pr
 
 //      // return result of call
 //      llvm::Value* result = llvm::CallInst::Create(m_func, llvm::makeArrayRef(largs), "", gen.getBlock());
-//      return ExpressionGen(gen, m_returnType, result);
+//      return ValueBuilder(block, result, m_returnType);
 // }
 
 // // emit IR instruction for binary operation
-// ExpressionGen LlvmCtorEmitter::emit(const StatementGen& gen, const ExpressionVector& values) {
+// ValueBuilder LlvmCtorEmitter::emit(BlockBuilder bloc, const ExpressionVector& values) {
 //     return values[0];
 // }
 
 
 // /// emit IR instruction for binary operation
-// ExpressionGen LlvmUpcast::emit(const StatementGen& gen, const ExpressionVector& values) {
+// ValueBuilder LlvmUpcast::emit(BlockBuilder bloc, const ExpressionVector& values) {
 //     throw "Not implemented";
 // }

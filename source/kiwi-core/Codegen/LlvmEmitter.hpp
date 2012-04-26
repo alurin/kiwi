@@ -22,11 +22,8 @@ namespace codegen {
     public:
         LlvmCallEmitter(llvm::Function* func, Type* returnType);
 
-        // /// emit IR instruction for binary operation
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionVector& values
-        // );
+        /// emit IR instruction for binary operation
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::Function* m_func;
         Type* m_returnType;
@@ -34,16 +31,13 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM integer unary operators emitter
-    class LlvmZeroUnaryOperator : public UnaryEmitter {
+    class LlvmZeroUnaryOperator : public CallableEmitter {
     public:
         /// constructor
         LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, Type* type);
 
-        // /// emit llvm operator
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionGen& value
-        // );
+        /// emit llvm operator
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::Instruction::BinaryOps m_opcode;
         Type*  m_type;
@@ -51,17 +45,13 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM binary operators emitter
-    class LlvmBinaryOperator : public BinaryEmitter {
+    class LlvmBinaryOperator : public CallableEmitter {
     public:
         /// constructor
         LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, Type* type);
 
-        // /// emit llvm operator
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionGen& left,
-        //     const ExpressionGen& right
-        // );
+        /// emit llvm operator
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::Instruction::BinaryOps m_opcode;
         Type* m_type;
@@ -69,7 +59,7 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM binary operators emitter for compare integers
-    class LlvmIntegerCompareOperator : public BinaryEmitter {
+    class LlvmIntegerCompareOperator : public CallableEmitter {
     public:
         /// constructor
         LlvmIntegerCompareOperator(
@@ -77,12 +67,8 @@ namespace codegen {
             Context* context
         );
 
-        // /// emit llvm operator
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionGen& left,
-        //     const ExpressionGen& right
-        // );
+        /// emit llvm operator
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::CmpInst::Predicate m_predicate;
         Context* m_context;
@@ -90,7 +76,7 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM binary operators emitter for compare strings
-    class LlvmStringCompareOperator : public BinaryEmitter {
+    class LlvmStringCompareOperator : public CallableEmitter {
     public:
         /// constructor
         LlvmStringCompareOperator(
@@ -98,55 +84,39 @@ namespace codegen {
             Context* context
         );
 
-        /// emit llvm operator
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionGen& left,
-        //     const ExpressionGen& right
-        // );
+         emit llvm operator
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::CmpInst::Predicate m_predicate;
         Context* m_context;
     }; /// class LlvmStringCompareOperator
 
     //==--------------------------------------------------------------------==//
-    class LlvmIntegerPrintOperator : public UnaryEmitter {
+    class LlvmIntegerPrintOperator : public CallableEmitter {
     public:
-        // /// emit llvm operator
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionGen& value
-        // );
+        /// emit llvm operator
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; // class LlvmIntegerPrintOperator
 
     //==--------------------------------------------------------------------==//
-    class LlvmBoolPrintOperator : public UnaryEmitter {
+    class LlvmBoolPrintOperator : public CallableEmitter {
     public:
-        // /// emit llvm operator
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionGen& value
-        // );
+        /// emit llvm operator
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; // class LlvmBoolPrintOperator
 
     //==--------------------------------------------------------------------==//
-    class LlvmCharPrintOperator : public UnaryEmitter {
+    class LlvmCharPrintOperator : public CallableEmitter {
     public:
-        // /// emit llvm operator
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionGen& value
-        // );
+        /// emit llvm operator
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; // class LlvmCharPrintOperator
 
     //==--------------------------------------------------------------------==//
-    class LlvmStringPrintOperator : public UnaryEmitter {
+    class LlvmStringPrintOperator : public CallableEmitter {
     public:
-        // /// emit llvm operator
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionGen& value
-        // );
+        /// emit llvm operator
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; // class LlvmStringPrintOperator
 
     //==--------------------------------------------------------------------==//
@@ -168,46 +138,33 @@ namespace codegen {
     }; /// class LlvmStringEmitter
 
     //==--------------------------------------------------------------------==//
-    class LlvmStringConcatenate : public BinaryEmitter {
+    class LlvmStringConcatenate : public CallableEmitter {
     public:
-        // /// emit llvm operator
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionGen& left,
-        //     const ExpressionGen& right
-        // );
+        /// emit llvm operator
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; /// class LlvmStringConcatenate
 
     //==--------------------------------------------------------------------==//
     class LlvmStringSubtraction : public CallableEmitter {
     public:
-        // /// emit IR instruction for binary operation
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionVector& values
-        // );
+        /// emit IR instruction for binary operation
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; /// class LlvmStringSubtraction
 
     //==--------------------------------------------------------------------==//
     /// LLVM emitter for empty constructors
     class LlvmCtorEmitter : public CallableEmitter {
     public:
-        // /// emit IR instruction for binary operation
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionVector& values
-        // );
+        /// emit IR instruction for binary operation
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
     }; // class LlvmCallEmitter
 
     /// Llvm emitter for up cast
     class LlvmUpcast : public CallableEmitter {
     public:
-        // /// emit IR instruction for binary operation
-        // virtual ExpressionGen emit(
-        //     const StatementGen& gen,
-        //     const ExpressionVector& values
-        // );
+        /// emit IR instruction for binary operation
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     };
 } // namesapce codegen
 } // namesapce  kiwi

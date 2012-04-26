@@ -7,6 +7,7 @@
 #include "Builder.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/DerivedTypes.hpp"
+#include "kiwi/Codegen/Emitter.hpp"
 #include "llvm/Module.h"
 #include "llvm/Function.h"
 #include "llvm/BasicBlock.h"
@@ -246,4 +247,13 @@ ValueBuilder BlockBuilder::createStringConst(const String& value) {
      );
     result->setUnnamedAddr(true); // Binary equal strings must be merged
     return ValueBuilder(*this, result, type);
+}
+
+/// Create call for callable with arguments
+ValueBuilder BlockBuilder::createCall(Callable* call, std::vector<ValueBuilder> args) {
+    codegen::CallableEmitter* emitter = call->getEmitter();
+    if (emitter) {
+        return emitter->emit(*this, args);
+    }
+    throw "emitter not founded";
 }
