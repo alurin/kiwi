@@ -1,3 +1,9 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #ifndef KIWI_ENGINE_INCLUDED
 #define KIWI_ENGINE_INCLUDED
 
@@ -31,5 +37,4 @@ namespace kiwi
         Context* m_context;
     };
 }
-
 #endif

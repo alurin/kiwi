@@ -1,3 +1,9 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #include "LlvmEmitter.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Module.hpp"

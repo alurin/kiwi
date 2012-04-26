@@ -1,3 +1,9 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #include <unittest++/UnitTest++.h>
 
 /*
@@ -27,5 +33,5 @@
  * == MORE INFO ==
  *      See: http://unittest-cpp.sourceforge.net/UnitTest++.html
  */
- 
- 
+
+

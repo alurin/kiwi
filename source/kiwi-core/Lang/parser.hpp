@@ -120,7 +120,7 @@ namespace kiwi { namespace lang {
     {
 
 /* Line 35 of lalr1.cc  */
-#line 60 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
+#line 63 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
 
     int                     integerVal;
     double                  doubleVal;

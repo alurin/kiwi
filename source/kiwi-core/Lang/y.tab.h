@@ -1,6 +1,9 @@
-// $Id: y.tab.h 39 2008-08-03 10:07:15Z tb $
-/** \file y.tab.h Forwarding include file to parser.h (actually by including scanner.h) */
-
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 /* When using automake the bison parser file "xyz.yy" is processed by the
  * ylwrap script. It calls bison in a separate directory, which outputs source
  * to the default names "y.tab.c" and "y.tab.h". The ylwrap script then renames

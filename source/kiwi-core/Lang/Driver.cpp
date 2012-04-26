@@ -1,6 +1,9 @@
-// $Id: driver.cc 39 2008-08-03 10:07:15Z tb $
-/** \file driver.cc Implementation of the example::Driver class. */
-
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #include "Driver.hpp"
 #include "Logger.hpp"
 #include "ExpressionNode.hpp"

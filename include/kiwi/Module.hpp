@@ -1,3 +1,9 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #ifndef KIWI_MODULE_INCLUDED
 #define KIWI_MODULE_INCLUDED
 

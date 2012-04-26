@@ -1,3 +1,9 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #include "Builder.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/DerivedTypes.hpp"

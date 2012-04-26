@@ -1,6 +1,9 @@
-// $Id: driver.h 17 2007-08-19 18:51:39Z tb $
-/** \file driver.h Declaration of the kiwi::lang::Driver class. */
-
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #ifndef EXAMPLE_DRIVER_H
 #define EXAMPLE_DRIVER_H
 
