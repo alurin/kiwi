@@ -31,7 +31,7 @@ Tested and development in Ubuntu 64-bit.
 Prerequisites
 -------------
 This project requires:
-* Cross-platform Make (CMake) v2.6.2+
+* Cross-platform Make (CMake) v2.8+
 * GNU Make or equivalent.
 * GCC or an alternative, reasonably conformant C++ compiler.
 * Boost C++ Libraries v1.37+ (v1.46 recomended) [HEADERS and LIBRARIES]
