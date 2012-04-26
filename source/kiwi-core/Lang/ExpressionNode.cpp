@@ -266,12 +266,12 @@ ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) co
     // }
 }
 
+#include <llvm/Function.h>
 ValueBuilder ThisNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // llvm::Function* func = block.getFunction();
-    // if (func->arg_empty()) {
-    //     KIWI_ERROR_AND_EXIT("Not found this", getLocation());
-    // }
-    // llvm::Argument* arg  = func->arg_begin();
-    // return ValueBuilder(block, m_thisType, arg);
+    llvm::Function* func = block.getFunction();
+    if (func->arg_empty()) {
+        KIWI_ERROR_AND_EXIT("Not found this", getLocation());
+    }
+    llvm::Argument* arg  = func->arg_begin();
+    return ValueBuilder(block, arg, m_thisType);
 }

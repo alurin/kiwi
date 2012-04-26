@@ -13,6 +13,7 @@
 #include "llvm/BasicBlock.h"
 #include "llvm/Instructions.h"
 #include "llvm/Constants.h"
+#include <llvm/Support/IRBuilder.h>
 #include "kiwi/assert.hpp"
 
 #define EMPTY_WHILE_WRAP(_stmt_) do { _stmt_ } while(0)
@@ -271,4 +272,18 @@ ValueBuilder BlockBuilder::createCall(Callable* call, std::vector<ValueBuilder> 
         return emitter->emit(*this, args);
     }
     throw "emitter not founded";
+}
+
+/// Create conditional goto
+void BlockBuilder::createCond(ValueBuilder value, BlockBuilder blockTrue, BlockBuilder blockFalse) {
+    llvm::Value* cond = value.getValue();
+    if (!cond->getType()->isIntegerTy(1)) {
+        throw "Condition must be boolean";
+    }
+    llvm::IRBuilder<>(m_block).CreateCondBr(cond, blockTrue.getBlock(), blockFalse.getBlock());
+}
+
+/// Create unconditional goto
+void BlockBuilder::createBr(BlockBuilder block) {
+    llvm::IRBuilder<>(m_block).CreateBr(block.getBlock());
 }

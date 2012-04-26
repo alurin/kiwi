@@ -121,6 +121,12 @@ namespace kiwi {
         /// Create return result of callable
         void createReturn(ValueBuilder value);
 
+        /// Create conditional goto
+        void createCond(ValueBuilder value, BlockBuilder blockTrue, BlockBuilder blockFalse);
+
+        /// Create unconditional goto
+        void createBr(BlockBuilder block);
+
         /// Allocate memory in stack for mutable variable
         ValueBuilder createVariable(const Identifier& name, Type* type, bool autoInit = true);
 

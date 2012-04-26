@@ -97,30 +97,20 @@ BlockBuilder PrintStatement::emit(Driver& driver, BlockBuilder block) const {
 
 /// emit instructions for statement
 BlockBuilder ConditionalNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // llvm::BasicBlock* blockTrue  = llvm::BasicBlock::Create(gen.getContext(), "true",  gen.getFunction());
-    // llvm::BasicBlock* blockFalse = llvm::BasicBlock::Create(gen.getContext(), "false", gen.getFunction());
-    // llvm::BasicBlock* blockNext  = llvm::BasicBlock::Create(gen.getContext(), "next",  gen.getFunction());
+    BlockBuilder blockTrue  = block.createBlock("true");
+    BlockBuilder blockFalse = block.createBlock("false");
+    BlockBuilder blockNext  = block.createBlock("next");
+    ValueBuilder result     = m_cond->emit(driver, block);
 
-    // BlockBuilder genTrue(gen.getOwner(), blockTrue);
-    // BlockBuilder genFalse(gen.getOwner(), blockFalse);
-    // BlockBuilder genNext(gen.getOwner(), blockNext);
+    /// Emit branches
+    if (m_trueStmt)  blockTrue  = m_trueStmt->emit(driver, blockTrue);
+    if (m_falseStmt) blockFalse = m_falseStmt->emit(driver, blockFalse);
 
-    // ValueBuilder result = m_cond->emit(driver, gen);
-    // llvm::Value* cond = result.getValue();
-    // if (!cond->getType()->isIntegerTy(1)) {
-    //     KIWI_ERROR_AND_EXIT("Condition must be boolean", m_cond->getLocation());
-    // }
+    result.createCond(result, blockTrue, blockFalse);
+    blockFalse.createBr(blockNext);
+    blockTrue.createBr(blockNext);
 
-    // /// Emit branches
-    // if (m_trueStmt)  genTrue  = m_trueStmt->emit(driver, genTrue);
-    // if (m_falseStmt) genFalse = m_falseStmt->emit(driver, genFalse);
-
-    // llvm::IRBuilder<>(result.getBlock()).CreateCondBr(cond, blockTrue, blockFalse);
-    // llvm::IRBuilder<>(genFalse.getBlock()).CreateBr(blockNext);
-    // llvm::IRBuilder<>(genTrue.getBlock()).CreateBr(blockNext);
-
-    // return genNext;
+    return blockNext;
 }
 
 // emit instructions for statement
