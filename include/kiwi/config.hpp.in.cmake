@@ -80,7 +80,7 @@
 #   endif
 #endif
 
-#if KIWI_LIBRARY
+#ifdef KIWI_LIBRARY
 #   ifdef KIWI_DLL_EXPORTS // defined if we are building the KIWI DLL (instead of using it)
 #       define KIWI_API KIWI_API_EXPORT
 #   else
