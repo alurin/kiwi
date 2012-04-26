@@ -230,7 +230,7 @@ ValueBuilder BlockBuilder::createStringConst(const String& value) {
 
     // generate string
     llvm::Constant* string = llvm::ConstantStruct::get(stringType, size, buffer, NULL);
-    llvm::GlobalVariable* result  = new llvm::GlobalVariable(
+    llvm::GlobalVariable* result = new llvm::GlobalVariable(
         *m_module,
         stringType,
         true,
