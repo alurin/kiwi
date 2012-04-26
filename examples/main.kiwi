@@ -1,6 +1,0 @@
-#!/usr/env kiwi
-
-var $a, $b, $c, $n;
-
-$a = $b + $c;
-$n = $b - $c;
