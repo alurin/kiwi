@@ -1,6 +1,9 @@
-/* $Id: scanner.ll 44 2008-10-23 09:03:19Z tb $ -*- mode: c++ -*- */
-/** \file scanner.ll Define the example Flex lexical scanner */
-
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 %{ /*** C/C++ Declarations ***/
 
 #include "kiwi/types.hpp"

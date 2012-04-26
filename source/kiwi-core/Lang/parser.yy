@@ -1,6 +1,9 @@
-/* $Id: parser.yy 48 2009-09-05 08:07:10Z tb $ -*- mode: c++ -*- */
-/** \file parser.yy Contains the example Bison parser source */
-
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 %{ /*** C/C++ Declarations ***/
 
 #include "kiwi/config.hpp"

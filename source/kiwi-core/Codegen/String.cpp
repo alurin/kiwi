@@ -1,3 +1,9 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #include "kiwi/Codegen/String.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"

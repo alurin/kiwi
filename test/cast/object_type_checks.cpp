@@ -1,3 +1,9 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #include "test.h" // Brings in the UnitTest++ framework
 #include "kiwi/Engine.hpp"
 #include "kiwi/Module.hpp"

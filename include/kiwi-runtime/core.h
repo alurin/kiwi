@@ -1,7 +1,7 @@
 #ifndef KIWI_RUNTIME_CORE_INCLUDED
 #define KIWI_RUNTIME_CORE_INCLUDED
 
-#include "kiwi-runtime/config.h"
+#include "kiwi/config.hpp"
 
 /// Start up kiwi runtime and prepare dependences
 KIWI_RUNTIME

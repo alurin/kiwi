@@ -1,7 +1,13 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #ifndef KIWI_RUNTIME_USTRING_INCLUDED
 #define KIWI_RUNTIME_USTRING_INCLUDED
 
-#include "kiwi-runtime/config.h"
+#include "kiwi/config.hpp"
 #include <stdint.h>
 #include <unicode/utypes.h>
 

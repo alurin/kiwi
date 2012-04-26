@@ -1,7 +1,7 @@
 #ifndef KIWI_RUNTIME_GC_INCLUDED
 #define KIWI_RUNTIME_GC_INCLUDED
 
-#include "kiwi-runtime/config.h"
+#include "kiwi/config.hpp"
 #include <stdint.h>
 #include <stddef.h>
 

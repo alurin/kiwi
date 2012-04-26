@@ -1,7 +1,8 @@
 Authors
 =======
-* Vasiliy Sheredeko
-    * Email: piphon@gmail.com
+ * Vasiliy "Alurin" Sheredeko
+   ** Email (Home): piphon@gmail.com
+   ** Email (Work): alurin@kronverk-studio.com
 
 Acknowledgements
 ----------------

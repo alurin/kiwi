@@ -4,8 +4,13 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
+<<<<<<< HEAD
 PROJECT_NAME           = ${KIWI_NAME}
 PROJECT_NUMBER         = ${KIWI_VERSION_STRING}
+=======
+PROJECT_NAME           = ${APPLICATION_NAME}
+PROJECT_NUMBER         = ${APPLICATION_VERSION_STRING}
+>>>>>>> 6460549d748e8ddb3c488a29ec31c2f804bb884a
 OUTPUT_DIRECTORY       =
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
@@ -23,7 +28,11 @@ QT_AUTOBRIEF           = NO
 MULTILINE_CPP_IS_BRIEF = NO
 INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = NO
+<<<<<<< HEAD
 TAB_SIZE               = 4
+=======
+TAB_SIZE               = 8
+>>>>>>> 6460549d748e8ddb3c488a29ec31c2f804bb884a
 ALIASES                =
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
@@ -122,7 +131,11 @@ IGNORE_PREFIX          =
 # configuration options related to the HTML output
 #---------------------------------------------------------------------------
 GENERATE_HTML          = YES
+<<<<<<< HEAD
 HTML_OUTPUT            = doc
+=======
+HTML_OUTPUT            = docs
+>>>>>>> 6460549d748e8ddb3c488a29ec31c2f804bb884a
 HTML_FILE_EXTENSION    = .html
 HTML_HEADER            =
 HTML_FOOTER            =

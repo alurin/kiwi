@@ -1,5 +1,9 @@
-// $Id: scanner.h 17 2007-08-19 18:51:39Z tb $
-
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #ifndef EXAMPLE_SCANNER_H
 #define EXAMPLE_SCANNER_H
 

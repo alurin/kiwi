@@ -1,3 +1,9 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #include "kiwi/assert.hpp"
 #include "kiwi/Codegen/Object.hpp"
 #include "kiwi/Members.hpp"
