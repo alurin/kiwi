@@ -105,8 +105,14 @@ namespace kiwi {
         /// Create return, if basic block has not terminator instruction
         void createTrailReturn();
 
-        /// Allocate memory in stack for mutable varaible
+        /// Allocate memory in stack for mutable variable
         ValueBuilder createVariable(const Identifier& name, Type* type, bool autoInit = true);
+
+        /// Create store in mutable variable
+        ValueBuilder createStore(ValueBuilder variable, ValueBuilder value);
+
+        /// Create load from mutable variable
+        ValueBuilder createLoad(ValueBuilder variable);
 
         /// Create integer constant
         ValueBuilder createIntConst(int32_t value);

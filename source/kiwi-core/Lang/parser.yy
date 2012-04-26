@@ -283,15 +283,13 @@ variable_declare
                                                 yyfree($2);
                                             }
     | type      VAR_LOCAL '=' expression    {
-                                                driver.scope()->declare(*$2, $1, $4);
-                                                KIWI_DUMP("Not implement!!! Variable init expression");
-                                                $$ = 0;
+                                                VariableNode* node = driver.scope()->declare(*$2, $1, $4);
+                                                $$ = driver.createInit(node, @3);
                                                 yyfree($2);
                                             }
     | TYPE_AUTO VAR_LOCAL '=' expression    {
-                                                driver.scope()->declare(*$2, $4);
-                                                KIWI_DUMP("Not implement!!! Variable init expression");
-                                                $$ = 0;
+                                                VariableNode* node = driver.scope()->declare(*$2, $4);
+                                                $$ = driver.createInit(node, @3);
                                                 yyfree($2);
                                             }
     ;

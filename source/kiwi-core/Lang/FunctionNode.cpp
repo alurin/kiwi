@@ -19,6 +19,10 @@ NamedNode::NamedNode(FunctionNode* owner, TypeNode* type)
 
 NamedNode::~NamedNode() {
     delete m_type;
+    for (BuilderMap::const_iterator i = m_builders.begin(); i != m_builders.end(); ++i) {
+        ValueBuilder* builder = i->second;
+        delete builder;
+    }
 }
 
 ArgumentNode::ArgumentNode(FunctionNode* owner, const Identifier& name, TypeNode* type)
@@ -31,7 +35,7 @@ VariableNode::VariableNode(ScopeNode* owner, const Identifier& name, TypeNode* t
 }
 
 VariableNode::~VariableNode() {
-    // delete m_init; initilisator owned by expression statement, not varaible
+    delete m_init;
 }
 
 ScopeNode::ScopeNode(ScopeNode* parent)
@@ -80,6 +84,20 @@ ExpressionStatementNode::ExpressionStatementNode(ScopeNode* parent, ExpressionNo
 
 ExpressionStatementNode::~ExpressionStatementNode() {
     delete m_expr;
+}
+
+/// insert allocation
+void NamedNode::insertBuilder(llvm::Function* func, ValueBuilder* builder) {
+    m_builders.insert(std::make_pair(func, builder));
+}
+
+/// find builder
+ValueBuilder* NamedNode::findBuilder(llvm::Function* func) {
+    BuilderMap::const_iterator i = m_builders.find(func);
+    if (i != m_builders.end()) {
+        return i->second;
+    }
+    return 0;
 }
 
 ArgumentNode* FunctionNode::declare(const Identifier& name, TypeNode* type) {
@@ -142,20 +160,12 @@ void ScopeNode::append(ExpressionNode* expr) {
     }
 }
 
-MutableNode* ArgumentNode::getLeft() {
-    return new ArgumentMutableNode(this);
+MutableNode* NamedNode::getLeft() {
+    return new NamedMutableNode(this);
 }
 
-ExpressionNode* ArgumentNode::getRight() {
-    return new ArgumentExpressionNode(this);
-}
-
-MutableNode* VariableNode::getLeft() {
-    return new VariableMutableNode(this);
-}
-
-ExpressionNode* VariableNode::getRight() {
-    return new VariableExpressionNode(this);
+ExpressionNode* NamedNode::getRight() {
+    return new NamedExpressionNode(this);
 }
 
 void FieldNode::generateMember(Driver& driver, Type* ownerType) {
@@ -200,7 +210,7 @@ void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
     //         llvm::StoreInst*  store = new llvm::StoreInst(i, value, entry);
 
     //         // save information
-    //         VariableGen vargen(arg->getType()->get(driver), value);
+    //         ValueBuilder vargen(arg->getType()->get(driver), value);
     //         arg->setGenerator(vargen);
     //     } else {
     //         i->setName("this");
@@ -224,39 +234,17 @@ BlockBuilder ScopeNode::emit(Driver& driver, BlockBuilder block) const {
         }
 
         // allocate and init variable
+        ValueBuilder* builder = 0;
         if (ExpressionNode* init = var->getInitilizator()) {
-            ValueBuilder expr = init->emit(driver, block);
+            ValueBuilder expr   = init->emit(driver, block);
             ValueBuilder vargen = block.createVariable(var->getName(), type ?: expr.getType(), false);
-            KIWI_DUMP("Store information about variable not implemented");
+            builder = new ValueBuilder(vargen);
         } else {
             ValueBuilder vargen = block.createVariable(var->getName(), type); // not spaun new blocks
-            KIWI_DUMP("Store information about variable not implemented");
+            builder = new ValueBuilder(vargen);
         }
-
-    //     Type* type               = 0;
-    //     llvm::Value* var_default = 0;
-
-    //     if (var->getInitilizator()) {
-    //         ExpressionNode* init = var->getInitilizator();
-    //         ValueBuilder value  = init->emit(driver, block);
-    //         block = value;
-
-    //         // store information about auto type
-    //         type        = value.getType();
-    //         var_default = value.getValue();
-    //         var->setType(new ConcreteTypeNode(type));
-    //     } else {
-    //         type        = var->getType()->get(driver);
-    //         var_default = llvm::Constant::getNullValue(type->getVarType());
-    //     }
-    //     llvm::Type* var_type = type->getVarType();
-
-    //     // initilizate variable
-    //     llvm::AllocaInst* value  = new llvm::AllocaInst(var_type, i->first, block.getBlock());
-    //     new llvm::StoreInst(var_default, value, block.getBlock());
-
-    //     VariableGen vargen(type, value);
-    //     var->setGenerator(vargen);
+        // store information about allocation
+        var->insertBuilder(block.getFunction(), builder);
     }
 
     // emit statements and expressions
@@ -268,6 +256,5 @@ BlockBuilder ScopeNode::emit(Driver& driver, BlockBuilder block) const {
 }
 
 BlockBuilder ExpressionStatementNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    //return m_expr->emit(driver, block);
+    return m_expr->emit(driver, block);
 }

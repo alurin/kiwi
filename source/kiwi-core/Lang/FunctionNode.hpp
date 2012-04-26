@@ -26,6 +26,8 @@ namespace lang {
     /// Named parameter syntax node
     class NamedNode : public Node {
     public:
+        typedef std::map<llvm::Function*, ValueBuilder*> BuilderMap;
+
         // destructor
         virtual ~NamedNode();
 
@@ -35,22 +37,25 @@ namespace lang {
         }
 
         /// create left node for this named node
-        virtual MutableNode*  getLeft() =0;
+        virtual MutableNode*  getLeft();
 
         /// create right node for this named node
-        virtual ExpressionNode* getRight() =0;
+        virtual ExpressionNode* getRight();
 
-        //VariableGen getGenerator() const {
-        //    return m_gen;
-        //}
+        /// insert allocation
+        void insertBuilder(llvm::Function* func, ValueBuilder* builder);
 
-        //void setGenerator(VariableGen gen) {
-        //    m_gen = gen;
-        //}
+        /// find builder
+        ValueBuilder* findBuilder(llvm::Function* func);
     protected:
-        FunctionNode*   o_owner;
-        TypeNode*       m_type;
-        //VariableGen     m_gen;
+        /// Owner
+        FunctionNode* o_owner;
+
+        /// Type
+        TypeNode* m_type;
+
+        /// map for allocated memory from IR for varaible in other scopes
+        BuilderMap m_builders;
 
         NamedNode(FunctionNode* owner, TypeNode* type);
     };
@@ -68,11 +73,6 @@ namespace lang {
             return m_name;
         }
 
-        /// create left node for this named node
-        virtual MutableNode* getLeft();
-
-        /// create right node for this named node
-        virtual ExpressionNode* getRight();
     protected:
         Identifier    m_name;
     };
@@ -99,12 +99,6 @@ namespace lang {
         Identifier getName() const {
             return m_name;
         }
-
-        /// create left node for this named node
-        virtual MutableNode* getLeft();
-
-        /// create right node for this named node
-        virtual ExpressionNode* getRight();
     protected:
         ScopeNode*      o_owner;
         ExpressionNode* m_init;

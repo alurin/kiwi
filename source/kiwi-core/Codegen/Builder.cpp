@@ -40,13 +40,13 @@ Builder::Builder(llvm::Module* module)
     BUILDER_ASSERT();
 }
 
-/// Copy constructor
+// Copy constructor
 Builder::Builder(const Builder& builder)
 : m_module(builder.m_module), m_context(builder.m_context) {
     BUILDER_ASSERT();
 }
 
-/// Assigment
+// Assigment
 Builder& Builder::operator=(const Builder& builder) {
     if (this != &builder) {
         m_module  = builder.m_module;
@@ -57,19 +57,19 @@ Builder& Builder::operator=(const Builder& builder) {
     return *this;
 }
 
-/// Call
+// Call
 FunctionBuilder::FunctionBuilder(llvm::Function* function, Callable* analog)
 : Builder(function->getParent()), m_func(function), m_analog(analog) {
     BUILDER_FUNCTION_ASSERT();
 }
 
-/// Copy constructor
+// Copy constructor
 FunctionBuilder::FunctionBuilder(const FunctionBuilder& builder)
 : Builder(builder), m_func(builder.m_func), m_analog(builder.m_analog) {
     BUILDER_FUNCTION_ASSERT();
 }
 
-/// Assigment
+// Assigment
 FunctionBuilder& FunctionBuilder::operator=(const FunctionBuilder& builder) {
     if (this != &builder) {
         Builder::operator=(builder);
@@ -81,19 +81,19 @@ FunctionBuilder& FunctionBuilder::operator=(const FunctionBuilder& builder) {
     return *this;
 }
 
-/// constructor
+// constructor
 BlockBuilder::BlockBuilder(const FunctionBuilder& builder, llvm::BasicBlock* block)
 : FunctionBuilder(builder), m_block(block) {
     BUILDER_BLOCK_ASSERT();
 }
 
-/// Copy constructor
+// Copy constructor
 BlockBuilder::BlockBuilder(const BlockBuilder& builder)
 : FunctionBuilder(builder), m_block(builder.m_block) {
     BUILDER_BLOCK_ASSERT();
 }
 
-/// Assigment
+// Assigment
 BlockBuilder& BlockBuilder::operator=(const BlockBuilder& builder) {
     if (this != &builder) {
         FunctionBuilder::operator=(builder);
@@ -103,19 +103,19 @@ BlockBuilder& BlockBuilder::operator=(const BlockBuilder& builder) {
     return *this;
 }
 
-/// constructor
+// constructor
 ValueBuilder::ValueBuilder(const BlockBuilder& builder, llvm::Value* value, Type* type)
 : BlockBuilder(builder), m_value(value), m_type(type) {
     BUILDER_VALUE_ASSERT();
 }
 
-/// Copy constructor
+// Copy constructor
 ValueBuilder::ValueBuilder(const ValueBuilder& builder)
 : BlockBuilder(builder), m_value(builder.m_value), m_type(builder.m_type) {
     BUILDER_VALUE_ASSERT();
 }
 
-/// Assigment
+// Assigment
 ValueBuilder& ValueBuilder::operator=(const ValueBuilder& builder) {
     if (this != &builder) {
         FunctionBuilder::operator=(builder);
@@ -154,7 +154,7 @@ void BlockBuilder::createTrailReturn() {
     }
 }
 
-/// Allocate memory in stack for mutable varaible
+// Allocate memory in stack for mutable varaible
 ValueBuilder BlockBuilder::createVariable(const Identifier& name, Type* type, bool autoInit) {
     llvm::Type* analog = type->getVarType();
     llvm::AllocaInst* variable = new llvm::AllocaInst(analog, name, m_block);
@@ -165,27 +165,79 @@ ValueBuilder BlockBuilder::createVariable(const Identifier& name, Type* type, bo
     return ValueBuilder(*this, variable, type);
 }
 
-/// Emit constants
+/// Create store in mutable variable
+ValueBuilder BlockBuilder::createStore(ValueBuilder variable, ValueBuilder value) {
+    if (variable.getType() == value.getType()) {
+        llvm::StoreInst* inst = new llvm::StoreInst(value.getValue(), variable.getValue(), m_block);
+        return ValueBuilder(*this, value.getValue(), value.getType());
+    }
+    throw "Unknown cast";
+}
+
+/// Create load from mutable variable
+ValueBuilder BlockBuilder::createLoad(ValueBuilder variable) {
+    llvm::LoadInst* inst = new llvm::LoadInst(variable.getValue(), "", m_block);
+    return ValueBuilder(*this, inst, variable.getType());
+}
+
+// Emit constants
 ValueBuilder BlockBuilder::createIntConst(int32_t value) {
     llvm::ConstantInt* result = llvm::ConstantInt::get(*m_context, llvm::APInt(32, value, false));
     return ValueBuilder(*this, result, IntType::get32(getNativeContext()));
 }
 
-/// Emit constants
+// Emit constants
 ValueBuilder BlockBuilder::createBoolConst(bool value) {
     llvm::ConstantInt* result = llvm::ConstantInt::get(*m_context, llvm::APInt(1, value, false));
     return ValueBuilder(*this, result, BoolType::get(getNativeContext()));
 }
 
-/// Emit constants
+// Emit constants
 ValueBuilder BlockBuilder::createCharConst(UChar value) {
     llvm::ConstantInt* result = llvm::ConstantInt::get(*m_context, llvm::APInt(16, value, true));
     return ValueBuilder(*this, result, CharType::get(getNativeContext()));
 }
 
-/// Emit constants
+// Emit constants
 ValueBuilder BlockBuilder::createStringConst(const String& value) {
-    KIWI_DUMP("lockBuilder::createStringConst");
-    return createBoolConst(false);
-    // return StringEmitter(StringType::get(getNativeContext())).emit(m_block, value);
+    StringType* type = StringType::get(getNativeContext());
+    // get partial types for string
+    llvm::Type* charType = llvm::IntegerType::get(*m_context, 16);
+    llvm::Type* sizeType = llvm::IntegerType::get(*m_context, 32);
+    llvm::ArrayType* bufferType = llvm::ArrayType::get(charType, value.length());
+
+    // generate string type
+    std::vector<llvm::Type*> elements;
+    elements.push_back(sizeType);
+    elements.push_back(bufferType);
+
+    llvm::Type* elementType = llvm::dyn_cast<llvm::PointerType>(type->getVarType())->getElementType();
+    llvm::StructType* stringType = llvm::dyn_cast<llvm::StructType>(elementType);
+
+    // generate size
+    llvm::Constant* size = llvm::ConstantInt::get(*m_context, llvm::APInt(32, value.length(), false));
+
+    // generate buffer
+    llvm::Constant* buffer = 0; {
+        std::vector<llvm::Constant*> bufferConst;
+        for (int i = 0; i < value.length(); ++i) {
+            UChar c = value[i];
+            llvm::Constant* value = llvm::ConstantInt::get(*m_context, llvm::APInt(16, c, false));
+            bufferConst.push_back(value);
+        }
+        buffer = llvm::ConstantArray::get(bufferType, bufferConst);
+    }
+
+    // generate string
+    llvm::Constant* string = llvm::ConstantStruct::get(stringType, size, buffer, NULL);
+    llvm::GlobalVariable* result  = new llvm::GlobalVariable(
+        *m_module,
+        stringType,
+        true,
+        llvm::GlobalValue::PrivateLinkage,
+        string,
+        "string"
+     );
+    result->setUnnamedAddr(true); // Binary equal strings must be merged
+    return ValueBuilder(*this, result, type);
 }

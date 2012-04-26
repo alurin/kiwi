@@ -1,3 +1,4 @@
+#include "kiwi/assert.hpp"
 #include "Driver.hpp"
 #include "StatementNode.hpp"
 #include "FunctionNode.hpp"
@@ -45,14 +46,18 @@ PrintStatement::~PrintStatement() {
     delete m_return;
 }
 
-/// constructor
+// constructor
 ConditionalNode::ConditionalNode(ScopeNode* parent, ExpressionNode* cond, StatementNode* trueStmt, StatementNode* falseStmt)
 : StatementNode(parent), m_cond(cond) , m_trueStmt(trueStmt) , m_falseStmt(falseStmt) {
 }
 
-/// destructor
+// destructor
 ConditionalNode::~ConditionalNode() {
 
+}
+// constructor
+InitStatement::InitStatement(ScopeNode* parent, VariableNode* var)
+: StatementNode(parent), m_var(var) {
 }
 
 // emit instructions for return statement
@@ -115,4 +120,15 @@ BlockBuilder ConditionalNode::emit(Driver& driver, BlockBuilder block) const {
     // llvm::IRBuilder<>(genTrue.getBlock()).CreateBr(blockNext);
 
     // return genNext;
+}
+
+// emit instructions for statement
+BlockBuilder InitStatement::emit(Driver& driver, BlockBuilder block) const {
+    ExpressionNode* init = m_var->getInitilizator();
+    kiwi_assert(init, "Initilizate varaible node created, but initilizator not found");
+    ValueBuilder  value   = init->emit(driver, block);
+    ValueBuilder* builder = m_var->findBuilder(block.getFunction());
+    if (!builder)
+        KIWI_ERROR_AND_EXIT("Not found value builder for store value in varaible", getLocation());
+    return value.createStore(*builder, value);
 }

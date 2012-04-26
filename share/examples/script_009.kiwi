@@ -2,6 +2,5 @@
 /* Test script for classes definition */
 
 void main() {
-    int $a = 10;
-    int $b = 11;
+    auto $a = "fail";
 }

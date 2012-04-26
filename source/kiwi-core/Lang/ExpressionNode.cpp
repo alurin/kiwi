@@ -41,17 +41,12 @@ AssignNode::~AssignNode() {
     delete m_right;
 }
 
-VariableMutableNode::VariableMutableNode(VariableNode* var)
+NamedMutableNode::NamedMutableNode(NamedNode* var)
 : o_var(var) { }
 
-VariableExpressionNode::VariableExpressionNode(VariableNode* var)
+NamedExpressionNode::NamedExpressionNode(NamedNode* var)
 : o_var(var) { }
 
-ArgumentMutableNode::ArgumentMutableNode(ArgumentNode* arg)
-: o_arg(arg) { }
-
-ArgumentExpressionNode::ArgumentExpressionNode(ArgumentNode* arg)
-: o_arg(arg) { }
 
 IntegerConstNode::IntegerConstNode(Context* context, int32_t value)
 : m_context(context), m_value(value) { }
@@ -229,38 +224,18 @@ ValueBuilder AssignNode::emit(Driver& driver, BlockBuilder block) const {
     return m_left->emit(driver, value);
 }
 
-ValueBuilder ArgumentMutableNode::emit(Driver& driver, ValueBuilder value) const {
-    KIWI_NOT_IMPLEMENTED();
-    // VariableGen var = o_arg->getGenerator();
-    // if (var.getType() == block.getType()) {
-    //     llvm::StoreInst* inst = new llvm::StoreInst(block.getValue(), var.getValue(), block.getBlock());
-    //     return gen;
-    // }
-    // KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
+ValueBuilder NamedMutableNode::emit(Driver& driver, ValueBuilder value) const {
+    ValueBuilder* builder = o_var->findBuilder(value.getFunction());
+    if (!builder)
+        KIWI_ERROR_AND_EXIT("Not found value builder for store value in varaible", getLocation());
+    return value.createStore(*builder, value);
 }
 
-ValueBuilder ArgumentExpressionNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // VariableGen var      = o_arg->getGenerator();
-    // llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", block.getBlock());
-    // return ValueBuilder(block, var.getType(), inst);
-}
-
-ValueBuilder VariableMutableNode::emit(Driver& driver, ValueBuilder value) const {
-    KIWI_NOT_IMPLEMENTED();
-    // VariableGen var = o_var->getGenerator();
-    // if (var.getType() == value.getType()) {
-    //     llvm::StoreInst* inst = new llvm::StoreInst(value.getValue(), var.getValue(), value.getBlock());
-    //     return gen;
-    // }
-    // KIWI_ERROR_AND_EXIT("unknown cast", getLocation());
-}
-
-ValueBuilder VariableExpressionNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // VariableGen var      = o_var->getGenerator();
-    // llvm::LoadInst* inst = new llvm::LoadInst(var.getValue(), "", block.getBlock());
-    // return ValueBuilder(block, var.getType(), inst);
+ValueBuilder NamedExpressionNode::emit(Driver& driver, BlockBuilder block) const {
+    ValueBuilder* builder = o_var->findBuilder(block.getFunction());
+    if (!builder)
+        KIWI_ERROR_AND_EXIT("Not found value builder for store value in varaible", getLocation());
+    return block.createLoad(*builder);
 }
 
 ValueBuilder IntegerConstNode::emit(Driver& driver, BlockBuilder block) const {

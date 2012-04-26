@@ -16,8 +16,7 @@ namespace kiwi {
     class VariableBuilder;
 
 namespace lang {
-    class VariableNode;
-    class ArgumentNode;
+    class NamedNode;
     class Driver;
     class TypeNode;
 
@@ -198,59 +197,31 @@ namespace lang {
     };
 
     //==--------------------------------------------------------------------==//
-    /// Argument mutable syntax node
-    class ArgumentMutableNode : public MutableNode {
+    /// Named mutable syntax node
+    class NamedMutableNode : public MutableNode {
     public:
         /// Constructor
-        ArgumentMutableNode(ArgumentNode* arg);
+        NamedMutableNode(NamedNode* var);
 
         /// Emit instructions
         virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const;
     protected:
-        /// Argument node
-        ArgumentNode* o_arg;
+        /// Named node
+        NamedNode* o_var;
     };
 
     //==--------------------------------------------------------------------==//
-    /// Argument expression syntax node
-    class ArgumentExpressionNode : public ExpressionNode {
+    /// Named expression syntax node
+    class NamedExpressionNode : public ExpressionNode {
     public:
         /// Constructor
-        ArgumentExpressionNode(ArgumentNode* arg);
+        NamedExpressionNode(NamedNode* var);
 
         /// Emit instructions
         virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
-        /// Argument node
-        ArgumentNode* o_arg;
-    };
-
-    //==--------------------------------------------------------------------==//
-    /// Varaible mutable syntax node
-    class VariableMutableNode : public MutableNode {
-    public:
-        /// Constructor
-        VariableMutableNode(VariableNode* var);
-
-        /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const;
-    protected:
-        /// Varaible node
-        VariableNode* o_var;
-    };
-
-    //==--------------------------------------------------------------------==//
-    /// Varaible expression syntax node
-    class VariableExpressionNode : public ExpressionNode {
-    public:
-        /// Constructor
-        VariableExpressionNode(VariableNode* var);
-
-        /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
-    protected:
-        /// Varaible node
-        VariableNode* o_var;
+        /// Named node
+        NamedNode* o_var;
     };
 
     /// TODO: ADD COMMETS ====================================================//

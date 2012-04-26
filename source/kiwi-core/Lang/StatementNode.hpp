@@ -14,6 +14,7 @@ namespace lang
     class ScopeNode;
     class ExpressionNode;
     class Driver;
+    class VariableNode;
 
     /// Statement syntax node
     class StatementNode : public Node {
@@ -91,6 +92,18 @@ namespace lang
         StatementNode*  m_falseStmt;
     };
 
+
+    /// Statement node for varaible initilization
+    class InitStatement : public StatementNode {
+    public:
+        /// constructor
+        InitStatement(ScopeNode* parent, VariableNode* var);
+
+        /// emit instructions for statement
+        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
+    protected:
+        VariableNode* m_var;
+    };
 }}
 
 #endif

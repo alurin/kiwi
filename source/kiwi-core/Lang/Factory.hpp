@@ -242,6 +242,10 @@ namespace lang {
             return inject(new ConditionalNode(scope(), cond, trueStmt, falseStmt), loc);
         }
 
+        StatementNode* createInit(VariableNode* var, const location& loc) {
+            return inject(new InitStatement(scope(), var), loc);
+        }
+
         //===--------------------------------------------------------------===//
         //    Calls
         //===--------------------------------------------------------------===//
