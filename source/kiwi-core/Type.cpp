@@ -63,10 +63,10 @@ Context* Type::getContext() const {
 // add binary operator
 UnaryOperator* Type::addUnary(
     Member::UnaryOpcode opcode,
-    Type* resultType,
+    Type* returnType,
     codegen::CallableEmitter* emitter
 ) {
-    UnaryOperator* op = new UnaryOperator(opcode, this, resultType, emitter);
+    UnaryOperator* op = new UnaryOperator(opcode, this, returnType, emitter);
     m_unary.push_back(op);
     return op;
 }
@@ -74,11 +74,11 @@ UnaryOperator* Type::addUnary(
 // add binary operator
 BinaryOperator* Type::addBinary(
     Member::BinaryOpcode opcode,
-    Type* resultType,
+    Type* returnType,
     Type* operandType,
     codegen::CallableEmitter* emitter
 ) {
-    BinaryOperator* op = new BinaryOperator(opcode, this, resultType, operandType, emitter);
+    BinaryOperator* op = new BinaryOperator(opcode, this, returnType, operandType, emitter);
     m_binary.push_back(op);
     return op;
 }
@@ -86,11 +86,11 @@ BinaryOperator* Type::addBinary(
 /// add multiary operator
 MultiaryOperator* Type::addMultiary(
     Member::MultiaryOpcode opcode,
-    Type* resultType,
+    Type* returnType,
     std::vector<Type*> arguments,
     codegen::CallableEmitter* emitter
 ) {
-    MultiaryOperator* op = new MultiaryOperator(opcode, this, resultType, arguments, emitter);
+    MultiaryOperator* op = new MultiaryOperator(opcode, this, returnType, arguments, emitter);
     m_multiary.push_back(op);
     return op;
 }
@@ -103,8 +103,8 @@ Field* Type::addField(const Identifier& name, Type* fieldType) {
 }
 
 // add method
-Method* Type::addMethod(const Identifier& name, Type* resultType, std::vector<Type*> arguments) {
-    Method* method = new Method(name, this, resultType, arguments);
+Method* Type::addMethod(const Identifier& name, Type* returnType, std::vector<Type*> arguments) {
+    Method* method = new Method(name, this, returnType, arguments);
     m_methods.push_back(method);
     return method;
 }

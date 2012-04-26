@@ -6,9 +6,10 @@
  */
 #include "ContextImpl.hpp"
 #include "ModuleImpl.hpp"
+#include "Codegen/Builder.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
-// #include "kiwi/Codegen/Startup.hpp"
+#include "kiwi/Members.hpp"
 #include "Lang/Driver.hpp"
 #include "llvm/Analysis/Passes.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
@@ -75,8 +76,8 @@ void Module::build() {
     /// create startup function
     Method* mainMethod = getMainMethod();
     if (mainMethod) {
-        // StartupEmitter emitter(mainMethod);
-        // emitter.emitJIT();
+        FunctionBuilder builder(mainMethod);
+        builder.createJITStartupPoint();
     }
 
     // Set up the optimizer pipeline.  Start with registering info about how the

@@ -69,14 +69,14 @@ namespace kiwi {
         /// add unary operator
         UnaryOperator* addUnary(
             Member::UnaryOpcode opcode,
-            Type* resultType,
+            Type* returnType,
             codegen::CallableEmitter* emitter
         );
 
         /// add binary operator
         BinaryOperator* addBinary(
             Member::BinaryOpcode opcode,
-            Type* resultType,
+            Type* returnType,
             Type* operandType,
             codegen::CallableEmitter* emitter
         );
@@ -84,7 +84,7 @@ namespace kiwi {
         /// add binary operator
         MultiaryOperator* addMultiary(
             Member::MultiaryOpcode opcode,
-            Type* resultType,
+            Type* returnType,
             std::vector<Type*> arguments,
             codegen::CallableEmitter* emitter
         );
@@ -93,7 +93,7 @@ namespace kiwi {
         Field* addField(const Identifier& name, Type* type);
 
         /// add method
-        Method* addMethod(const Identifier& name, Type* resultType, std::vector<Type*> arguments);
+        Method* addMethod(const Identifier& name, Type* returnType, std::vector<Type*> arguments);
 
         /// find unary operator
         UnaryOperator* findUnary(Member::UnaryOpcode opcode) const;

@@ -13,7 +13,6 @@
 #include "kiwi/Module.hpp"
 #include "kiwi/Type.hpp"
 #include "../Codegen/Builder.hpp"
-#include "../Codegen/Method.hpp"
 #include <vector>
 
 using namespace kiwi;
@@ -62,8 +61,8 @@ ScopeNode::~ScopeNode() {
     }
 }
 
-FunctionNode::FunctionNode(const Identifier& name, TypeNode* thisType, TypeNode* resultType)
-: m_name(name), m_this(thisType), m_type(resultType), m_root(new ScopeNode(this)), m_func(0) {
+FunctionNode::FunctionNode(const Identifier& name, TypeNode* thisType, TypeNode* returnType)
+: m_name(name), m_this(thisType), m_type(returnType), m_root(new ScopeNode(this)), m_func(0) {
 
 }
 
@@ -175,13 +174,13 @@ ExpressionNode* NamedNode::getRight() {
 }
 
 void FieldNode::generateMember(Driver& driver, Type* ownerType) {
-    Type* resultType = m_type->get(driver);
-    ownerType->addField(m_name, resultType);
+    Type* returnType = m_type->get(driver);
+    ownerType->addField(m_name, returnType);
 }
 
 void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
     Module* module   = ownerType->getModule();
-    Type* resultType = m_type->get(driver);
+    Type* returnType = m_type->get(driver);
     std::vector<Type*> frontendArgs;
 
     // collect arguments
@@ -190,17 +189,20 @@ void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
         Type*         frontend_type = arg->getType()->get(driver);
         frontendArgs.push_back(frontend_type);
     }
-    m_method = ownerType->addMethod(m_name, resultType, frontendArgs);
-}
-
-void FunctionNode::generateIRSignature(Driver& driver, Type* owner) {
-    m_func = MethodEmitter(m_method).emitDefinition();
+    m_method = ownerType->addMethod(m_name, returnType, frontendArgs);
 }
 
 #include <llvm/Instructions.h>
 #include <llvm/Function.h>
+
+void FunctionNode::generateIRSignature(Driver& driver, Type* owner) {
+    m_func = FunctionBuilder(m_method).getFunction();
+    Identifier fullName = m_method->getOwnerType()->getName() + "::" + m_method->getName();
+    m_func->setName(fullName);
+}
+
 void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
-    FunctionBuilder func(m_func, m_method);
+    FunctionBuilder func(m_method);
     BlockBuilder entry = func.createBlock("entry");
     // emit mutable variables for arguments
     size_t j = 0;

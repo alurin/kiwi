@@ -181,7 +181,7 @@ namespace lang {
     {
     public:
         /// construct function node
-        FunctionNode(const Identifier& name, TypeNode* thisType, TypeNode* resultType);
+        FunctionNode(const Identifier& name, TypeNode* thisType, TypeNode* returnType);
 
         /// destructor
         virtual ~FunctionNode();

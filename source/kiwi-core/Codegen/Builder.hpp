@@ -14,6 +14,7 @@ namespace llvm {
     class LLVMContext;
     class Module;
     class Function;
+    class FunctionType;
     class BasicBlock;
     class Value;
 }
@@ -23,6 +24,8 @@ namespace kiwi {
     class Module;
     class Type;
     class Callable;
+    class Type;
+    class ObjectType;
 
     class FunctionBuilder;
     class BlockBuilder;
@@ -33,13 +36,23 @@ namespace kiwi {
     class Builder {
     public:
         /// Constructor from function. Created first block for function
-        Builder(llvm::Module* module);
+        Builder(Module* module);
 
         /// Copy constructor
         Builder(const Builder& builder);
 
         /// Assigment
         Builder& operator=(const Builder& builder);
+
+        /// return native context
+        Context* getNativeContext() const {
+            return m_nativeContext;
+        }
+
+        /// return native context
+        Module* getNativeModule() const {
+            return m_nativeModule;
+        }
 
         /// returns LLVM context
         llvm::LLVMContext& getContext() const {
@@ -51,21 +64,28 @@ namespace kiwi {
             return m_module;
         }
     protected:
-        /// Current LLVM context
-        llvm::LLVMContext* m_context;
+        /// Native Kiwi context
+        Context* m_nativeContext;
 
-        /// Current LLVM module
-        llvm::Module* m_module;
+        /// Native Kiwi module
+        Module* m_nativeModule;
 
-        /// Current Kiwi module
+        /// LLVM context
+        llvm::LLVMContext*  m_context;
+
+        /// LLVM module
+        llvm::Module*       m_module;
     };
 
     //==--------------------------------------------------------------------==//
     /// This class stored information about function.
     class FunctionBuilder : public Builder {
     public:
-        /// Call
-        FunctionBuilder(llvm::Function* function, Callable* analog);
+        /// Constructor
+        FunctionBuilder(Callable* analog);
+
+        /// Constructor
+        FunctionBuilder(Type* type, llvm::Function* func);
 
         /// Copy constructor
         FunctionBuilder(const FunctionBuilder& builder);
@@ -73,30 +93,36 @@ namespace kiwi {
         /// Assigment
         FunctionBuilder& operator=(const FunctionBuilder& builder);
 
+        /// emit method definition
+        llvm::FunctionType* getFunctionType() const;
+
+        /// return function
+        llvm::Function* getFunction() const;
+
+        /// Create sturtup point by current function
+        llvm::Function* createJITStartupPoint();
+
         /// Create new basic block and return builder pointed to this block
         BlockBuilder createBlock(const Identifier& name);
 
-        /// return function
-        llvm::Function* getFunction() const {
-            return m_func;
+                /// return native callable
+        Callable* getNativeCallable() const {
+            return m_nativeCallable;
         }
 
-        /// return native context
-        Context* getNativeContext() const;
-
-        /// return native context
-        Module* getNativeModule() const;
-
-        /// return callable
-        Callable* getCallable() const {
-            return m_analog;
+        /// return native type
+        Type* getNativeOwner() const {
+            return m_nativeOwner;
         }
-    protected:
+    private:
         /// Current LLVM function
-        llvm::Function* m_func;
+        mutable llvm::Function* m_func;
 
         /// Cullable analog
-        Callable* m_analog;
+        Callable* m_nativeCallable;
+
+        /// Cullable analog
+        Type* m_nativeOwner;
     };
 
     //==--------------------------------------------------------------------==//
@@ -135,6 +161,9 @@ namespace kiwi {
 
         /// Create load from mutable variable
         ValueBuilder createLoad(ValueBuilder variable);
+
+        /// Create new object
+        ValueBuilder createNew(ObjectType* type, Callable* ctor = 0, std::vector<ValueBuilder> args = std::vector<ValueBuilder>());
 
         /// Create call for callable with arguments
         ValueBuilder createCall(Callable* call, std::vector<ValueBuilder> args);

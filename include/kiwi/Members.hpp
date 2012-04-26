@@ -179,7 +179,7 @@ namespace kiwi
         UnaryOperator(
             UnaryOpcode opcode,
             Type* ownerType,
-            Type* resultType,
+            Type* returnType,
             codegen::CallableEmitter* emitter
         );
     };
@@ -210,7 +210,7 @@ namespace kiwi
         BinaryOperator(
             BinaryOpcode opcode,
             Type* ownerType,
-            Type* resultType,
+            Type* returnType,
             Type* operandType,
             codegen::CallableEmitter* emitter
         );
@@ -241,7 +241,7 @@ namespace kiwi
         MultiaryOperator(
             MultiaryOpcode opcode,
             Type* ownerType,
-            Type* resultType,
+            Type* returnType,
             TypeVector types,
             codegen::CallableEmitter* emitter
         );
@@ -279,7 +279,7 @@ namespace kiwi
     protected:
         Identifier          m_name;
 
-        Method(const Identifier& name, Type* ownerType, Type* resultType, std::vector<Type*> arguments);
+        Method(const Identifier& name, Type* ownerType, Type* returnType, std::vector<Type*> arguments);
     };
 
     //==--------------------------------------------------------------------==//
