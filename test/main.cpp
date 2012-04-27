@@ -12,8 +12,10 @@
  *
  */
 #include "test.h"
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     return UnitTest::RunAllTests();
 }

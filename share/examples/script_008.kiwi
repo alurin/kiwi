@@ -2,30 +2,33 @@
 /* Test script for classes definition */
 
 class Parent {
-    string test() {
-        return "Parent::test";
+    int @a;
+
+    string getClassName() {
+        return "Parent";
+    }
+
+    void run() {
+        print "Call method: "; print getClassName(); print "\n";
+        print "Field value: "; print @a;             print "\n";
     }
 }
 
 class Child {
     inherit Parent;
 
-    string test() {
-        return "Child::test";
+    string getClassName() {
+        return "Child";
     }
 }
 
 void test(Parent $obj) {
-    print "Call method: "; print $obj.test(); print "\n";
 }
 
 void main() {
     auto $parent = new Parent();
     auto $child  = new Child();
 
-    print $parent.test(); print "\n";
-    print $child.test();  print "\n";
-
-    // test($parent);
-    // test($child); /// < NOT WORKED, CAST!!!
+    #$parent.run();
+    #$child.run();
 }

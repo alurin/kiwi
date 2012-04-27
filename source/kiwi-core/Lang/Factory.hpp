@@ -81,12 +81,12 @@ namespace lang {
 
         // returns left expression for instance node
         MutableNode* instanceLeft(const Identifier& name, const location& loc) {
-            return inject(new InstanceMutableNode(name), loc);
+            return inject(new InstanceMutableNode(createThis(loc), name), loc);
         }
 
         /// returns right expression for instance node
         ExpressionNode* instanceRight(const Identifier& name, const location& loc) {
-            return inject(new InstanceExpressionNode(name), loc);
+            return inject(new InstanceExpressionNode(createThis(loc), name), loc);
         }
 
         //===--------------------------------------------------------------===//
@@ -139,7 +139,7 @@ namespace lang {
             return inject(new BoolConstNode(m_context, value), loc);
         }
 
-        ExpressionNode* createThis(const location& loc);
+        ThisNode* createThis(const location& loc);
 
         //===--------------------------------------------------------------===//
         //    Expressions

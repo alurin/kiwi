@@ -117,9 +117,21 @@ BlockBuilder ConditionalNode::emit(Driver& driver, BlockBuilder block) const {
 BlockBuilder InitStatement::emit(Driver& driver, BlockBuilder block) const {
     ExpressionNode* init = m_var->getInitilizator();
     kiwi_assert(init, "Initilizate varaible node created, but initilizator not found");
-    ValueBuilder  value   = init->emit(driver, block);
-    ValueBuilder* builder = m_var->findBuilder(block.getFunction());
-    if (!builder)
-        KIWI_ERROR_AND_EXIT("Not found value builder for store value in varaible", getLocation());
-    return value.createStore(*builder, value);
+
+    // init value for variable
+    ValueBuilder value = init->emit(driver, block);
+
+    // get variable type
+    Type* type = 0;
+    if (m_var->getType() != 0) {
+        type = m_var->getType()->get(driver);
+    } else {
+        type = value.getType();
+    }
+
+    // allocate variable and store init value
+    ValueBuilder vargen   = block.createVariable(m_var->getName(), type, false);
+    ValueBuilder* builder = new ValueBuilder(vargen);
+    m_var->insertBuilder(block.getFunction(), builder);
+    return vargen.createStore(*builder, value);
 }

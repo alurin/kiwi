@@ -98,13 +98,13 @@ NewNode::NewNode(TypeNode* type)
 : MultiaryNode(Member::Constructor), m_type(type) {
 }
 
-InstanceMutableNode::InstanceMutableNode(const Identifier& name)
-: m_name(name) { }
+InstanceMutableNode::InstanceMutableNode(ThisNode* thisNode, const Identifier& name)
+: m_thisNode(thisNode), m_name(name) { }
 
-InstanceExpressionNode::InstanceExpressionNode(const Identifier& name)
-: m_name(name) { }
+InstanceExpressionNode::InstanceExpressionNode(ThisNode* thisNode, const Identifier& name)
+: m_thisNode(thisNode), m_name(name) { }
 
-ThisNode::ThisNode(ObjectType* thisType)
+ThisNode::ThisNode(CompoundNode* thisType)
 : m_thisType(thisType) { }
 
 void CallableNode::append(const Identifier& name, ExpressionNode* value) {
@@ -197,6 +197,7 @@ Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) const
 ValueBuilder NewNode::emit(Driver& driver, BlockBuilder block) const {
     ObjectType* objType = dyn_cast<ObjectType>(m_type->get(driver));
     if (objType) {
+        KIWI_DUMP("NewNode::emit");
         return block.createNew(objType);
     }
     KIWI_ERROR_AND_EXIT("Type has not be constructed", m_type->getLocation());
@@ -243,7 +244,7 @@ ValueBuilder InstanceMutableNode::emit(Driver& driver, ValueBuilder value) const
     if (type) {
         Field* field     = type->findField(m_name);
         if (field) {
-            ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, value);
+            ValueBuilder thisValue = m_thisNode->emit(driver, value);
             return thisValue.createStore(thisValue, field, value);
         }
     }
@@ -256,7 +257,7 @@ ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) co
     if (type) {
         Field* field     = type->findField(m_name);
         if (field) {
-            ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, block);
+            ValueBuilder thisValue = m_thisNode->emit(driver, block);
             return thisValue.createLoad(thisValue, field);
         }
     }
@@ -269,6 +270,7 @@ ValueBuilder ThisNode::emit(Driver& driver, BlockBuilder block) const {
     if (func->arg_empty()) {
         KIWI_ERROR_AND_EXIT("Not found this", getLocation());
     }
-    llvm::Argument* arg  = func->arg_begin();
-    return ValueBuilder(block, arg, m_thisType);
+    Type* type = m_thisType->getType();
+    kiwi_assert(type, "Type is null");
+    return ValueBuilder(block, func->arg_begin(), type);
 }

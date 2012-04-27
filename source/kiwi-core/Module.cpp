@@ -10,6 +10,7 @@
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Members.hpp"
+#include "kiwi/Support/Cast.hpp"
 #include "Lang/Driver.hpp"
 #include "llvm/Analysis/Passes.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
@@ -56,7 +57,10 @@ Method* Module::getMainMethod() {
 
 bool Module::includeFile(const Path& filename) {
     Context* context = getContext();
-    ObjectType* type = ObjectType::create(this);
+    ObjectType* type = dyn_cast<ObjectType>(this->find("Script"));
+    if (!type) {
+        type = ObjectType::create(this, "Script");
+    }
     lang::DriverRef driver(context, type);
     if (driver.parseFile(filename)) {
         if (!m_metadata->mainMethod && driver.getMainMethod()) {

@@ -234,25 +234,12 @@ BlockBuilder ScopeNode::emit(Driver& driver, BlockBuilder block) const {
     // emit mutable variables
     for (std::map<Identifier, VariableNode*>::const_iterator i = m_vars.begin(); i != m_vars.end(); ++i) {
         VariableNode* var = i->second;
-        Type* type = 0;
-
-        // get type
-        if (var->getType() != 0) {
-            type = var->getType()->get(driver);
-        }
-
-        // allocate and init variable
-        ValueBuilder* builder = 0;
-        if (ExpressionNode* init = var->getInitilizator()) {
-            ValueBuilder expr   = init->emit(driver, block);
-            ValueBuilder vargen = block.createVariable(var->getName(), type ?: expr.getType(), false);
-            builder = new ValueBuilder(vargen);
-        } else {
+        if (!var->getInitilizator()) {
+            Type* type = var->getType()->get(driver);
             ValueBuilder vargen = block.createVariable(var->getName(), type); // not spaun new blocks
-            builder = new ValueBuilder(vargen);
+            ValueBuilder* builder = new ValueBuilder(vargen);
+            var->insertBuilder(block.getFunction(), builder);
         }
-        // store information about allocation
-        var->insertBuilder(block.getFunction(), builder);
     }
 
     // emit statements and expressions

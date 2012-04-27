@@ -14,7 +14,8 @@ IF(VALGRIND)
         valgrind
         COMMAND ${VALGRIND} --leak-check=full --leak-resolution=med ${MAINFOLDER}/bin/${test_BIN}
         DEPENDS ${test_BIN}
-        COMMENT "Executing unit tests with valgrind checks..." VERBATIM SOURCES ${test_SRCS})
+        COMMENT "Executing unit tests with valgrind checks..." VERBATIM
+        SOURCES ${test_SRCS})
 ENDIF(VALGRIND)
 
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")

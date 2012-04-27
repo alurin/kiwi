@@ -124,7 +124,7 @@ CallableNode* NodeFactory::call() {
 
 /// declare call
 CallableNode* NodeFactory::call(const Identifier& name, const location& loc) {
-    CallNode* call = new CallNode(new ThisNode(dyn_cast<ObjectType>(m_this)), name);
+    CallNode* call = new CallNode(createThis(loc), name);
     call->setLocation(loc);
     m_calls.push(call);
     return call;
@@ -159,8 +159,8 @@ CallableNode* NodeFactory::callEnd(const location& loc) {
     return call;
 }
 
-ExpressionNode* NodeFactory::createThis(const location& loc) {
-    ExpressionNode* node = new ThisNode(dyn_cast<ObjectType>(m_this));
+ThisNode* NodeFactory::createThis(const location& loc) {
+    ThisNode* node = new ThisNode(classTop());
     node->setLocation(loc);
     return node;
 }

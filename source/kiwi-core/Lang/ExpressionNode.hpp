@@ -25,6 +25,8 @@ namespace lang {
     class NamedNode;
     class Driver;
     class TypeNode;
+    class CompoundNode;
+    class ThisNode;
 
     //==--------------------------------------------------------------------==//
     /// Mutable synatax node
@@ -234,22 +236,24 @@ namespace lang {
     //==--------------------------------------------------------------------==//
     class InstanceMutableNode : public MutableNode {
     public:
-        InstanceMutableNode(const Identifier& name);
+        InstanceMutableNode(ThisNode* thisNode, const Identifier& name);
 
         /// Emit instructions
         virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const;
     protected:
+        ThisNode*  m_thisNode;
         Identifier m_name;
     };
 
     //==--------------------------------------------------------------------==//
     class InstanceExpressionNode : public ExpressionNode {
     public:
-        InstanceExpressionNode(const Identifier& name);
+        InstanceExpressionNode(ThisNode* thisNode, const Identifier& name);
 
         /// Emit instructions
         virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
+        ThisNode*  m_thisNode;
         Identifier m_name;
     };
 
@@ -308,13 +312,14 @@ namespace lang {
     //==--------------------------------------------------------------------==//
     class ThisNode : public ExpressionNode {
     public:
-        ThisNode(ObjectType* thisType);
+        ThisNode(CompoundNode* thisType);
 
         /// Emit instructions
         virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
     protected:
-        ObjectType* m_thisType;
+        CompoundNode* m_thisType;
     };
+
 }}
 
 #endif

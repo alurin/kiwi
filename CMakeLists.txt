@@ -25,7 +25,8 @@ SET (KIWI_ID "${KIWI_VENDOR_ID}.${PROJECT_NAME}")
 #
 SET (CMAKE_VERBOSE_MAKEFILE 0) # Use 1 for debugging, 0 for release
 
-OPTION( DEBUG "Enable debug build for source" OFF )
+OPTION(DEBUG "Enable debug build for source" OFF )
+OPTION(GC    "Build with support of libGC"   ON )
 STRING(TOUPPER CMAKE_BUILD_TYPE _TYPE)
 
 IF( DEBUG OR  _TYPE STREQUAL "DEBUG")
@@ -88,18 +89,21 @@ LINK_DIRECTORIES(${LLVM_LIBRARY_DIRS})
 # Locate External Projects
 #
 
-EXTERNALPROJECT_ADD(
-    bdwgc
-    PREFIX ${CMAKE_BINARY_DIR}/bdwgc
-    SOURCE_DIR ${MAINFOLDER}/vendor/lib/bdwgc
-    INSTALL_COMMAND ""
-    CMAKE_ARGS
-        -DCMAKE_C_FLAGS=${EXTERNAL_C_FLAGS}
-        -DCMAKE_CXX_FLAGS=${EXTERNAL_CXX_FLAGS}
-)
-ADD_LIBRARY(gc-lib UNKNOWN IMPORTED)
-SET_PROPERTY(TARGET gc-lib PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bdwgc/src/bdwgc-build/libgc-lib.a )
-INCLUDE_DIRECTORIES(${MAINFOLDER}/vendor/lib/bdwgc/include)
+IF (GC)
+    set(KIWI_GC TRUE)
+    EXTERNALPROJECT_ADD(
+        bdwgc
+        PREFIX ${CMAKE_BINARY_DIR}/bdwgc
+        SOURCE_DIR ${MAINFOLDER}/vendor/lib/bdwgc
+        INSTALL_COMMAND ""
+        CMAKE_ARGS
+            -DCMAKE_C_FLAGS=${EXTERNAL_C_FLAGS}
+            -DCMAKE_CXX_FLAGS=${EXTERNAL_CXX_FLAGS}
+    )
+    ADD_LIBRARY(gc-lib UNKNOWN IMPORTED)
+    SET_PROPERTY(TARGET gc-lib PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bdwgc/src/bdwgc-build/libgc-lib.a )
+    INCLUDE_DIRECTORIES(${MAINFOLDER}/vendor/lib/bdwgc/include)
+ENDIF(GC)
 
 #
 # Configure Files

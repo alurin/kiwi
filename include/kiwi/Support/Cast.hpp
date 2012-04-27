@@ -19,7 +19,7 @@ namespace kiwi {
     /// simple dynamic cast to instance B
     template<typename D, typename S>
     D* dyn_cast(S* obj) {
-        if (classof<D>(obj))
+        if (obj && classof<D>(obj))
             return reinterpret_cast<D*>(obj);
         return 0;
     }
@@ -27,7 +27,7 @@ namespace kiwi {
     /// simple dynamic cast to instance B
     template<typename D, typename S>
     const D* dyn_cast(const S* obj) {
-        if (classof<D>(obj))
+        if (obj && classof<D>(obj))
             return reinterpret_cast<const D*>(obj);
         return 0;
     }
