@@ -1,6 +1,13 @@
 #!/usr/bin/env kiwi
 /* Test script for classes definition */
 
+class ExampleClass {
+    void test() {
+        print "ExampleClass::test"; print "\n";
+    }
+}
+
 void main() {
-    auto $a = "fail";
+    auto $a = new ExampleClass();
+    $a.test();
 }

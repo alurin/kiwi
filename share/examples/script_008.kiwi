@@ -22,6 +22,10 @@ void test(Parent $obj) {
 void main() {
     auto $parent = new Parent();
     auto $child  = new Child();
-    test($parent);
+
+    print $parent.test(); print "\n";
+    print $child.test();  print "\n";
+
+    // test($parent);
     // test($child); /// < NOT WORKED, CAST!!!
 }

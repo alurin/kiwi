@@ -195,16 +195,11 @@ Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) const
 
 // Emit instructions
 ValueBuilder NewNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // std::vector<ValueBuilder> args;
-    // Type* type = m_type->get(driver);
-    // if (ObjectType* objType = dyn_cast<ObjectType>(type)) {
-    //     ValueBuilder expr   = ObjectEmitter(objType).emitNew(gen);
-    //     args.push_back(expr);
-    //     ValueBuilder result = emitCall(driver, expr, args);
-    //     return ValueBuilder(result, expr.getType(), expr.getValue());
-    // }
-    // KIWI_ERROR_AND_EXIT("Type has not constructed", m_type->getLocation());
+    ObjectType* objType = dyn_cast<ObjectType>(m_type->get(driver));
+    if (objType) {
+        return block.createNew(objType);
+    }
+    KIWI_ERROR_AND_EXIT("Type has not be constructed", m_type->getLocation());
 }
 
 ValueBuilder AssignNode::emit(Driver& driver, BlockBuilder block) const {
