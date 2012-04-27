@@ -267,7 +267,16 @@ void ObjectType::emit() {
     }
 
     // collect fields
+    llvm::LLVMContext& context = m_module->getContext()->getContext();
+    llvm::Module* module       = m_module->getModule();
     std::vector<llvm::Type*> types;
+
+    // add vtable and vmap to type
+    llvm::Type* sizeType            = llvm::IntegerType::get(context, 32);
+    llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, m_fields.size());
+    types.push_back(addressMapType->getPointerTo());
+
+    // add field to type
     int j = 0;
     for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
         Field* field = *i;
@@ -279,8 +288,6 @@ void ObjectType::emit() {
     }
 
     // emit llvm type analog
-    llvm::LLVMContext& context = m_module->getContext()->getContext();
-    llvm::Module* module       = m_module->getModule();
     llvm::StructType* type = 0;
     if (types.size()) {
         type = llvm::StructType::create(types);
@@ -297,7 +304,7 @@ void ObjectType::emit() {
     j = 0;
     for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
         // create variable for compare
-        llvm::APInt idxV(32, j, false);
+        llvm::APInt idxV(32, j + 1, false);
         llvm::ConstantInt* idx = llvm::ConstantInt::get(context, idxV);
 
         // buffer
@@ -309,8 +316,6 @@ void ObjectType::emit() {
         addresses.push_back(cst);
     }
 
-    llvm::Type* sizeType            = llvm::IntegerType::get(context, 8)->getPointerTo();
-    llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, m_fields.size());
     llvm::Constant* addressMapValue = llvm::ConstantArray::get(addressMapType, makeArrayRef(addresses));
 
     // generate string

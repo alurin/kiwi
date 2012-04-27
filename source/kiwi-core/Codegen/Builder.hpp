@@ -20,16 +20,17 @@ namespace llvm {
 }
 
 namespace kiwi {
-    class Context;
-    class Module;
-    class Type;
-    class Callable;
-    class Type;
-    class ObjectType;
-
-    class FunctionBuilder;
     class BlockBuilder;
+    class FunctionBuilder;
     class ValueBuilder;
+
+    class Callable;
+    class Context;
+    class Field;
+    class Module;
+    class ObjectType;
+    class Type;
+    class Type;
 
     //==--------------------------------------------------------------------==//
     /// This class store information about module and context.
@@ -165,6 +166,12 @@ namespace kiwi {
         /// Create new object
         ValueBuilder createNew(ObjectType* type, Callable* ctor = 0, std::vector<ValueBuilder> args = std::vector<ValueBuilder>());
 
+        /// Create store in object field
+        ValueBuilder createStore(ValueBuilder thisValue, Field* field, ValueBuilder value);
+
+        /// Create load from object field
+        ValueBuilder createLoad(ValueBuilder thisValue, Field* field);
+
         /// Create call for callable with arguments
         ValueBuilder createCall(Callable* call, std::vector<ValueBuilder> args);
 
@@ -187,6 +194,9 @@ namespace kiwi {
     protected:
         /// LLVM block
         llvm::BasicBlock* m_block;
+
+        /// Find offset for field in object
+        llvm::Value* offsetField(ValueBuilder thisValue, Field* field);
     };
 
     //==--------------------------------------------------------------------==//

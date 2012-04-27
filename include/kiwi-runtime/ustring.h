@@ -11,6 +11,12 @@
 #include <stdint.h>
 #include <unicode/utypes.h>
 
+
+/// Compare two string
+/// @see u_strCompare
+KIWI_RUNTIME
+int8_t kiwi_string_compare(const UChar* buf1, const int32_t len1, const UChar* buf2, const int32_t len2);
+
 /**
  * return substring from ustring
  *

@@ -5,9 +5,14 @@ class ExampleClass {
     void test() {
         print "ExampleClass::test"; print "\n";
     }
+
+    void test(int $a) {
+        print "ExampleClass::test("; print $a; print ")\n";
+    }
 }
 
 void main() {
     auto $a = new ExampleClass();
     $a.test();
+    $a.test(2);
 }

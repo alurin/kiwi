@@ -13,7 +13,7 @@ LIST(REMOVE_ITEM core_SOURCES "Lang/parser.cpp")
 LIST(REMOVE_ITEM core_SOURCES "Lang/parser.hpp")
 SET (core_SOURCES ${core_SOURCES} ${BISON_KiwiParser_OUTPUTS} ${FLEX_KiwiScanner_OUTPUTS})
 
-SET (core_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${LLVM_LIBRARIES} "${PROJECT_NAME}-runtime")
+SET (core_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} ${LLVM_LIBRARIES} "${PROJECT_NAME}-runtime" icuuc icuio)
 SET (core_LIB "lib${PROJECT_NAME}")
 
 ADD_LIBRARY(${core_LIB} SHARED ${core_SOURCES})

@@ -9,6 +9,7 @@
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
 #include "kiwi/Context.hpp"
+#include "kiwi/assert.hpp"
 #include "scanner.h"
 #include "TypeNode.hpp"
 #include <fstream>
@@ -118,12 +119,6 @@ bool DriverRef::parse() {
         // create type members
         for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
             (*i)->generateMembers(driver);
-
-            // find first main method.
-            Type* type = (*i)->getType();
-            if (type && !m_mainMethod) {
-                m_mainMethod = type->findMethod("main", empty);
-            }
         }
 
         /// generate code for members
@@ -134,6 +129,13 @@ bool DriverRef::parse() {
         /// generate code for members
         for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
             (*i)->generateIRCode(driver);
+
+            // find first main method.
+            Type* type = (*i)->getType();
+            if (type && !m_mainMethod) {
+                m_mainMethod = type->findMethod("main", empty);
+            }
         }
     }
+    if (!m_mainMethod) KIWI_DUMP("m_mainMethod not found");
 }

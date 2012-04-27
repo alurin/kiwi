@@ -25,8 +25,8 @@ My current goals
 
 **WARNING**
 -----------
-This is EXPEREMENTAL and is not known whether it's be PRODUCTION used.
-Tested and development in Ubuntu 64-bit.
+This is EXPEREMENTAL and is not known whether it's be complete for PRODUCTION.
+Tested and development in Ubuntu 10.10 64-bit.
 
 Prerequisites
 -------------

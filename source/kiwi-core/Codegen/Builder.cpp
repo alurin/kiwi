@@ -46,6 +46,16 @@
 using namespace kiwi;
 
 //===--------------------------------------------------------------------------------------------------------------===//
+//    Utils
+//===--------------------------------------------------------------------------------------------------------------===//
+namespace {
+    llvm::ConstantInt* makeConstantInt(llvm::LLVMContext& context, int32_t value) {
+        llvm::APInt cst(32, value, false);
+        return llvm::ConstantInt::get(context, cst);
+    }
+}
+
+//===--------------------------------------------------------------------------------------------------------------===//
 //    Constructors and assignments
 //===--------------------------------------------------------------------------------------------------------------===//
 Builder::Builder(Module* module)
@@ -84,7 +94,7 @@ FunctionBuilder::FunctionBuilder(Callable* analog)
     BUILDER_FUNCTION_ASSERT();
 }
 
-/// Constructor
+// Constructor
 FunctionBuilder::FunctionBuilder(Type* type, llvm::Function* func)
 : Builder(type->getModule()), m_nativeCallable(0), m_nativeOwner(type), m_func(func) {
     BUILDER_FUNCTION_ASSERT();
@@ -268,13 +278,13 @@ void BlockBuilder::createTrailReturn() {
     }
 }
 
-/// Create void return
+// Create void return
 void BlockBuilder::createReturn() {
     /// @todo check equals of return type
     llvm::ReturnInst::Create(*m_context, m_block);
 }
 
-/// Create return result of callable
+// Create return result of callable
 void BlockBuilder::createReturn(ValueBuilder value) {
     llvm::ReturnInst::Create(*m_context, value.getValue(), m_block);
 }
@@ -290,7 +300,7 @@ ValueBuilder BlockBuilder::createVariable(const Identifier& name, Type* type, bo
     return ValueBuilder(*this, variable, type);
 }
 
-/// Create store in mutable variable
+// Create store in mutable variable
 ValueBuilder BlockBuilder::createStore(ValueBuilder variable, ValueBuilder value) {
     if (variable.getType() == value.getType()) {
         llvm::StoreInst* inst = new llvm::StoreInst(value.getValue(), variable.getValue(), m_block);
@@ -299,7 +309,7 @@ ValueBuilder BlockBuilder::createStore(ValueBuilder variable, ValueBuilder value
     throw "Unknown cast";
 }
 
-/// Create load from mutable variable
+// Create load from mutable variable
 ValueBuilder BlockBuilder::createLoad(ValueBuilder variable) {
     llvm::LoadInst* inst = new llvm::LoadInst(variable.getValue(), "", m_block);
     return ValueBuilder(*this, inst, variable.getType());
@@ -368,7 +378,7 @@ ValueBuilder BlockBuilder::createStringConst(const String& value) {
     return ValueBuilder(*this, result, type);
 }
 
-/// Create call for callable with arguments
+// Create call for callable with arguments
 ValueBuilder BlockBuilder::createCall(Callable* call, std::vector<ValueBuilder> args) {
     codegen::CallableEmitter* emitter = call->getEmitter();
     if (emitter) {
@@ -377,7 +387,7 @@ ValueBuilder BlockBuilder::createCall(Callable* call, std::vector<ValueBuilder> 
     throw "emitter not founded";
 }
 
-/// Create conditional goto
+// Create conditional goto
 void BlockBuilder::createCond(ValueBuilder value, BlockBuilder blockTrue, BlockBuilder blockFalse) {
     llvm::Value* cond = value.getValue();
     if (!cond->getType()->isIntegerTy(1)) {
@@ -386,14 +396,88 @@ void BlockBuilder::createCond(ValueBuilder value, BlockBuilder blockTrue, BlockB
     llvm::IRBuilder<>(m_block).CreateCondBr(cond, blockTrue.getBlock(), blockFalse.getBlock());
 }
 
-/// Create unconditional goto
+// Create unconditional goto
 void BlockBuilder::createBr(BlockBuilder block) {
     llvm::IRBuilder<>(m_block).CreateBr(block.getBlock());
 }
 
-/// Create new object
+// Create new object
 ValueBuilder BlockBuilder::createNew(ObjectType* type, Callable* ctor, std::vector<ValueBuilder> args) {
-    llvm::Type* elementType = llvm::dyn_cast<llvm::PointerType>(type->getVarType())->getElementType();
-    llvm::AllocaInst* variable = new llvm::AllocaInst(elementType, "new.obj", m_block);
+    // find size of allocation
+    llvm::Type* elementType = type->getVarType();
+    llvm::Constant* null    = llvm::Constant::getNullValue(elementType);
+
+    // create variable for compare
+    llvm::APInt cst = llvm::APInt(32, 1, false);
+    llvm::ConstantInt* one = llvm::ConstantInt::get(*m_context, cst);
+
+    std::vector<llvm::Value*> bufferIdx; // buffer
+    bufferIdx.push_back(one);
+
+    // find first string for method
+    llvm::Value* size = llvm::GetElementPtrInst::CreateInBounds(null, makeArrayRef(bufferIdx), "", m_block);
+    size = new llvm::PtrToIntInst(size, llvm::IntegerType::get(*m_context, 32), "sizeof", m_block);
+
+    std::vector<llvm::Value*> callocArgs;
+    callocArgs.push_back(size);
+
+    // allocate memory for object
+    llvm::FunctionType* mallocType = llvm::FunctionType::get(llvm::IntegerType::get(*m_context, 8)->getPointerTo(), llvm::IntegerType::get(*m_context, 32), 0);
+    llvm::Function* mallocFunc     = llvm::dyn_cast<llvm::Function>(m_module->getOrInsertFunction("kiwi_malloc", mallocType));
+    llvm::Value* value    = llvm::CallInst::Create(mallocFunc, makeArrayRef(callocArgs), "alloca", m_block);
+    llvm::Value* variable = new llvm::BitCastInst(value, type->getVarType(), "obj", m_block);
+
+    // store amap and vtable about object
+    bufferIdx.clear();
+    bufferIdx.push_back(llvm::ConstantInt::get(*m_context, llvm::APInt(32, 0, false)));
+    bufferIdx.push_back(llvm::ConstantInt::get(*m_context, llvm::APInt(32, 0, false)));
+    llvm::Value* amapLoc = llvm::GetElementPtrInst::CreateInBounds(variable, makeArrayRef(bufferIdx), "", m_block);
+    llvm::Value* amap    = type->getVarAddressMap();
+    new llvm::StoreInst(amap, amapLoc, "", m_block);
+
+    // new llvm::(stringCst, stringType, "string.val", m_block);
     return ValueBuilder(*this, variable, type);
+}
+
+// Create store in object field
+ValueBuilder BlockBuilder::createStore(ValueBuilder thisValue, Field* field, ValueBuilder value) {
+    llvm::Value* offset = offsetField(thisValue, field);
+    new llvm::StoreInst(value.getValue(), offset, "", m_block);
+    return ValueBuilder(*this, value.getValue(), field->getFieldType());
+}
+
+// Create load from object field
+ValueBuilder BlockBuilder::createLoad(ValueBuilder thisValue, Field* field) {
+    llvm::Value* offset   = offsetField(thisValue, field);
+    llvm::Value* loadInst = new llvm::LoadInst(offset, "", m_block);
+    return ValueBuilder(*this, loadInst, field->getFieldType());
+}
+
+// Returns pointer to value of field obkect
+llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, Field* field) {
+    llvm::Value* value    = thisValue.getValue();
+
+    // load amap
+    std::vector<llvm::Value*> addressIdx;
+    addressIdx.push_back(makeConstantInt(*m_context, 0));
+    addressIdx.push_back(makeConstantInt(*m_context, 0));
+    llvm::Value* amapOffset = llvm::GetElementPtrInst::Create(value, makeArrayRef(addressIdx), "", m_block);
+    llvm::Value* amap       = new llvm::LoadInst(amapOffset, "amap", m_block);
+
+    // load offset
+    addressIdx.clear();
+    addressIdx.push_back(makeConstantInt(*m_context, 0));
+    addressIdx.push_back(makeConstantInt(*m_context, field->getPosition()));
+    llvm::Value* position    = llvm::GetElementPtrInst::Create(amap, makeArrayRef(addressIdx), "position", m_block);
+    llvm::Value* fieldOffset = new llvm::LoadInst(position, "", m_block);
+
+    // calculate actual offset
+    llvm::Value* castNull    = new llvm::PtrToIntInst(value, llvm::IntegerType::get(*m_context, 64), "", m_block);
+    llvm::Value* castOffset  = new llvm::PtrToIntInst(fieldOffset, llvm::IntegerType::get(*m_context, 64), "", m_block);
+    llvm::Value* summInst    = llvm::BinaryOperator::Create(llvm::Instruction::Add, castNull, castOffset, "", m_block);
+
+    // cast to field type and return
+    llvm::Type* fieldType = field->getFieldType()->getVarType()->getPointerTo();
+    llvm::Value* offset      = new llvm::IntToPtrInst(summInst, fieldType, "offset", m_block);
+    return offset;
 }

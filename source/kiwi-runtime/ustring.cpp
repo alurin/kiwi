@@ -17,6 +17,11 @@
     int32_t* __destLength = (int32_t*) _str;    \
     *__destLength = 0;
 
+// compare two strings
+int8_t kiwi_string_compare(const UChar* buf1, const int32_t len1, const UChar* buf2, const int32_t len2) {
+    return u_strCompare(buf1, len1, buf2, len2, false);
+}
+
 
 // return substring from ustring
 UChar kiwi_subchar(const UChar* buffer, const int32_t length, const int32_t indexAt) {

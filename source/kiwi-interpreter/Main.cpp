@@ -18,7 +18,7 @@ int main(int argc, char const *argv[]) {
     Module* module = Module::create("user.script", context);
 
     Path filename;
-    if (argc == 1) {
+    if (argc < 2) {
         return 1;
     }
 

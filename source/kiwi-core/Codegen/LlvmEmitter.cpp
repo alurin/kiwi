@@ -63,8 +63,8 @@ ValueBuilder LlvmStringCompareOperator::emit(BlockBuilder block, const Expressio
     llvm::Type*     charType   = llvm::IntegerType::get(context, 16)->getPointerTo();
     llvm::Type*     boolType   = llvm::IntegerType::get(context, 8);
 
-    /// u_strCompare(const UChar *s1, int32_t length1, const UChar *s2, int32_t length2, UBool codePointOrder);
-    llvm::Function* compare  = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("u_strCompare", lengthType, charType, lengthType, charType, lengthType, boolType, NULL));
+    /// kiwi_string_compare(const UChar *s1, int32_t length1, const UChar *s2, int32_t length2);
+    llvm::Function* compare  = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_string_compare", lengthType, charType, lengthType, charType, lengthType, NULL));
 
     // create variable for compare
     llvm::APInt cst(32, 0, false);

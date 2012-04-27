@@ -238,27 +238,29 @@ ValueBuilder CharConstNode::emit(Driver& driver, BlockBuilder block) const {
 }
 
 ValueBuilder InstanceMutableNode::emit(Driver& driver, ValueBuilder value) const {
-    KIWI_NOT_IMPLEMENTED();
-    // Type* owner = block.getOwner();
-    // ObjectType* type = dyn_cast<ObjectType>(owner);
-    // if (type) {
-    //     ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
-    //     return ObjectEmitter(type).emitStore(block, thisValue, m_name, gen);
-    // } else {
-    //     KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
-    // }
+    Type* owner      = value.getNativeOwner();
+    ObjectType* type = dyn_cast<ObjectType>(owner);
+    if (type) {
+        Field* field     = type->findField(m_name);
+        if (field) {
+            ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, value);
+            return thisValue.createStore(thisValue, field, value);
+        }
+    }
+    KIWI_ERROR_AND_EXIT("Field not found", getLocation());
 }
 
 ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) const {
-    KIWI_NOT_IMPLEMENTED();
-    // Type* owner = block.getOwner();
-    // ObjectType* type = dyn_cast<ObjectType>(owner);
-    // if (type) {
-    //     ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, gen);
-    //     return ObjectEmitter(type).emitLoad(block, thisValue, m_name);
-    // } else {
-    //     KIWI_ERROR_AND_EXIT("Fields not exists in type", getLocation());
-    // }
+    Type* owner      = block.getNativeOwner();
+    ObjectType* type = dyn_cast<ObjectType>(owner);
+    if (type) {
+        Field* field     = type->findField(m_name);
+        if (field) {
+            ValueBuilder thisValue = ThisNode(dyn_cast<ObjectType>(owner)).emit(driver, block);
+            return thisValue.createLoad(thisValue, field);
+        }
+    }
+    KIWI_ERROR_AND_EXIT("Field not found", getLocation());
 }
 
 #include <llvm/Function.h>
