@@ -44,7 +44,10 @@ Driver* Driver::createFromFile(Context* context, Type* thisType, const std::stri
     std::ifstream* in = new std::ifstream(filename.c_str(), std::ios::binary | std::ios::in);
     if (!in->good()) {
         delete in;
-        return 0;
+
+        std::stringstream stream;
+        stream << "File '" << filename << "'' not found";
+        throw stream.str().c_str();
     }
     return new Driver(context, thisType, in, filename, true);
 }
@@ -138,4 +141,5 @@ bool DriverRef::parse() {
         }
     }
     if (!m_mainMethod) KIWI_DUMP("m_mainMethod not found");
+    return true;
 }

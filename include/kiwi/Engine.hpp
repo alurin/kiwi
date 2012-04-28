@@ -17,6 +17,16 @@ namespace kiwi
     /// Shut down Kiwi and clean up memory for dependences
     void shutdown();
 
+    /// Guard for engine
+    class EngineGuard {
+    public:
+        // constructor
+        EngineGuard() { startup(); }
+
+        // destructor
+        ~EngineGuard() { shutdown(); }
+    };
+
     ///
     class ContextEngine {
     public:

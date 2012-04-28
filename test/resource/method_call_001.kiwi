@@ -1,10 +1,10 @@
 #!/usr/bin/env kiwi
 /* Test script for methods call */
 
-void printHelloWord() {
-    print "Hello word!\n";
+void testMethod() {
+    print "Test method call\n";
 }
 
 void main() {
-    printHelloWord();
+    testMethod();
 }

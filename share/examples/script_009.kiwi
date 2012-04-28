@@ -1,8 +1,0 @@
-#!/usr/bin/env kiwi
-/* Test script for classes definition */
-
-class ExampleClass { }
-
-void main() {
-    auto $a = new ExampleClass();
-}

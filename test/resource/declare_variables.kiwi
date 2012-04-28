@@ -1,0 +1,15 @@
+#!/usr/bin/env kiwi
+
+void main() {
+    // variable with type
+    int $a;
+    print $a; print "\n";
+
+    // variable with type and init
+    int $b = 1;
+    print $b; print "\n";
+
+    // auto variable
+    auto $c = 2;
+    print $c; print "\n";
+}
