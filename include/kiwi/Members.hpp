@@ -8,7 +8,9 @@
 #define KIWI_MEMBERS_INCLUDED
 
 #include "kiwi/Member.hpp"
+#include "kiwi/Support/MemberSet.hpp"
 #include <vector>
+#include <set>
 
 namespace kiwi
 {
@@ -145,6 +147,7 @@ namespace kiwi
         Callable(Type* ownerType, Type* returnType, TypeVector types, codegen::CallableEmitter* emitter);
     private:
         /// create arguments from types
+        /// @todo move in anonym namespace
         void makeArgumentsFromTypes(TypeVector types);
     };
 
@@ -204,7 +207,7 @@ namespace kiwi
             return true;
         }
     protected:
-        BinaryOpcode             m_opcode;
+        BinaryOpcode m_opcode;
 
         /// constructor
         BinaryOperator(
@@ -277,7 +280,7 @@ namespace kiwi
             return true;
         }
     protected:
-        Identifier          m_name;
+        Identifier m_name;
 
         Method(const Identifier& name, Type* ownerType, Type* returnType, std::vector<Type*> arguments);
     };
@@ -287,6 +290,7 @@ namespace kiwi
     class Field : public Member {
         friend class Type;
         friend class ObjectType;
+        friend class MemberSet<Field>;
     public:
         /// returns field name
         Identifier getName() const {
@@ -303,6 +307,24 @@ namespace kiwi
             return m_position;
         }
 
+        /// Override field in parent class with this fiels
+        void override(Field* field);
+
+        /// Is override field from parent class?
+        bool isOverride(Field* field) const;
+
+        /// Is override field from parent class?
+        bool isDeclared() const {
+            return m_isDeclared;
+        }
+
+        /// Remove override field in parent class with this fiels
+        void removeOverride(Field* field);
+
+        bool override_empty() const {
+            return m_overrides.empty();
+        }
+
         /// classof check
         static bool classof(const Member* type) {
             return type->getMemberID() == FieldID;
@@ -313,16 +335,38 @@ namespace kiwi
             return true;
         }
     protected:
+        /// field name
         Identifier m_name;
+
+        /// field type
         Type* m_fieldType;
+
+        /// field position in address map for class
         int32_t m_position;
 
-        /// constructor
+        /// list of merged parent fields
+        std::set<Field*> m_overrides;
+
+        /// Field is declared in owner type?
+        bool m_isDeclared;
+
+        /// constructor: clone field from parent
+        Field(Type* ownerType, Field* field);
+
+        /// constructor: declare field field
+        Field(Type* ownerType, Type* fieldType);
+
+        /// constructor: declare anonym field
         Field(const Identifier& name, Type* ownerType, Type* fieldType);
 
         /// Set position
         void setPosition(int32_t position) {
             m_position = position;
+        }
+
+        /// Set name
+        void setName(const Identifier& name) {
+            m_name = name;
         }
     };
 

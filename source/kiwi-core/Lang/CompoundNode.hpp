@@ -27,10 +27,14 @@ namespace lang {
         void append(MemberNode* member);
 
         /// void
-        void inherit(const Identifier& name) { }
+        void inherit(const Identifier& name) {
+            m_inherits.push_back(name);
+        }
 
         /// void
-        void implement(const Identifier& name) { }
+        void implement(const Identifier& name) {
+
+        }
 
         /// returns type
         Type* getType() const {
@@ -54,6 +58,9 @@ namespace lang {
 
         /// remove members
         std::vector<MemberNode*> m_members;
+
+        /// remove members
+        std::vector<Identifier> m_inherits;
 
         /// internal constructor
         CompoundNode();

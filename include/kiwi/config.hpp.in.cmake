@@ -163,4 +163,9 @@
 #   define KIWI_ID KIWI_VENDOR_ID "." KIWI_CODENAME
 #endif
 
+#define KIWI_NOT_IMPLEMENTED() \
+    do {                                 \
+        throw #__FILE #__LINE__ "Not implemented";                        \
+    } while (0)
+
 #endif

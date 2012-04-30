@@ -197,7 +197,6 @@ Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) const
 ValueBuilder NewNode::emit(Driver& driver, BlockBuilder block) const {
     ObjectType* objType = dyn_cast<ObjectType>(m_type->get(driver));
     if (objType) {
-        KIWI_DUMP("NewNode::emit");
         return block.createNew(objType);
     }
     KIWI_ERROR_AND_EXIT("Type has not be constructed", m_type->getLocation());

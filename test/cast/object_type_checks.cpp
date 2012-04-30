@@ -13,8 +13,7 @@
 
 using namespace kiwi;
 
-TEST(object_methods_check) // Declares a test named "types_cast_check"
-{
+TEST(object_methods_check) {
     Context* context = Context::create();
     Module*  module  = Module::create("script", context);
     ObjectType* type = ObjectType::create(module);
@@ -38,10 +37,10 @@ TEST(object_methods_check) // Declares a test named "types_cast_check"
         Method* method  = type->findMethod("method", args);
         CHECK_EQUAL(method, created);
     }
+    delete context;
 }
 
-TEST(object_inheritance_check) // Declares a test named "types_cast_check"
-{
+TEST(object_inheritance_check) {
     Context* context = Context::create();
     Module*  module  = Module::create("script", context);
 
@@ -77,5 +76,45 @@ TEST(object_inheritance_check) // Declares a test named "types_cast_check"
     CHECK(third->isCastableTo(second));
     CHECK(!third->isCastableTo(any));
 
+    delete context;
+}
+
+TEST(object_field_override_check_after) {
+    Context* context = Context::create();
+    Module*  module  = Module::create("script", context);
+    Type*       type = IntType::get32(context);
+
+    ObjectType* clA  = ObjectType::create(module, "A");  // A { @a, @b }
+    ObjectType* clB  = ObjectType::create(module, "B");  // B { @a, @c }
+    ObjectType* clC  = ObjectType::create(module, "C");  // C : A,B { @a merge A::@a, B::@a as }
+
+
+    // inherit classes before
+    clC->inherit(clA);
+
+    // add fields
+    clA->addField("a", type);
+    clA->addField("b", type);
+    clB->addField("a", type);
+    clB->addField("c", type);
+
+    // inherit classes affter
+    clC->inherit(clB);
+
+    // merge fields
+    Field* aF = clC->addField("a", type);
+
+    clC->mergeField(aF, clA->findField("a"));
+    clC->mergeField(aF, clB->findField("a"));
+
+    CHECK(clC->findField("a"));
+    CHECK(clC->findField("b"));
+    CHECK(clC->findField("c"));
+
+    CHECK(clC->findField("a")->isOverride(clA->findField("a")));
+    CHECK(clC->findField("a")->isOverride(clB->findField("a")));
+    CHECK(clC->findField("b")->isOverride(clA->findField("b")));
+    CHECK(clC->findField("c")->isOverride(clB->findField("c")));
+    CHECK_EQUAL(3, clC->field_size());
     delete context;
 }

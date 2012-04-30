@@ -43,7 +43,8 @@ Module::~Module() {
         delete type;
     }
     delete m_metadata;
-    delete m_module;
+    delete m_engine;
+    // delete m_module;
 }
 
 Module* Module::create(const Identifier& name, Context* ref) {

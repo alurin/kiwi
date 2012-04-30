@@ -210,6 +210,9 @@ namespace kiwi {
         typedef InterfaceVector::const_iterator                     interface_iterator;
         typedef ParentVector::const_iterator                        parent_iterator;
 
+        /// destructor
+        virtual ~ObjectType();
+
         /// Create anonym object type in module
         static ObjectType* create(Module* module);
 
@@ -224,6 +227,9 @@ namespace kiwi {
 
         /// This class implement interface?
         bool isImplement(const InterfaceType* type, bool duckCast = true) const;
+
+        /// This class inherits from type?
+        virtual bool isInherit(const Type* type, bool duckCast) const;
 
         /// This class inherits from class?
         bool isInherit(const ObjectType* type) const;

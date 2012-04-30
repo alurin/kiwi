@@ -17,10 +17,11 @@
         throw message;                   \
     } while (0)
 
+#undef  KIWI_NOT_IMPLEMENTED
 #define KIWI_NOT_IMPLEMENTED() \
     do {                                 \
-        driver.error(getLocation(), "Yet not implemented"); \
-        throw "Yet not implemented";                   \
+        driver.error(getLocation(), #__FILE #__LINE__ "Not implemented"); \
+        throw #__FILE #__LINE__ "Not implemented";                        \
     } while (0)
 
 namespace kiwi { namespace lang {

@@ -28,6 +28,7 @@ namespace kiwi {
     class Method;
     class Field;
     class CastOperator;
+    class TypeImpl;
 
     /// Type metadata
     class Type {
@@ -61,10 +62,12 @@ namespace kiwi {
             return m_module;
         }
 
-        /// return LLVM analog for variables
-        llvm::Type* getVarType() const {
-            return m_varType;
+        TypeImpl* getMetadata() const {
+            return m_meta;
         }
+
+        /// return LLVM analog for variables
+        llvm::Type* getVarType() const;
 
         /// add unary operator
         UnaryOperator* addUnary(
@@ -92,6 +95,12 @@ namespace kiwi {
         /// add field
         Field* addField(const Identifier& name, Type* type);
 
+        /// Merge inherited field
+        Field* mergeField(Field* declared, Field* inherited);
+
+        /// find field operator
+        Field* findField(const Identifier& name) const;
+
         /// add method
         Method* addMethod(const Identifier& name, Type* returnType, std::vector<Type*> arguments);
 
@@ -104,14 +113,17 @@ namespace kiwi {
         /// find binary operator
         MultiaryOperator* findMultiary(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) const;
 
-        /// find field operator
-        Field* findField(const Identifier& name) const;
-
         /// find method
         Method* findMethod(const Identifier& name, std::vector<Type*> arguments) const;
 
         /// find cast operator
         virtual CastOperator* findCastTo(const Type* type) const;
+
+        //==--------------------------------------------------------------------------------------------------------==//
+        //          Method for work with type system
+        //==--------------------------------------------------------------------------------------------------------==//
+        /// This class inherits from type?
+        virtual bool isInherit(const Type* type, bool duckCast = false) const;
 
         /// Type is castable to other type (up-cast(from child to parent) or implict cast)
         virtual bool isCastableTo(const Type* type, bool duckCast = true) const;
@@ -124,6 +136,9 @@ namespace kiwi {
             return m_name;
         }
     protected:
+        /// Internal storage for type parameters
+        TypeImpl* m_meta;
+
         /// Class uniqual identifier
         TypeID m_typeID;
 
@@ -133,26 +148,11 @@ namespace kiwi {
         /// Name of type
         Identifier m_name;
 
-        /// List of unary operators
-        std::vector<UnaryOperator*> m_unary;
-
-        /// List of binary operators
-        std::vector<BinaryOperator*> m_binary;
-
-        /// List of multiary operators
-        std::vector<MultiaryOperator*> m_multiary;
-
-        /// List of methods
-        std::vector<Method*> m_methods;
-
-        /// List of fields
-        std::vector<Field*> m_fields;
-
-        /// LLVM analog
-        llvm::Type* m_varType;
-
         /// constructor
         Type(Module* module);
+
+        /// add base type
+        void inheritBase(Type* type);
     };
 }
 

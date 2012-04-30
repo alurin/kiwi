@@ -1,0 +1,48 @@
+#!/usr/bin/env kiwi
+/* Test script for call method from child class */
+
+class A {
+    void getClassName() {
+        return "A";
+    }
+
+    void test() {
+        print "Call "; print getClassName(); print "::test()\n";
+    }
+}
+
+class B {
+    inherit A;
+
+    void getClassName() {
+        return "B";
+    }
+}
+
+class C {
+    inherit A;
+
+    void getClassName() {
+        return "C";
+    }
+}
+
+class D {
+    inherit A;
+
+    void getClassName() {
+        return "D";
+    }
+}
+
+void main() {
+    auto $a = new A();
+    auto $b = new B();
+    auto $c = new C();
+    auto $d = new D();
+
+    $a.test();
+    $b.test();
+    $c.test();
+    $d.test();
+}

@@ -945,7 +945,7 @@ namespace kiwi { namespace lang {
 
 /* Line 678 of lalr1.cc  */
 #line 333 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
-    { (yyval.rightnode) = driver.callEnd((yylocation_stack_[(7) - (1)]));                   }
+    { (yyval.rightnode) = driver.callEnd((yylocation_stack_[(7) - (3)]));                   }
     break;
 
   case 63:
@@ -959,7 +959,7 @@ namespace kiwi { namespace lang {
 
 /* Line 678 of lalr1.cc  */
 #line 336 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
-    { (yyval.rightnode) = driver.callEnd((yylocation_stack_[(6) - (1)]));              }
+    { (yyval.rightnode) = driver.callEnd((yylocation_stack_[(6) - (1)]) + (yylocation_stack_[(6) - (2)]));         }
     break;
 
   case 65:

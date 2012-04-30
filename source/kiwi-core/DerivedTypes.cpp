@@ -25,7 +25,7 @@ using namespace kiwi::codegen;
 IntType::IntType(Module* module, int32_t size, bool unsign)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
-    m_varType = llvm::IntegerType::get(context, size);
+    m_meta->m_varType = llvm::IntegerType::get(context, size);
     m_typeID  = IntID;
     m_name    = "int";
 }
@@ -33,7 +33,7 @@ IntType::IntType(Module* module, int32_t size, bool unsign)
 BoolType::BoolType(Module* module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
-    m_varType = llvm::IntegerType::get(context, 1);
+    m_meta->m_varType = llvm::IntegerType::get(context, 1);
     m_typeID  = BoolID;
     m_name    = "bool";
 }
@@ -41,7 +41,7 @@ BoolType::BoolType(Module* module)
 VoidType::VoidType(Module* module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
-    m_varType = llvm::Type::getVoidTy(context);
+    m_meta->m_varType = llvm::Type::getVoidTy(context);
     m_typeID  = VoidID;
     m_name    = "void";
 }
@@ -49,7 +49,7 @@ VoidType::VoidType(Module* module)
 CharType::CharType(Module* module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
-    m_varType = llvm::IntegerType::get(context, 16);
+    m_meta->m_varType = llvm::IntegerType::get(context, 16);
     m_typeID  = CharID;
     m_name    = "char";
 }
@@ -58,6 +58,13 @@ ObjectType::ObjectType(Module* module)
 : Type(module), m_addressMap(0), m_virtualTable(0) {
     m_typeID  = ObjectID;
     m_name    = "object";
+}
+
+ObjectType::~ObjectType() {
+    for (parent_iterator i = parent_begin(); i != parent_end(); ++i) {
+        InheritanceMetadata<ObjectType>* meta = *i;
+        delete meta;
+    }
 }
 
 StringType::StringType(Module* module)
@@ -219,8 +226,23 @@ StringType* StringType::get(Context* context) {
 /// add parent type
 bool ObjectType::inherit(ObjectType* type) {
     if (type != this && !isInherit(type)) {
+        while(!parents.empty()) {
+            // pop element off stack
+            const ObjectType* parent = parents.top();
+            parents.pop();
+
+            if (parent == type)
+                return true;
+
+            for (parent_iterator i = parent->parent_begin(); i != parent->parent_end(); ++i) {
+                parents.push((*i)->getType());
+            }
+        }
+
+
         InheritanceMetadata<ObjectType>* meta = new InheritanceMetadata<ObjectType>(type, new codegen::LlvmUpcast());
         m_parents.push_back(meta);
+        inheritBase(type);
         return true;
     }
     return false;
@@ -230,19 +252,6 @@ bool ObjectType::inherit(ObjectType* type) {
 bool ObjectType::isInherit(const ObjectType* type) const{
     std::stack<const ObjectType*> parents;
     parents.push(this);
-
-    while(!parents.empty()) {
-        // pop element off stack
-        const ObjectType* parent = parents.top();
-        parents.pop();
-
-        if (parent == type)
-            return true;
-
-        for (parent_iterator i = parent->parent_begin(); i != parent->parent_end(); ++i) {
-            parents.push((*i)->getType());
-        }
-    }
     return false;
 }
 
@@ -262,73 +271,81 @@ bool ObjectType::isCastableTo(const Type* type, bool duckCast) const {
 }
 // Emit type structure
 void ObjectType::emit() {
-    if (m_varType != 0) {
-        return;
+    // if (m_varType != 0) {
+    //     return;
+    // }
+
+    // // collect fields
+    // llvm::LLVMContext& context = m_module->getContext()->getContext();
+    // llvm::Module* module       = m_module->getModule();
+    // std::vector<llvm::Type*> types;
+
+    // // add vtable and vmap to type
+    // llvm::Type* sizeType            = llvm::IntegerType::get(context, 32);
+    // llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, m_fields.size());
+    // types.push_back(addressMapType->getPointerTo());
+
+    // // add field to type
+    // int j = 0;
+    // for (MemberSet<Field>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
+    //     Field* field = *i;
+
+    //     Type* type = field->getFieldType();
+    //     types.push_back(type->getVarType());
+
+    //     field->setPosition(j);
+    // }
+
+    // // emit llvm type analog
+    // llvm::StructType* type = 0;
+    // if (types.size()) {
+    //     type = llvm::StructType::create(types);
+    // } else {
+    //     type = llvm::StructType::create(context);
+    // }
+    // m_varType = type->getPointerTo();
+
+    // // emit address map
+    // std::vector<llvm::Constant*> addresses;
+    // std::vector<llvm::Constant*> buffer;
+    // llvm::Constant* nullCst = llvm::Constant::getNullValue(m_varType);
+    // llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(32, 0, false));
+    // j = 0;
+    // for (MemberSet<Field>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
+    //     // create variable for compare
+    //     llvm::APInt idxV(32, j + 1, false);
+    //     llvm::ConstantInt* idx = llvm::ConstantInt::get(context, idxV);
+
+    //     // buffer
+    //     buffer.clear();
+    //     buffer.push_back(zero);
+    //     buffer.push_back(idx);
+
+    //     llvm::Constant* cst = llvm::ConstantExpr::getGetElementPtr(nullCst, makeArrayRef(buffer));
+    //     addresses.push_back(cst);
+    // }
+
+    // llvm::Constant* addressMapValue = llvm::ConstantArray::get(addressMapType, makeArrayRef(addresses));
+
+    // // generate string
+    // m_addressMap  = new llvm::GlobalVariable(
+    //     *module,
+    //     addressMapType,
+    //     true,
+    //     llvm::GlobalValue::PrivateLinkage,
+    //     addressMapValue,
+    //     "amap"
+    // );
+
+    // // add simple constructor
+    // std::vector<Type*> empty;
+    // addMultiary(Member::Constructor, VoidType::get(m_module->getContext()), empty, new LlvmCtorEmitter());
+}
+
+bool ObjectType::isInherit(const Type* type, bool duckCast) const {
+    if (const ObjectType* parent = dyn_cast<ObjectType>(type)) {
+        return isInherit(parent);
+    } else if (const InterfaceType* interface = dyn_cast<InterfaceType>(type)) {
+        return isImplement(interface, duckCast);
     }
-
-    // collect fields
-    llvm::LLVMContext& context = m_module->getContext()->getContext();
-    llvm::Module* module       = m_module->getModule();
-    std::vector<llvm::Type*> types;
-
-    // add vtable and vmap to type
-    llvm::Type* sizeType            = llvm::IntegerType::get(context, 32);
-    llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, m_fields.size());
-    types.push_back(addressMapType->getPointerTo());
-
-    // add field to type
-    int j = 0;
-    for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
-        Field* field = *i;
-
-        Type* type = field->getFieldType();
-        types.push_back(type->getVarType());
-
-        field->setPosition(j);
-    }
-
-    // emit llvm type analog
-    llvm::StructType* type = 0;
-    if (types.size()) {
-        type = llvm::StructType::create(types);
-    } else {
-        type = llvm::StructType::create(context);
-    }
-    m_varType = type->getPointerTo();
-
-    // emit address map
-    std::vector<llvm::Constant*> addresses;
-    std::vector<llvm::Constant*> buffer;
-    llvm::Constant* nullCst = llvm::Constant::getNullValue(m_varType);
-    llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(32, 0, false));
-    j = 0;
-    for (std::vector<Field*>::iterator i = m_fields.begin(); i != m_fields.end(); ++i, ++j) {
-        // create variable for compare
-        llvm::APInt idxV(32, j + 1, false);
-        llvm::ConstantInt* idx = llvm::ConstantInt::get(context, idxV);
-
-        // buffer
-        buffer.clear();
-        buffer.push_back(zero);
-        buffer.push_back(idx);
-
-        llvm::Constant* cst = llvm::ConstantExpr::getGetElementPtr(nullCst, makeArrayRef(buffer));
-        addresses.push_back(cst);
-    }
-
-    llvm::Constant* addressMapValue = llvm::ConstantArray::get(addressMapType, makeArrayRef(addresses));
-
-    // generate string
-    m_addressMap  = new llvm::GlobalVariable(
-        *module,
-        addressMapType,
-        true,
-        llvm::GlobalValue::PrivateLinkage,
-        addressMapValue,
-        "amap"
-    );
-
-    // add simple constructor
-    std::vector<Type*> empty;
-    addMultiary(Member::Constructor, VoidType::get(m_module->getContext()), empty, new LlvmCtorEmitter());
 }

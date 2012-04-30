@@ -7,7 +7,9 @@
 #include "Driver.hpp"
 #include "CompoundNode.hpp"
 #include "MemberNode.hpp"
+#include "kiwi/Module.hpp"
 #include "kiwi/DerivedTypes.hpp"
+#include "kiwi/Support/Cast.hpp"
 #include "kiwi/assert.hpp"
 
 using namespace kiwi;
@@ -47,7 +49,19 @@ void CompoundNode::append(MemberNode* member) {
 }
 
 void ClassNode::generateType(Driver& driver) {
-    m_type = ObjectType::create(driver.getModule(), m_name);
+    ObjectType* current;
+    m_type = current = ObjectType::create(driver.getModule(), m_name);
+
+    for (std::vector<Identifier>::iterator i = m_inherits.begin(); i != m_inherits.end(); ++i) {
+        Type* type = driver.getModule()->find(*i);
+        if (ObjectType* parent = dyn_cast<ObjectType>(type)) {
+            current->inherit(parent);
+        } else if (type) {
+            KIWI_ERROR_AND_EXIT("Unknown inheritance", getLocation());
+        } else {
+            KIWI_ERROR_AND_EXIT("Type not found", getLocation());
+        }
+    }
 }
 
 void CompoundNode::generateType(Driver& driver) {

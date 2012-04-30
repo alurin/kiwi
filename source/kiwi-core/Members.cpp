@@ -9,11 +9,12 @@
 #include "kiwi/Support/Array.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/assert.hpp"
+#include <algorithm>
 
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-/// constructor
+// constructor
 Callable::Callable(Type* ownerType, Type* returnType, TypeVector types)
 : Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(0) {
     makeArgumentsFromTypes(types);
@@ -21,7 +22,7 @@ Callable::Callable(Type* ownerType, Type* returnType, TypeVector types)
     kiwi_assert(m_args[0]->getType() == ownerType, "First argument for callable must be owner type");
 }
 
-/// constructor
+// constructor
 Callable::Callable(Type* ownerType, Type* returnType, TypeVector types, codegen::CallableEmitter* emitter)
 : Member(ownerType), m_returnType(returnType), m_func(0), m_emitter(emitter) {
     makeArgumentsFromTypes(types);
@@ -70,8 +71,20 @@ MultiaryOperator::MultiaryOperator(
 }
 
 // constructor
+Field::Field(Type* ownerType, Field* field)
+: Member(ownerType), m_name(field->getName()), m_fieldType(field->getFieldType()), m_isDeclared(false) {
+    override(field);
+}
+
+// // constructor
+// Field::Field(Type* ownerType, Type* fieldType)
+// : Member(ownerType), m_name(""), m_fieldType(fieldType) {
+//     m_memberID = FieldID;
+// }
+
+// constructor
 Field::Field(const Identifier& name, Type* ownerType, Type* fieldType)
-: Member(ownerType), m_name(name), m_fieldType(fieldType) {
+: Member(ownerType), m_name(name), m_fieldType(fieldType), m_isDeclared(true) {
     m_memberID = FieldID;
 }
 
@@ -90,7 +103,7 @@ CastOperator::CastOperator(Type* sourceType, Type* destType)
     m_memberID = CastID;
 }
 
-/// Check signature
+// Check signature
 bool Callable::hasSignature(const TypeVector& types, bool isCast) const {
     if (types.size() != m_args.size())
         return false;
@@ -118,4 +131,21 @@ void Callable::makeArgumentsFromTypes(TypeVector types) {
         Argument* arg = new Argument(this, type, m_args.size());
         m_args.push_back(arg);
     }
+}
+
+/// Override field in parent class with this fiels
+void Field::override(Field* field) {
+    m_overrides.insert(field);
+}
+
+// Remove override field in parent class with this fiels
+void Field::removeOverride(Field* field) {
+    std::set<Field*>::iterator res = std::find(m_overrides.begin(), m_overrides.end(), field);
+    if (res != m_overrides.end())
+        m_overrides.erase(res);
+}
+
+/// Is override field from parent class?
+bool Field::isOverride(Field* field) const {
+    return std::find(m_overrides.begin(), m_overrides.end(), field) != m_overrides.end();
 }

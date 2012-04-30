@@ -298,29 +298,29 @@ variable_declare
     ;
 
 expression
-    : '-' expression %prec UNARY    { $$ = driver.createNeg($2, @1); }
-    | '+' expression %prec UNARY    { $$ = driver.createPos($2, @1); }
-    | '!' expression %prec UNARY    { $$ = driver.createNot($2, @1); }
+    : '-' expression %prec UNARY        { $$ = driver.createNeg($2, @1); }
+    | '+' expression %prec UNARY        { $$ = driver.createPos($2, @1); }
+    | '!' expression %prec UNARY        { $$ = driver.createNot($2, @1); }
 
 
-    | expression '+'   expression   { $$ = driver.createAdd($1, $3, @2); }
-    | expression '-'   expression   { $$ = driver.createSub($1, $3, @2); }
-    | expression '*'   expression   { $$ = driver.createMul($1, $3, @2); }
-    | expression '/'   expression   { $$ = driver.createDiv($1, $3, @2); }
-    | expression "<<"  expression   { $$ = driver.createLsh($1, $3, @2); }
-    | expression ">>"  expression   { $$ = driver.createRsh($1, $3, @2); }
+    | expression '+'   expression       { $$ = driver.createAdd($1, $3, @2); }
+    | expression '-'   expression       { $$ = driver.createSub($1, $3, @2); }
+    | expression '*'   expression       { $$ = driver.createMul($1, $3, @2); }
+    | expression '/'   expression       { $$ = driver.createDiv($1, $3, @2); }
+    | expression "<<"  expression       { $$ = driver.createLsh($1, $3, @2); }
+    | expression ">>"  expression       { $$ = driver.createRsh($1, $3, @2); }
 
-    | expression '|'   expression   { $$ = driver.createOr ($1, $3, false, @2); }
-    | expression "||"  expression   { $$ = driver.createOr ($1, $3, true,  @2); }
-    | expression '&'   expression   { $$ = driver.createAnd($1, $3, false, @2); }
-    | expression "&&"  expression   { $$ = driver.createAnd($1, $3, true,  @2); }
+    | expression '|'   expression       { $$ = driver.createOr ($1, $3, false, @2); }
+    | expression "||"  expression       { $$ = driver.createOr ($1, $3, true,  @2); }
+    | expression '&'   expression       { $$ = driver.createAnd($1, $3, false, @2); }
+    | expression "&&"  expression       { $$ = driver.createAnd($1, $3, true,  @2); }
 
-    | expression "=="  expression   { $$ = driver.createEq ($1, $3, @2); }
-    | expression "!="  expression   { $$ = driver.createNeq($1, $3, @2); }
-    | expression ">="  expression   { $$ = driver.createGe ($1, $3, @2); }
-    | expression "<="  expression   { $$ = driver.createLe ($1, $3, @2); }
-    | expression '>'   expression   { $$ = driver.createGt ($1, $3, @2); }
-    | expression '<'   expression   { $$ = driver.createLt ($1, $3, @2); }
+    | expression "=="  expression       { $$ = driver.createEq ($1, $3, @2); }
+    | expression "!="  expression       { $$ = driver.createNeq($1, $3, @2); }
+    | expression ">="  expression       { $$ = driver.createGe ($1, $3, @2); }
+    | expression "<="  expression       { $$ = driver.createLe ($1, $3, @2); }
+    | expression '>'   expression       { $$ = driver.createGt ($1, $3, @2); }
+    | expression '<'   expression       { $$ = driver.createLt ($1, $3, @2); }
 
     //==-------- Call and multinary operators ------------------------------==//
     | expression                        { driver.subBegin($1, @1);           }
@@ -330,30 +330,30 @@ expression
         '(' call_arguments ')'          { $$ = driver.callEnd(@1);           }
 
     | right '.' IDENT                   { driver.call($1, *$3, @1 + @3); yyfree($3); }
-        '(' call_arguments ')'          { $$ = driver.callEnd(@1);                   }
+        '(' call_arguments ')'          { $$ = driver.callEnd(@3);                   }
 
     | NEW type                          { driver.newBegin($2, @1);              }
-        '(' call_arguments ')'          { $$ = driver.callEnd(@1);              }
+        '(' call_arguments ')'          { $$ = driver.callEnd(@1 + @2);         }
 
-    | left       '='   expression   { $$ = driver.createAssign($1, $3, @2); }
+    | left       '='   expression       { $$ = driver.createAssign($1, $3, @2); }
     | right
     ;
 
 left
-    : VAR_LOCAL                     { $$ = driver.left(*$1, @1); yyfree($1);          }
-    | VAR_INSTANCE                  { $$ = driver.instanceLeft(*$1, @1); yyfree($1);  }
+    : VAR_LOCAL                         { $$ = driver.left(*$1, @1); yyfree($1);          }
+    | VAR_INSTANCE                      { $$ = driver.instanceLeft(*$1, @1); yyfree($1);  }
     ;
 
 right
-    : VAR_LOCAL                     { $$ = driver.right(*$1, @1); yyfree($1);         }
-    | VAR_INSTANCE                  { $$ = driver.instanceRight(*$1, @1); yyfree($1); }
-    | INTEGER                       { $$ = driver.createInt($1, @1);                  }
-    | STRING                        { $$ = driver.createString(*$1, @1); yyfree($1);  }
-    | BOOL_TRUE                     { $$ = driver.createBool(true, @1);               }
-    | BOOL_FALSE                    { $$ = driver.createBool(false, @1);              }
-    | CHAR                          { $$ = driver.createChar($1, @1);                 }
-    | THIS                          { $$ = driver.createThis(@1);                     }
-    | '(' expression ')'            { $$ = $2;                                        }
+    : VAR_LOCAL                         { $$ = driver.right(*$1, @1); yyfree($1);         }
+    | VAR_INSTANCE                      { $$ = driver.instanceRight(*$1, @1); yyfree($1); }
+    | INTEGER                           { $$ = driver.createInt($1, @1);                  }
+    | STRING                            { $$ = driver.createString(*$1, @1); yyfree($1);  }
+    | BOOL_TRUE                         { $$ = driver.createBool(true, @1);               }
+    | BOOL_FALSE                        { $$ = driver.createBool(false, @1);              }
+    | CHAR                              { $$ = driver.createChar($1, @1);                 }
+    | THIS                              { $$ = driver.createThis(@1);                     }
+    | '(' expression ')'                { $$ = $2;                                        }
     ;
 
 //==------------------------------------------------------------------------==//

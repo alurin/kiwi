@@ -83,6 +83,9 @@ namespace kiwi
             return m_memberID;
         }
 
+        /// Parent class contains equal member with name(optional) and signature
+        bool isInherit() const;
+
         /// temp: get name of operator by opcode
         static Identifier getOperatorName(UnaryOpcode opcode);
 
