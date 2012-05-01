@@ -23,10 +23,11 @@ Callable::Callable(Type* ownerType, Type* returnType, TypeVector types)
 
 // constructor
 Callable::Callable(Type* ownerType, Callable* callable)
-: Member(ownerType), m_returnType(callable->m_returnType), m_func(0), m_policy(callable->m_policy ? new CloneEmitter(callable->m_policy) : 0) {
-    cloneArguments(callable->m_args);
+: Member(ownerType), m_returnType(callable->m_returnType), m_func(0), m_policy(callable->m_policy ? new CloneEmitter(callable) : 0) {
+    cloneArguments(ownerType, callable->m_args);
     kiwi_assert(m_args.size() > 0, "Callable must have minimum one argument");
     kiwi_assert(m_args[0]->getType() == ownerType, "First argument for callable must be owner type");
+
 }
 
 Callable::~Callable() {
@@ -68,10 +69,16 @@ void Callable::makeArgumentsFromTypes(TypeVector types) {
     }
 }
 
-void Callable::cloneArguments(ArgumentVector args) {
-    for (ArgumentVector::iterator i = args.begin(); i != args.end(); ++i) {
-        Argument* oarg = *i;
-        Argument* arg = new Argument(*oarg);
-        m_args.push_back(arg);
+void Callable::cloneArguments(Type* thisType, ArgumentVector args) {
+    int j = 0;
+    for (ArgumentVector::iterator i = args.begin(); i != args.end(); ++i, ++j) {
+        if (j) {
+            Argument* oarg = *i;
+            Argument* arg = new Argument(*oarg);
+            m_args.push_back(arg);
+        } else {
+            Argument* arg = new Argument(this, thisType, 0);
+            m_args.push_back(arg);
+        }
     }
 }

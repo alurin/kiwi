@@ -103,10 +103,6 @@ void TypeImpl::insertBase(Type* type) {
         fields().inherit(meta->fields());
         methods().inherit(meta->methods());
 
-        // connect to signals from base type
-        meta->onInsertField.connect(InsertFieldListener(m_owner));
-        meta->onInsertMethod.connect(InsertMethodListener(m_owner));
-
         // merge already existes members from base type
 
     }

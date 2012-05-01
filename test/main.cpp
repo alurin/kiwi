@@ -19,7 +19,7 @@
 #include <sstream>
 #include "kiwi/Engine.hpp"
 
-void run_script(std::string filename, int32_t olevel);
+void test_crash();
 
 int main(int argc, char* argv[]) {
     kiwi::EngineGuard guard;

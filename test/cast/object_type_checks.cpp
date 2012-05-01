@@ -95,8 +95,7 @@ TEST(object_field_override_check_after) {
     ObjectType* clB  = ObjectType::create(module, "B");  // B { @a, @c }
     ObjectType* clC  = ObjectType::create(module, "C");  // C : A,B { @a merge A::@a, B::@a as }
 
-
-    // inherit classes before
+    // inherit classes affter
     clC->inherit(clA);
 
     // add fields
@@ -122,6 +121,7 @@ TEST(object_field_override_check_after) {
     CHECK(clC->findField("a")->isOverride(clB->findField("a")));
     CHECK(clC->findField("b")->isOverride(clA->findField("b")));
     CHECK(clC->findField("c")->isOverride(clB->findField("c")));
-    // CHECK_EQUAL(3, clC->field_size());
+    CHECK_EQUAL(3, clC->field_size());
+
     delete context;
 }

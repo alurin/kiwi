@@ -17,6 +17,7 @@ namespace kiwi {
     /// e.g. fieldss and methods
     template<typename T>
     class Overridable {
+        friend class Type;
     public:
         /// set of overrides
         typedef std::set<T*>                            override_set;
@@ -29,7 +30,7 @@ namespace kiwi {
 
         /// Is override member from parent class?
         bool isDeclared() const {
-            return m_isDeclared || !isOverride();
+            return m_isDeclared;
         }
 
         /// member is overrided member from base type?
@@ -39,6 +40,26 @@ namespace kiwi {
 
         /// Is override member from parent class?
         bool isOverride(T* member) const;
+
+        /// returns iterator pointed to begin of members set
+        override_iterator override_begin() {
+            return m_overrides.begin();
+        }
+
+        /// returns iterator pointed to begin of members set
+        override_const_iterator override_begin() const {
+            return m_overrides.begin();
+        }
+
+        /// returns iterator pointed to end of members set
+        override_iterator override_end() {
+            return m_overrides.end();
+        }
+
+        /// returns iterator pointed to end of members set
+        override_const_iterator override_end() const {
+            return m_overrides.end();
+        }
     protected:
         /// list of merged parent members
         override_set m_overrides;
@@ -54,6 +75,9 @@ namespace kiwi {
 
         /// Override member in parent class with this fiels
         void unoverride(T* member);
+
+        /// Change isDeclared flag
+        void declare(bool value = true);
     };
 
     //==--------------------------------------------------------------------==//
@@ -71,14 +95,18 @@ namespace kiwi {
     // Remove override member in parent class with this fiels
     template<typename T>
     void Overridable<T>::unoverride(T* member) {
-        override_iterator pos = std::find(m_overrides.begin(), m_overrides.end(), member);
-        m_overrides.erase(pos);
+        m_overrides.erase(member);
     }
 
     // Override member in parent class with this fiels
     template<typename T>
     bool Overridable<T>::isOverride(T* member) const{
-        return std::find(m_overrides.begin(), m_overrides.end(), member) != m_overrides.end();
+        return m_overrides.find(member) != m_overrides.end();
+    }
+    // Change isDeclared flag
+    template<typename T>
+    void Overridable<T>::declare(bool value) {
+        m_isDeclared = value;
     }
 }
 

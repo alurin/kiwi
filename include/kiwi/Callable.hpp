@@ -79,12 +79,12 @@ namespace kiwi {
         }
 
         /// returns pointer to first argument from callable (iterator)
-        const_iterator begin() const {
+        const_iterator arg_begin() const {
             return m_args.begin();
         }
 
         /// return pointer after last argument from callable (iterator)
-        const_iterator end() const {
+        const_iterator arg_end() const {
             return m_args.end();
         }
     protected:
@@ -112,7 +112,7 @@ namespace kiwi {
 
         /// create arguments from parent callable
         /// @todo move in anonym namespace
-        void cloneArguments(ArgumentVector args);
+        void cloneArguments(Type* thisType, ArgumentVector args);
     };
 }
 

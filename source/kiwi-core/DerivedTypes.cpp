@@ -236,7 +236,7 @@ void ObjectType::emit() {
 
     // add vtable and vmap to type
     llvm::Type* sizeType            = llvm::IntegerType::get(context, 32);
-    llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, 0); //m_fields.size());
+    llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, m_meta->fields().size());
     types.push_back(addressMapType->getPointerTo());
 
     // add field to type

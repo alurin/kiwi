@@ -11,6 +11,8 @@
 #include <vector>
 
 namespace kiwi {
+    class Callable;
+
     /// Abstract emmiter for unary operators
     class CallablePolicy {
     public:
@@ -24,17 +26,17 @@ namespace kiwi {
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values) =0;
     }; // class Emitter
 
-namespace codegen {
+
     class CloneEmitter : public CallablePolicy {
     public:
-        CloneEmitter(CallablePolicy* emitter);
+        CloneEmitter(Callable* callable);
 
         /// emit IR instruction
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
-        CallablePolicy* m_emitter;
+        Callable* m_callable;
     };
 
-}} // namespace kiwi::codegen
+} // namespace kiwi::codegen
 
 #endif

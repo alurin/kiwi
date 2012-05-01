@@ -115,6 +115,11 @@ namespace kiwi {
         Identifier getName() const {
             return m_name;
         }
+
+        size_t field_size() const;
+
+        /// dump information about type
+        void dump();
     protected:
         /// Internal storage for type parameters
         TypeImpl* m_meta;

@@ -186,6 +186,7 @@ Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) const
     std::vector<Type*> args(types.begin() + 1, types.end());
     Callable* call = types[0]->findMethod(m_method, args);
     if (!call) {
+        types[0]->dump();
         KIWI_ERROR_AND_THROW("Method not found", getLocation());
     }
     return call;

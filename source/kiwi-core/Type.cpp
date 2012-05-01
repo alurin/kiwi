@@ -145,6 +145,12 @@ MultiaryOperator* Type::addMultiary(
 
 // add field
 Field* Type::addField(const Identifier& name, Type* fieldType) {
+    if (Field* override = findField(name)) {
+        if (!override->isDeclared()) {
+            override->declare();
+            return override;
+        }
+    }
     return new Field(name, this, fieldType);
 }
 
@@ -188,6 +194,11 @@ bool Type::isInherit(const Type* type, bool duckCast) const {
 
 bool Type::isCastableTo(const Type* type, bool duckCast) const {
     return m_meta->isBase(type);
+}
+
+// return size of fields set
+size_t Type::field_size() const {
+    return m_meta->fields().size();
 }
 
 // Emit type structure

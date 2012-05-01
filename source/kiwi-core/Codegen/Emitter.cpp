@@ -5,18 +5,23 @@
  *******************************************************************************
  */
 #include "Emitter.hpp"
+#include "kiwi/Callable.hpp"
 
 using namespace kiwi;
-using namespace kiwi::codegen;
 
 CallablePolicy::~CallablePolicy() {
 }
 
-CloneEmitter::CloneEmitter(CallablePolicy* emitter)
-: m_emitter(emitter) {
+CloneEmitter::CloneEmitter(Callable* callable)
+: m_callable(callable) {
 }
 
 /// emit IR instruction
 ValueBuilder CloneEmitter::emit(BlockBuilder block, const ExpressionVector& values) {
-    return m_emitter->emit(block, values);
+    CallablePolicy* policy = m_callable->getPolicy();
+    if (policy) {
+        return policy->emit(block, values);
+    } else {
+        throw "Policy not found for function";
+    }
 }
