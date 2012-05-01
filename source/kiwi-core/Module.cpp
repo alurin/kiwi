@@ -22,7 +22,6 @@
 #include "llvm/Transforms/IPO.h"
 
 using namespace kiwi;
-using namespace kiwi::codegen;
 
 typedef int32_t (*ReturnMainPoint)();
 

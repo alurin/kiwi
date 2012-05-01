@@ -15,9 +15,6 @@ namespace llvm {
 }
 
 namespace kiwi {
-    namespace codegen {
-        class CallableEmitter;
-    };
     class Context;
     class Module;
     class Member;
@@ -70,33 +67,19 @@ namespace kiwi {
         llvm::Type* getVarType() const;
 
         /// add unary operator
-        UnaryOperator* addUnary(
-            Member::UnaryOpcode opcode,
-            Type* returnType,
-            codegen::CallableEmitter* emitter
-        );
+        UnaryOperator* addUnary(Member::UnaryOpcode opcode, Type* returnType);
 
         /// add binary operator
-        BinaryOperator* addBinary(
-            Member::BinaryOpcode opcode,
-            Type* returnType,
-            Type* operandType,
-            codegen::CallableEmitter* emitter
-        );
+        BinaryOperator* addBinary(Member::BinaryOpcode opcode, Type* returnType, Type* operandType);
 
         /// add binary operator
-        MultiaryOperator* addMultiary(
-            Member::MultiaryOpcode opcode,
-            Type* returnType,
-            std::vector<Type*> arguments,
-            codegen::CallableEmitter* emitter
-        );
+        MultiaryOperator* addMultiary(Member::MultiaryOpcode opcode, Type* returnType, std::vector<Type*> arguments);
 
         /// add field
         Field* addField(const Identifier& name, Type* type);
 
         /// Merge inherited field
-        Field* mergeField(Field* declared, Field* inherited);
+        void mergeField(Field* declared, Field* inherited);
 
         /// find field operator
         Field* findField(const Identifier& name) const;
@@ -115,9 +98,6 @@ namespace kiwi {
 
         /// find method
         Method* findMethod(const Identifier& name, std::vector<Type*> arguments) const;
-
-        /// find cast operator
-        virtual CastOperator* findCastTo(const Type* type) const;
 
         //==--------------------------------------------------------------------------------------------------------==//
         //          Method for work with type system

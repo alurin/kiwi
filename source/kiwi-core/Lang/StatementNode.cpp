@@ -4,7 +4,6 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-#include "kiwi/assert.hpp"
 #include "Driver.hpp"
 #include "StatementNode.hpp"
 #include "FunctionNode.hpp"
@@ -15,7 +14,6 @@
 
 using namespace kiwi;
 using namespace kiwi::lang;
-using namespace kiwi::codegen;
 
 StatementNode::StatementNode(ScopeNode* parent)
 : o_owner(parent->o_owner), o_parent(parent) {
@@ -92,7 +90,7 @@ BlockBuilder PrintStatement::emit(Driver& driver, BlockBuilder block) const {
         args.push_back(result);
         return block.createCall(op, args);
     }
-    KIWI_ERROR_AND_EXIT("not found print operator", getLocation());
+    KIWI_ERROR_AND_THROW("not found print operator", getLocation());
 }
 
 /// emit instructions for statement

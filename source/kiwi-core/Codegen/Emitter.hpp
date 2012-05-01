@@ -11,19 +11,29 @@
 #include <vector>
 
 namespace kiwi {
-namespace codegen {
     /// Abstract emmiter for unary operators
-    class CallableEmitter {
+    class CallablePolicy {
     public:
         /// type for vector of expressions
         typedef std::vector<ValueBuilder> ExpressionVector;
 
         /// virtual destructor
-        virtual ~CallableEmitter();
+        virtual ~CallablePolicy();
 
         /// emit IR instruction
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values) =0;
     }; // class Emitter
+
+namespace codegen {
+    class CloneEmitter : public CallablePolicy {
+    public:
+        CloneEmitter(CallablePolicy* emitter);
+
+        /// emit IR instruction
+        virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
+    protected:
+        CallablePolicy* m_emitter;
+    };
 
 }} // namespace kiwi::codegen
 

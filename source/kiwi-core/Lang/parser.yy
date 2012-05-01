@@ -7,7 +7,6 @@
 %{ /*** C/C++ Declarations ***/
 
 #include "kiwi/config.hpp"
-#include "kiwi/assert.hpp"
 #include <stdio.h>
 #include <string>
 #include <vector>

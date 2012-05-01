@@ -4,11 +4,10 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-#ifndef KIWI_ASSERT_INCLUDED
-#define KIWI_ASSERT_INCLUDED
+#include "kiwi/Argument.hpp"
 
-#include "kiwi/config.hpp"
+using namespace kiwi;
 
-
-
-#endif
+// constructor
+Argument::Argument(Callable* owner, Type* type, int32_t position)
+: m_owner(owner), m_type(type) { }

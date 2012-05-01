@@ -4,7 +4,6 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-#include "kiwi/assert.hpp"
 #include "Driver.hpp"
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
@@ -17,7 +16,6 @@
 
 using namespace kiwi;
 using namespace kiwi::lang;
-using namespace kiwi::codegen;
 
 NamedNode::NamedNode(FunctionNode* owner, TypeNode* type)
 : o_owner(owner), m_type(type) { }

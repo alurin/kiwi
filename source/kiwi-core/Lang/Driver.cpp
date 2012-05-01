@@ -9,7 +9,6 @@
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
 #include "kiwi/Context.hpp"
-#include "kiwi/assert.hpp"
 #include "scanner.h"
 #include "TypeNode.hpp"
 #include <fstream>

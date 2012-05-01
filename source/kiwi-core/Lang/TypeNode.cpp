@@ -33,7 +33,7 @@ Type* QualifiedTypeNode::get(Driver& driver) {
     Type*   type   = module->find(m_name);
     if (!type) {
         /// FUCK!!! where NORMAL format and handling exception memory
-        KIWI_ERROR_AND_EXIT("Type not found", getLocation());
+        KIWI_ERROR_AND_THROW("Type not found", getLocation());
     }
     return type;
 }

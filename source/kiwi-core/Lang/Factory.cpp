@@ -4,7 +4,6 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-#include "kiwi/assert.hpp"
 #include "Factory.hpp"
 #include "kiwi/Support/Cast.hpp"
 

@@ -8,42 +8,100 @@
 #include "ModuleImpl.hpp"
 #include "TypeImpl.hpp"
 #include "Codegen/LlvmEmitter.hpp"
-#include "kiwi/assert.hpp"
 #include "kiwi/Type.hpp"
+#include "kiwi/Argument.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Support/Array.hpp"
-#include <llvm/Constants.h>
-#include <llvm/DerivedTypes.h>
-#include <llvm/GlobalVariable.h>
-#include <llvm/Instruction.h>
-#include <llvm/Module.h>
-#include <llvm/ADT/ArrayRef.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;
 
 #define KIWI_CONDITIONAL(__cond, __msg) do { if (!(__cond)) throw __msg; } while(false)
 
-namespace {
-    class InheritField {
-    public:
-        InheritField(Type* type);
+#define TYPE_IMPLEMENTATION_FINDERS(_name, _type, _method) \
+    void Type::merge ## _name(_type* declared, _type* inherited) { \
+        m_meta->_method().merge(declared, inherited); \
+    }
 
-        void operator()(Field* field);
+
+TYPE_IMPLEMENTATION_FINDERS(Field, Field, fields)
+
+namespace {
+    /// Finder
+    class UnaryFinder {
+    public:
+        /// constructor
+        UnaryFinder(Member::UnaryOpcode opcode) : m_opcode(opcode) {
+        }
+
+        /// conditional for find
+        bool operator()(UnaryOperator* op) {
+            return op->getOpcode() == m_opcode;
+        }
     private:
-        Type* m_type;
+        /// opcode
+        Member::UnaryOpcode m_opcode;
     };
 
-    /// Inherit field
-    InheritField::InheritField(Type* type) : m_type(type) {
-    }
+    class BinaryFinder {
+    public:
+        BinaryFinder(Member::BinaryOpcode opcode, Type* operandType)
+        : m_opcode(opcode), m_operandType(operandType) {
+        }
 
-    void InheritField::operator()(Field* field) {
-        // m_type->inheritField(field);
-        KIWI_DUMP("Inherit field " << field->getOwnerType()->getName() << "." << field->getName());
-    }
+        bool operator()(BinaryOperator* op) {
+            return op->getOpcode() == m_opcode && m_operandType == op->getArgument(1)->getType();
+        }
+    protected:
+        Member::BinaryOpcode m_opcode;
+        Type* m_operandType;
+    };
+
+    class MultiaryFinder {
+    public:
+        MultiaryFinder(Member::MultiaryOpcode opcode, std::vector<Type*> arguments)
+        : m_opcode(opcode), m_arguments(arguments) {
+        }
+
+        bool operator()(MultiaryOperator* op) {
+            return op->getOpcode() == m_opcode && op->hasSignature(m_arguments);
+        }
+
+    protected:
+        Member::MultiaryOpcode m_opcode;
+        std::vector<Type*> m_arguments;
+    };
+
+    class FieldFinder {
+    public:
+        FieldFinder(const Identifier& name)
+        : m_name(name) {
+        }
+
+        bool operator()(Field* field) {
+            return field->getName() == m_name;
+        }
+
+    protected:
+        Identifier m_name;
+    };
+
+    class MethodFinder {
+    public:
+        MethodFinder(const Identifier& name, std::vector<Type*> arguments)
+        : m_name(name), m_arguments(arguments) {
+        }
+
+        bool operator()(Method* method) {
+            return method->getName() == m_name && method->hasSignature(m_arguments);
+        }
+    protected:
+        Identifier m_name;
+        std::vector<Type*> m_arguments;
+    };
+
 }
 
 Type::Type(Module* module)
@@ -62,93 +120,76 @@ Context* Type::getContext() const {
 // add binary operator
 UnaryOperator* Type::addUnary(
     Member::UnaryOpcode opcode,
-    Type* returnType,
-    codegen::CallableEmitter* emitter
+    Type* returnType
 ) {
-    KIWI_NOT_IMPLEMENT();
+    return new UnaryOperator(opcode, this, returnType);
 }
 
 // add binary operator
 BinaryOperator* Type::addBinary(
     Member::BinaryOpcode opcode,
     Type* returnType,
-    Type* operandType,
-    codegen::CallableEmitter* emitter
+    Type* operandType
 ) {
-    KIWI_NOT_IMPLEMENT();
+    return new BinaryOperator(opcode, this, returnType, operandType);
 }
 
 /// add multiary operator
 MultiaryOperator* Type::addMultiary(
     Member::MultiaryOpcode opcode,
     Type* returnType,
-    std::vector<Type*> arguments,
-    codegen::CallableEmitter* emitter
+    std::vector<Type*> arguments
 ) {
-    KIWI_NOT_IMPLEMENT();
+    return new MultiaryOperator(opcode, this, returnType, arguments);
 }
 
 // add field
 Field* Type::addField(const Identifier& name, Type* fieldType) {
-    KIWI_NOT_IMPLEMENT();
-}
-
-// Merge fields
-Field* Type::mergeField(Field* declared, Field* inherited) {
-    KIWI_NOT_IMPLEMENT();
+    return new Field(name, this, fieldType);
 }
 
 // add method
 Method* Type::addMethod(const Identifier& name, Type* returnType, std::vector<Type*> arguments) {
-    KIWI_NOT_IMPLEMENT();
+    return new Method(name, this, returnType, arguments);
 }
 
 // find unary operator
 UnaryOperator* Type::findUnary(Member::UnaryOpcode opcode) const {
-    KIWI_NOT_IMPLEMENT();
+    return find_if(m_meta->unary(), UnaryFinder(opcode));
 }
 
 // find binary operator
 BinaryOperator* Type::findBinary(Member::BinaryOpcode opcode, Type* operandType) const {
-    KIWI_NOT_IMPLEMENT();
+    return find_if(m_meta->binary(), BinaryFinder(opcode, operandType));
 }
 
 // find binary operator
 MultiaryOperator* Type::findMultiary(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) const {
-    KIWI_NOT_IMPLEMENT();
+    return find_if(m_meta->multiary(), MultiaryFinder(opcode, makeVector(const_cast<Type*>(this), arguments)));
 }
 
 // find field
 Field* Type::findField(const Identifier& name) const {
-    KIWI_NOT_IMPLEMENT();
+    return find_if(m_meta->fields(), FieldFinder(name));
 }
 
 // find method
 Method* Type::findMethod(const Identifier& name, std::vector<Type*> arguments) const {
-    KIWI_NOT_IMPLEMENT();
+    return find_if(m_meta->methods(), MethodFinder(name, makeVector(const_cast<Type*>(this), arguments)));
 }
 
 llvm::Type* Type::getVarType() const {
-    return m_meta->m_varType;
+    return m_meta->varType;
 }
 
 bool Type::isInherit(const Type* type, bool duckCast) const {
-    KIWI_NOT_IMPLEMENT();
+    return m_meta->isBase(type);
 }
 
 bool Type::isCastableTo(const Type* type, bool duckCast) const {
-    KIWI_NOT_IMPLEMENT();
-}
-
-CastOperator* Type::findCastTo(const Type* type) const {
-    KIWI_NOT_IMPLEMENT();
-}
-
-void Type::inheritBase(Type* type) {
-    KIWI_NOT_IMPLEMENT();
+    return m_meta->isBase(type);
 }
 
 // Emit type structure
 void Type::emit() {
-    KIWI_NOT_IMPLEMENT();
 }

@@ -7,187 +7,14 @@
 #ifndef KIWI_MEMBERS_INCLUDED
 #define KIWI_MEMBERS_INCLUDED
 
-#include "kiwi/Member.hpp"
-#include <vector>
-#include <set>
-#include <algorithm>
+#include "kiwi/Callable.hpp"
+#include "kiwi/Overridable.hpp"
 
 namespace kiwi
 {
-    class Callable;
-
-    namespace codegen {
-        class CallableEmitter;
-    };
-
-    template<typename T>
-    class Overridable {
-    public:
-        /// Is override field from parent class?
-        bool isDeclared() const {
-            return m_isDeclared || !isOverride();
-        }
-
-        /// member is overrided member from base type?
-        bool isOverride() const {
-            return !m_overrides.empty();
-        }
-
-        /// Is override field from parent class?
-        bool isOverride(Field* field) const {
-            return std::find(m_overrides.begin(), m_overrides.end(), field) != m_overrides.end();
-        }
-    protected:
-        /// list of merged parent fields
-        std::set<Field*> m_overrides;
-
-        /// Field is declared in owner type?
-        bool m_isDeclared;
-
-        /// constructor
-        Overridable(bool isDeclared);
-
-        /// Override field in parent class with this fiels
-        void override(Field* field);
-
-        /// Override field in parent class with this fiels
-        void unoverride(Field* field);
-    };
-
-    //==--------------------------------------------------------------------==//
-    /// Method argument
-    class Argument {
-        friend class Callable;
-    public:
-        /// return argument owner
-        Callable* getOwner() const {
-            return m_owner;
-        }
-
-        /// returns argument name
-        Identifier getName() const {
-            return m_name;
-        }
-
-        /// set argument name
-        void setName(const Identifier& name) {
-            m_name = name;
-        }
-
-        /// returns argument type
-        Type* getType () const {
-            return m_type;
-        }
-
-        /// returns argument position
-        int32_t getPosition() const {
-            return m_position;
-        }
-    protected:
-        /// argument owner method
-        Callable* m_owner;
-
-        /// argument name
-        Identifier m_name;
-
-        /// argument type
-        Type* m_type;
-
-        /// argument position
-        int32_t m_position;
-
-        Argument(Callable* owner, Type* type, int32_t position);
-    };
-
-    //==--------------------------------------------------------------------==//
-    /// Callable member, common base for all operators and methods
-    class Callable : public Member {
-    public:
-        typedef std::vector<Type*>              TypeVector;
-        typedef std::vector<Argument*>          ArgumentVector;
-        typedef ArgumentVector::const_iterator  const_iterator;
-
-        /// virtual destructo
-        virtual ~Callable();
-
-        /// returns callable's return type
-        Type* getReturnType() const {
-            return m_returnType;
-        }
-
-        /// Check signature
-        bool hasSignature(const TypeVector& types, bool isCast = false) const;
-
-        /// Return emitter for callable
-        codegen::CallableEmitter* getEmitter() const {
-            return m_emitter;
-        }
-
-        /// returns llvm analog
-        llvm::Function* getFunction() const {
-            return m_func;
-        }
-
-        /// set llvm analog
-        void setFunction(llvm::Function* func);
-
-        /// returns argument by index
-        Argument* getArgument(int32_t indexAt) {
-            if (indexAt < 0 || size() <= indexAt) {
-                return 0;
-            }
-            return m_args[indexAt];
-        }
-
-        /// returns argument by name [not implemented]
-        Argument* getArgument(const Identifier& name);
-
-        /// returns size of arguments
-        size_t size() const {
-            return m_args.size();
-        }
-
-        /// empty arguments?
-        bool empty() const {
-            return m_args.empty();
-        }
-
-        /// returns pointer to first argument from callable (iterator)
-        const_iterator begin() const {
-            return m_args.begin();
-        }
-
-        /// return pointer after last argument from callable (iterator)
-        const_iterator end() const {
-            return m_args.end();
-        }
-    protected:
-        /// return type
-        Type* m_returnType;
-
-        /// list of arguments
-        ArgumentVector m_args;
-
-        /// Emitter for generate IR code
-        codegen::CallableEmitter* m_emitter;
-
-        /// External or internal IR function
-        llvm::Function* m_func;
-
-        /// constructor with standart emitter
-        Callable(Type* ownerType, Type* returnType, TypeVector types);
-
-        /// constructor
-        Callable(Type* ownerType, Type* returnType, TypeVector types, codegen::CallableEmitter* emitter);
-    private:
-        /// create arguments from types
-        /// @todo move in anonym namespace
-        void makeArgumentsFromTypes(TypeVector types);
-    };
-
     //==--------------------------------------------------------------------==//
     /// Unary operator
-    class UnaryOperator : public Callable, public Overridable<Field> {
+    class UnaryOperator : public Callable, public Overridable<UnaryOperator> {
         friend class Type;
     public:
         /// returns binary operator opcode
@@ -216,14 +43,13 @@ namespace kiwi
         UnaryOperator(
             UnaryOpcode opcode,
             Type* ownerType,
-            Type* returnType,
-            codegen::CallableEmitter* emitter
+            Type* returnType
         );
     };
 
     //==--------------------------------------------------------------------==//
     /// Binary operator
-    class BinaryOperator : public Callable, public Overridable<Field> {
+    class BinaryOperator : public Callable, public Overridable<BinaryOperator> {
         friend class Type;
     public:
         /// returns binary opcode
@@ -248,14 +74,13 @@ namespace kiwi
             BinaryOpcode opcode,
             Type* ownerType,
             Type* returnType,
-            Type* operandType,
-            codegen::CallableEmitter* emitter
+            Type* operandType
         );
     };
 
     //==--------------------------------------------------------------------==//
     /// Method argument
-    class MultiaryOperator : public Callable, public Overridable<Field> {
+    class MultiaryOperator : public Callable, public Overridable<MultiaryOperator> {
         friend class Type;
     public:
         /// returns multiary opcode
@@ -279,15 +104,15 @@ namespace kiwi
             MultiaryOpcode opcode,
             Type* ownerType,
             Type* returnType,
-            TypeVector types,
-            codegen::CallableEmitter* emitter
+            TypeVector types
         );
     };
 
     //==--------------------------------------------------------------------==//
     /// Method member
-    class Method : public Callable, public Overridable<Field> {
+    class Method : public Callable, public Overridable<Method> {
         friend class Type;
+        template<class Method> friend class MemberSet;
     public:
         /// Returns method name
         Identifier getName() const {
@@ -316,6 +141,10 @@ namespace kiwi
     protected:
         Identifier m_name;
 
+        /// constructor for inhertit method
+        Method(Type* ownerType, Method* method);
+
+        /// constructor
         Method(const Identifier& name, Type* ownerType, Type* returnType, std::vector<Type*> arguments);
     };
 
@@ -324,9 +153,7 @@ namespace kiwi
     class Field : public Member, public Overridable<Field> {
         friend class Type;
         friend class ObjectType;
-
-        template<class Field>
-        friend class MemberSet;
+        template<class Field> friend class MemberSet;
     public:
         /// returns field name
         Identifier getName() const {
@@ -362,7 +189,7 @@ namespace kiwi
         /// field position in address map for class
         int32_t m_position;
 
-        /// constructor: clone field from parent
+        /// constructor: inherit field field
         Field(Type* ownerType, Field* field);
 
         /// constructor: declare field field
@@ -384,7 +211,7 @@ namespace kiwi
 
     //==--------------------------------------------------------------------==//
     /// Cast operator
-    class CastOperator : public Callable, public Overridable<Field> {
+    class CastOperator : public Callable, public Overridable<CastOperator> {
         friend class Type;
     protected:
         /// constructor

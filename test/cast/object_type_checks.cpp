@@ -24,18 +24,25 @@ TEST(object_methods_check) {
 
     // create method "method" without argument
     {
-        Method* created = type->addMethod("method", type1, args); // method();
+        Field* created = type->addField("field1", type1);
+        Field* method  = type->findField("field1");
+        CHECK_EQUAL(created, method);
+    }
+
+    // create method "method" without argument
+    {
+        Method* created = type->addMethod("method", type1, args);
         Method* method  = type->findMethod("method", args);
-        CHECK_EQUAL(method, created);
+        CHECK_EQUAL(created, method);
     }
 
     // create another method with name "method" with argument
     {
         args.clear();
         args.push_back(type2);
-        Method* created = type->addMethod("method", type1, args); // method();
+        Method* created = type->addMethod("method", type1, args);
         Method* method  = type->findMethod("method", args);
-        CHECK_EQUAL(method, created);
+        CHECK_EQUAL(created, method);
     }
     delete context;
 }

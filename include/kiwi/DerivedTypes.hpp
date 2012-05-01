@@ -174,34 +174,6 @@ namespace kiwi {
     };
 
     //==--------------------------------------------------------------------==//
-    /// Metadata for information about inheritance
-    template<typename Type>
-    class InheritanceMetadata {
-    public:
-        /// constructor
-        InheritanceMetadata(Type* type, codegen::CallableEmitter* emitter);
-
-        /// destructor
-        virtual ~InheritanceMetadata();
-
-        /// returns type
-        Type* getType() const {
-            return m_type;
-        }
-
-        /// returns emitter for casting operator
-        codegen::CallableEmitter* getEmitter() const {
-            return m_emitter;
-        }
-    protected:
-        /// Parent class, implemented interface and e.t.c
-        Type* m_type;
-
-        /// Emiiter for casting
-        codegen::CallableEmitter* m_emitter;
-    };
-
-    //==--------------------------------------------------------------------==//
     /// Object type
     class ObjectType : public Type {
     public:
@@ -234,14 +206,10 @@ namespace kiwi {
         }
 
         /// return LLVM analog for address map
-        llvm::GlobalVariable* getVarAddressMap() const {
-            KIWI_NOT_IMPLEMENT();
-        }
+        llvm::GlobalVariable* getVarAddressMap() const;
 
         /// return LLVM analog for address map
-        llvm::GlobalVariable* getVarVirtualTable() const {
-            KIWI_NOT_IMPLEMENT();
-        }
+        llvm::GlobalVariable* getVarVirtualTable() const;
 
         /// emit LLVM analog for type
         virtual void emit();

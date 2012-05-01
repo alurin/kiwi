@@ -7,6 +7,7 @@
 #include "Builder.hpp"
 #include "Emitter.hpp"
 #include "kiwi/Module.hpp"
+#include "kiwi/Argument.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Support/Cast.hpp"
@@ -16,7 +17,6 @@
 #include "llvm/Instructions.h"
 #include "llvm/Constants.h"
 #include <llvm/Support/IRBuilder.h>
-#include "kiwi/assert.hpp"
 
 #define EMPTY_WHILE_WRAP(_stmt_) do { _stmt_ } while(0)
 
@@ -380,11 +380,11 @@ ValueBuilder BlockBuilder::createStringConst(const String& value) {
 
 // Create call for callable with arguments
 ValueBuilder BlockBuilder::createCall(Callable* call, std::vector<ValueBuilder> args) {
-    codegen::CallableEmitter* emitter = call->getEmitter();
-    if (emitter) {
-        return emitter->emit(*this, args);
+    CallablePolicy* policy = call->getPolicy();
+    if (policy) {
+        return policy->emit(*this, args);
     }
-    throw "emitter not founded";
+    throw "Function not implemented";
 }
 
 // Create conditional goto

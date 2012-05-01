@@ -11,17 +11,20 @@
 #include "kiwi/types.hpp"
 #include "location.hh"
 
-#define KIWI_ERROR_AND_EXIT(message, location) \
+#define KIWI_ERROR_AND_THROW(message, location) \
     do {                                 \
         driver.error(location, message); \
         throw message;                   \
     } while (0)
 
-#define KIWI_LANG_NOT_IMPLEMENT() \
-    do {                                 \
-        driver.error(getLocation(), __FILE__ ":" KIWI_TOSTRING(__LINE__) "Not implemented"); \
-        throw __FILE__ ":" KIWI_TOSTRING(__LINE__) "Not implemented";                        \
-    } while (0)
+// error for development time
+#ifdef KIWI_DEBUG
+#   define KIWI_LANG_NOT_IMPLEMENT() \
+        do {                                 \
+            driver.error(getLocation(), __FILE__ ":" KIWI_TOSTRING(__LINE__) "Not implemented"); \
+            throw __FILE__ ":" KIWI_TOSTRING(__LINE__) "Not implemented";                        \
+        } while (0)
+#endif
 
 namespace kiwi { namespace lang {
 

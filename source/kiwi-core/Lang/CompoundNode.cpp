@@ -10,7 +10,6 @@
 #include "kiwi/Module.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Support/Cast.hpp"
-#include "kiwi/assert.hpp"
 
 using namespace kiwi;
 using namespace kiwi::lang;
@@ -57,9 +56,9 @@ void ClassNode::generateType(Driver& driver) {
         if (ObjectType* parent = dyn_cast<ObjectType>(type)) {
             current->inherit(parent);
         } else if (type) {
-            KIWI_ERROR_AND_EXIT("Unknown inheritance", getLocation());
+            KIWI_ERROR_AND_THROW("Unknown inheritance", getLocation());
         } else {
-            KIWI_ERROR_AND_EXIT("Type not found", getLocation());
+            KIWI_ERROR_AND_THROW("Type not found", getLocation());
         }
     }
 }

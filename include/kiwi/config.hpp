@@ -1,3 +1,9 @@
+/*
+ *******************************************************************************
+ *   Copyright (C) 2012 Vasiliy Sheredeko
+ *   MIT license. All Rights Reserved.
+ *******************************************************************************
+ */
 #ifndef KIWI_CONFIG_INCLUDED
 #define KIWI_CONFIG_INCLUDED
 
@@ -61,13 +67,12 @@
 #define KIWI_STRINGIFY(x) #x
 #define KIWI_TOSTRING(x) KIWI_STRINGIFY(x)
 
+/// \def KIWI_NOT_IMPLEMENT Error for development time of not implemented features
 #ifdef KIWI_DEBUG
 #   define KIWI_NOT_IMPLEMENT() \
         do {                                 \
             throw __FILE__ ":" KIWI_TOSTRING(__LINE__) "Not implemented";                        \
         } while (0)
-#else
-#   define KIWI_NOT_IMPLEMENT # @warning dsfsdf
 #endif
 
 ///==--------------------------------------------------------------------------------------------------------------==///

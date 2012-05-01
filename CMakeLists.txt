@@ -25,17 +25,19 @@ SET (KIWI_ID "${KIWI_VENDOR_ID}.${PROJECT_NAME}")
 #
 SET (CMAKE_VERBOSE_MAKEFILE 0) # Use 1 for debugging, 0 for release
 
-OPTION(DEBUG "Enable debug build for source" OFF )
+OPTION(Debug "Enable debug build for source" OFF )
 OPTION(GC    "Build with support of libGC"   ON )
 STRING(TOUPPER CMAKE_BUILD_TYPE _TYPE)
 
-IF( DEBUG OR  _TYPE STREQUAL "DEBUG")
+IF( Debug OR  _TYPE STREQUAL "DEBUG")
+    SET( Debug ON )
     SET( KIWI_DEBUG 1 )
     SET( CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
-ELSE( DEBUG OR  _TYPE STREQUAL "DEBUG")
+ELSE( Debug OR  _TYPE STREQUAL "DEBUG")
+    SET( Debug OFF )
     SET( KIWI_RELEASE 1 )
     SET( CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
-ENDIF( DEBUG OR  _TYPE STREQUAL "DEBUG")
+ENDIF( Debug OR  _TYPE STREQUAL "DEBUG")
 
 MESSAGE(STATUS "Build ${CMAKE_BUILD_TYPE} version of project")
 

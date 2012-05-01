@@ -13,11 +13,11 @@
 
 /// Allocate memory from GC
 KIWI_RUNTIME
-void* kiwi_malloc(size_t size);
+void* kiwi_malloc(int32_t size);
 
 /// Allocat memory buffer from GC. This buffer must not containts pointers to
 /// other GC allocated memory
 KIWI_RUNTIME
-void* kiwi_malloc_atomic(size_t size);
+void* kiwi_malloc_atomic(int32_t size);
 
 #endif
