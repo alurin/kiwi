@@ -22,7 +22,7 @@ install_manifest.txt
 *.sublime-*
 
 # Generated files
-include/kiwi/config.hpp
+include/kiwi/machine.hpp
 
 # My files and documents
 .idea

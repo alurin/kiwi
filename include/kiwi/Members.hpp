@@ -8,9 +8,9 @@
 #define KIWI_MEMBERS_INCLUDED
 
 #include "kiwi/Member.hpp"
-#include "kiwi/Support/MemberSet.hpp"
 #include <vector>
 #include <set>
+#include <algorithm>
 
 namespace kiwi
 {
@@ -18,6 +18,40 @@ namespace kiwi
 
     namespace codegen {
         class CallableEmitter;
+    };
+
+    template<typename T>
+    class Overridable {
+    public:
+        /// Is override field from parent class?
+        bool isDeclared() const {
+            return m_isDeclared || !isOverride();
+        }
+
+        /// member is overrided member from base type?
+        bool isOverride() const {
+            return !m_overrides.empty();
+        }
+
+        /// Is override field from parent class?
+        bool isOverride(Field* field) const {
+            return std::find(m_overrides.begin(), m_overrides.end(), field) != m_overrides.end();
+        }
+    protected:
+        /// list of merged parent fields
+        std::set<Field*> m_overrides;
+
+        /// Field is declared in owner type?
+        bool m_isDeclared;
+
+        /// constructor
+        Overridable(bool isDeclared);
+
+        /// Override field in parent class with this fiels
+        void override(Field* field);
+
+        /// Override field in parent class with this fiels
+        void unoverride(Field* field);
     };
 
     //==--------------------------------------------------------------------==//
@@ -153,7 +187,7 @@ namespace kiwi
 
     //==--------------------------------------------------------------------==//
     /// Unary operator
-    class UnaryOperator : public Callable {
+    class UnaryOperator : public Callable, public Overridable<Field> {
         friend class Type;
     public:
         /// returns binary operator opcode
@@ -189,7 +223,7 @@ namespace kiwi
 
     //==--------------------------------------------------------------------==//
     /// Binary operator
-    class BinaryOperator : public Callable {
+    class BinaryOperator : public Callable, public Overridable<Field> {
         friend class Type;
     public:
         /// returns binary opcode
@@ -221,7 +255,7 @@ namespace kiwi
 
     //==--------------------------------------------------------------------==//
     /// Method argument
-    class MultiaryOperator : public Callable {
+    class MultiaryOperator : public Callable, public Overridable<Field> {
         friend class Type;
     public:
         /// returns multiary opcode
@@ -252,7 +286,7 @@ namespace kiwi
 
     //==--------------------------------------------------------------------==//
     /// Method member
-    class Method : public Callable {
+    class Method : public Callable, public Overridable<Field> {
         friend class Type;
     public:
         /// Returns method name
@@ -287,10 +321,12 @@ namespace kiwi
 
     //==--------------------------------------------------------------------==//
     /// Field member
-    class Field : public Member {
+    class Field : public Member, public Overridable<Field> {
         friend class Type;
         friend class ObjectType;
-        friend class MemberSet<Field>;
+
+        template<class Field>
+        friend class MemberSet;
     public:
         /// returns field name
         Identifier getName() const {
@@ -305,24 +341,6 @@ namespace kiwi
         /// returns position in address map
         int32_t getPosition() const {
             return m_position;
-        }
-
-        /// Override field in parent class with this fiels
-        void override(Field* field);
-
-        /// Is override field from parent class?
-        bool isOverride(Field* field) const;
-
-        /// Is override field from parent class?
-        bool isDeclared() const {
-            return m_isDeclared;
-        }
-
-        /// Remove override field in parent class with this fiels
-        void removeOverride(Field* field);
-
-        bool override_empty() const {
-            return m_overrides.empty();
         }
 
         /// classof check
@@ -343,12 +361,6 @@ namespace kiwi
 
         /// field position in address map for class
         int32_t m_position;
-
-        /// list of merged parent fields
-        std::set<Field*> m_overrides;
-
-        /// Field is declared in owner type?
-        bool m_isDeclared;
 
         /// constructor: clone field from parent
         Field(Type* ownerType, Field* field);
@@ -372,7 +384,7 @@ namespace kiwi
 
     //==--------------------------------------------------------------------==//
     /// Cast operator
-    class CastOperator : public Callable {
+    class CastOperator : public Callable, public Overridable<Field> {
         friend class Type;
     protected:
         /// constructor

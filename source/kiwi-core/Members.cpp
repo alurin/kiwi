@@ -5,14 +5,19 @@
  *******************************************************************************
  */
 #include "ContextImpl.hpp"
+#include "TypeImpl.hpp"
 #include "Codegen/LlvmEmitter.hpp"
 #include "kiwi/Support/Array.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/assert.hpp"
-#include <algorithm>
 
 using namespace kiwi;
 using namespace kiwi::codegen;
+
+// constructor
+template<typename T>
+Overridable<T>::Overridable(bool isDeclared) : m_isDeclared(isDeclared) {
+}
 
 // constructor
 Callable::Callable(Type* ownerType, Type* returnType, TypeVector types)
@@ -44,8 +49,9 @@ UnaryOperator::UnaryOperator(
     Type* ownerType,
     Type* returnType,
     codegen::CallableEmitter* emitter
-) : Callable(ownerType, returnType, makeVector(ownerType, 0), emitter), m_opcode(opcode) {
+) : Callable(ownerType, returnType, makeVector(ownerType, 0), emitter), Overridable<Field>(true), m_opcode(opcode) {
     m_memberID = UnaryID;
+    ownerType->getMetadata()->insert(this);
 }
 
 // constructor
@@ -55,8 +61,9 @@ BinaryOperator::BinaryOperator(
     Type* returnType,
     Type* operandType,
     codegen::CallableEmitter* emitter
-) : Callable(ownerType, returnType, makeVector(ownerType, operandType, 0), emitter), m_opcode(opcode) {
+) : Callable(ownerType, returnType, makeVector(ownerType, operandType, 0), emitter), Overridable<Field>(true), m_opcode(opcode) {
     m_memberID = BinaryID;
+    ownerType->getMetadata()->insert(this);
 }
 
 // constructor
@@ -66,32 +73,29 @@ MultiaryOperator::MultiaryOperator(
     Type* returnType,
     TypeVector args,
     codegen::CallableEmitter* emitter
-) : Callable(ownerType, returnType, makeVector(ownerType, args), emitter), m_opcode(opcode) {
+) : Callable(ownerType, returnType, makeVector(ownerType, args), emitter), Overridable<Field>(true), m_opcode(opcode) {
     m_memberID = MultiaryID;
+    ownerType->getMetadata()->insert(this);
 }
 
 // constructor
 Field::Field(Type* ownerType, Field* field)
-: Member(ownerType), m_name(field->getName()), m_fieldType(field->getFieldType()), m_isDeclared(false) {
+: Member(ownerType), m_name(field->getName()), m_fieldType(field->getFieldType()), Overridable<Field>(false) {
     override(field);
 }
 
-// // constructor
-// Field::Field(Type* ownerType, Type* fieldType)
-// : Member(ownerType), m_name(""), m_fieldType(fieldType) {
-//     m_memberID = FieldID;
-// }
-
 // constructor
 Field::Field(const Identifier& name, Type* ownerType, Type* fieldType)
-: Member(ownerType), m_name(name), m_fieldType(fieldType), m_isDeclared(true) {
+: Member(ownerType), m_name(name), m_fieldType(fieldType), Overridable<Field>(true) {
     m_memberID = FieldID;
+    ownerType->getMetadata()->insert(this);
 }
 
 // constructor
 Method::Method(const Identifier& name, Type* ownerType, Type* returnType, TypeVector types)
-: Callable(ownerType, returnType, makeVector(ownerType, types)), m_name(name) {
+: Callable(ownerType, returnType, makeVector(ownerType, types)), Overridable<Field>(true), m_name(name) {
     m_memberID = MethodID;
+    ownerType->getMetadata()->insert(this);
 }
 
 // constructor
@@ -99,7 +103,7 @@ Argument::Argument(Callable* owner, Type* type, int32_t position)
 : m_owner(owner), m_type(type) { }
 
 CastOperator::CastOperator(Type* sourceType, Type* destType)
-: Callable(sourceType, destType, makeVector(sourceType, 0)) {
+: Callable(sourceType, destType, makeVector(sourceType, 0)), Overridable<Field>(true) {
     m_memberID = CastID;
 }
 
@@ -133,19 +137,16 @@ void Callable::makeArgumentsFromTypes(TypeVector types) {
     }
 }
 
-/// Override field in parent class with this fiels
-void Field::override(Field* field) {
+// Override field in parent class with this fiels
+template<typename T>
+void Overridable<T>::override(Field* field) {
     m_overrides.insert(field);
 }
 
 // Remove override field in parent class with this fiels
-void Field::removeOverride(Field* field) {
+template<typename T>
+void Overridable<T>::unoverride(Field* field) {
     std::set<Field*>::iterator res = std::find(m_overrides.begin(), m_overrides.end(), field);
     if (res != m_overrides.end())
         m_overrides.erase(res);
-}
-
-/// Is override field from parent class?
-bool Field::isOverride(Field* field) const {
-    return std::find(m_overrides.begin(), m_overrides.end(), field) != m_overrides.end();
 }

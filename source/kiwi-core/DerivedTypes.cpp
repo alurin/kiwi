@@ -5,14 +5,13 @@
  *******************************************************************************
  */
 #include "ContextImpl.hpp"
+#include "TypeImpl.hpp"
 #include "Codegen/LlvmEmitter.hpp"
-
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Support/Array.hpp"
 #include "kiwi/Support/Cast.hpp"
-
 #include <llvm/Constants.h>
 #include <llvm/GlobalVariable.h>
 #include <llvm/ADT/ArrayRef.h>
@@ -55,16 +54,9 @@ CharType::CharType(Module* module)
 }
 
 ObjectType::ObjectType(Module* module)
-: Type(module), m_addressMap(0), m_virtualTable(0) {
+: Type(module) {
     m_typeID  = ObjectID;
     m_name    = "object";
-}
-
-ObjectType::~ObjectType() {
-    for (parent_iterator i = parent_begin(); i != parent_end(); ++i) {
-        InheritanceMetadata<ObjectType>* meta = *i;
-        delete meta;
-    }
 }
 
 StringType::StringType(Module* module)
@@ -77,7 +69,7 @@ StringType::StringType(Module* module)
     elements.push_back(sizeType);
     elements.push_back(bufferType);
     llvm::Type* stringType     = llvm::StructType::create(context, llvm::makeArrayRef(elements), "string", false);
-    m_varType                  = stringType->getPointerTo(0);
+    m_meta->m_varType          = stringType->getPointerTo(0);
     m_typeID                   = StringID;
 }
 
@@ -225,52 +217,21 @@ StringType* StringType::get(Context* context) {
 
 /// add parent type
 bool ObjectType::inherit(ObjectType* type) {
-    if (type != this && !isInherit(type)) {
-        while(!parents.empty()) {
-            // pop element off stack
-            const ObjectType* parent = parents.top();
-            parents.pop();
-
-            if (parent == type)
-                return true;
-
-            for (parent_iterator i = parent->parent_begin(); i != parent->parent_end(); ++i) {
-                parents.push((*i)->getType());
-            }
-        }
-
-
-        InheritanceMetadata<ObjectType>* meta = new InheritanceMetadata<ObjectType>(type, new codegen::LlvmUpcast());
-        m_parents.push_back(meta);
-        inheritBase(type);
-        return true;
-    }
-    return false;
+    KIWI_NOT_IMPLEMENT();
 }
 
 /// inherit type?
 bool ObjectType::isInherit(const ObjectType* type) const{
-    std::stack<const ObjectType*> parents;
-    parents.push(this);
-    return false;
+    KIWI_NOT_IMPLEMENT();
 }
 
 /// implement interface?
 bool ObjectType::isImplement(const InterfaceType* type, bool duckCast) const {
-    return false;
-}
-
-///
-bool ObjectType::isCastableTo(const Type* type, bool duckCast) const {
-    if (const ObjectType* parent = dyn_cast<ObjectType>(type)) {
-        return isInherit(parent);
-    } else if (const InterfaceType* interface = dyn_cast<InterfaceType>(type)) {
-        return isImplement(interface, duckCast);
-    }
-    return Type::isCastableTo(type, duckCast);
+    KIWI_NOT_IMPLEMENT();
 }
 // Emit type structure
 void ObjectType::emit() {
+    KIWI_NOT_IMPLEMENT();
     // if (m_varType != 0) {
     //     return;
     // }
@@ -340,12 +301,4 @@ void ObjectType::emit() {
     // // add simple constructor
     // std::vector<Type*> empty;
     // addMultiary(Member::Constructor, VoidType::get(m_module->getContext()), empty, new LlvmCtorEmitter());
-}
-
-bool ObjectType::isInherit(const Type* type, bool duckCast) const {
-    if (const ObjectType* parent = dyn_cast<ObjectType>(type)) {
-        return isInherit(parent);
-    } else if (const InterfaceType* interface = dyn_cast<InterfaceType>(type)) {
-        return isImplement(interface, duckCast);
-    }
 }

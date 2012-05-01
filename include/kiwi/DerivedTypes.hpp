@@ -205,14 +205,6 @@ namespace kiwi {
     /// Object type
     class ObjectType : public Type {
     public:
-        typedef std::vector< InheritanceMetadata<InterfaceType>* >  InterfaceVector;
-        typedef std::vector< InheritanceMetadata<ObjectType>* >     ParentVector;
-        typedef InterfaceVector::const_iterator                     interface_iterator;
-        typedef ParentVector::const_iterator                        parent_iterator;
-
-        /// destructor
-        virtual ~ObjectType();
-
         /// Create anonym object type in module
         static ObjectType* create(Module* module);
 
@@ -228,14 +220,8 @@ namespace kiwi {
         /// This class implement interface?
         bool isImplement(const InterfaceType* type, bool duckCast = true) const;
 
-        /// This class inherits from type?
-        virtual bool isInherit(const Type* type, bool duckCast) const;
-
         /// This class inherits from class?
         bool isInherit(const ObjectType* type) const;
-
-        /// Type is castable to other type (up-cast(from child to parent) or implict cast)
-        virtual bool isCastableTo(const Type* type, bool duckCast = true) const;
 
         /// classof check
         static bool classof(const Type* type) {
@@ -249,48 +235,17 @@ namespace kiwi {
 
         /// return LLVM analog for address map
         llvm::GlobalVariable* getVarAddressMap() const {
-            return m_addressMap;
+            KIWI_NOT_IMPLEMENT();
         }
 
         /// return LLVM analog for address map
         llvm::GlobalVariable* getVarVirtualTable() const {
-            return m_virtualTable;
-        }
-
-        /// returns iterator pointed to first parent in class
-        parent_iterator parent_begin() const {
-            return m_parents.begin();
-        }
-
-        /// returns iterator pointed after last parent in class
-        parent_iterator parent_end() const {
-            return m_parents.end();
-        }
-
-        /// returns iterator pointed to first interface in class
-        interface_iterator interface_begin() const {
-            return m_interfaces.begin();
-        }
-
-        /// returns iterator pointed after last interface in class
-        interface_iterator interface_end() const {
-            return m_interfaces.end();
+            KIWI_NOT_IMPLEMENT();
         }
 
         /// emit LLVM analog for type
         virtual void emit();
     protected:
-        /// List of implemented interfaces
-        InterfaceVector m_interfaces;
-
-        /// List of inherit classes
-        ParentVector m_parents;
-
-        /// LLVM global variable with address map for class
-        llvm::GlobalVariable* m_addressMap;
-
-        /// LLVM global variable with virtual table for class
-        llvm::GlobalVariable* m_virtualTable;
 
         // anonym object constructor
         ObjectType(Module* module);
