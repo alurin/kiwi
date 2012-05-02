@@ -64,8 +64,15 @@ InitStatement::InitStatement(ScopeNode* parent, VariableNode* var)
 : StatementNode(parent), m_var(var) {
 }
 
+/// emit instructions for statement
+BlockBuilder StatementNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_EXCEPTION_ADD_LOCATION({
+        return emitImpl(driver, block);
+    }, getLocation());
+}
+
 // emit instructions for return statement
-BlockBuilder ReturnStatement::emit(Driver& driver, BlockBuilder block) const {
+BlockBuilder ReturnStatement::emitImpl(Driver& driver, BlockBuilder block) const {
     if (m_return) {
         ValueBuilder result = m_return->emit(driver, block);
         block.createReturn(result);
@@ -76,7 +83,7 @@ BlockBuilder ReturnStatement::emit(Driver& driver, BlockBuilder block) const {
 }
 
 // emit instructions for print statement
-BlockBuilder PrintStatement::emit(Driver& driver, BlockBuilder block) const {
+BlockBuilder PrintStatement::emitImpl(Driver& driver, BlockBuilder block) const {
     // emit operand
     ValueBuilder result = m_return->emit(driver, block);
 
@@ -97,7 +104,7 @@ BlockBuilder PrintStatement::emit(Driver& driver, BlockBuilder block) const {
 }
 
 /// emit instructions for statement
-BlockBuilder ConditionalNode::emit(Driver& driver, BlockBuilder block) const {
+BlockBuilder ConditionalNode::emitImpl(Driver& driver, BlockBuilder block) const {
     BlockBuilder blockTrue  = block.createBlock("true");
     BlockBuilder blockFalse = block.createBlock("false");
     BlockBuilder blockNext  = block.createBlock("next");
@@ -115,7 +122,7 @@ BlockBuilder ConditionalNode::emit(Driver& driver, BlockBuilder block) const {
 }
 
 // emit instructions for statement
-BlockBuilder InitStatement::emit(Driver& driver, BlockBuilder block) const {
+BlockBuilder InitStatement::emitImpl(Driver& driver, BlockBuilder block) const {
     ExpressionNode* init = m_var->getInitilizator();
     kiwi_assert(init, "Initilizate varaible node created, but initilizator not found");
 

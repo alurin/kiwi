@@ -66,7 +66,7 @@ namespace lang {
         ScopeNode* scope();
 
         /// begin new scope
-        ScopeNode* scopeBegin();
+        ScopeNode* scopeBegin(const location& loc);
 
         /// end current scope
         ScopeNode* scopeEnd();

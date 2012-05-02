@@ -121,7 +121,7 @@ namespace lang {
         virtual ~ExpressionStatementNode();
 
         /// Emit instructions for expression
-        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual BlockBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         ExpressionNode* m_expr;
     };
@@ -135,13 +135,13 @@ namespace lang {
         virtual ~ScopeNode();
 
         /// declare scope variable
-        VariableNode* declare(const Identifier& name, TypeNode* type);
+        VariableNode* declare(const Identifier& name, TypeNode* type, const location& loc);
 
         /// declare scope variable with initilizator
-        VariableNode* declare(const Identifier& name, TypeNode* type, ExpressionNode* expr);
+        VariableNode* declare(const Identifier& name, TypeNode* type, ExpressionNode* expr, const location& loc);
 
         /// declare scope variable with initilizator and auto type
-        VariableNode* declare(const Identifier& name, ExpressionNode* expr);
+        VariableNode* declare(const Identifier& name, ExpressionNode* expr, const location& loc);
 
         /// returns named node from scope
         NamedNode* get(const Identifier& name);
@@ -153,7 +153,7 @@ namespace lang {
         void append(ExpressionNode* expr);
 
         /// Emit instructions for scope statement
-        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual BlockBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         std::map<Identifier, VariableNode*> m_vars;
         std::vector<StatementNode*>         m_stmts;
@@ -187,7 +187,7 @@ namespace lang {
         virtual ~FunctionNode();
 
         /// declare function argument
-        ArgumentNode* declare(const Identifier& name, TypeNode* type);
+        ArgumentNode* declare(const Identifier& name, TypeNode* type, const location& loc);
 
         /// get function arguments
         ArgumentNode* get(const Identifier& name);

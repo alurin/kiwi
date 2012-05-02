@@ -33,7 +33,10 @@ namespace lang {
     class MutableNode : public Node {
     public:
         /// Emit instructions for store value
-        virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const =0;
+        ValueBuilder emit(Driver& driver, ValueBuilder value) const;
+
+    protected:
+        virtual ValueBuilder emitImpl(Driver& driver, ValueBuilder value) const =0;
     };
 
     //==--------------------------------------------------------------------==//
@@ -41,12 +44,15 @@ namespace lang {
     class ExpressionNode : public Node {
     public:
         /// Emit instruction for receive value
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const =0;
+        ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+
+    protected:
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const =0;
     };
 
     //==--------------------------------------------------------------------==//
     /// Arument for callable syntax node
-    class CallableArgument {
+    class CallableArgument : public Node {
         friend class CallableNode;
     public:
         virtual ~CallableArgument();
@@ -87,10 +93,10 @@ namespace lang {
         void append(const Identifier& name, ExpressionNode* value);
 
         /// Add positioned argument
-        void prepend(ExpressionNode* value);
+        //void prepend(ExpressionNode* value);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
 
     protected:
         /// list of arguments
@@ -179,7 +185,7 @@ namespace lang {
         NewNode(TypeNode* type);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         TypeNode* m_type;
     };
@@ -195,7 +201,7 @@ namespace lang {
         virtual ~AssignNode();
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         /// Left expression node
         MutableNode* m_left;
@@ -212,7 +218,7 @@ namespace lang {
         NamedMutableNode(NamedNode* var);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const;
+        virtual ValueBuilder emitImpl(Driver& driver, ValueBuilder value) const;
     protected:
         /// Named node
         NamedNode* o_var;
@@ -226,7 +232,7 @@ namespace lang {
         NamedExpressionNode(NamedNode* var);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         /// Named node
         NamedNode* o_var;
@@ -239,7 +245,7 @@ namespace lang {
         InstanceMutableNode(ThisNode* thisNode, const Identifier& name);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, ValueBuilder value) const;
+        virtual ValueBuilder emitImpl(Driver& driver, ValueBuilder value) const;
     protected:
         ThisNode*  m_thisNode;
         Identifier m_name;
@@ -251,7 +257,7 @@ namespace lang {
         InstanceExpressionNode(ThisNode* thisNode, const Identifier& name);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         ThisNode*  m_thisNode;
         Identifier m_name;
@@ -264,7 +270,7 @@ namespace lang {
         IntegerConstNode(Context* context, int32_t value);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         Context*  m_context;
         int32_t     m_value;
@@ -277,7 +283,7 @@ namespace lang {
         StringConstNode(Context* context, const String& value);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         Context*  m_context;
         String      m_value;
@@ -290,7 +296,7 @@ namespace lang {
         CharConstNode(Context* context, const UChar& value);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         Context*  m_context;
         UChar     m_value;
@@ -303,7 +309,7 @@ namespace lang {
         BoolConstNode(Context* context, bool value);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         Context*  m_context;
         bool        m_value;
@@ -315,7 +321,7 @@ namespace lang {
         ThisNode(CompoundNode* thisType);
 
         /// Emit instructions
-        virtual ValueBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         CompoundNode* m_thisType;
     };

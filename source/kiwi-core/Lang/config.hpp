@@ -6,8 +6,17 @@
 #include "kiwi/Exception.hpp"
 #include "location.hh"
 
-#define KIWI_LANG_START { try {
-#define KIWI_LANG_STOP(_loc)  } catch (Exception &ex) { ex << exception_location(to_location(_loc)); throw }
+#define KIWI_EXCEPTION_ADD_LOCATION(_stmt, _loc) \
+    do { \
+        try { \
+            _stmt \
+        } catch (Exception &ex) { \
+            if (!boost::get_error_info<exception_location>(ex)) { \
+                ex << exception_location(to_location(_loc)); \
+            } \
+            throw; \
+        } \
+    } while (false)
 
 namespace kiwi {
 namespace lang {
@@ -16,7 +25,10 @@ namespace lang {
     Location to_location(const location& loc) {
         Position begin(loc.begin.line, loc.begin.column);
         Position end(loc.end.line, loc.end.column);
-        return Location(*(loc.begin.filename), begin, end);
+        if (loc.begin.filename) {
+            return Location(*(loc.begin.filename), begin, end);
+        }
+        return Location("", begin, end);
     }
 
 }}

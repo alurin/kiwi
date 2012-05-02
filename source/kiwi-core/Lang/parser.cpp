@@ -652,7 +652,7 @@ namespace kiwi { namespace lang {
 
 /* Line 678 of lalr1.cc  */
 #line 208 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
-    { driver.func()->declare(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode)); }
+    { driver.func()->declare(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode), (yylocation_stack_[(2) - (2)])); }
     break;
 
   case 12:
@@ -673,7 +673,7 @@ namespace kiwi { namespace lang {
 
 /* Line 678 of lalr1.cc  */
 #line 235 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
-    { driver.scopeBegin();              }
+    { driver.scopeBegin((yylocation_stack_[(1) - (1)]));            }
     break;
 
   case 22:
@@ -687,7 +687,7 @@ namespace kiwi { namespace lang {
 
 /* Line 678 of lalr1.cc  */
 #line 240 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
-    { (yyval.stmtnode) = driver.scopeEnd();           }
+    { (yyval.stmtnode) = driver.scopeEnd();         }
     break;
 
   case 24:
@@ -736,7 +736,7 @@ namespace kiwi { namespace lang {
 
 /* Line 678 of lalr1.cc  */
 #line 274 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
-    { driver.call()->append((yysemantic_stack_[(1) - (1)].rightnode)); (yysemantic_stack_[(1) - (1)].rightnode) = 0;          }
+    { driver.call()->append((yysemantic_stack_[(1) - (1)].rightnode)); (yysemantic_stack_[(1) - (1)].rightnode) = 0; }
     break;
 
   case 35:
@@ -744,7 +744,7 @@ namespace kiwi { namespace lang {
 /* Line 678 of lalr1.cc  */
 #line 282 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     {
-                                                driver.scope()->declare(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode));
+                                                driver.scope()->declare(*(yysemantic_stack_[(2) - (2)].stringVal), (yysemantic_stack_[(2) - (1)].typenode), (yylocation_stack_[(2) - (2)]));
                                                 (yyval.stmtnode) = 0;
                                                 yyfree((yysemantic_stack_[(2) - (2)].stringVal));
                                             }
@@ -755,7 +755,7 @@ namespace kiwi { namespace lang {
 /* Line 678 of lalr1.cc  */
 #line 287 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     {
-                                                VariableNode* node = driver.scope()->declare(*(yysemantic_stack_[(4) - (2)].stringVal), (yysemantic_stack_[(4) - (1)].typenode), (yysemantic_stack_[(4) - (4)].rightnode));
+                                                VariableNode* node = driver.scope()->declare(*(yysemantic_stack_[(4) - (2)].stringVal), (yysemantic_stack_[(4) - (1)].typenode), (yysemantic_stack_[(4) - (4)].rightnode), (yylocation_stack_[(4) - (2)]));
                                                 (yyval.stmtnode) = driver.createInit(node, (yylocation_stack_[(4) - (3)]));
                                                 yyfree((yysemantic_stack_[(4) - (2)].stringVal));
                                             }
@@ -766,7 +766,7 @@ namespace kiwi { namespace lang {
 /* Line 678 of lalr1.cc  */
 #line 292 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.yy"
     {
-                                                VariableNode* node = driver.scope()->declare(*(yysemantic_stack_[(4) - (2)].stringVal), (yysemantic_stack_[(4) - (4)].rightnode));
+                                                VariableNode* node = driver.scope()->declare(*(yysemantic_stack_[(4) - (2)].stringVal), (yysemantic_stack_[(4) - (4)].rightnode), (yylocation_stack_[(4) - (2)]));
                                                 (yyval.stmtnode) = driver.createInit(node, (yylocation_stack_[(4) - (3)]));
                                                 yyfree((yysemantic_stack_[(4) - (2)].stringVal));
                                             }

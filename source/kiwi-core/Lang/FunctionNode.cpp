@@ -103,10 +103,11 @@ ValueBuilder* NamedNode::findBuilder(llvm::Function* func) {
     return 0;
 }
 
-ArgumentNode* FunctionNode::declare(const Identifier& name, TypeNode* type) {
+ArgumentNode* FunctionNode::declare(const Identifier& name, TypeNode* type, const location& loc) {
     ArgumentNode* arg = new ArgumentNode(this, name, type);
     m_positions.push_back(arg);
     m_args.insert(std::make_pair(name, arg));
+    arg->setLocation(loc);
     return arg;
 }
 
@@ -120,23 +121,26 @@ ArgumentNode* FunctionNode::get(const Identifier& name) {
     }
 }
   // declare scope variable with initilizator
-VariableNode* ScopeNode::declare(const Identifier& name, TypeNode* type) {
+VariableNode* ScopeNode::declare(const Identifier& name, TypeNode* type, const location& loc) {
     VariableNode* var = new VariableNode(this, name, type, 0);
     m_vars.insert(std::make_pair(name, var));
+    var->setLocation(loc);
     return var;
 }
 
 // declare scope variable with initilizator
-VariableNode* ScopeNode::declare(const Identifier& name, TypeNode* type, ExpressionNode* expr) {
+VariableNode* ScopeNode::declare(const Identifier& name, TypeNode* type, ExpressionNode* expr, const location& loc) {
     VariableNode* var = new VariableNode(this, name, type, expr);
     m_vars.insert(std::make_pair(name, var));
+    var->setLocation(loc);
     return var;
 }
 
 // declare scope variable with initilizator and auto type
-VariableNode* ScopeNode::declare(const Identifier& name, ExpressionNode* expr) {
+VariableNode* ScopeNode::declare(const Identifier& name, ExpressionNode* expr, const location& loc) {
     VariableNode* var = new VariableNode(this, name, 0, expr);
     m_vars.insert(std::make_pair(name, var));
+    var->setLocation(loc);
     return var;
 }
 
@@ -229,7 +233,7 @@ void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
     entry.createTrailReturn();
 }
 
-BlockBuilder ScopeNode::emit(Driver& driver, BlockBuilder block) const {
+BlockBuilder ScopeNode::emitImpl(Driver& driver, BlockBuilder block) const {
     // emit mutable variables
     for (std::map<Identifier, VariableNode*>::const_iterator i = m_vars.begin(); i != m_vars.end(); ++i) {
         VariableNode* var = i->second;
@@ -249,6 +253,6 @@ BlockBuilder ScopeNode::emit(Driver& driver, BlockBuilder block) const {
     return block;
 }
 
-BlockBuilder ExpressionStatementNode::emit(Driver& driver, BlockBuilder block) const {
+BlockBuilder ExpressionStatementNode::emitImpl(Driver& driver, BlockBuilder block) const {
     return m_expr->emit(driver, block);
 }

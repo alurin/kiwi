@@ -205,7 +205,7 @@ function_arguments_required
     ;
 
 function_argument
-    : type VAR_LOCAL                { driver.func()->declare(*$2, $1); }
+    : type VAR_LOCAL                { driver.func()->declare(*$2, $1, @2); }
     ;
 
 function_statement
@@ -232,12 +232,12 @@ statement
     ;
 
 scope
-    : '{'                        { driver.scopeBegin();              }
+    : '{'                        { driver.scopeBegin(@1);            }
         scope_end                { $$ = $3;                          }
     ;
 
 scope_end
-    : statements '}'             { $$ = driver.scopeEnd();           }
+    : statements '}'             { $$ = driver.scopeEnd();         }
     ;
 
 return_statement
@@ -270,8 +270,8 @@ call_arguments_required
     ;
 
 call_argument
-    : IDENT ':' expression          { driver.call()->append(*$1, $3); yyfree($1); $3 = 0; }
-    | expression                    { driver.call()->append($1); $1 = 0;          }
+    : IDENT ':' expression                           { driver.call()->append(*$1, $3); yyfree($1); $3 = 0; }
+    | expression                                     { driver.call()->append($1); $1 = 0; }
     ;
 
 //==------------------------------------------------------------------------==//
@@ -280,17 +280,17 @@ call_argument
 
 variable_declare
     : type      VAR_LOCAL                   {
-                                                driver.scope()->declare(*$2, $1);
+                                                driver.scope()->declare(*$2, $1, @2);
                                                 $$ = 0;
                                                 yyfree($2);
                                             }
     | type      VAR_LOCAL '=' expression    {
-                                                VariableNode* node = driver.scope()->declare(*$2, $1, $4);
+                                                VariableNode* node = driver.scope()->declare(*$2, $1, $4, @2);
                                                 $$ = driver.createInit(node, @3);
                                                 yyfree($2);
                                             }
     | TYPE_AUTO VAR_LOCAL '=' expression    {
-                                                VariableNode* node = driver.scope()->declare(*$2, $4);
+                                                VariableNode* node = driver.scope()->declare(*$2, $4, @2);
                                                 $$ = driver.createInit(node, @3);
                                                 yyfree($2);
                                             }

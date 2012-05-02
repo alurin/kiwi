@@ -81,10 +81,12 @@ CharConstNode::CharConstNode(Context* context, const UChar& value)
 
 CallableArgument::CallableArgument(const Identifier& name, ExpressionNode* value, int32_t position)
 : m_name(name), m_value(value), m_position(position) {
+    setLocation(value->getLocation());
 }
 
 CallableArgument::CallableArgument(ExpressionNode* value, int32_t position)
 : m_value(value), m_position(position) {
+    setLocation(value->getLocation());
 }
 
 CallableArgument::~CallableArgument() {
@@ -132,16 +134,28 @@ void CallableNode::append(ExpressionNode* value) {
         m_arguments.push_back(new CallableArgument(value, m_arguments.size()));
 }
 
-void CallableNode::prepend(ExpressionNode* value) {
-    if (value)
-        m_arguments.push_front(new CallableArgument(value, m_arguments.size()));
+// void CallableNode::prepend(ExpressionNode* value) {
+//     if (value)
+//         m_arguments.push_front(new CallableArgument(value, m_arguments.size()));
+// }
+
+ValueBuilder MutableNode::emit(Driver& driver, ValueBuilder value) const {
+    KIWI_EXCEPTION_ADD_LOCATION({
+        return emitImpl(driver, value);
+    }, getLocation());
+}
+
+ValueBuilder ExpressionNode::emit(Driver& driver, BlockBuilder block) const {
+    KIWI_EXCEPTION_ADD_LOCATION({
+        return emitImpl(driver, block);
+    }, getLocation());
 }
 
 ValueBuilder CallableArgument::emit(Driver& driver, BlockBuilder block) const {
     return m_value->emit(driver, block);
 }
 
-ValueBuilder CallableNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder CallableNode::emitImpl(Driver& driver, BlockBuilder block) const {
     std::vector<ValueBuilder> args;
     return emitCall(driver, block, args);
 }
@@ -218,7 +232,7 @@ Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) const
 }
 
 // Emit instructions
-ValueBuilder NewNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder NewNode::emitImpl(Driver& driver, BlockBuilder block) const {
     Type* type = m_type->get(driver);
     if (ObjectType* objType = dyn_cast<ObjectType>(type)) {
         return block.createNew(objType);
@@ -229,12 +243,12 @@ ValueBuilder NewNode::emit(Driver& driver, BlockBuilder block) const {
     }
 }
 
-ValueBuilder AssignNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder AssignNode::emitImpl(Driver& driver, BlockBuilder block) const {
     ValueBuilder value = m_right->emit(driver, block);
     return m_left->emit(driver, value);
 }
 
-ValueBuilder NamedMutableNode::emit(Driver& driver, ValueBuilder value) const {
+ValueBuilder NamedMutableNode::emitImpl(Driver& driver, ValueBuilder value) const {
     ValueBuilder* builder = o_var->findBuilder(value.getFunction());
     if (!builder) {
         throw LangException()
@@ -244,7 +258,7 @@ ValueBuilder NamedMutableNode::emit(Driver& driver, ValueBuilder value) const {
     return value.createStore(*builder, value);
 }
 
-ValueBuilder NamedExpressionNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder NamedExpressionNode::emitImpl(Driver& driver, BlockBuilder block) const {
     ValueBuilder* builder = o_var->findBuilder(block.getFunction());
     if (!builder)
         throw LangException()
@@ -253,24 +267,24 @@ ValueBuilder NamedExpressionNode::emit(Driver& driver, BlockBuilder block) const
     return block.createLoad(*builder);
 }
 
-ValueBuilder IntegerConstNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder IntegerConstNode::emitImpl(Driver& driver, BlockBuilder block) const {
     return block.createIntConst(m_value);
 }
 
-ValueBuilder BoolConstNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder BoolConstNode::emitImpl(Driver& driver, BlockBuilder block) const {
     return block.createBoolConst(m_value);
 }
 
-ValueBuilder StringConstNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder StringConstNode::emitImpl(Driver& driver, BlockBuilder block) const {
     return block.createStringConst(m_value);
 }
 
-ValueBuilder CharConstNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder CharConstNode::emitImpl(Driver& driver, BlockBuilder block) const {
     return block.createCharConst(m_value);
 }
 
 /// @todo Remove copy past
-ValueBuilder InstanceMutableNode::emit(Driver& driver, ValueBuilder value) const {
+ValueBuilder InstanceMutableNode::emitImpl(Driver& driver, ValueBuilder value) const {
     Type* owner      = value.getNativeOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
@@ -286,7 +300,7 @@ ValueBuilder InstanceMutableNode::emit(Driver& driver, ValueBuilder value) const
 }
 
 /// @todo Remove copy past
-ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder InstanceExpressionNode::emitImpl(Driver& driver, BlockBuilder block) const {
     Type* owner      = block.getNativeOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
@@ -302,7 +316,7 @@ ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) co
 }
 
 #include <llvm/Function.h>
-ValueBuilder ThisNode::emit(Driver& driver, BlockBuilder block) const {
+ValueBuilder ThisNode::emitImpl(Driver& driver, BlockBuilder block) const {
     llvm::Function* func = block.getFunction();
     if (func->arg_empty()) {
         throw LangException()

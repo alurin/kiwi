@@ -26,7 +26,7 @@ namespace lang
     class StatementNode : public Node {
     public:
         /// emit instructions for statement
-        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const =0;
+        BlockBuilder emit(Driver& driver, BlockBuilder block) const;
 
         /// returns parent function node
         FunctionNode* getOwner() const {
@@ -46,6 +46,9 @@ namespace lang
 
         /// Create paret
         StatementNode(ScopeNode* parent);
+
+        /// emit instructions implementation for statement
+        virtual BlockBuilder emitImpl(Driver& driver, BlockBuilder block) const =0;
     };
 
     /// Return statement syntax node
@@ -61,7 +64,7 @@ namespace lang
         ~ReturnStatement();
 
         /// emit instructions for statement
-        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual BlockBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         ExpressionNode* m_return;
     };
@@ -76,7 +79,7 @@ namespace lang
         ~PrintStatement();
 
         /// emit instructions for statement
-        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual BlockBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         ExpressionNode* m_return;
     };
@@ -91,7 +94,7 @@ namespace lang
         ~ConditionalNode();
 
         /// emit instructions for statement
-        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual BlockBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         ExpressionNode* m_cond;
         StatementNode*  m_trueStmt;
@@ -106,7 +109,7 @@ namespace lang
         InitStatement(ScopeNode* parent, VariableNode* var);
 
         /// emit instructions for statement
-        virtual BlockBuilder emit(Driver& driver, BlockBuilder block) const;
+        virtual BlockBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
         VariableNode* m_var;
     };

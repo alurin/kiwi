@@ -88,11 +88,11 @@ ScopeNode* NodeFactory::scope() {
 }
 
 // begin new scope
-ScopeNode* NodeFactory::scopeBegin() {
+ScopeNode* NodeFactory::scopeBegin(const location& loc) {
     ScopeNode* parent = scope();
     ScopeNode* scope  = new ScopeNode(parent);
     m_scopes.push(scope);
-    return scope;
+    return inject(scope, loc);
 }
 
 // end current scope
@@ -104,25 +104,17 @@ ScopeNode* NodeFactory::scopeEnd() {
 }
 
 MutableNode* NodeFactory::left(const Identifier& name, const location& loc) {
-    try {
+    KIWI_EXCEPTION_ADD_LOCATION({
         MutableNode* node = scope()->get(name)->getLeft();
-        node->setLocation(loc);
-        return node;
-    } catch (LangException& ex) {
-        ex << exception_location(to_location(loc));
-        throw;
-    }
+        return inject(node, loc);
+    }, loc);
 }
 
 ExpressionNode* NodeFactory::right(const Identifier& name, const location& loc) {
-    try {
+    KIWI_EXCEPTION_ADD_LOCATION({
         ExpressionNode* node = scope()->get(name)->getRight();
-        node->setLocation(loc);
-        return node;
-    } catch (LangException& ex) {
-        ex << exception_location(to_location(loc));
-        throw;
-    }
+        return inject(node, loc);
+    }, loc);
 }
 
 /// returns current call
@@ -163,13 +155,11 @@ CallableNode* NodeFactory::subBegin(ExpressionNode* expr, const location& loc) {
 CallableNode* NodeFactory::callEnd(const location& loc) {
     kiwi_assert(!m_calls.empty(), "Calls stack is empty");
     CallableNode* call = m_calls.top();
-    call->setLocation(loc);
     m_calls.pop();
-    return call;
+    return inject(call, loc);
 }
 
 ThisNode* NodeFactory::createThis(const location& loc) {
     ThisNode* node = new ThisNode(classTop());
-    node->setLocation(loc);
-    return node;
+    return inject(node, loc);
 }
