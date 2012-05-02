@@ -6,6 +6,7 @@
  */
 #include "kiwi/Engine.hpp"
 #include "kiwi/Module.hpp"
+#include "kiwi/Exception.hpp"
 #include <boost/program_options.hpp>
 #include <iostream>
 
@@ -37,9 +38,14 @@ int main(int argc, char const *argv[]) {
 
     // Load options from console
     po::variables_map vm;
-    po::store(po::command_line_parser(argc, argv).
-          options(desc).positional(p).run(), vm);
-    po::notify(vm);
+    try {
+        po::store(po::command_line_parser(argc, argv).
+            options(desc).positional(p).run(), vm);
+        po::notify(vm);
+    } catch (boost::program_options::error & ex ) {
+        std::cerr << "Error: " << ex.what() << "\n";
+        return 2;
+    }
 
     /// Run application
     ContextEngine engine;
@@ -64,7 +70,7 @@ int main(int argc, char const *argv[]) {
             } else {
                 return module->run();
             }
-        } catch (const char* ex) {
+        } catch (Exception& ex) {
             std::cerr << ex << "\n";
             return 1;
         }

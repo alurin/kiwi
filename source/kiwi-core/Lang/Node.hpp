@@ -7,30 +7,13 @@
 #ifndef KIWI_LANG_NODE_INTERNAL
 #define KIWI_LANG_NODE_INTERNAL
 
-#include "kiwi/config.hpp"
-#include "kiwi/types.hpp"
+#include "config.hpp"
 #include "location.hh"
-
-#define KIWI_ERROR_AND_THROW(message, location) \
-    do {                                 \
-        driver.error(location, message); \
-        throw message;                   \
-    } while (0)
-
-// error for development time
-#ifdef KIWI_DEBUG
-#   define KIWI_LANG_NOT_IMPLEMENT() \
-        do {                                 \
-            driver.error(getLocation(), __FILE__ ":" KIWI_TOSTRING(__LINE__) "Not implemented"); \
-            throw __FILE__ ":" KIWI_TOSTRING(__LINE__) "Not implemented";                        \
-        } while (0)
-#endif
 
 namespace kiwi { namespace lang {
 
     /// Root for all statements nodes
-    class Node
-    {
+    class Node {
         Node(const Node&);              ///< NOT IMPLEMENT!!!
         Node& operator=(const Node&);   ///< NOT IMPLEMENT!!!
     public:
@@ -53,6 +36,11 @@ namespace kiwi { namespace lang {
         Node() {};
     };
 
+
+    inline
+    Location to_location(const Node* node) {
+        return to_location(node->getLocation());
+    }
 } }
 
 #endif

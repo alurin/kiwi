@@ -90,7 +90,10 @@ BlockBuilder PrintStatement::emit(Driver& driver, BlockBuilder block) const {
         args.push_back(result);
         return block.createCall(op, args);
     }
-    KIWI_ERROR_AND_THROW("not found print operator", getLocation());
+
+    throw LangException()
+            << exception_format("Not found rules for print value of '%1%' ", result.getType()->getName())
+            << exception_location(to_location(this));
 }
 
 /// emit instructions for statement

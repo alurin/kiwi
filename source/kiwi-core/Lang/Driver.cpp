@@ -5,10 +5,10 @@
  *******************************************************************************
  */
 #include "Driver.hpp"
-#include "Logger.hpp"
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
 #include "kiwi/Context.hpp"
+#include "kiwi/Exception.hpp"
 #include "scanner.h"
 #include "TypeNode.hpp"
 #include <fstream>
@@ -21,7 +21,6 @@ Driver::Driver(Context* context, Type* thisType, std::istream* stream,
      const std::string& sname, bool hasOwnership)
 : NodeFactory(context, thisType),
     m_stream(stream),
-    logger(new SourceLogger(stream)),
     m_hasOwnership(hasOwnership),
     streamname(sname),
     trace_scanning(context->isDebug()),
@@ -32,7 +31,6 @@ Driver::~Driver() {
     if (m_hasOwnership) {
         delete m_stream;
     }
-    delete logger;
 }
 
 Driver* Driver::createFromStream(Context* context, Type* thisType, std::istream& stream, const std::string& sname) {
@@ -43,10 +41,9 @@ Driver* Driver::createFromFile(Context* context, Type* thisType, const std::stri
     std::ifstream* in = new std::ifstream(filename.c_str(), std::ios::binary | std::ios::in);
     if (!in->good()) {
         delete in;
-
-        std::stringstream stream;
-        stream << "File '" << filename << "'' not found";
-        throw stream.str().c_str();
+        throw LangException()
+            << exception_message("File %s not found or not readable")
+            << exception_filename(filename);
     }
     return new Driver(context, thisType, in, filename, true);
 }
@@ -69,13 +66,18 @@ bool Driver::parse() {
     parser.set_debug_level(trace_parsing);
 
     // parse stream
-    return (parser.parse() == 0);
+    try {
+        return (parser.parse() == 0);
+    } catch (LangException& ex) {
+        ex << exception_filename(streamname);
+        throw;
+    }
 }
 
-void Driver::error(const class location& l,
-		   const std::string& m) {
-    if (logger)
-        logger->error(l, m);
+void Driver::error(const class location& l, const std::string& m) {
+    throw LangException()
+        << exception_message(m)
+        << exception_location(to_location(l));
 }
 
 DriverRef::DriverRef(Context* context, Type* thisType)

@@ -12,9 +12,24 @@
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Support/Cast.hpp"
 #include "../Codegen/Builder.hpp"
+#include <sstream>
 
 using namespace kiwi;
 using namespace kiwi::lang;
+
+
+namespace {
+    inline
+    std::string format_call(const std::vector<Type*>& args) {
+        std::stringstream ss;
+        bool notFirst = false;
+        for (std::vector<Type*>::const_iterator i = args.begin(); i != args.end(); ++i) {
+            if (notFirst) ss << ", "; else notFirst = true;
+            ss << (*i)->getName();
+        }
+        return ss.str();
+    }
+}
 
 BinaryNode::BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic)
 : m_opcode(opcode), m_logic(logic) {
@@ -151,15 +166,20 @@ ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vec
     /// find call
     Callable* call = call = findCallable(driver, types);
 
-    if (!call)
-        KIWI_ERROR_AND_THROW("Method or operator for call not found", getLocation());
+    if (!call) {
+        throw LangException()
+            << exception_message("Not found rules for call")
+            << exception_location(to_location(this));
+    }
     return block.createCall(call, args);
 }
 
 Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) const {
     Callable* call = types[0]->findBinary(m_opcode, types[1]);
     if (!call) {
-        KIWI_ERROR_AND_THROW("Not found binary operator", getLocation());
+        throw LangException()
+            << exception_format("Not found binary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
+            << exception_location(to_location(this));
     }
     return call;
 }
@@ -167,7 +187,9 @@ Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) con
 Callable* UnaryNode::findCallable(Driver& driver, std::vector<Type*> types) const {
     Callable* call = types[0]->findUnary(m_opcode);
     if (!call) {
-        KIWI_ERROR_AND_THROW("not found unary operator", getLocation());
+        throw LangException()
+            << exception_format("Not found unary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
+            << exception_location(to_location(this));
     }
     return call;
 }
@@ -177,7 +199,9 @@ Callable* MultiaryNode::findCallable(Driver& driver, std::vector<Type*> types) c
     std::vector<Type*> args(types.begin() + 1, types.end());
     Callable* call = types[0]->findMultiary(m_opcode, args);
     if (!call) {
-        KIWI_ERROR_AND_THROW("not found multiary operator", getLocation());
+        throw LangException()
+            << exception_format("Not found multiary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
+            << exception_location(to_location(this));
     }
     return call;
 }
@@ -186,19 +210,23 @@ Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) const
     std::vector<Type*> args(types.begin() + 1, types.end());
     Callable* call = types[0]->findMethod(m_method, args);
     if (!call) {
-        types[0]->dump();
-        KIWI_ERROR_AND_THROW("Method not found", getLocation());
+        throw LangException()
+            << exception_format("Not found method %1%(%2%)", m_method % format_call(types))
+            << exception_location(to_location(this));
     }
     return call;
 }
 
 // Emit instructions
 ValueBuilder NewNode::emit(Driver& driver, BlockBuilder block) const {
-    ObjectType* objType = dyn_cast<ObjectType>(m_type->get(driver));
-    if (objType) {
+    Type* type = m_type->get(driver);
+    if (ObjectType* objType = dyn_cast<ObjectType>(type)) {
         return block.createNew(objType);
+    } else {
+        throw LangException()
+            << exception_format("Type '%1%' is not constructable", type->getName())
+            << exception_location(to_location(this));
     }
-    KIWI_ERROR_AND_THROW("Type has not be constructed", m_type->getLocation());
 }
 
 ValueBuilder AssignNode::emit(Driver& driver, BlockBuilder block) const {
@@ -208,15 +236,20 @@ ValueBuilder AssignNode::emit(Driver& driver, BlockBuilder block) const {
 
 ValueBuilder NamedMutableNode::emit(Driver& driver, ValueBuilder value) const {
     ValueBuilder* builder = o_var->findBuilder(value.getFunction());
-    if (!builder)
-        KIWI_ERROR_AND_THROW("Not found value builder for store value in varaible", getLocation());
+    if (!builder) {
+        throw LangException()
+            << exception_message("Not found value builder for store value in varaible")
+            << exception_location(to_location(this));
+    }
     return value.createStore(*builder, value);
 }
 
 ValueBuilder NamedExpressionNode::emit(Driver& driver, BlockBuilder block) const {
     ValueBuilder* builder = o_var->findBuilder(block.getFunction());
     if (!builder)
-        KIWI_ERROR_AND_THROW("Not found value builder for store value in varaible", getLocation());
+        throw LangException()
+            << exception_message("Not found value builder for store value in varaible")
+            << exception_location(to_location(this));
     return block.createLoad(*builder);
 }
 
@@ -236,19 +269,23 @@ ValueBuilder CharConstNode::emit(Driver& driver, BlockBuilder block) const {
     return block.createCharConst(m_value);
 }
 
+/// @todo Remove copy past
 ValueBuilder InstanceMutableNode::emit(Driver& driver, ValueBuilder value) const {
     Type* owner      = value.getNativeOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
     if (type) {
-        Field* field     = type->findField(m_name);
+        Field* field = type->findField(m_name);
         if (field) {
             ValueBuilder thisValue = m_thisNode->emit(driver, value);
             return thisValue.createStore(thisValue, field, value);
         }
     }
-    KIWI_ERROR_AND_THROW("Field not found", getLocation());
+    throw LangException()
+        << exception_format("Field '%1%' not found in type '%2%'", m_name% type->getName())
+        << exception_location(to_location(this));
 }
 
+/// @todo Remove copy past
 ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) const {
     Type* owner      = block.getNativeOwner();
     ObjectType* type = dyn_cast<ObjectType>(owner);
@@ -259,14 +296,18 @@ ValueBuilder InstanceExpressionNode::emit(Driver& driver, BlockBuilder block) co
             return thisValue.createLoad(thisValue, field);
         }
     }
-    KIWI_ERROR_AND_THROW("Field not found", getLocation());
+    throw LangException()
+        << exception_format("Field '%1%' not found in type '%2%'", m_name% type->getName())
+        << exception_location(to_location(this));
 }
 
 #include <llvm/Function.h>
 ValueBuilder ThisNode::emit(Driver& driver, BlockBuilder block) const {
     llvm::Function* func = block.getFunction();
     if (func->arg_empty()) {
-        KIWI_ERROR_AND_THROW("Not found this", getLocation());
+        throw LangException()
+            << exception_message("This or self argument not found")
+            << exception_location(to_location(this));
     }
     Type* type = m_thisType->getType();
     kiwi_assert(type, "Type is null");

@@ -5,6 +5,7 @@
  *******************************************************************************
  */
 #include "kiwi/Engine.hpp"
+#include "kiwi/Exception.hpp"
 #include "kiwi/Module.hpp"
 #include <iostream>
 
@@ -30,6 +31,8 @@ int main(int argc, char const *argv[]) {
             return module->run();
         }
         return 1;
+    } catch (Exception& ex) {
+        std::cerr << ex << "\n";
     } catch (const char* ex) {
         std::cerr << ex << "\n";
         return 1;

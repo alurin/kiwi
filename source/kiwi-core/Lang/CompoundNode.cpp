@@ -56,9 +56,13 @@ void ClassNode::generateType(Driver& driver) {
         if (ObjectType* parent = dyn_cast<ObjectType>(type)) {
             current->inherit(parent);
         } else if (type) {
-            KIWI_ERROR_AND_THROW("Unknown inheritance", getLocation());
+            throw LangException()
+                << exception_format("Type '%1%' is not class", m_name)
+                << exception_location(to_location(this));
         } else {
-            KIWI_ERROR_AND_THROW("Type not found", getLocation());
+            throw LangException()
+                << exception_format("Type '%1%' not found", m_name)
+                << exception_location(to_location(this));
         }
     }
 }

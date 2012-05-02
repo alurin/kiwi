@@ -61,8 +61,6 @@ namespace lang {
         class Scanner* lexer;
 
     private:
-        /// Pointer to the current logger
-        class SourceLogger* logger;
 
         /// Pointer to input stream
         std::istream* m_stream;
