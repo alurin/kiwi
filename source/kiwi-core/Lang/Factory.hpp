@@ -8,6 +8,7 @@
 #define KIWI_LANG_FACTORY_INTERNAL
 
 #include "kiwi/DerivedTypes.hpp"
+#include "kiwi/Exception.hpp"
 #include "StatementNode.hpp"
 #include "ExpressionNode.hpp"
 #include "FunctionNode.hpp"
@@ -117,7 +118,9 @@ namespace lang {
         }
 
         TypeNode* createArrayTy(TypeNode* type, const location& loc) {
-            throw "Not implemented";
+            throw Exception()
+                << exception_message("Not implemented")
+                << exception_location(to_location(loc));
         }
 
         //===--------------------------------------------------------------===//

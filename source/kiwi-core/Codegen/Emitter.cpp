@@ -6,6 +6,7 @@
  */
 #include "Emitter.hpp"
 #include "kiwi/Callable.hpp"
+#include "kiwi/Exception.hpp"
 
 using namespace kiwi;
 
@@ -22,6 +23,7 @@ ValueBuilder CloneEmitter::emit(BlockBuilder block, const ExpressionVector& valu
     if (policy) {
         return policy->emit(block, values);
     } else {
-        throw "Policy not found for function";
+        throw Exception()
+            << exception_message("Policy not found for function");
     }
 }

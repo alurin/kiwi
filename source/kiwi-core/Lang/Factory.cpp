@@ -104,15 +104,25 @@ ScopeNode* NodeFactory::scopeEnd() {
 }
 
 MutableNode* NodeFactory::left(const Identifier& name, const location& loc) {
-    MutableNode* node = scope()->get(name)->getLeft();
-    node->setLocation(loc);
-    return node;
+    try {
+        MutableNode* node = scope()->get(name)->getLeft();
+        node->setLocation(loc);
+        return node;
+    } catch (LangException& ex) {
+        ex << exception_location(to_location(loc));
+        throw;
+    }
 }
 
 ExpressionNode* NodeFactory::right(const Identifier& name, const location& loc) {
-    ExpressionNode* node = scope()->get(name)->getRight();
-    node->setLocation(loc);
-    return node;
+    try {
+        ExpressionNode* node = scope()->get(name)->getRight();
+        node->setLocation(loc);
+        return node;
+    } catch (LangException& ex) {
+        ex << exception_location(to_location(loc));
+        throw;
+    }
 }
 
 /// returns current call

@@ -8,6 +8,7 @@
 #include "Emitter.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Argument.hpp"
+#include "kiwi/Exception.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Support/Cast.hpp"
@@ -224,7 +225,8 @@ llvm::Function* FunctionBuilder::getFunction() const {
 llvm::Function* FunctionBuilder::createJITStartupPoint() {
     ObjectType* self = dyn_cast<ObjectType>(m_nativeCallable->getOwnerType());
     if (!self) {
-        throw "Self type must be Object type";
+        throw Exception()
+            << exception_message("Self type must be Object type");
     }
 
     /// create startup function
@@ -306,7 +308,8 @@ ValueBuilder BlockBuilder::createStore(ValueBuilder variable, ValueBuilder value
         llvm::StoreInst* inst = new llvm::StoreInst(value.getValue(), variable.getValue(), m_block);
         return ValueBuilder(*this, value.getValue(), value.getType());
     }
-    throw "Unknown cast";
+    throw Exception()
+            << exception_message("Cast unknown");
 }
 
 // Create load from mutable variable
@@ -384,14 +387,16 @@ ValueBuilder BlockBuilder::createCall(Callable* call, std::vector<ValueBuilder> 
     if (policy) {
         return policy->emit(*this, args);
     }
-    throw "Function not implemented";
+    throw Exception()
+            << exception_message("Function not implemented");
 }
 
 // Create conditional goto
 void BlockBuilder::createCond(ValueBuilder value, BlockBuilder blockTrue, BlockBuilder blockFalse) {
     llvm::Value* cond = value.getValue();
     if (!cond->getType()->isIntegerTy(1)) {
-        throw "Condition must be boolean";
+        throw Exception()
+            << exception_message("Condition must be boolean type");
     }
     llvm::IRBuilder<>(m_block).CreateCondBr(cond, blockTrue.getBlock(), blockFalse.getBlock());
 }

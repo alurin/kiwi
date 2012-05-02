@@ -6,6 +6,9 @@
 #include "kiwi/Exception.hpp"
 #include "location.hh"
 
+#define KIWI_LANG_START { try {
+#define KIWI_LANG_STOP(_loc)  } catch (Exception &ex) { ex << exception_location(to_location(_loc)); throw }
+
 namespace kiwi {
 namespace lang {
 

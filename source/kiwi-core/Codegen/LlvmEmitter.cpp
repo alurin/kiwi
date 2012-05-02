@@ -7,6 +7,7 @@
 #include "LlvmEmitter.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Module.hpp"
+#include "kiwi/Exception.hpp"
 #include <llvm/Instructions.h>
 #include <llvm/Constants.h>
 #include <llvm/Module.h>
@@ -228,7 +229,8 @@ ValueBuilder LlvmStringConcatenate::emit(BlockBuilder block, const ExpressionVec
 // emit IR instruction for string substraction
 ValueBuilder LlvmStringSubtraction::emit(BlockBuilder block, const ExpressionVector& values) {
     if (values.size() != 2 && values.size() != 3) {
-        throw "Not implemented";
+        throw Exception()
+            << exception_message("Not implemented");
     }
 
     Context*         t_context = block.getNativeContext();
@@ -311,5 +313,6 @@ ValueBuilder LlvmCtorEmitter::emit(BlockBuilder bloc, const ExpressionVector& va
 
 /// emit IR instruction for binary operation
 ValueBuilder LlvmUpcast::emit(BlockBuilder bloc, const ExpressionVector& values) {
-    throw "Not implemented";
+    throw Exception()
+            << exception_message("Not implemented");
 }
