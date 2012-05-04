@@ -115,10 +115,10 @@ ObjectPtr ObjectType::create(ModulePtr module, const Identifier& name) {
 }
 
 void IntegerType::initializate() {
-    ContextPtr context = m_module->getContext();
+    ContextPtr context = getContext();
     TypePtr boolTy = BooleanType::get(context);
     TypePtr voidTy = VoidType::get(context);
-    TypePtr intTy = this;
+    TypePtr intTy = shared_from_this();
 
     addUnary(Member::Pos,  intTy)->setPolicy(new LlvmZeroUnaryOperator(llvm::Instruction::Add, intTy));
     addUnary(Member::Neg,  intTy)->setPolicy(new LlvmZeroUnaryOperator(llvm::Instruction::Sub, intTy));
@@ -138,9 +138,9 @@ void IntegerType::initializate() {
 }
 
 void BooleanType::initializate() {
-    ContextPtr context = m_module->getContext();
+    ContextPtr context = getContext();
     TypePtr     voidTy = VoidType::get(context);
-    TypePtr     boolTy = this;
+    TypePtr     boolTy = shared_from_this();
 
     addBinary(Member::Eq,  boolTy, boolTy)->setPolicy(new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
     addBinary(Member::Neq, boolTy, boolTy)->setPolicy(new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
@@ -149,21 +149,21 @@ void BooleanType::initializate() {
 }
 
 void CharType::initializate() {
-    ContextPtr context = m_module->getContext();
+    ContextPtr context = getContext();
     TypePtr     boolTy = BooleanType::get(context);
     TypePtr     voidTy = VoidType::get(context);
-    TypePtr     charTy = this;
+    TypePtr     charTy = shared_from_this();
 
     addUnary(Member::Print, voidTy)->setPolicy(new LlvmCharPrintOperator());
 }
 
 void StringType::initializate() {
-    ContextPtr context = m_module->getContext();
+    ContextPtr context = getContext();
     TypePtr     charTy = CharType::get(context);
     TypePtr     boolTy = BooleanType::get(context);
     TypePtr     voidTy = VoidType::get(context);
     TypePtr      intTy = IntegerType::get32(context);
-    TypePtr   stringTy = this;
+    TypePtr   stringTy = shared_from_this();
 
     addBinary(Member::Eq,  boolTy, stringTy)->setPolicy(new LlvmStringCompareOperator(llvm::CmpInst::ICMP_EQ, context));
     addBinary(Member::Neq, boolTy, stringTy)->setPolicy(new LlvmStringCompareOperator(llvm::CmpInst::ICMP_NE, context));
@@ -230,7 +230,7 @@ void ObjectType::emit() {
     }
 
     // collect fields
-    llvm::LLVMContext& context = m_module->getContext()->getContext();
+    llvm::LLVMContext& context = getContext()->getContext();
     llvm::Module* module       = m_module->getModule();
     std::vector<llvm::Type*> types;
 
@@ -301,7 +301,7 @@ void ObjectType::emit() {
     }
     // add simple constructor
     std::vector<TypePtr> empty;
-    addMultiary(Member::Constructor, VoidType::get(m_module->getContext()), empty)->setPolicy(new LlvmCtorEmitter());
+    addMultiary(Member::Constructor, VoidType::get(m_module.lock()->getContext()), empty)->setPolicy(new LlvmCtorEmitter());
 }
 
 

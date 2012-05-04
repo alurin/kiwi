@@ -24,8 +24,6 @@ namespace kiwi {
      * General enter point for Kiwi language infrastructure
      */
     class Context : public boost::enable_shared_from_this<Context>, public boost::noncopyable {
-        Context(const Context&);                ///< NOT IMPLEMENT!!!
-        Context& operator=(const Context&);     ///< NOT IMPLEMENT!!!
     public:
         /// create new instance of context
         static ContextPtr create();

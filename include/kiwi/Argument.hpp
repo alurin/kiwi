@@ -35,7 +35,7 @@ namespace kiwi {
 
         /// returns argument type
         TypePtr getType () const {
-            return m_type;
+            return m_type.lock();
         }
 
         /// returns argument position
@@ -50,7 +50,7 @@ namespace kiwi {
         Identifier m_name;
 
         /// argument type
-        TypePtr m_type;
+        TypeWeak m_type;
 
         /// argument position
         int32_t m_position;

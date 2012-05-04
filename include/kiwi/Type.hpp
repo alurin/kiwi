@@ -28,9 +28,7 @@ namespace kiwi {
     class TypeImpl;
 
     /// Type metadata
-    class Type {
-        Type(const Type&);                   ///< NOT IMPLEMENT!!!
-        Type& operator=(const Type& type);   ///< NOT IMPLEMENT!!!
+    class Type : public boost::enable_shared_from_this<Type>, public boost::noncopyable {
     public:
         /// Type identifier
         enum TypeID {

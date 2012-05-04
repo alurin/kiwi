@@ -33,7 +33,7 @@ namespace kiwi {
 
         /// returns callable's return type
         TypePtr getReturnType() const {
-            return m_returnType;
+            return m_returnType.lock();
         }
 
         /// Check signature
@@ -89,7 +89,7 @@ namespace kiwi {
         }
     protected:
         /// return type
-        TypePtr m_returnType;
+        TypeWeak m_returnType;
 
         /// list of arguments
         ArgumentVector m_args;

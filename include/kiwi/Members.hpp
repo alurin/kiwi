@@ -24,7 +24,7 @@ namespace kiwi
 
         /// returns result type
         TypePtr getReturnType() const {
-            return m_returnType;
+            return m_returnType.lock();
         }
 
         /// classof check
