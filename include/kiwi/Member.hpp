@@ -10,17 +10,8 @@
 #include "kiwi/config.hpp"
 #include "kiwi/types.hpp"
 
-namespace llvm
-{
-    class Type;
-    class Function;
-    class GlobalVariable;
-}
-
 namespace kiwi
 {
-    class Type;
-
     /// Type member
     class Member {
     public:
@@ -74,8 +65,8 @@ namespace kiwi
         virtual ~Member();
 
         /// Returns owner type
-        Type* getOwnerType() const {
-            return m_ownerType;
+        TypePtr getOwnerType() const {
+            return m_ownerType.lock();
         }
 
         /// get member class identifier
@@ -99,10 +90,10 @@ namespace kiwi
         MemberID m_memberID;
 
         /// member owner type
-        Type* m_ownerType;
+        TypeWeak m_ownerType;
 
         /// cosntructor
-        Member(Type* type);
+        Member(TypePtr type);
     };
 }
 

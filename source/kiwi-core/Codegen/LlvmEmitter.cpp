@@ -15,24 +15,24 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-LlvmCallEmitter::LlvmCallEmitter(llvm::Function* func, Type* returnType)
+LlvmCallEmitter::LlvmCallEmitter(llvm::Function* func, TypePtr returnType)
 : m_func(func), m_returnType(returnType) {
 
 }
 
 // constructor
-LlvmZeroUnaryOperator::LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, Type* type)
+LlvmZeroUnaryOperator::LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, TypePtr type)
 : m_opcode(opcode), m_type(type) { }
 
 // constructor
-LlvmBinaryOperator::LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, Type* type)
+LlvmBinaryOperator::LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, TypePtr type)
 : m_opcode(opcode), m_type(type) { }
 
 // constructor
-LlvmIntegerCompareOperator::LlvmIntegerCompareOperator(llvm::CmpInst::Predicate predicate, Context* context)
+LlvmIntegerCompareOperator::LlvmIntegerCompareOperator(llvm::CmpInst::Predicate predicate, ContextPtr context)
 : m_predicate(predicate), m_context(context) { }
 
-LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate predicate, Context* context)
+LlvmStringCompareOperator::LlvmStringCompareOperator(llvm::CmpInst::Predicate predicate, ContextPtr context)
 : m_predicate(predicate), m_context(context) { }
 
 // emit instruction for interger unary operator
@@ -52,7 +52,7 @@ ValueBuilder LlvmBinaryOperator::emit(BlockBuilder block, const ExpressionVector
 // emit instruction for binary operator
 ValueBuilder LlvmIntegerCompareOperator::emit(BlockBuilder block, const ExpressionVector& values) {
     llvm::Value* result = new llvm::ICmpInst(*(block.getBlock()), m_predicate, values[0].getValue(), values[1].getValue(), "");
-    return ValueBuilder(block, result, BoolType::get(m_context));
+    return ValueBuilder(block, result, BooleanType::get(m_context));
 }
 
 // emit instruction for binary operator
@@ -109,7 +109,7 @@ ValueBuilder LlvmStringCompareOperator::emit(BlockBuilder block, const Expressio
     // compute string compare and return result
     llvm::Value* value  = llvm::CallInst::Create(compare, makeArrayRef(args), "", block.getBlock());
     llvm::Value* result = new llvm::ICmpInst(*(block.getBlock()), m_predicate, zero, value, "");
-    return ValueBuilder(block, result, BoolType::get(m_context));
+    return ValueBuilder(block, result, BooleanType::get(m_context));
 }
 
 ValueBuilder LlvmIntegerPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {
@@ -233,7 +233,7 @@ ValueBuilder LlvmStringSubtraction::emit(BlockBuilder block, const ExpressionVec
             << exception_message("Not implemented");
     }
 
-    Context*         t_context = block.getNativeContext();
+    ContextPtr         t_context = block.getNativeContext();
     llvm::Module*       module = block.getModule();
     llvm::LLVMContext& context = block.getContext();
     llvm::Type*     lengthType = llvm::IntegerType::get(context, 32);
@@ -251,7 +251,7 @@ ValueBuilder LlvmStringSubtraction::emit(BlockBuilder block, const ExpressionVec
 
     //
     llvm::Function* substraction = 0;
-    Type* returnType = 0;
+    TypePtr returnType;
 
     // collect types and functions
     if (values.size() == 2) {           /// substraction of character from string

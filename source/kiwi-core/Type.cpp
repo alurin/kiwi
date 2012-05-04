@@ -47,7 +47,7 @@ namespace {
 
     class BinaryFinder {
     public:
-        BinaryFinder(Member::BinaryOpcode opcode, Type* operandType)
+        BinaryFinder(Member::BinaryOpcode opcode, TypePtr operandType)
         : m_opcode(opcode), m_operandType(operandType) {
         }
 
@@ -56,12 +56,12 @@ namespace {
         }
     protected:
         Member::BinaryOpcode m_opcode;
-        Type* m_operandType;
+        TypePtr m_operandType;
     };
 
     class MultiaryFinder {
     public:
-        MultiaryFinder(Member::MultiaryOpcode opcode, std::vector<Type*> arguments)
+        MultiaryFinder(Member::MultiaryOpcode opcode, std::vector<TypePtr> arguments)
         : m_opcode(opcode), m_arguments(arguments) {
         }
 
@@ -71,7 +71,7 @@ namespace {
 
     protected:
         Member::MultiaryOpcode m_opcode;
-        std::vector<Type*> m_arguments;
+        std::vector<TypePtr> m_arguments;
     };
 
     class FieldFinder {
@@ -90,7 +90,7 @@ namespace {
 
     class MethodFinder {
     public:
-        MethodFinder(const Identifier& name, std::vector<Type*> arguments)
+        MethodFinder(const Identifier& name, std::vector<TypePtr> arguments)
         : m_name(name), m_arguments(arguments) {
         }
 
@@ -99,12 +99,12 @@ namespace {
         }
     protected:
         Identifier m_name;
-        std::vector<Type*> m_arguments;
+        std::vector<TypePtr> m_arguments;
     };
 
 }
 
-Type::Type(Module* module)
+Type::Type(ModulePtr module)
 : m_typeID((TypeID) 0), m_module(module), m_meta(new TypeImpl(this)) {
     m_module->getMetadata()->types.push_back(this);
 }
@@ -113,14 +113,14 @@ Type::~Type() {
     delete m_meta;
 }
 
-Context* Type::getContext() const {
+ContextPtr Type::getContext() const {
     return m_module->getContext();
 }
 
 // add binary operator
 UnaryOperator* Type::addUnary(
     Member::UnaryOpcode opcode,
-    Type* returnType
+    TypePtr returnType
 ) {
     return new UnaryOperator(opcode, this, returnType);
 }
@@ -128,8 +128,8 @@ UnaryOperator* Type::addUnary(
 // add binary operator
 BinaryOperator* Type::addBinary(
     Member::BinaryOpcode opcode,
-    Type* returnType,
-    Type* operandType
+    TypePtr returnType,
+    TypePtr operandType
 ) {
     return new BinaryOperator(opcode, this, returnType, operandType);
 }
@@ -137,14 +137,14 @@ BinaryOperator* Type::addBinary(
 /// add multiary operator
 MultiaryOperator* Type::addMultiary(
     Member::MultiaryOpcode opcode,
-    Type* returnType,
-    std::vector<Type*> arguments
+    TypePtr returnType,
+    std::vector<TypePtr> arguments
 ) {
     return new MultiaryOperator(opcode, this, returnType, arguments);
 }
 
 // add field
-Field* Type::addField(const Identifier& name, Type* fieldType) {
+Field* Type::addField(const Identifier& name, TypePtr fieldType) {
     if (Field* override = findField(name)) {
         if (!override->isDeclared()) {
             override->declare();
@@ -155,7 +155,7 @@ Field* Type::addField(const Identifier& name, Type* fieldType) {
 }
 
 // add method
-Method* Type::addMethod(const Identifier& name, Type* returnType, std::vector<Type*> arguments) {
+Method* Type::addMethod(const Identifier& name, TypePtr returnType, std::vector<TypePtr> arguments) {
     return new Method(name, this, returnType, arguments);
 }
 
@@ -165,13 +165,13 @@ UnaryOperator* Type::findUnary(Member::UnaryOpcode opcode) const {
 }
 
 // find binary operator
-BinaryOperator* Type::findBinary(Member::BinaryOpcode opcode, Type* operandType) const {
+BinaryOperator* Type::findBinary(Member::BinaryOpcode opcode, TypePtr operandType) const {
     return find_if(m_meta->binary(), BinaryFinder(opcode, operandType));
 }
 
 // find binary operator
-MultiaryOperator* Type::findMultiary(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) const {
-    return find_if(m_meta->multiary(), MultiaryFinder(opcode, makeVector(const_cast<Type*>(this), arguments)));
+MultiaryOperator* Type::findMultiary(Member::MultiaryOpcode opcode, std::vector<TypePtr> arguments) const {
+    return find_if(m_meta->multiary(), MultiaryFinder(opcode, makeVector(const_cast<TypePtr>(this), arguments)));
 }
 
 // find field
@@ -180,19 +180,19 @@ Field* Type::findField(const Identifier& name) const {
 }
 
 // find method
-Method* Type::findMethod(const Identifier& name, std::vector<Type*> arguments) const {
-    return find_if(m_meta->methods(), MethodFinder(name, makeVector(const_cast<Type*>(this), arguments)));
+Method* Type::findMethod(const Identifier& name, std::vector<TypePtr> arguments) const {
+    return find_if(m_meta->methods(), MethodFinder(name, makeVector(const_cast<TypePtr>(this), arguments)));
 }
 
 llvm::Type* Type::getVarType() const {
     return m_meta->varType;
 }
 
-bool Type::isInherit(const Type* type, bool duckCast) const {
+bool Type::isInherit(const TypePtr type, bool duckCast) const {
     return m_meta->isBase(type);
 }
 
-bool Type::isCastableTo(const Type* type, bool duckCast) const {
+bool Type::isCastableTo(const TypePtr type, bool duckCast) const {
     return m_meta->isBase(type);
 }
 

@@ -20,13 +20,13 @@ namespace codegen {
     /// LLVM emitter for function from source code
     class LlvmCallEmitter : public CallablePolicy {
     public:
-        LlvmCallEmitter(llvm::Function* func, Type* returnType);
+        LlvmCallEmitter(llvm::Function* func, TypePtr returnType);
 
         /// emit IR instruction for binary operation
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::Function* m_func;
-        Type* m_returnType;
+        TypePtr m_returnType;
     }; // class LlvmCallEmitter
 
     //==--------------------------------------------------------------------==//
@@ -34,13 +34,13 @@ namespace codegen {
     class LlvmZeroUnaryOperator : public CallablePolicy {
     public:
         /// constructor
-        LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, Type* type);
+        LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, TypePtr type);
 
         /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::Instruction::BinaryOps m_opcode;
-        Type*  m_type;
+        TypePtr  m_type;
     }; /// class LlvmZeroUnaryOperator
 
     //==--------------------------------------------------------------------==//
@@ -48,13 +48,13 @@ namespace codegen {
     class LlvmBinaryOperator : public CallablePolicy {
     public:
         /// constructor
-        LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, Type* type);
+        LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, TypePtr type);
 
         /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::Instruction::BinaryOps m_opcode;
-        Type* m_type;
+        TypePtr m_type;
     }; /// class LlvmBinaryOperator
 
     //==--------------------------------------------------------------------==//
@@ -64,14 +64,14 @@ namespace codegen {
         /// constructor
         LlvmIntegerCompareOperator(
             llvm::CmpInst::Predicate predicate,
-            Context* context
+            ContextPtr context
         );
 
         /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::CmpInst::Predicate m_predicate;
-        Context* m_context;
+        ContextPtr m_context;
     }; /// class LlvmIntegerCompareOperator
 
     //==--------------------------------------------------------------------==//
@@ -81,14 +81,14 @@ namespace codegen {
         /// constructor
         LlvmStringCompareOperator(
             llvm::CmpInst::Predicate predicate,
-            Context* context
+            ContextPtr context
         );
 
         /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::CmpInst::Predicate m_predicate;
-        Context* m_context;
+        ContextPtr m_context;
     }; /// class LlvmStringCompareOperator
 
     //==--------------------------------------------------------------------==//

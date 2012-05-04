@@ -16,49 +16,49 @@ namespace kiwi {
         friend class Context;
     public:
         /// returns void type from context
-        static VoidType* get(Context* context);
+        static VoidPtr get(ContextPtr context);
 
         /// classof check
-        static bool classof(const Type* type) {
+        static bool classof(const TypePtr type) {
             return type->getTypeID() == VoidID;
         }
 
         /// classof check
-        static bool classof(const VoidType*) {
+        static bool classof(const VoidPtr) {
             return true;
         }
     private:
         /// constructor
-        VoidType(Module* module);
+        VoidType(ModulePtr module);
 
         /// create integer type
-        static VoidType* create(Module* module);
+        static VoidPtr create(ModulePtr module);
     };
 
     //==--------------------------------------------------------------------==//
     /// Integers types metadata
-    class IntType : public Type
+    class IntegerType : public Type
     {
         friend class Context;
     public:
         /// returns 32-bit signed integer type for context
-        static IntType* get32(Context* context);
+        static IntegerPtr get32(ContextPtr context);
 
         /// classof check
-        static bool classof(const Type* type) {
+        static bool classof(const TypePtr type) {
             return type->getTypeID() == IntID;
         }
 
         /// classof check
-        static bool classof(const IntType*) {
+        static bool classof(const IntegerPtr) {
             return true;
         }
     private:
         /// constructor
-        IntType(Module* module, int32_t size, bool unsign);
+        IntegerType(ModulePtr module, int32_t size, bool unsign);
 
         /// create integer type
-        static IntType* create(Module* module, int32_t size, bool unsign);
+        static IntegerPtr create(ModulePtr module, int32_t size, bool unsign);
 
         /// initializator
         void initializate();
@@ -66,28 +66,28 @@ namespace kiwi {
 
     //==--------------------------------------------------------------------==//
     /// Boolean type metadata
-    class BoolType : public Type
+    class BooleanType : public Type
     {
         friend class Context;
     public:
         /// returns boolean type from context
-        static BoolType* get(Context* context);
+        static BooleanPtr get(ContextPtr context);
 
         /// classof check
-        static bool classof(const Type* type) {
+        static bool classof(const TypePtr type) {
             return type->getTypeID() == BoolID;
         }
 
         /// classof check
-        static bool classof(const BoolType*) {
+        static bool classof(const BooleanPtr) {
             return true;
         }
     protected:
         /// constructor
-        BoolType(Module* module);
+        BooleanType(ModulePtr module);
 
         /// create module type
-        static BoolType* create(Module* module);
+        static BooleanPtr create(ModulePtr module);
 
         /// initializator
         void initializate();
@@ -99,23 +99,23 @@ namespace kiwi {
         friend class Context;
     public:
         /// return unicode character type from context
-        static CharType* get(Context* context);
+        static CharPtr get(ContextPtr context);
 
         /// classof check
-        static bool classof(const Type* type) {
+        static bool classof(const TypePtr type) {
             return type->getTypeID() == CharID;
         }
 
         /// classof check
-        static bool classof(const CharType*) {
+        static bool classof(const CharPtr) {
             return true;
         }
     protected:
         /// constructor
-        CharType(Module* module);
+        CharType(ModulePtr module);
 
         /// create module type
-        static CharType* create(Module* module);
+        static CharPtr create(ModulePtr module);
 
         /// initializator
         void initializate();
@@ -127,23 +127,23 @@ namespace kiwi {
         friend class Context;
     public:
         /// returns unicode string type from context
-        static StringType* get(Context* context);
+        static StringPtr get(ContextPtr context);
 
         /// classof check
-        static bool classof(const Type* type) {
+        static bool classof(const TypePtr type) {
             return type->getTypeID() == StringID;
         }
 
         /// classof check
-        static bool classof(const StringType*) {
+        static bool classof(const StringPtr) {
             return true;
         }
     protected:
         /// constructor
-        StringType(Module* module);
+        StringType(ModulePtr module);
 
         /// create module type
-        static StringType* create(Module* module);
+        static StringPtr create(ModulePtr module);
 
         /// initializator
         void initializate();
@@ -154,23 +154,23 @@ namespace kiwi {
     class InterfaceType : public Type {
     public:
         /// Inherti other interface
-        void inherit(InterfaceType* type);
+        void inherit(InterfacePtr type);
 
         /// classof check
-        static bool classof(const Type* type) {
+        static bool classof(const TypePtr type) {
             return type->getTypeID() == InterfaceID;
         }
 
         /// classof check
-        static bool classof(const InterfaceType*) {
+        static bool classof(const InterfacePtr) {
             return true;
         }
     protected:
         // anonym object constructor
-        InterfaceType(Module* module);
+        InterfaceType(ModulePtr module);
 
         // constructor
-        InterfaceType(Module* module, const Identifier& name);
+        InterfaceType(ModulePtr module, const Identifier& name);
     };
 
     //==--------------------------------------------------------------------==//
@@ -178,48 +178,42 @@ namespace kiwi {
     class ObjectType : public Type {
     public:
         /// Create anonym object type in module
-        static ObjectType* create(Module* module);
+        static ObjectPtr create(ModulePtr module);
 
         /// Create object type in module
-        static ObjectType* create(Module* module, const Identifier& name);
+        static ObjectPtr create(ModulePtr module, const Identifier& name);
 
         /// Implement interface
-        // void implement(InterfaceType* type);
+        // void implement(InterfacePtr type);
 
         /// Inherit class
-        bool inherit(ObjectType* type);
+        bool inherit(ObjectPtr type);
 
         /// This class implement interface?
-        bool isImplement(const InterfaceType* type, bool duckCast = true) const;
+        bool isImplement(const InterfacePtr type, bool duckCast = true) const;
 
         /// This class inherits from class?
-        bool isInherit(const ObjectType* type) const;
+        bool isInherit(const ObjectPtr type) const;
 
         /// classof check
-        static bool classof(const Type* type) {
+        static bool classof(const TypePtr type) {
             return type->getTypeID() == ObjectID;
         }
 
         /// classof check
-        static bool classof(const ObjectType*) {
+        static bool classof(const ObjectPtr) {
             return true;
         }
-
-        /// return LLVM analog for address map
-        llvm::GlobalVariable* getVarAddressMap() const;
-
-        /// return LLVM analog for address map
-        llvm::GlobalVariable* getVarVirtualTable() const;
 
         /// emit LLVM analog for type
         virtual void emit();
     protected:
 
         // anonym object constructor
-        ObjectType(Module* module);
+        ObjectType(ModulePtr module);
 
         // constructor
-        ObjectType(Module* module, const Identifier& name);
+        ObjectType(ModulePtr module, const Identifier& name);
     };
 }
 

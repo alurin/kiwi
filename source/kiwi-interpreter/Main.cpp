@@ -13,10 +13,10 @@ using namespace kiwi;
 
 int main(int argc, char const *argv[]) {
     ContextEngine engine;
-    Context* context = engine.get();
+    ContextPtr context = engine.get();
     context->setOptimizationLevel(1);
     context->setDebug(false);
-    Module* module = Module::create("user.script", context);
+    ModulePtr module = Module::create("user.script", context);
 
     Path filename;
     if (argc < 2) {

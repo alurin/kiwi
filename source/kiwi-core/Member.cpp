@@ -9,7 +9,7 @@
 using namespace kiwi;
 
 // cosntructor
-Member::Member(Type* type)
+Member::Member(TypePtr type)
 : m_memberID((MemberID) 0), m_ownerType(type) {
 }
 

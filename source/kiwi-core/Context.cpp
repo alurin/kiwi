@@ -5,44 +5,110 @@
  *******************************************************************************
  */
 #include "ContextImpl.hpp"
+#include "ModuleImpl.hpp"
+#include "RuntimeModule.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
-#include "RuntimeModule.hpp"
+#include "kiwi-runtime/core.h"
 #include <llvm/LLVMContext.h>
+#include <llvm/Support/ManagedStatic.h>
+#include <llvm/Support/TargetSelect.h>
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/JIT.h"
+#include "llvm/Analysis/Passes.h"
+#include "llvm/PassManager.h"
+#include "llvm/Target/TargetData.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/IPO.h"
+#include <unicode/uclean.h>
+#ifdef KIWI_GC
+    #include "gc.h"
+#endif
 
 using namespace kiwi;
 
-ContextImpl::ContextImpl()
-: runtime(0), boolTy(0), int32Ty(0), voidTy(0), charTy(0), stringTy(0) {
+namespace {
+    /// Static guard
+    GuardWeak globalGuard;
+
+    /// Return or create new global guard
+    GuardPtr get_global_guard() {
+        if (globalGuard.expired()) {
+            GuardPtr guard = GuardPtr(new Guard());
+            globalGuard = guard;
+            return guard;
+        } else {
+            return globalGuard.lock();
+        }
+    }
 }
 
+// Initialize resources for vendor libraries
+Guard::Guard() {
+    UErrorCode errorCode;
+
+    kiwi_dummy();                       // Init kiwi-runtime (link as dummy)
+    u_init(&errorCode);                 // ICU init
+    llvm::llvm_start_multithreaded();   // LLVM init as multithreaded
+    llvm::InitializeNativeTarget();     // LLVM JIT init
+
+    #ifdef KIWI_GC
+    GC_INIT();                          // GC init
+    #endif
+}
+
+// Clean up resource for vendor libraries
+Guard::~Guard() {
+    llvm::llvm_shutdown();              // LLVM cleanup
+    u_cleanup();                        // ICU cleanup
+
+    #ifdef KIWI_GC
+    GC_gcollect();                      // GC cleanup
+    #endif
+}
+
+// Constructor
+ContextImpl::ContextImpl() : guard(get_global_guard())
+, m_backendContext(new llvm::LLVMContext()), m_backendEngine(0) {
+
+}
+
+ContextImpl::~ContextImpl() {
+    delete m_backendEngine;
+    delete m_backendContext;
+}
+
+// Constructor
 Context::Context()
 : m_context(0), m_metadata(new ContextImpl()), m_optimizationLevel(1), m_debug(false) {
 }
 
 Context::~Context() {
-    for (std::vector<Module*>::iterator i = m_metadata->modules.begin(); i != m_metadata->modules.end(); ++i) {
-        Module* module = *i;
-        delete module;
-    }
     delete m_metadata;
-    delete m_context;
 }
 
-Context* Context::create() {
-    Context* context = new Context();
+ContextPtr Context::create() {
+    ContextPtr context = ContextPtr(new Context());
     context->initializate();
     return context;
 }
 
 void Context::initializate() {
-    m_context            = new llvm::LLVMContext();
-    m_metadata->runtime  = Module::create("system", this);
-    m_metadata->boolTy   = BoolType::create(m_metadata->runtime);
-    m_metadata->int32Ty  = IntType::create(m_metadata->runtime, 32, false);
+    // create system module
+    m_metadata->runtime  = Module::create("system", shared_from_this());
+    ModuleImpl* impl     = m_metadata->runtime->getMetadata();
+    llvm::Module* module = impl->getBackendModule();
+
+    // create execution engine
+    m_metadata->m_backendEngine = llvm::EngineBuilder(module).create();
+
+    // create types
+    m_metadata->boolTy   = BooleanType::create(m_metadata->runtime);
+    m_metadata->int32Ty  = IntegerType::create(m_metadata->runtime, 32, false);
     m_metadata->voidTy   = VoidType::create(m_metadata->runtime);
     m_metadata->charTy   = CharType::create(m_metadata->runtime);
     m_metadata->stringTy = StringType::create(m_metadata->runtime);
 
+    // init runtime type
     initRuntimeModule(m_metadata->runtime);
 }

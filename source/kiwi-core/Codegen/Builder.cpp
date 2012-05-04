@@ -6,6 +6,8 @@
  */
 #include "Builder.hpp"
 #include "Emitter.hpp"
+#include "../ModuleImpl.hpp"
+#include "../TypeImpl.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Argument.hpp"
 #include "kiwi/Exception.hpp"
@@ -59,19 +61,19 @@ namespace {
 //===--------------------------------------------------------------------------------------------------------------===//
 //    Constructors and assignments
 //===--------------------------------------------------------------------------------------------------------------===//
-Builder::Builder(Module* module)
-: m_nativeModule(module), m_nativeContext(0), m_module(0), m_context(0) {
+Builder::Builder(ModulePtr module)
+: m_nativeModule(module), m_module(0), m_context(0) {
     m_nativeContext = m_nativeModule->getContext();
-    m_module        = m_nativeModule->getModule();
+    m_module        = m_nativeModule->getMetadata()->getBackendModule();
     m_context       = &m_module->getContext();
     BUILDER_ASSERT();
 }
 
 // Copy constructor
 Builder::Builder(const Builder& builder)
-: m_nativeModule(builder.m_nativeModule), m_nativeContext(0), m_module(0), m_context(0) {
+: m_nativeModule(builder.m_nativeModule), m_module(0), m_context(0) {
     m_nativeContext = m_nativeModule->getContext();
-    m_module        = m_nativeModule->getModule();
+    m_module        = m_nativeModule->getMetadata()->getBackendModule();
     m_context       = &m_module->getContext();
     BUILDER_ASSERT();
 }
@@ -89,15 +91,15 @@ Builder& Builder::operator=(const Builder& builder) {
 }
 
 // Constructor
-FunctionBuilder::FunctionBuilder(Callable* analog)
+FunctionBuilder::FunctionBuilder(CallablePtr analog)
 : Builder(analog->getOwnerType()->getModule()), m_nativeCallable(analog)
 , m_nativeOwner(analog->getOwnerType()) , m_func(0) {
     BUILDER_FUNCTION_ASSERT();
 }
 
 // Constructor
-FunctionBuilder::FunctionBuilder(Type* type, llvm::Function* func)
-: Builder(type->getModule()), m_nativeCallable(0), m_nativeOwner(type), m_func(func) {
+FunctionBuilder::FunctionBuilder(TypePtr type, llvm::Function* func)
+: Builder(type->getModule()), m_nativeOwner(type), m_func(func) {
     BUILDER_FUNCTION_ASSERT();
 }
 
@@ -143,7 +145,7 @@ BlockBuilder& BlockBuilder::operator=(const BlockBuilder& builder) {
 }
 
 // constructor
-ValueBuilder::ValueBuilder(const BlockBuilder& builder, llvm::Value* value, Type* type)
+ValueBuilder::ValueBuilder(const BlockBuilder& builder, llvm::Value* value, TypePtr type)
 : BlockBuilder(builder), m_value(value), m_type(type) {
     BUILDER_VALUE_ASSERT();
 }
@@ -223,7 +225,7 @@ llvm::Function* FunctionBuilder::getFunction() const {
 }
 
 llvm::Function* FunctionBuilder::createJITStartupPoint() {
-    ObjectType* self = dyn_cast<ObjectType>(m_nativeCallable->getOwnerType());
+    ObjectPtr self = dyn_cast<ObjectType>(m_nativeCallable->getOwnerType());
     if (!self) {
         throw Exception()
             << exception_message("Self type must be Object type");
@@ -292,7 +294,7 @@ void BlockBuilder::createReturn(ValueBuilder value) {
 }
 
 // Allocate memory in stack for mutable varaible
-ValueBuilder BlockBuilder::createVariable(const Identifier& name, Type* type, bool autoInit) {
+ValueBuilder BlockBuilder::createVariable(const Identifier& name, TypePtr type, bool autoInit) {
     llvm::Type* analog = type->getVarType();
     llvm::AllocaInst* variable = new llvm::AllocaInst(analog, name, m_block);
     if (autoInit) {
@@ -321,13 +323,13 @@ ValueBuilder BlockBuilder::createLoad(ValueBuilder variable) {
 // Emit constants
 ValueBuilder BlockBuilder::createIntConst(int32_t value) {
     llvm::ConstantInt* result = llvm::ConstantInt::get(*m_context, llvm::APInt(32, value, false));
-    return ValueBuilder(*this, result, IntType::get32(getNativeContext()));
+    return ValueBuilder(*this, result, IntegerType::get32(getNativeContext()));
 }
 
 // Emit constants
 ValueBuilder BlockBuilder::createBoolConst(bool value) {
     llvm::ConstantInt* result = llvm::ConstantInt::get(*m_context, llvm::APInt(1, value, false));
-    return ValueBuilder(*this, result, BoolType::get(getNativeContext()));
+    return ValueBuilder(*this, result, BooleanType::get(getNativeContext()));
 }
 
 // Emit constants
@@ -338,7 +340,7 @@ ValueBuilder BlockBuilder::createCharConst(UChar value) {
 
 // Emit constants
 ValueBuilder BlockBuilder::createStringConst(const String& value) {
-    StringType* type = StringType::get(getNativeContext());
+    StringPtr type = StringType::get(getNativeContext());
     // get partial types for string
     llvm::Type* charType = llvm::IntegerType::get(*m_context, 16);
     llvm::Type* sizeType = llvm::IntegerType::get(*m_context, 32);
@@ -381,16 +383,6 @@ ValueBuilder BlockBuilder::createStringConst(const String& value) {
     return ValueBuilder(*this, result, type);
 }
 
-// Create call for callable with arguments
-ValueBuilder BlockBuilder::createCall(Callable* call, std::vector<ValueBuilder> args) {
-    CallablePolicy* policy = call->getPolicy();
-    if (policy) {
-        return policy->emit(*this, args);
-    }
-    throw Exception()
-            << exception_message("Function not implemented");
-}
-
 // Create conditional goto
 void BlockBuilder::createCond(ValueBuilder value, BlockBuilder blockTrue, BlockBuilder blockFalse) {
     llvm::Value* cond = value.getValue();
@@ -407,7 +399,7 @@ void BlockBuilder::createBr(BlockBuilder block) {
 }
 
 // Create new object
-ValueBuilder BlockBuilder::createNew(ObjectType* type, Callable* ctor, std::vector<ValueBuilder> args) {
+ValueBuilder BlockBuilder::createNew(ObjectPtr type, CallablePtr ctor, std::vector<ValueBuilder> args) {
     // find size of allocation
     llvm::Type* elementType = type->getVarType();
     llvm::Constant* null    = llvm::Constant::getNullValue(elementType);
@@ -437,7 +429,7 @@ ValueBuilder BlockBuilder::createNew(ObjectType* type, Callable* ctor, std::vect
     bufferIdx.push_back(llvm::ConstantInt::get(*m_context, llvm::APInt(32, 0, false)));
     bufferIdx.push_back(llvm::ConstantInt::get(*m_context, llvm::APInt(32, 0, false)));
     llvm::Value* amapLoc = llvm::GetElementPtrInst::CreateInBounds(variable, makeArrayRef(bufferIdx), "", m_block);
-    llvm::Value* amap    = type->getVarAddressMap();
+    llvm::Value* amap    = type->getMetadata()->addressMap;
     new llvm::StoreInst(amap, amapLoc, "", m_block);
 
     // new llvm::(stringCst, stringType, "string.val", m_block);
@@ -445,27 +437,37 @@ ValueBuilder BlockBuilder::createNew(ObjectType* type, Callable* ctor, std::vect
 }
 
 // Create store in object field
-ValueBuilder BlockBuilder::createStore(ValueBuilder thisValue, Field* field, ValueBuilder value) {
+ValueBuilder BlockBuilder::createStore(ValueBuilder thisValue, FieldPtr field, ValueBuilder value) {
     llvm::Value* offset = offsetField(thisValue, field);
     new llvm::StoreInst(value.getValue(), offset, "", m_block);
     return ValueBuilder(*this, value.getValue(), field->getFieldType());
 }
 
 // Create load from object field
-ValueBuilder BlockBuilder::createLoad(ValueBuilder thisValue, Field* field) {
+ValueBuilder BlockBuilder::createLoad(ValueBuilder thisValue, FieldPtr field) {
     llvm::Value* offset   = offsetField(thisValue, field);
     llvm::Value* loadInst = new llvm::LoadInst(offset, "", m_block);
     return ValueBuilder(*this, loadInst, field->getFieldType());
 }
 
+// Create call for callable with arguments
+ValueBuilder BlockBuilder::createCall(CallablePtr call, std::vector<ValueBuilder> args) {
+    CallablePolicy* policy = call->getPolicy();
+    if (policy) {
+        return policy->emit(*this, args);
+    }
+    throw Exception()
+            << exception_message("Function not implemented");
+}
+
 // Returns pointer to value of field obkect
-llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, Field* field) {
+llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, FieldPtr field) {
     llvm::Value* value    = thisValue.getValue();
 
     // load amap
     std::vector<llvm::Value*> addressIdx;
     addressIdx.push_back(makeConstantInt(*m_context, 0));
-    addressIdx.push_back(makeConstantInt(*m_context, 0));
+    addressIdx.push_back(makeConstantInt(*m_context, 1));
     llvm::Value* amapOffset = llvm::GetElementPtrInst::Create(value, makeArrayRef(addressIdx), "", m_block);
     llvm::Value* amap       = new llvm::LoadInst(amapOffset, "amap", m_block);
 

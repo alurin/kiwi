@@ -7,7 +7,7 @@ Add submodule for [LLVM](git://github.com/earl/llvm-mirror.git)
 
 Source code clean up
 --------------------
-* Add compoud type for struct and object types
+* Add compound type for struct and object types
 * Add base for interface and object type
 * Add normal handle for inheritance and implements
 * Abstract base for Unary, minary, multiary, calls and e.t.c:
@@ -76,3 +76,25 @@ Language
         - File system:
             - Virtual FS (prefered)
             - Normal FS
+
+vtable: void*[]         -- dynamic array or hash table //
+amap:   int[];          -- dynamic array or hash table //
+
+metadata:
+    vtable  %vtable;    -- dynamic array or hash table //
+    amap    %amap       -- dynamic array or hash table //
+
+object:
+    metadata *classid;  -- fixed value
+    data**              -- dynamic structure
+
+call
+    if !updated -> update
+    load pointer
+
+load:
+    if !updated -> load null
+
+store:
+    if !exists && !updated -> update
+    save value

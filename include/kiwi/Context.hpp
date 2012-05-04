@@ -9,33 +9,32 @@
 
 #include "kiwi/types.hpp"
 
-namespace llvm
-{
+namespace llvm {
     class LLVMContext;
 }
 
-namespace kiwi
-{
+namespace kiwi {
     /// Storage for internal context metadata
     class ContextImpl;
 
+    /// Typedef for smart reference for context
+    typedef boost::shared_ptr<class Context> ContextPtr;
+
     /**
-     * General enter point for Kiwi compiler infrastructure
-     *
-     * @author Vasiliy Sheredeko
-     * @since 2012-04-15
+     * General enter point for Kiwi language infrastructure
      */
-    class Context {
+    class Context : public boost::enable_shared_from_this<Context>, public boost::noncopyable {
         Context(const Context&);                ///< NOT IMPLEMENT!!!
         Context& operator=(const Context&);     ///< NOT IMPLEMENT!!!
     public:
-        /// create new instance
-        static Context* create();
+        /// create new instance of context
+        static ContextPtr create();
 
         /// destructor
         virtual ~Context();
 
         /// returns LLVM context
+        /// @todo move to internal metadata
         llvm::LLVMContext& getContext() const {
             return *m_context;
         }

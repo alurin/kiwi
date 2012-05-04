@@ -19,14 +19,16 @@ namespace kiwi {
     class Overridable {
         friend class Type;
     public:
+        typedef boost::weak_ptr<T> reference;
+
         /// set of overrides
-        typedef std::set<T*>                            override_set;
+        typedef std::set<reference> override_set;
 
         /// iterator for set of overrides
-        typedef typename override_set::iterator         override_iterator;
+        typedef typename override_set::iterator iterator;
 
         /// const iterator for set of overrides
-        typedef typename override_set::const_iterator   override_const_iterator;
+        typedef typename override_set::const_iterator const_iterator;
 
         /// Is override member from parent class?
         bool isDeclared() const {
@@ -39,25 +41,25 @@ namespace kiwi {
         }
 
         /// Is override member from parent class?
-        bool isOverride(T* member) const;
+        bool isOverride(reference member) const;
 
         /// returns iterator pointed to begin of members set
-        override_iterator override_begin() {
+        iterator override_begin() {
             return m_overrides.begin();
         }
 
         /// returns iterator pointed to begin of members set
-        override_const_iterator override_begin() const {
+        const_iterator override_begin() const {
             return m_overrides.begin();
         }
 
         /// returns iterator pointed to end of members set
-        override_iterator override_end() {
+        iterator override_end() {
             return m_overrides.end();
         }
 
         /// returns iterator pointed to end of members set
-        override_const_iterator override_end() const {
+        const_iterator override_end() const {
             return m_overrides.end();
         }
     protected:
@@ -71,10 +73,10 @@ namespace kiwi {
         Overridable(bool isDeclared);
 
         /// Override member in parent class with this fiels
-        void override(T* member);
+        void override(reference member);
 
         /// Override member in parent class with this fiels
-        void unoverride(T* member);
+        void unoverride(reference member);
 
         /// Change isDeclared flag
         void declare(bool value = true);
@@ -88,19 +90,19 @@ namespace kiwi {
 
     // Override member in parent class with this fiels
     template<typename T>
-    void Overridable<T>::override(T* member) {
+    void Overridable<T>::override(reference member) {
         m_overrides.insert(member);
     }
 
     // Remove override member in parent class with this fiels
     template<typename T>
-    void Overridable<T>::unoverride(T* member) {
+    void Overridable<T>::unoverride(reference member) {
         m_overrides.erase(member);
     }
 
     // Override member in parent class with this fiels
     template<typename T>
-    bool Overridable<T>::isOverride(T* member) const{
+    bool Overridable<T>::isOverride(reference member) const{
         return m_overrides.find(member) != m_overrides.end();
     }
     // Change isDeclared flag

@@ -49,7 +49,7 @@ int main(int argc, char const *argv[]) {
 
     /// Run application
     ContextEngine engine;
-    Context* context = engine.get();
+    ContextPtr context = engine.get();
     context->setOptimizationLevel(opt);
     context->setDebug(vm.count("debug"));
 
@@ -58,7 +58,7 @@ int main(int argc, char const *argv[]) {
 
         try {
             // create script module
-            Module* module = Module::create("Kiwi::Script", context);
+            ModulePtr module = Module::create("Kiwi::Script", context);
             for (std::vector< std::string >::iterator i = files.begin(); i != files.end(); ++i) {
                 module->includeFile(*i);
             }

@@ -34,7 +34,7 @@ namespace kiwi {
         }
 
         /// returns argument type
-        Type* getType () const {
+        TypePtr getType () const {
             return m_type;
         }
 
@@ -50,12 +50,12 @@ namespace kiwi {
         Identifier m_name;
 
         /// argument type
-        Type* m_type;
+        TypePtr m_type;
 
         /// argument position
         int32_t m_position;
 
-        Argument(Callable* owner, Type* type, int32_t position);
+        Argument(Callable* owner, TypePtr type, int32_t position);
     };
 }
 

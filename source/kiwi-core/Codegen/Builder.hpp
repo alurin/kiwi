@@ -37,7 +37,7 @@ namespace kiwi {
     class Builder {
     public:
         /// Constructor from function. Created first block for function
-        Builder(Module* module);
+        Builder(ModulePtr module);
 
         /// Copy constructor
         Builder(const Builder& builder);
@@ -46,12 +46,12 @@ namespace kiwi {
         Builder& operator=(const Builder& builder);
 
         /// return native context
-        Context* getNativeContext() const {
+        ContextPtr getNativeContext() const {
             return m_nativeContext;
         }
 
         /// return native context
-        Module* getNativeModule() const {
+        ModulePtr getNativeModule() const {
             return m_nativeModule;
         }
 
@@ -66,10 +66,10 @@ namespace kiwi {
         }
     protected:
         /// Native Kiwi context
-        Context* m_nativeContext;
+        ContextPtr m_nativeContext;
 
         /// Native Kiwi module
-        Module* m_nativeModule;
+        ModulePtr m_nativeModule;
 
         /// LLVM context
         llvm::LLVMContext*  m_context;
@@ -83,10 +83,10 @@ namespace kiwi {
     class FunctionBuilder : public Builder {
     public:
         /// Constructor
-        FunctionBuilder(Callable* analog);
+        FunctionBuilder(CallablePtr analog);
 
         /// Constructor
-        FunctionBuilder(Type* type, llvm::Function* func);
+        FunctionBuilder(TypePtr type, llvm::Function* func);
 
         /// Copy constructor
         FunctionBuilder(const FunctionBuilder& builder);
@@ -106,13 +106,13 @@ namespace kiwi {
         /// Create new basic block and return builder pointed to this block
         BlockBuilder createBlock(const Identifier& name);
 
-                /// return native callable
-        Callable* getNativeCallable() const {
+        /// return native callable
+        CallablePtr getNativeCallable() const {
             return m_nativeCallable;
         }
 
         /// return native type
-        Type* getNativeOwner() const {
+        TypePtr getNativeOwner() const {
             return m_nativeOwner;
         }
     private:
@@ -120,10 +120,10 @@ namespace kiwi {
         mutable llvm::Function* m_func;
 
         /// Cullable analog
-        Callable* m_nativeCallable;
+        CallablePtr m_nativeCallable;
 
         /// Cullable analog
-        Type* m_nativeOwner;
+        TypePtr m_nativeOwner;
     };
 
     //==--------------------------------------------------------------------==//
@@ -155,7 +155,7 @@ namespace kiwi {
         void createBr(BlockBuilder block);
 
         /// Allocate memory in stack for mutable variable
-        ValueBuilder createVariable(const Identifier& name, Type* type, bool autoInit = true);
+        ValueBuilder createVariable(const Identifier& name, TypePtr type, bool autoInit = true);
 
         /// Create store in mutable variable
         ValueBuilder createStore(ValueBuilder variable, ValueBuilder value);
@@ -164,16 +164,16 @@ namespace kiwi {
         ValueBuilder createLoad(ValueBuilder variable);
 
         /// Create new object
-        ValueBuilder createNew(ObjectType* type, Callable* ctor = 0, std::vector<ValueBuilder> args = std::vector<ValueBuilder>());
+        ValueBuilder createNew(ObjectPtr type, CallablePtr ctor = CallablePtr(), std::vector<ValueBuilder> args = std::vector<ValueBuilder>());
 
         /// Create store in object field
-        ValueBuilder createStore(ValueBuilder thisValue, Field* field, ValueBuilder value);
+        ValueBuilder createStore(ValueBuilder thisValue, FieldPtr field, ValueBuilder value);
 
         /// Create load from object field
-        ValueBuilder createLoad(ValueBuilder thisValue, Field* field);
+        ValueBuilder createLoad(ValueBuilder thisValue, FieldPtr field);
 
         /// Create call for callable with arguments
-        ValueBuilder createCall(Callable* call, std::vector<ValueBuilder> args);
+        ValueBuilder createCall(CallablePtr call, std::vector<ValueBuilder> args);
 
         /// Create integer constant
         ValueBuilder createIntConst(int32_t value);
@@ -196,7 +196,7 @@ namespace kiwi {
         llvm::BasicBlock* m_block;
 
         /// Find offset for field in object
-        llvm::Value* offsetField(ValueBuilder thisValue, Field* field);
+        llvm::Value* offsetField(ValueBuilder thisValue, FieldPtr field);
     };
 
     //==--------------------------------------------------------------------==//
@@ -204,7 +204,7 @@ namespace kiwi {
     class ValueBuilder : public BlockBuilder {
     public:
         /// constructor
-        ValueBuilder(const BlockBuilder& builder, llvm::Value* value, Type* type);
+        ValueBuilder(const BlockBuilder& builder, llvm::Value* value, TypePtr type);
 
         /// Copy constructor
         ValueBuilder(const ValueBuilder& builder);
@@ -218,7 +218,7 @@ namespace kiwi {
         }
 
         /// returns value type
-        Type* getType() const {
+        TypePtr getType() const {
             return m_type;
         }
     protected:
@@ -226,7 +226,7 @@ namespace kiwi {
         llvm::Value* m_value;
 
         /// Value type
-        Type* m_type;
+        TypePtr m_type;
     };
 }
 

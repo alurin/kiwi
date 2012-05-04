@@ -69,26 +69,26 @@ namespace lang {
         bool m_hasOwnership;
 
         /// construct a new parser driver context
-        Driver(Context* context, Type* thisType, std::istream* stream,
+        Driver(ContextPtr context, TypePtr thisType, std::istream* stream,
                 const std::string& sname, bool hasOwnership);
 
         /// Create driver for parsing a stream.
-        static Driver* createFromStream(Context* context, Type* thisType,
+        static Driver* createFromStream(ContextPtr context, TypePtr thisType,
                 std::istream& in, const std::string& sname = "stream input");
 
         /// Create driver for parsing a string.
-        static Driver* createFromString(Context* context, Type* thisType,
+        static Driver* createFromString(ContextPtr context, TypePtr thisType,
             const std::string& input, const std::string& sname = "string stream");
 
         /// Create driver for parsing a file.
-        static Driver* createFromFile(Context* context, Type* thisType, const std::string& filename);
+        static Driver* createFromFile(ContextPtr context, TypePtr thisType, const std::string& filename);
     };
 
     /// Memory safe
     class DriverRef {
     public:
         /// Constructor
-        DriverRef(Context* context, Type* thisType);
+        DriverRef(ContextPtr context, TypePtr thisType);
 
         /// Destructor
         ~DriverRef();
@@ -105,14 +105,14 @@ namespace lang {
         bool parseFile( const std::string& filename);
 
         /// Return main method from current source file
-        Method* getMainMethod() const {
+        MethodPtr getMainMethod() const {
             return m_mainMethod;
         }
     private:
-        Driver*  m_driver;
-        Context* m_context;
-        Type*    m_thisType;
-        Method*  m_mainMethod;
+        Driver*     m_driver;
+        ContextPtr  m_context;
+        TypePtr     m_thisType;
+        MethodPtr   m_mainMethod;
 
         // local parsing and building process
         bool parse();

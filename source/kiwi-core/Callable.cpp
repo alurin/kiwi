@@ -14,7 +14,7 @@ using namespace kiwi;
 using namespace kiwi::codegen;
 
 // constructor
-Callable::Callable(Type* ownerType, Type* returnType, TypeVector types)
+Callable::Callable(TypePtr ownerType, TypePtr returnType, TypeVector types)
 : Member(ownerType), m_returnType(returnType), m_func(0), m_policy(0) {
     makeArgumentsFromTypes(types);
     kiwi_assert(m_args.size() > 0, "Callable must have minimum one argument");
@@ -22,7 +22,7 @@ Callable::Callable(Type* ownerType, Type* returnType, TypeVector types)
 }
 
 // constructor
-Callable::Callable(Type* ownerType, Callable* callable)
+Callable::Callable(TypePtr ownerType, Callable* callable)
 : Member(ownerType), m_returnType(callable->m_returnType), m_func(0), m_policy(new CloneEmitter(callable)) {
     cloneArguments(ownerType, callable->m_args);
     kiwi_assert(m_args.size() > 0, "Callable must have minimum one argument");
@@ -63,13 +63,13 @@ void Callable::setFunction(llvm::Function* func) {
 
 void Callable::makeArgumentsFromTypes(TypeVector types) {
     for (TypeVector::iterator i = types.begin(); i != types.end(); ++i) {
-        Type* type = *i;
+        TypePtr type = *i;
         Argument* arg = new Argument(this, type, m_args.size());
         m_args.push_back(arg);
     }
 }
 
-void Callable::cloneArguments(Type* thisType, ArgumentVector args) {
+void Callable::cloneArguments(TypePtr thisType, ArgumentVector args) {
     int j = 0;
     for (ArgumentVector::iterator i = args.begin(); i != args.end(); ++i, ++j) {
         if (j) {

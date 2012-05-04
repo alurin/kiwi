@@ -37,7 +37,7 @@ namespace lang {
         }
 
         /// returns type
-        Type* getType() const {
+        TypePtr getType() const {
             return m_type;
         }
 
@@ -54,7 +54,7 @@ namespace lang {
         void generateIRCode(Driver& driver);
     protected:
         /// Generated type
-        Type* m_type;
+        TypePtr m_type;
 
         /// remove members
         std::vector<MemberNode*> m_members;
@@ -66,7 +66,7 @@ namespace lang {
         CompoundNode();
 
         /// internal constructor
-        CompoundNode(Type* type);
+        CompoundNode(TypePtr type);
     }; // class CompoundNode
 
     //==--------------------------------------------------------------------==//
@@ -88,7 +88,7 @@ namespace lang {
     class ConcreteClassType : public CompoundNode {
     public:
         /// constructor
-        ConcreteClassType(Type* type);
+        ConcreteClassType(TypePtr type);
     protected:
     }; // class ConcreteClassType
 }} // namespace kiwi::lang

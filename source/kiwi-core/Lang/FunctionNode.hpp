@@ -168,7 +168,7 @@ namespace lang {
         virtual ~FieldNode();
 
         /// Generate metadata
-        virtual void generateMember(Driver& driver, Type* owner);
+        virtual void generateMember(Driver& driver, TypePtr owner);
     protected:
         // store fields
         Identifier                  m_name;
@@ -198,15 +198,15 @@ namespace lang {
         }
 
         /// Generate metadata
-        virtual void generateMember(Driver& driver, Type* owner);
+        virtual void generateMember(Driver& driver, TypePtr owner);
 
         /// Emit function code and instruction
-        virtual void generateIRSignature(Driver& driver, Type* owner);
+        virtual void generateIRSignature(Driver& driver, TypePtr owner);
 
         /// Emit function code and instruction
-        virtual void generateIRCode(Driver& driver, Type* owner);
+        virtual void generateIRCode(Driver& driver, TypePtr owner);
 
-        Method* getMethod() const {
+        MethodPtr getMethod() const {
             return m_method;
         }
 
@@ -225,7 +225,7 @@ namespace lang {
         ScopeNode* m_root;
 
         // generated fields
-        Method* m_method;
+        MethodPtr m_method;
         llvm::Function* m_func;
 
         std::vector<ArgumentNode*>          m_positions;

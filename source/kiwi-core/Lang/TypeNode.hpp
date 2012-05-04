@@ -24,7 +24,7 @@ namespace lang {
         virtual ~TypeNode();
 
         /// get type
-        virtual Type* get(Driver& driver) =0;
+        virtual TypePtr get(Driver& driver) =0;
     protected:
         TypeNode();
     };
@@ -33,14 +33,14 @@ namespace lang {
     class ConcreteTypeNode : public TypeNode {
     public:
         /// constructor
-        ConcreteTypeNode(Type* type);
+        ConcreteTypeNode(TypePtr type);
 
         /// get type
-        virtual Type* get(Driver& driver) {
+        virtual TypePtr get(Driver& driver) {
             return m_type;
         }
     protected:
-        Type* m_type;
+        TypePtr m_type;
     };
 
     class QualifiedTypeNode : public TypeNode {
@@ -49,7 +49,7 @@ namespace lang {
         QualifiedTypeNode(const Identifier& name);
 
         /// get type
-        virtual Type* get(Driver& driver);
+        virtual TypePtr get(Driver& driver);
     protected:
         Identifier m_name;
     };

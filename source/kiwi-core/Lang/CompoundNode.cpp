@@ -16,11 +16,11 @@ using namespace kiwi::lang;
 
 // internal constructor
 CompoundNode::CompoundNode()
-: m_type(0) {
+: m_type() {
 }
 
 // internal constructor
-CompoundNode::CompoundNode(Type* type)
+CompoundNode::CompoundNode(TypePtr type)
 : m_type(type) {
 }
 
@@ -37,7 +37,7 @@ ClassNode::ClassNode(const Identifier& name) : m_name(name) {
 }
 
 // constructor
-ConcreteClassType::ConcreteClassType(Type* type)
+ConcreteClassType::ConcreteClassType(TypePtr type)
 : CompoundNode(type) {
 }
 
@@ -48,12 +48,12 @@ void CompoundNode::append(MemberNode* member) {
 }
 
 void ClassNode::generateType(Driver& driver) {
-    ObjectType* current;
+    ObjectPtr current;
     m_type = current = ObjectType::create(driver.getModule(), m_name);
 
     for (std::vector<Identifier>::iterator i = m_inherits.begin(); i != m_inherits.end(); ++i) {
-        Type* type = driver.getModule()->find(*i);
-        if (ObjectType* parent = dyn_cast<ObjectType>(type)) {
+        TypePtr type = driver.getModule()->find(*i);
+        if (ObjectPtr parent = dyn_cast<ObjectType>(type)) {
             current->inherit(parent);
         } else if (type) {
             throw LangException()

@@ -52,11 +52,11 @@ namespace kiwi {
         }
 
         /// returns type owner context
-        Context* getContext() const;
+        ContextPtr getContext() const;
 
         /// returns type owner module
-        Module* getModule() const {
-            return m_module;
+        ModulePtr getModule() const {
+            return m_module.lock();
         }
 
         TypeImpl* getMetadata() const {
@@ -67,46 +67,46 @@ namespace kiwi {
         llvm::Type* getVarType() const;
 
         /// add unary operator
-        UnaryOperator* addUnary(Member::UnaryOpcode opcode, Type* returnType);
+        UnaryPtr addUnary(Member::UnaryOpcode opcode, TypePtr returnType);
 
         /// add binary operator
-        BinaryOperator* addBinary(Member::BinaryOpcode opcode, Type* returnType, Type* operandType);
+        BinaryPtr addBinary(Member::BinaryOpcode opcode, TypePtr returnType, TypePtr operandType);
 
         /// add binary operator
-        MultiaryOperator* addMultiary(Member::MultiaryOpcode opcode, Type* returnType, std::vector<Type*> arguments);
+        MultiaryPtr addMultiary(Member::MultiaryOpcode opcode, TypePtr returnType, std::vector<TypePtr> arguments);
 
         /// add field
-        Field* addField(const Identifier& name, Type* type);
+        FieldPtr addField(const Identifier& name, TypePtr type);
 
         /// Merge inherited field
-        void mergeField(Field* declared, Field* inherited);
+        void mergeField(FieldPtr declared, FieldPtr inherited);
 
         /// find field operator
-        Field* findField(const Identifier& name) const;
+        FieldPtr findField(const Identifier& name) const;
 
         /// add method
-        Method* addMethod(const Identifier& name, Type* returnType, std::vector<Type*> arguments);
+        MethodPtr addMethod(const Identifier& name, TypePtr returnType, std::vector<TypePtr> arguments);
 
         /// find unary operator
-        UnaryOperator* findUnary(Member::UnaryOpcode opcode) const;
+        UnaryPtr findUnary(Member::UnaryOpcode opcode) const;
 
         /// find binary operator
-        BinaryOperator* findBinary(Member::BinaryOpcode opcode, Type* operandType) const;
+        BinaryPtr findBinary(Member::BinaryOpcode opcode, TypePtr operandType) const;
 
         /// find binary operator
-        MultiaryOperator* findMultiary(Member::MultiaryOpcode opcode, std::vector<Type*> arguments) const;
+        MultiaryPtr findMultiary(Member::MultiaryOpcode opcode, std::vector<TypePtr> arguments) const;
 
         /// find method
-        Method* findMethod(const Identifier& name, std::vector<Type*> arguments) const;
+        MethodPtr findMethod(const Identifier& name, std::vector<TypePtr> arguments) const;
 
         //==--------------------------------------------------------------------------------------------------------==//
         //          Method for work with type system
         //==--------------------------------------------------------------------------------------------------------==//
         /// This class inherits from type?
-        virtual bool isInherit(const Type* type, bool duckCast = false) const;
+        virtual bool isInherit(const TypePtr type, bool duckCast = false) const;
 
         /// Type is castable to other type (up-cast(from child to parent) or implict cast)
-        virtual bool isCastableTo(const Type* type, bool duckCast = true) const;
+        virtual bool isCastableTo(const TypePtr type, bool duckCast = true) const;
 
         /// emit type metadata and structure
         virtual void emit();
@@ -128,16 +128,16 @@ namespace kiwi {
         TypeID m_typeID;
 
         /// Type module
-        Module* m_module;
+        ModuleWeak m_module;
 
         /// Name of type
         Identifier m_name;
 
         /// constructor
-        Type(Module* module);
+        Type(ModulePtr module);
 
         /// add base type
-        void inheritBase(Type* type);
+        void inheritBase(TypePtr type);
     };
 }
 

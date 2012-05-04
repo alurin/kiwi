@@ -21,7 +21,7 @@
 using namespace kiwi;
 using namespace kiwi::codegen;
 
-IntType::IntType(Module* module, int32_t size, bool unsign)
+IntegerType::IntegerType(ModulePtr module, int32_t size, bool unsign)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_meta->varType = llvm::IntegerType::get(context, size);
@@ -29,7 +29,7 @@ IntType::IntType(Module* module, int32_t size, bool unsign)
     m_name    = "int";
 }
 
-BoolType::BoolType(Module* module)
+BooleanType::BooleanType(ModulePtr module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_meta->varType = llvm::IntegerType::get(context, 1);
@@ -37,7 +37,7 @@ BoolType::BoolType(Module* module)
     m_name    = "bool";
 }
 
-VoidType::VoidType(Module* module)
+VoidType::VoidType(ModulePtr module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_meta->varType = llvm::Type::getVoidTy(context);
@@ -45,7 +45,7 @@ VoidType::VoidType(Module* module)
     m_name    = "void";
 }
 
-CharType::CharType(Module* module)
+CharType::CharType(ModulePtr module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     m_meta->varType = llvm::IntegerType::get(context, 16);
@@ -53,13 +53,13 @@ CharType::CharType(Module* module)
     m_name    = "char";
 }
 
-ObjectType::ObjectType(Module* module)
+ObjectType::ObjectType(ModulePtr module)
 : Type(module) {
     m_typeID  = ObjectID;
     m_name    = "object";
 }
 
-StringType::StringType(Module* module)
+StringType::StringType(ModulePtr module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getContext();
     llvm::Type* charType       = llvm::IntegerType::get(context, 16);
@@ -73,52 +73,52 @@ StringType::StringType(Module* module)
     m_typeID                   = StringID;
 }
 
-IntType* IntType::create(Module* module, int32_t size, bool unsign) {
-    IntType* type = new IntType(module, size, unsign);
+IntegerPtr IntegerType::create(ModulePtr module, int32_t size, bool unsign) {
+    IntegerPtr type = IntegerPtr(new IntegerType(module, size, unsign));
     type->initializate();
     return type;
 }
 
-BoolType* BoolType::create(Module* module) {
-    BoolType* type = new BoolType(module);
+BooleanPtr BooleanType::create(ModulePtr module) {
+    BooleanPtr type = BooleanPtr(new BooleanType(module));
     type->initializate();
     return type;
 }
 
-VoidType* VoidType::create(Module* module) {
-    VoidType* type = new VoidType(module);
+VoidPtr VoidType::create(ModulePtr module) {
+    VoidPtr type = VoidPtr(new VoidType(module));
     return type;
 }
 
-CharType* CharType::create(Module* module) {
-    CharType* type = new CharType(module);
+CharPtr CharType::create(ModulePtr module) {
+    CharPtr type = CharPtr(new CharType(module));
     type->initializate();
     return type;
 }
 
-StringType* StringType::create(Module* module) {
-    StringType* type = new StringType(module);
+StringPtr StringType::create(ModulePtr module) {
+    StringPtr type = StringPtr(new StringType(module));
     type->initializate();
     return type;
 }
 
-ObjectType* ObjectType::create(Module* module) {
-    ObjectType* type = new ObjectType(module);
+ObjectPtr ObjectType::create(ModulePtr module) {
+    ObjectPtr type = ObjectPtr(new ObjectType(module));
     return type;
 }
 
-ObjectType* ObjectType::create(Module* module, const Identifier& name) {
-    ObjectType* type = new ObjectType(module);
+ObjectPtr ObjectType::create(ModulePtr module, const Identifier& name) {
+    ObjectPtr type = ObjectPtr(new ObjectType(module));
     type->m_name = name;
     module->registerType(type, name);
     return type;
 }
 
-void IntType::initializate() {
-    Context* context = m_module->getContext();
-    Type* boolTy = BoolType::get(context);
-    Type* voidTy = VoidType::get(context);
-    Type* intTy = this;
+void IntegerType::initializate() {
+    ContextPtr context = m_module->getContext();
+    TypePtr boolTy = BooleanType::get(context);
+    TypePtr voidTy = VoidType::get(context);
+    TypePtr intTy = this;
 
     addUnary(Member::Pos,  intTy)->setPolicy(new LlvmZeroUnaryOperator(llvm::Instruction::Add, intTy));
     addUnary(Member::Neg,  intTy)->setPolicy(new LlvmZeroUnaryOperator(llvm::Instruction::Sub, intTy));
@@ -137,10 +137,10 @@ void IntType::initializate() {
     addUnary(Member::Print, voidTy)->setPolicy(new LlvmIntegerPrintOperator());
 }
 
-void BoolType::initializate() {
-    Context* context = m_module->getContext();
-    Type*     voidTy = VoidType::get(context);
-    Type*     boolTy = this;
+void BooleanType::initializate() {
+    ContextPtr context = m_module->getContext();
+    TypePtr     voidTy = VoidType::get(context);
+    TypePtr     boolTy = this;
 
     addBinary(Member::Eq,  boolTy, boolTy)->setPolicy(new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_EQ, context));
     addBinary(Member::Neq, boolTy, boolTy)->setPolicy(new LlvmIntegerCompareOperator(llvm::CmpInst::ICMP_NE, context));
@@ -149,21 +149,21 @@ void BoolType::initializate() {
 }
 
 void CharType::initializate() {
-    Context* context = m_module->getContext();
-    Type*     boolTy = BoolType::get(context);
-    Type*     voidTy = VoidType::get(context);
-    Type*     charTy = this;
+    ContextPtr context = m_module->getContext();
+    TypePtr     boolTy = BooleanType::get(context);
+    TypePtr     voidTy = VoidType::get(context);
+    TypePtr     charTy = this;
 
     addUnary(Member::Print, voidTy)->setPolicy(new LlvmCharPrintOperator());
 }
 
 void StringType::initializate() {
-    Context* context = m_module->getContext();
-    Type*     charTy = CharType::get(context);
-    Type*     boolTy = BoolType::get(context);
-    Type*     voidTy = VoidType::get(context);
-    Type*      intTy = IntType::get32(context);
-    Type*   stringTy = this;
+    ContextPtr context = m_module->getContext();
+    TypePtr     charTy = CharType::get(context);
+    TypePtr     boolTy = BooleanType::get(context);
+    TypePtr     voidTy = VoidType::get(context);
+    TypePtr      intTy = IntegerType::get32(context);
+    TypePtr   stringTy = this;
 
     addBinary(Member::Eq,  boolTy, stringTy)->setPolicy(new LlvmStringCompareOperator(llvm::CmpInst::ICMP_EQ, context));
     addBinary(Member::Neq, boolTy, stringTy)->setPolicy(new LlvmStringCompareOperator(llvm::CmpInst::ICMP_NE, context));
@@ -180,43 +180,43 @@ void StringType::initializate() {
     addUnary(Member::Print, voidTy)->setPolicy(new LlvmStringPrintOperator());
 }
 
-IntType* IntType::get32(Context* context) {
+IntegerTypePtr IntegerType::get32(ContextPtr context) {
     ContextImpl* meta = context->getMetadata();
     return meta->int32Ty;
 }
 
-BoolType* BoolType::get(Context* context) {
+BooleanPtr BooleanType::get(ContextPtr context) {
     ContextImpl* meta = context->getMetadata();
     return meta->boolTy;
 }
 
-VoidType* VoidType::get(Context* context) {
+VoidTypePtr VoidType::get(ContextPtr context) {
     ContextImpl* meta = context->getMetadata();
     return meta->voidTy;
 }
 
-CharType* CharType::get(Context* context) {
+CharTypePtr CharType::get(ContextPtr context) {
     ContextImpl* meta = context->getMetadata();
     return meta->charTy;
 }
 
-StringType* StringType::get(Context* context) {
+StringTypePtr StringType::get(ContextPtr context) {
     ContextImpl* meta = context->getMetadata();
     return meta->stringTy;
 }
 
 /// add parent type
-bool ObjectType::inherit(ObjectType* type) {
+bool ObjectType::inherit(ObjectTypePtr type) {
     m_meta->insertBase(type);
 }
 
 /// inherit type?
-bool ObjectType::isInherit(const ObjectType* type) const{
+bool ObjectType::isInherit(const ObjectTypePtr type) const{
     return m_meta->isBase(type);
 }
 
 // /// implement interface?
-// bool ObjectType::isImplement(const InterfaceType* type, bool duckCast) const {
+// bool ObjectType::isImplement(const InterfaceTypePtr type, bool duckCast) const {
 //     if (duckCast) {
 //         m_meta->implement(type, true);
 //     }
@@ -234,24 +234,31 @@ void ObjectType::emit() {
     llvm::Module* module       = m_module->getModule();
     std::vector<llvm::Type*> types;
 
-    // add vtable and vmap to type
+    // add vtable to type
+    llvm::Type* pointerType           = llvm::IntegerType::get(context, 8)->getPointerTo();
+    llvm::ArrayTypePtr virtualTableType = llvm::ArrayType::get(pointerType, m_meta->methods().size());
+    llvm::ArrayTypePtr virtualTableSamp = llvm::ArrayType::get(pointerType, 0);
+    types.push_back(virtualTableType);
+
+    // add amap to type
     llvm::Type* sizeType            = llvm::IntegerType::get(context, 32);
-    llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, m_meta->fields().size());
-    types.push_back(addressMapType->getPointerTo());
+    llvm::ArrayTypePtr addressMapType = llvm::ArrayType::get(sizeType, m_meta->fields().size());
+    llvm::ArrayTypePtr addressMapSamp = llvm::ArrayType::get(sizeType, 0);
+    types.push_back(addressMapType);
 
     // add field to type
     int j = 0;
     for (MemberSet<Field>::const_iterator i = m_meta->fields().begin(); i != m_meta->fields().end(); ++i, ++j) {
         Field* field = *i;
 
-        Type* type = field->getFieldType();
+        TypePtr type = field->getFieldType();
         types.push_back(type->getVarType());
 
         field->setPosition(j);
     }
 
     // emit llvm type analog
-    llvm::StructType* type = 0;
+    llvm::StructTypePtr type = 0;
     if (types.size()) {
         type = llvm::StructType::create(types);
     } else {
@@ -259,40 +266,41 @@ void ObjectType::emit() {
     }
     m_meta->varType = type->getPointerTo();
 
-    // emit address map
-    std::vector<llvm::Constant*> addresses;
-    std::vector<llvm::Constant*> buffer;
-    llvm::Constant* nullCst = llvm::Constant::getNullValue(m_meta->varType);
-    llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(32, 0, false));
-    j = 0;
-    for (MemberSet<Field>::const_iterator i = m_meta->fields().begin(); i != m_meta->fields().end(); ++i, ++j) {
-        // create variable for compare
-        llvm::APInt idxV(32, j + 1, false);
-        llvm::ConstantInt* idx = llvm::ConstantInt::get(context, idxV);
+    {
+        // emit address map
+        std::vector<llvm::Constant*> addresses;
+        std::vector<llvm::Constant*> buffer;
+        llvm::Constant* nullCst = llvm::Constant::getNullValue(m_meta->varType);
+        llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(32, 0, false));
+        j = 2;
+        for (MemberSet<Field>::const_iterator i = m_meta->fields().begin(); i != m_meta->fields().end(); ++i, ++j) {
+            // create variable for compare
+            llvm::APInt idxV(32, j, false);
+            llvm::ConstantInt* idx = llvm::ConstantInt::get(context, idxV);
 
-        // buffer
-        buffer.clear();
-        buffer.push_back(zero);
-        buffer.push_back(idx);
+            // buffer
+            buffer.clear();
+            buffer.push_back(zero);
+            buffer.push_back(idx);
 
-        llvm::Constant* cst = llvm::ConstantExpr::getGetElementPtr(nullCst, makeArrayRef(buffer));
-        addresses.push_back(cst);
+            llvm::Constant* cst = llvm::ConstantExpr::getGetElementPtr(nullCst, makeArrayRef(buffer));
+            addresses.push_back(cst);
+        }
+
+        llvm::Constant* addressMapValue = llvm::ConstantArray::get(addressMapType, makeArrayRef(addresses));
+
+        // generate string
+        m_meta->addressMap  = new llvm::GlobalVariable(
+            *module,
+            addressMapType,
+            true,
+            llvm::GlobalValue::PrivateLinkage,
+            addressMapValue,
+            "amap"
+        );
     }
-
-    llvm::Constant* addressMapValue = llvm::ConstantArray::get(addressMapType, makeArrayRef(addresses));
-
-    // generate string
-    m_meta->addressMap  = new llvm::GlobalVariable(
-        *module,
-        addressMapType,
-        true,
-        llvm::GlobalValue::PrivateLinkage,
-        addressMapValue,
-        "amap"
-    );
-
     // add simple constructor
-    std::vector<Type*> empty;
+    std::vector<TypePtr> empty;
     addMultiary(Member::Constructor, VoidType::get(m_module->getContext()), empty)->setPolicy(new LlvmCtorEmitter());
 }
 

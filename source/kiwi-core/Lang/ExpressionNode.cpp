@@ -20,10 +20,10 @@ using namespace kiwi::lang;
 
 namespace {
     inline
-    std::string format_call(const std::vector<Type*>& args) {
+    std::string format_call(const std::vector<TypePtr>& args) {
         std::stringstream ss;
         bool notFirst = false;
-        for (std::vector<Type*>::const_iterator i = args.begin(); i != args.end(); ++i) {
+        for (std::vector<TypePtr>::const_iterator i = args.begin(); i != args.end(); ++i) {
             if (notFirst) ss << ", "; else notFirst = true;
             ss << (*i)->getName();
         }
@@ -67,16 +67,16 @@ NamedExpressionNode::NamedExpressionNode(NamedNode* var)
 : o_var(var) { }
 
 
-IntegerConstNode::IntegerConstNode(Context* context, int32_t value)
+IntegerConstNode::IntegerConstNode(ContextPtr context, int32_t value)
 : m_context(context), m_value(value) { }
 
-BoolConstNode::BoolConstNode(Context* context, bool value)
+BoolConstNode::BoolConstNode(ContextPtr context, bool value)
 : m_context(context), m_value(value) { }
 
-StringConstNode::StringConstNode(Context* context, const String& value)
+StringConstNode::StringConstNode(ContextPtr context, const String& value)
 : m_context(context), m_value(value) { }
 
-CharConstNode::CharConstNode(Context* context, const UChar& value)
+CharConstNode::CharConstNode(ContextPtr context, const UChar& value)
 : m_context(context), m_value(value) { }
 
 CallableArgument::CallableArgument(const Identifier& name, ExpressionNode* value, int32_t position)
@@ -162,7 +162,7 @@ ValueBuilder CallableNode::emitImpl(Driver& driver, BlockBuilder block) const {
 
 // Find arguments for append before other
 ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vector<ValueBuilder> args) const {
-    std::vector<Type*> types;
+    std::vector<TypePtr> types;
     int j = 0;
     for (std::vector<ValueBuilder>::const_iterator i = args.begin(); i != args.end(); ++i, ++j) {
         types.push_back(i->getType());
@@ -178,7 +178,7 @@ ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vec
     }
 
     /// find call
-    Callable* call = call = findCallable(driver, types);
+    CallablePtr call = call = findCallable(driver, types);
 
     if (!call) {
         throw LangException()
@@ -188,8 +188,8 @@ ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vec
     return block.createCall(call, args);
 }
 
-Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) const {
-    Callable* call = types[0]->findBinary(m_opcode, types[1]);
+CallablePtr BinaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
+    CallablePtr call = types[0]->findBinary(m_opcode, types[1]);
     if (!call) {
         throw LangException()
             << exception_format("Not found binary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
@@ -198,8 +198,8 @@ Callable* BinaryNode::findCallable(Driver& driver, std::vector<Type*> types) con
     return call;
 }
 
-Callable* UnaryNode::findCallable(Driver& driver, std::vector<Type*> types) const {
-    Callable* call = types[0]->findUnary(m_opcode);
+CallablePtr UnaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
+    CallablePtr call = types[0]->findUnary(m_opcode);
     if (!call) {
         throw LangException()
             << exception_format("Not found unary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
@@ -208,10 +208,10 @@ Callable* UnaryNode::findCallable(Driver& driver, std::vector<Type*> types) cons
     return call;
 }
 
-Callable* MultiaryNode::findCallable(Driver& driver, std::vector<Type*> types) const {
+CallablePtr MultiaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
     kiwi_assert(types.size() > 0, "MultiaryNode::findCallable must recive at last one argument");
-    std::vector<Type*> args(types.begin() + 1, types.end());
-    Callable* call = types[0]->findMultiary(m_opcode, args);
+    std::vector<TypePtr> args(types.begin() + 1, types.end());
+    CallablePtr call = types[0]->findMultiary(m_opcode, args);
     if (!call) {
         throw LangException()
             << exception_format("Not found multiary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
@@ -220,9 +220,9 @@ Callable* MultiaryNode::findCallable(Driver& driver, std::vector<Type*> types) c
     return call;
 }
 
-Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) const {
-    std::vector<Type*> args(types.begin() + 1, types.end());
-    Callable* call = types[0]->findMethod(m_method, args);
+CallablePtr CallNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
+    std::vector<TypePtr> args(types.begin() + 1, types.end());
+    CallablePtr call = types[0]->findMethod(m_method, args);
     if (!call) {
         throw LangException()
             << exception_format("Not found method %1%(%2%)", m_method % format_call(types))
@@ -233,8 +233,8 @@ Callable* CallNode::findCallable(Driver& driver, std::vector<Type*> types) const
 
 // Emit instructions
 ValueBuilder NewNode::emitImpl(Driver& driver, BlockBuilder block) const {
-    Type* type = m_type->get(driver);
-    if (ObjectType* objType = dyn_cast<ObjectType>(type)) {
+    TypePtr type = m_type->get(driver);
+    if (ObjectPtr objType = dyn_cast<ObjectType>(type)) {
         return block.createNew(objType);
     } else {
         throw LangException()
@@ -285,33 +285,33 @@ ValueBuilder CharConstNode::emitImpl(Driver& driver, BlockBuilder block) const {
 
 /// @todo Remove copy past
 ValueBuilder InstanceMutableNode::emitImpl(Driver& driver, ValueBuilder value) const {
-    Type* owner      = value.getNativeOwner();
-    ObjectType* type = dyn_cast<ObjectType>(owner);
+    TypePtr owner      = value.getNativeOwner();
+    ObjectPtr type = dyn_cast<ObjectType>(owner);
     if (type) {
-        Field* field = type->findField(m_name);
+        FieldPtr field = type->findField(m_name);
         if (field) {
             ValueBuilder thisValue = m_thisNode->emit(driver, value);
             return thisValue.createStore(thisValue, field, value);
         }
     }
     throw LangException()
-        << exception_format("Field '%1%' not found in type '%2%'", m_name% type->getName())
+        << exception_format("Field '%1%' not found in type '%2%'", m_name % type->getName())
         << exception_location(to_location(this));
 }
 
 /// @todo Remove copy past
 ValueBuilder InstanceExpressionNode::emitImpl(Driver& driver, BlockBuilder block) const {
-    Type* owner      = block.getNativeOwner();
-    ObjectType* type = dyn_cast<ObjectType>(owner);
+    TypePtr owner      = block.getNativeOwner();
+    ObjectPtr type = dyn_cast<ObjectType>(owner);
     if (type) {
-        Field* field     = type->findField(m_name);
+        FieldPtr field     = type->findField(m_name);
         if (field) {
             ValueBuilder thisValue = m_thisNode->emit(driver, block);
             return thisValue.createLoad(thisValue, field);
         }
     }
     throw LangException()
-        << exception_format("Field '%1%' not found in type '%2%'", m_name% type->getName())
+        << exception_format("Field '%1%' not found in type '%2%'", m_name % type->getName())
         << exception_location(to_location(this));
 }
 
@@ -323,7 +323,7 @@ ValueBuilder ThisNode::emitImpl(Driver& driver, BlockBuilder block) const {
             << exception_message("This or self argument not found")
             << exception_location(to_location(this));
     }
-    Type* type = m_thisType->getType();
+    TypePtr type = m_thisType->getType();
     kiwi_assert(type, "Type is null");
     return ValueBuilder(block, func->arg_begin(), type);
 }

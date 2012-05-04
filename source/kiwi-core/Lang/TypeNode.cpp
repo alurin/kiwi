@@ -19,7 +19,7 @@ TypeNode::TypeNode() {
 TypeNode::~TypeNode() {
 }
 
-ConcreteTypeNode::ConcreteTypeNode(Type* type)
+ConcreteTypeNode::ConcreteTypeNode(TypePtr type)
 : m_type(type) {
 }
 
@@ -28,9 +28,9 @@ QualifiedTypeNode::QualifiedTypeNode(const Identifier& name)
 : m_name(name) {
 }
 
-Type* QualifiedTypeNode::get(Driver& driver) {
-    Module* module = driver.getModule();
-    Type*   type   = module->find(m_name);
+TypePtr QualifiedTypeNode::get(Driver& driver) {
+    ModulePtr module = driver.getModule();
+    TypePtr   type   = module->find(m_name);
     if (!type) {
         throw LangException()
             << exception_format("Type '%1%' not found", m_name)

@@ -10,7 +10,7 @@
 #include "kiwi/Module.hpp"
 
 namespace kiwi {
-    void initRuntimeModule(Module* module);
+    void initRuntimeModule(ModulePtr module);
 }
 
 #endif

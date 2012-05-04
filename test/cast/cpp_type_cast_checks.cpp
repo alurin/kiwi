@@ -29,26 +29,26 @@ public:
 
 TEST(types_cast_check) // Declares a test named "types_cast_check"
 {
-    Context* context = Context::create();
+    ContextPtr context = Context::create();
 
     cast_checker<VoidType, Type>::check(VoidType::get(context));
-    cast_checker<BoolType, Type>::check(BoolType::get(context));
+    cast_checker<BooleanType, Type>::check(BooleanType::get(context));
     cast_checker<CharType, Type>::check(CharType::get(context));
-    cast_checker<IntType, Type>::check(IntType::get32(context));
+    cast_checker<IntegerType, Type>::check(IntegerType::get32(context));
     cast_checker<StringType, Type>::check(StringType::get(context));
 
-    Module* module = Module::create("script", context);
+    ModulePtr module = Module::create("script", context);
     cast_checker<ObjectType, Type>::check(ObjectType::create(module));
     delete context;
 }
 
 TEST(members_cast_check) // Declares a test named "members_cast_check"
 {
-    Context* context = Context::create();
-    Module*  module  = Module::create("name", context);
-    ObjectType* type = ObjectType::create(module);
+    ContextPtr context = Context::create();
+    ModulePtr  module  = Module::create("name", context);
+    ObjectTypePtr type = ObjectType::create(module);
 
-    std::vector<Type*> args;
+    std::vector<TypePtr> args;
 
     cast_checker<Field, Member>::check(type->addField("field", type));
     cast_checker<Method, Member>::check(type->addMethod("method", type, args));

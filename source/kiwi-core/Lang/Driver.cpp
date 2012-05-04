@@ -17,7 +17,7 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
-Driver::Driver(Context* context, Type* thisType, std::istream* stream,
+Driver::Driver(ContextPtr context, TypePtr thisType, std::istream* stream,
      const std::string& sname, bool hasOwnership)
 : NodeFactory(context, thisType),
     m_stream(stream),
@@ -33,11 +33,11 @@ Driver::~Driver() {
     }
 }
 
-Driver* Driver::createFromStream(Context* context, Type* thisType, std::istream& stream, const std::string& sname) {
+Driver* Driver::createFromStream(ContextPtr context, TypePtr thisType, std::istream& stream, const std::string& sname) {
     return new Driver(context, thisType, &stream, sname, false);
 }
 
-Driver* Driver::createFromFile(Context* context, Type* thisType, const std::string &filename) {
+Driver* Driver::createFromFile(ContextPtr context, TypePtr thisType, const std::string &filename) {
     std::ifstream* in = new std::ifstream(filename.c_str(), std::ios::binary | std::ios::in);
     if (!in->good()) {
         delete in;
@@ -48,7 +48,7 @@ Driver* Driver::createFromFile(Context* context, Type* thisType, const std::stri
     return new Driver(context, thisType, in, filename, true);
 }
 
-Driver* Driver::createFromString(Context* context, Type* thisType, const std::string &input, const std::string& sname) {
+Driver* Driver::createFromString(ContextPtr context, TypePtr thisType, const std::string &input, const std::string& sname) {
     std::istringstream* iss = new std::istringstream(input);
     return new Driver(context, thisType, iss, sname, true);
 }
@@ -80,8 +80,8 @@ void Driver::error(const class location& l, const std::string& m) {
         << exception_location(to_location(l));
 }
 
-DriverRef::DriverRef(Context* context, Type* thisType)
-: m_context(context), m_thisType(thisType), m_driver(0), m_mainMethod(0) {
+DriverRef::DriverRef(ContextPtr context, TypePtr thisType)
+: m_context(context), m_thisType(thisType), m_driver(0) {
 }
 
 DriverRef::~DriverRef() {
@@ -113,7 +113,7 @@ bool DriverRef::parse() {
 
     Driver& driver = *m_driver;
     if (driver.parse()) {
-        std::vector<Type*> empty;
+        std::vector<TypePtr> empty;
 
         // create types
         for (std::vector<lang::CompoundNode*>::const_iterator i = driver.begin(); i != driver.end(); ++i) {
@@ -135,7 +135,7 @@ bool DriverRef::parse() {
             (*i)->generateIRCode(driver);
 
             // find first main method.
-            Type* type = (*i)->getType();
+            TypePtr type = (*i)->getType();
             if (type && !m_mainMethod) {
                 m_mainMethod = type->findMethod("main", empty);
             }

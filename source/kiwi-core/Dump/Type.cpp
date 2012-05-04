@@ -19,8 +19,8 @@ void Type::dump() {
     // dump base types
     if (m_meta->base_begin() != m_meta->base_end())
         std::cerr << "  Bases:\n";
-    for (std::set<Type*>::const_iterator i = m_meta->base_begin(); i != m_meta->base_end(); ++i) {
-        Type* base = *i;
+    for (std::set<TypePtr>::const_iterator i = m_meta->base_begin(); i != m_meta->base_end(); ++i) {
+        TypePtr base = *i;
         std::cerr << "    + " << base->getName() << "\n";
     }
 
@@ -28,7 +28,7 @@ void Type::dump() {
     if (m_meta->fields().begin() != m_meta->fields().end())
         std::cerr << "  Fields:\n";
     for (MemberSet<Field>::const_iterator i = m_meta->fields().begin(); i != m_meta->fields().end(); ++i) {
-        Field* field = (*i);
+        FieldPtr field = (*i);
 
         if (field->isDeclared()) {
             std::cerr << "    + ";
@@ -37,8 +37,8 @@ void Type::dump() {
         }
 
         std::cerr << field->getName() << " : " << field->getFieldType()->getName() << "\n";
-        for (Overridable<Field>::override_const_iterator j = field->override_begin(); j != field->override_end(); ++j) {
-            Field* override = *j;
+        for (Overridable<Field>::const_iterator j = field->override_begin(); j != field->override_end(); ++j) {
+            FieldPtr override = j->lock();
             std::cerr << "      -- " << override->getOwnerType()->getName() << ".@" << field->getName() << "\n";
         }
     }
@@ -46,7 +46,7 @@ void Type::dump() {
     if (m_meta->methods().begin() != m_meta->methods().end())
         std::cerr << "  Methods:\n";
     for (MemberSet<Method>::const_iterator i = m_meta->methods().begin(); i != m_meta->methods().end(); ++i) {
-        Method* method = (*i);
+        MethodPtr method = (*i);
 
         if (method->isDeclared()) {
             std::cerr << "    + ";
@@ -64,8 +64,8 @@ void Type::dump() {
         }
 
         std::cerr << ")\n";
-        for (Overridable<Method>::override_const_iterator j = method->override_begin(); j != method->override_end(); ++j) {
-            Method* override = *j;
+        for (Overridable<Method>::const_iterator j = method->override_begin(); j != method->override_end(); ++j) {
+            MethodPtr override = j->lock();
             std::cerr << "      -- " << override->getOwnerType()->getName() << ".@" << method->getName() << "\n";
         }
     }

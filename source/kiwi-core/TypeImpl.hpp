@@ -32,22 +32,25 @@ namespace kiwi {
     template<typename T>
     class MemberSet {
     public:
-        typedef typename std::set<T*>::const_iterator const_iterator;
+        /// typedef for smart pointers of type
+        typedef typename boost::shared_ptr<T> reference;
+
+        typedef typename std::set<reference>::const_iterator const_iterator;
 
         /// constructor
-        MemberSet(Type* owner);
+        MemberSet(TypePtr owner);
 
         /// insert member
-        void insert(T* member);
+        void insert(reference member);
 
         /// find field by base member
-        T* find(T* inherit) const;
+        reference find(reference inherit) const;
 
         /// merge inherit field in declare field
-        void merge(T* declare, T* inherit);
+        void merge(reference declare, reference inherit);
 
         /// inherit member
-        void inherit(T* member);
+        void inherit(reference member);
 
         /// merge members from other member set
         void inherit(MemberSet<T>& members);
@@ -68,16 +71,16 @@ namespace kiwi {
         }
     private:
         /// Owner for this implementation
-        Type* m_owner;
+        TypePtr m_owner;
 
         /// set of members
-        std::set<T*> m_members;
+        std::set<reference> m_members;
 
         /// Signal for insert new field
-        boost::signals2::signal<void (T*)> onInsert;
+        boost::signals2::signal<void (reference)> onInsert;
 
         /// Signal for insert new field
-        boost::signals2::signal<void (T*)> onRemove;
+        boost::signals2::signal<void (reference)> onRemove;
     };
 
 //==------------------------------------------------------------------------==//
@@ -86,9 +89,14 @@ namespace kiwi {
     template<typename T>
     class InsertMember {
     public:
+        /// typedef for smart pointers of type
+        typedef boost::shared_ptr<T> reference;
+
+        /// constructor
         InsertMember(MemberSet<T>& members);
 
-        void operator()(T* member);
+        /// event handler
+        void operator()(reference member);
     protected:
         MemberSet<T>& m_members;
     };
@@ -99,9 +107,14 @@ namespace kiwi {
     template<typename T>
     class RemoveMember {
     public:
+        /// typedef for smart pointers of type
+        typedef boost::shared_ptr<T> reference;
+
+        /// constructor
         RemoveMember(MemberSet<T>& members);
 
-        void operator()(T* member);
+        /// event handler
+        void operator()(reference member);
     protected:
         MemberSet<T>& m_members;
     };
@@ -111,11 +124,16 @@ namespace kiwi {
     template<typename T>
     class OverridePredicate {
     public:
-        OverridePredicate(T* member);
+        /// typedef for smart pointers of type
+        typedef boost::shared_ptr<T> reference;
 
-        bool operator()(T* member);
+        /// constructor
+        OverridePredicate(reference member);
+
+        /// predicate check
+        bool operator()(reference member);
     protected:
-        T* m_member;
+        reference m_member;
     };
 
 //==------------------------------------------------------------------------==//
@@ -134,40 +152,51 @@ namespace kiwi {
         llvm::GlobalVariable* virtualTable;
 
         /// insert base type
-        void insertBase(Type* type);
+        void insertBase(TypePtr type);
 
         /// insert base type
-        bool isBase(const Type* type) const;
+        bool isBase(const TypePtr type) const;
 
+        /// return set of fields
         MemberSet<Field>& fields() const {
             return *m_fields;
         }
+
+        /// return set of methods
         MemberSet<Method>& methods() const {
             return *m_methods;
         }
+
+        /// return set of unary operators
         MemberSet<UnaryOperator>& unary() const {
             return *m_unary;
         }
+
+        /// return set of binary operators
         MemberSet<BinaryOperator>& binary() const {
             return *m_binary;
         }
+
+        /// return set of multiary operators
         MemberSet<MultiaryOperator>& multiary() const {
             return *m_multiary;
         }
 
-
-        std::set<Type*>::const_iterator base_begin() const {
+        /// return iterator pointed for begin of bases
+        std::set<TypePtr>::const_iterator base_begin() const {
             return m_bases.begin();
         }
-        std::set<Type*>::const_iterator base_end() const {
+
+        /// return iterator pointed after end of bases
+        std::set<TypePtr>::const_iterator base_end() const {
             return m_bases.end();
         }
     protected:
         /// Owner for this implementation
-        Type* m_owner;
+        TypePtr m_owner;
 
         /// set of all based types [ struct and objects ]
-        std::set<Type*> m_bases;
+        std::set<TypePtr> m_bases;
 
         /// set of fields
         MemberSet<Field>* m_fields;
@@ -185,7 +214,7 @@ namespace kiwi {
         MemberSet<MultiaryOperator>* m_multiary;
     private:
         /// Constructor
-        TypeImpl(Type* owner);
+        TypeImpl(TypePtr owner);
 
         /// destructor
         ~TypeImpl();
@@ -195,34 +224,34 @@ namespace kiwi {
 
     // constructor
     template<typename T>
-    MemberSet<T>::MemberSet(Type* owner) : m_owner(owner) {
+    MemberSet<T>::MemberSet(TypePtr owner) : m_owner(owner) {
     }
 
     // find member by predicate
     template<typename T, typename C>
-    T* find_if(const MemberSet<T>& members, const C& value) {
+    typename MemberSet<T>::reference find_if(const MemberSet<T>& members, const C& value) {
         typename MemberSet<T>::const_iterator it = std::find_if(members.begin(), members.end(), value);
         return (it != members.end()) ? *it : 0;
     }
 
     // find member by name
     template<typename T>
-    T* MemberSet<T>::find(T* inherit) const {
+    typename MemberSet<T>::reference MemberSet<T>::find(reference inherit) const {
         return find_if(*this, OverridePredicate<T>(inherit));
     }
 
     // insert member
     template<typename T>
-    void MemberSet<T>::insert(T* member) {
+    void MemberSet<T>::insert(reference member) {
         m_members.insert(member);
         onInsert(member);
     }
 
     // merge inherit field in declare field
     template<typename T>
-    void MemberSet<T>::merge(T* declare, T* inherit) {
+    void MemberSet<T>::merge(reference declare, reference inherit) {
         // erase override from already declared field
-        T* exists = find(inherit);
+        reference exists = find(inherit);
         if (exists == declare) {
             // alredy merged
             return ;
@@ -241,10 +270,10 @@ namespace kiwi {
 
     // inherit member
     template<typename T>
-    void MemberSet<T>::inherit(T* member) {
-        T* exists = find(member);
+    void MemberSet<T>::inherit(reference member) {
+        reference exists = find(member);
         if (!exists) {
-            T* newf = new T(m_owner, member); // create clone
+            reference newf = new T(m_owner, member); // create clone
             m_members.insert(newf);
         }
     }
@@ -255,7 +284,7 @@ namespace kiwi {
         members.onInsert.connect(InsertMember<T>(*this));
         members.onRemove.connect(RemoveMember<T>(*this));
         for (const_iterator i = members.begin(); i != members.end(); ++i) {
-            T* member = *i;
+            reference member = *i;
             if (member->isDeclared()) {
                 inherit(member);
             }
@@ -270,7 +299,7 @@ namespace kiwi {
     }
 
     template<typename T>
-    void InsertMember<T>::operator()(T* member) {
+    void InsertMember<T>::operator()(reference member) {
         m_members.inherit(member);
     }
 
@@ -282,19 +311,19 @@ namespace kiwi {
     }
 
     template<typename T>
-    void RemoveMember<T>::operator()(T* member) {
+    void RemoveMember<T>::operator()(reference member) {
         // m_members.erase(member);
     }
 
 //==------------------------------------------------------------------------==//
 
     template<typename T>
-    OverridePredicate<T>::OverridePredicate(T* member)
+    OverridePredicate<T>::OverridePredicate(reference member)
     : m_member(member) {
     }
 
     template<typename T>
-    bool OverridePredicate<T>::operator()(T* member) {
+    bool OverridePredicate<T>::operator()(reference member) {
         return member->isOverride(m_member);
     }
 }

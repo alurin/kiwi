@@ -109,7 +109,7 @@ namespace lang {
         virtual ValueBuilder emitCall(Driver& driver, BlockBuilder block, std::vector<ValueBuilder> args) const;
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const =0;
+        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const =0;
     };
 
     //==--------------------------------------------------------------------==//
@@ -120,7 +120,7 @@ namespace lang {
         BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic = false);
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const;
+        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
     protected:
         /// Binary operation opcode
         Member::BinaryOpcode m_opcode;
@@ -138,7 +138,7 @@ namespace lang {
 
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const;
+        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
     protected:
         /// Unary operation opcode
         Member::UnaryOpcode m_opcode;
@@ -156,7 +156,7 @@ namespace lang {
         MultiaryNode(Member::MultiaryOpcode opcode, ExpressionNode* value);
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const;
+        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
     protected:
         Member::MultiaryOpcode m_opcode;
 
@@ -172,7 +172,7 @@ namespace lang {
         CallNode(ExpressionNode* expr, const Identifier& method);
 
         /// Find callable for current node
-        virtual Callable* findCallable(Driver& driver, std::vector<Type*> types) const;
+        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
     protected:
         Identifier                  m_method;
     };
@@ -267,12 +267,12 @@ namespace lang {
     class IntegerConstNode : public ExpressionNode
     {
     public:
-        IntegerConstNode(Context* context, int32_t value);
+        IntegerConstNode(ContextPtr context, int32_t value);
 
         /// Emit instructions
         virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
-        Context*  m_context;
+        ContextPtr  m_context;
         int32_t     m_value;
     };
 
@@ -280,12 +280,12 @@ namespace lang {
     class StringConstNode : public ExpressionNode
     {
     public:
-        StringConstNode(Context* context, const String& value);
+        StringConstNode(ContextPtr context, const String& value);
 
         /// Emit instructions
         virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
-        Context*  m_context;
+        ContextPtr  m_context;
         String      m_value;
     };
 
@@ -293,12 +293,12 @@ namespace lang {
     class CharConstNode : public ExpressionNode
     {
     public:
-        CharConstNode(Context* context, const UChar& value);
+        CharConstNode(ContextPtr context, const UChar& value);
 
         /// Emit instructions
         virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
-        Context*  m_context;
+        ContextPtr  m_context;
         UChar     m_value;
     };
 
@@ -306,12 +306,12 @@ namespace lang {
     class BoolConstNode : public ExpressionNode
     {
     public:
-        BoolConstNode(Context* context, bool value);
+        BoolConstNode(ContextPtr context, bool value);
 
         /// Emit instructions
         virtual ValueBuilder emitImpl(Driver& driver, BlockBuilder block) const;
     protected:
-        Context*  m_context;
+        ContextPtr  m_context;
         bool        m_value;
     };
 

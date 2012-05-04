@@ -23,7 +23,7 @@ namespace kiwi
         }
 
         /// returns result type
-        Type* getReturnType() const {
+        TypePtr getReturnType() const {
             return m_returnType;
         }
 
@@ -42,8 +42,8 @@ namespace kiwi
         /// constructor
         UnaryOperator(
             UnaryOpcode opcode,
-            Type* ownerType,
-            Type* returnType
+            TypePtr ownerType,
+            TypePtr returnType
         );
     };
 
@@ -72,9 +72,9 @@ namespace kiwi
         /// constructor
         BinaryOperator(
             BinaryOpcode opcode,
-            Type* ownerType,
-            Type* returnType,
-            Type* operandType
+            TypePtr ownerType,
+            TypePtr returnType,
+            TypePtr operandType
         );
     };
 
@@ -102,8 +102,8 @@ namespace kiwi
         // constructor
         MultiaryOperator(
             MultiaryOpcode opcode,
-            Type* ownerType,
-            Type* returnType,
+            TypePtr ownerType,
+            TypePtr returnType,
             TypeVector types
         );
     };
@@ -142,10 +142,10 @@ namespace kiwi
         Identifier m_name;
 
         /// constructor for inhertit method
-        Method(Type* ownerType, Method* method);
+        Method(TypePtr ownerType, Method* method);
 
         /// constructor
-        Method(const Identifier& name, Type* ownerType, Type* returnType, std::vector<Type*> arguments);
+        Method(const Identifier& name, TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> arguments);
     };
 
     //==--------------------------------------------------------------------==//
@@ -161,7 +161,7 @@ namespace kiwi
         }
 
         /// returns field type
-        Type* getFieldType() const {
+        TypePtr getFieldType() const {
             return m_fieldType;
         }
 
@@ -184,19 +184,19 @@ namespace kiwi
         Identifier m_name;
 
         /// field type
-        Type* m_fieldType;
+        TypePtr m_fieldType;
 
         /// field position in address map for class
         int32_t m_position;
 
         /// constructor: inherit field field
-        Field(Type* ownerType, Field* field);
+        Field(TypePtr ownerType, Field* field);
 
         /// constructor: declare field field
-        Field(Type* ownerType, Type* fieldType);
+        Field(TypePtr ownerType, TypePtr fieldType);
 
         /// constructor: declare anonym field
-        Field(const Identifier& name, Type* ownerType, Type* fieldType);
+        Field(const Identifier& name, TypePtr ownerType, TypePtr fieldType);
 
         /// Set position
         void setPosition(int32_t position) {
@@ -215,7 +215,7 @@ namespace kiwi
         friend class Type;
     protected:
         /// constructor
-        CastOperator(Type* sourceType, Type* destType);
+        CastOperator(TypePtr sourceType, TypePtr destType);
     };
 }
 

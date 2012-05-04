@@ -176,20 +176,20 @@ ExpressionNode* NamedNode::getRight() {
     return new NamedExpressionNode(this);
 }
 
-void FieldNode::generateMember(Driver& driver, Type* ownerType) {
-    Type* returnType = m_type->get(driver);
+void FieldNode::generateMember(Driver& driver, TypePtr ownerType) {
+    TypePtr returnType = m_type->get(driver);
     ownerType->addField(m_name, returnType);
 }
 
-void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
-    Module* module   = ownerType->getModule();
-    Type* returnType = m_type->get(driver);
-    std::vector<Type*> frontendArgs;
+void FunctionNode::generateMember(Driver& driver, TypePtr ownerType) {
+    ModulePtr module   = ownerType->getModule();
+    TypePtr returnType = m_type->get(driver);
+    std::vector<TypePtr> frontendArgs;
 
     // collect arguments
     for (std::vector<ArgumentNode*>::iterator i = m_positions.begin(); i != m_positions.end(); ++i) {
         ArgumentNode* arg           = *i;
-        Type*         frontend_type = arg->getType()->get(driver);
+        TypePtr         frontend_type = arg->getType()->get(driver);
         frontendArgs.push_back(frontend_type);
     }
     m_method = ownerType->addMethod(m_name, returnType, frontendArgs);
@@ -198,13 +198,13 @@ void FunctionNode::generateMember(Driver& driver, Type* ownerType) {
 #include <llvm/Instructions.h>
 #include <llvm/Function.h>
 
-void FunctionNode::generateIRSignature(Driver& driver, Type* owner) {
+void FunctionNode::generateIRSignature(Driver& driver, TypePtr owner) {
     m_func = FunctionBuilder(m_method).getFunction();
     Identifier fullName = m_method->getOwnerType()->getName() + "::" + m_method->getName();
     m_func->setName(fullName);
 }
 
-void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
+void FunctionNode::generateIRCode(Driver& driver, TypePtr ownerType) {
     FunctionBuilder func(m_method);
     BlockBuilder entry = func.createBlock("entry");
     // emit mutable variables for arguments
@@ -215,7 +215,7 @@ void FunctionNode::generateIRCode(Driver& driver, Type* ownerType) {
             ArgumentNode* arg = m_positions[j-1];
 
             // add mutable for arguments
-            Type* type = arg->getType()->get(driver);
+            TypePtr type = arg->getType()->get(driver);
             ValueBuilder variable = entry.createVariable(arg->getName(), type, false);
             /// @todo move store to builder
             llvm::StoreInst*  store = new llvm::StoreInst(i, variable.getValue(), entry.getBlock());
@@ -238,7 +238,7 @@ BlockBuilder ScopeNode::emitImpl(Driver& driver, BlockBuilder block) const {
     for (std::map<Identifier, VariableNode*>::const_iterator i = m_vars.begin(); i != m_vars.end(); ++i) {
         VariableNode* var = i->second;
         if (!var->getInitilizator()) {
-            Type* type = var->getType()->get(driver);
+            TypePtr type = var->getType()->get(driver);
             ValueBuilder vargen = block.createVariable(var->getName(), type); // not spaun new blocks
             ValueBuilder* builder = new ValueBuilder(vargen);
             var->insertBuilder(block.getFunction(), builder);

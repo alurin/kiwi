@@ -24,7 +24,7 @@ namespace kiwi {
     /// Callable member, common base for all operators and methods
     class Callable : public Member {
     public:
-        typedef std::vector<Type*>              TypeVector;
+        typedef std::vector<TypePtr>              TypeVector;
         typedef std::vector<Argument*>          ArgumentVector;
         typedef ArgumentVector::const_iterator  const_iterator;
 
@@ -32,7 +32,7 @@ namespace kiwi {
         virtual ~Callable();
 
         /// returns callable's return type
-        Type* getReturnType() const {
+        TypePtr getReturnType() const {
             return m_returnType;
         }
 
@@ -89,7 +89,7 @@ namespace kiwi {
         }
     protected:
         /// return type
-        Type* m_returnType;
+        TypePtr m_returnType;
 
         /// list of arguments
         ArgumentVector m_args;
@@ -101,10 +101,10 @@ namespace kiwi {
         llvm::Function* m_func;
 
         /// constructor
-        Callable(Type* ownerType, Type* returnType, TypeVector types);
+        Callable(TypePtr ownerType, TypePtr returnType, TypeVector types);
 
         /// constructor for inherited callable
-        Callable(Type* ownerType, Callable* callable);
+        Callable(TypePtr ownerType, Callable* callable);
     private:
         /// create arguments from types
         /// @todo move in anonym namespace
@@ -112,7 +112,7 @@ namespace kiwi {
 
         /// create arguments from parent callable
         /// @todo move in anonym namespace
-        void cloneArguments(Type* thisType, ArgumentVector args);
+        void cloneArguments(TypePtr thisType, ArgumentVector args);
     };
 }
 

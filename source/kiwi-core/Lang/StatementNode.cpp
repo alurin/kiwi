@@ -88,8 +88,8 @@ BlockBuilder PrintStatement::emitImpl(Driver& driver, BlockBuilder block) const 
     ValueBuilder result = m_return->emit(driver, block);
 
     // find emitter
-    Type* type = result.getType();
-    UnaryOperator* op = type->findUnary(UnaryOperator::Print);
+    TypePtr type = result.getType();
+    UnaryPtr op = type->findUnary(UnaryOperator::Print);
 
     // emit instruction
     if (op) {
@@ -130,7 +130,7 @@ BlockBuilder InitStatement::emitImpl(Driver& driver, BlockBuilder block) const {
     ValueBuilder value = init->emit(driver, block);
 
     // get variable type
-    Type* type = 0;
+    TypePtr type;
     if (m_var->getType() != 0) {
         type = m_var->getType()->get(driver);
     } else {

@@ -14,13 +14,13 @@
 using namespace kiwi;
 
 TEST(object_methods_check) {
-    Context* context = Context::create();
-    Module*  module  = Module::create("script", context);
-    ObjectType* type = ObjectType::create(module);
-    VoidType* type1  = VoidType::get(context);
-    BoolType* type2  = BoolType::get(context);
+    ContextPtr context  = Context::create();
+    ModulePtr  module   = Module::create("script", context);
+    ObjectPtr type      = ObjectType::create(module);
+    VoidPtr type1       = VoidType::get(context);
+    BooleanPtr type2    = BooleanType::get(context);
 
-    std::vector<Type*> args;
+    std::vector<TypePtr> args;
 
     // create method "method" without argument
     {
@@ -48,14 +48,14 @@ TEST(object_methods_check) {
 }
 
 TEST(object_inheritance_check) {
-    Context* context = Context::create();
-    Module*  module  = Module::create("script", context);
+    ContextPtr context = Context::create();
+    ModulePtr  module  = Module::create("script", context);
 
-    ObjectType* parent = ObjectType::create(module);
-    ObjectType* first  = ObjectType::create(module);
-    ObjectType* second = ObjectType::create(module);
-    ObjectType* third  = ObjectType::create(module);
-    ObjectType* any    = ObjectType::create(module);
+    ObjectTypePtr parent = ObjectType::create(module);
+    ObjectTypePtr first  = ObjectType::create(module);
+    ObjectTypePtr second = ObjectType::create(module);
+    ObjectTypePtr third  = ObjectType::create(module);
+    ObjectTypePtr any    = ObjectType::create(module);
 
     first->inherit(parent);
     third->inherit(first);
@@ -87,13 +87,13 @@ TEST(object_inheritance_check) {
 }
 
 TEST(object_field_override_check_after) {
-    Context* context = Context::create();
-    Module*  module  = Module::create("script", context);
-    Type*       type = IntType::get32(context);
+    ContextPtr context = Context::create();
+    ModulePtr  module  = Module::create("script", context);
+    TypePtr       type = IntegerType::get32(context);
 
-    ObjectType* clA  = ObjectType::create(module, "A");  // A { @a, @b }
-    ObjectType* clB  = ObjectType::create(module, "B");  // B { @a, @c }
-    ObjectType* clC  = ObjectType::create(module, "C");  // C : A,B { @a merge A::@a, B::@a as }
+    ObjectTypePtr clA  = ObjectType::create(module, "A");  // A { @a, @b }
+    ObjectTypePtr clB  = ObjectType::create(module, "B");  // B { @a, @c }
+    ObjectTypePtr clC  = ObjectType::create(module, "C");  // C : A,B { @a merge A::@a, B::@a as }
 
     // inherit classes affter
     clC->inherit(clA);

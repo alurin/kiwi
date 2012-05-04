@@ -98,11 +98,11 @@ namespace lang {
         }
 
         TypeNode* createIntTy(const location& loc) {
-            return inject(new ConcreteTypeNode(IntType::get32(m_context)), loc);
+            return inject(new ConcreteTypeNode(IntegerType::get32(m_context)), loc);
         }
 
         TypeNode* createBoolTy(const location& loc) {
-            return inject(new ConcreteTypeNode(BoolType::get(m_context)), loc);
+            return inject(new ConcreteTypeNode(BooleanType::get(m_context)), loc);
         }
 
         TypeNode* createStringTy(const location& loc) {
@@ -281,12 +281,12 @@ namespace lang {
         //    Other staff
         //===--------------------------------------------------------------===//
         /// return context
-        Context* getContext() const {
+        ContextPtr getContext() const {
             return m_context;
         }
 
         /// returns module
-        Module* getModule() const;
+        ModulePtr getModule() const;
 
         /// returns iterator for compounds: begin
         std::vector<CompoundNode*>::const_iterator begin() const {
@@ -307,10 +307,10 @@ namespace lang {
         void prepareScript(const location& loc);
     protected:
         /// Current context
-        Context* m_context;
+        ContextPtr m_context;
 
         /// This type
-        Type* m_this;
+        TypePtr m_this;
 
         /// Stack of current parse functions
         std::stack<CompoundNode*> m_classes;
@@ -328,7 +328,7 @@ namespace lang {
         std::vector<CompoundNode*> m_compounds;
 
         // constructor
-        NodeFactory(Context* context, Type* thisType);
+        NodeFactory(ContextPtr context, TypePtr thisType);
 
         //===--------------------------------------------------------------===//
         //    Utils

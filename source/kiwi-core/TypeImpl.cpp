@@ -15,21 +15,21 @@ namespace {
     class TypeListener {
     public:
         /// constructor
-        TypeListener(Type* owner);
+        TypeListener(TypePtr owner);
 
         /// deference implementation
         TypeImpl& getMetadata() {
             return *m_owner->getMetadata();
         }
     private:
-        Type* m_owner;
+        TypePtr m_owner;
     };
 
     /// Inherit field listener for fields
     class InsertFieldListener : protected TypeListener {
     public:
         /// constructor
-        InsertFieldListener(Type* owner);
+        InsertFieldListener(TypePtr owner);
 
         /// signal handler
         void operator()(Field* field);
@@ -39,7 +39,7 @@ namespace {
     class InsertMethodListener : protected TypeListener {
     public:
         /// constructor
-        InsertMethodListener(Type* owner);
+        InsertMethodListener(TypePtr owner);
 
         /// signal handler
         void operator()(Method* method);
@@ -47,15 +47,15 @@ namespace {
 }
 
 // constructor
-TypeListener::TypeListener(Type* owner) : m_owner(owner) {
+TypeListener::TypeListener(TypePtr owner) : m_owner(owner) {
 }
 
 // constructor
-InsertFieldListener::InsertFieldListener(Type* owner) : TypeListener(owner) {
+InsertFieldListener::InsertFieldListener(TypePtr owner) : TypeListener(owner) {
 }
 
 // constructor
-InsertMethodListener::InsertMethodListener(Type* owner) : TypeListener(owner) {
+InsertMethodListener::InsertMethodListener(TypePtr owner) : TypeListener(owner) {
 }
 
 // inherit field signal handler
@@ -71,7 +71,7 @@ void InsertMethodListener::operator()(Method* method) {
 //==------------------------------------------------------------------------==//
 
 // constructor
-TypeImpl::TypeImpl(Type* owner)
+TypeImpl::TypeImpl(TypePtr owner)
 : m_owner(owner), varType(0), addressMap(0), virtualTable(0) {
     m_fields   = new MemberSet<Field>(owner);
     m_methods  = new MemberSet<Method>(owner);
@@ -89,13 +89,13 @@ TypeImpl::~TypeImpl() {
     delete m_multiary;
 }
 
-void TypeImpl::insertBase(Type* type) {
+void TypeImpl::insertBase(TypePtr type) {
     TypeImpl* parentImpl = type->getMetadata();
-    for (std::set<Type*>::iterator i = parentImpl->m_bases.begin(); i != parentImpl->m_bases.end(); ++i) {
+    for (std::set<TypePtr>::iterator i = parentImpl->m_bases.begin(); i != parentImpl->m_bases.end(); ++i) {
         insertBase(*i);
     }
 
-    std::pair<std::set<Type*>::const_iterator, bool> result = m_bases.insert(type);
+    std::pair<std::set<TypePtr>::const_iterator, bool> result = m_bases.insert(type);
     if (result.second) {
         TypeImpl* meta = type->getMetadata();
 
@@ -108,6 +108,6 @@ void TypeImpl::insertBase(Type* type) {
     }
 }
 
-bool TypeImpl::isBase(const Type* type) const {
+bool TypeImpl::isBase(const TypePtr type) const {
     return std::find(m_bases.begin(), m_bases.end(), type) != m_bases.end();
 }

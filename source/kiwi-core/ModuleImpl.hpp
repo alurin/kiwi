@@ -9,6 +9,12 @@
 
 #include "kiwi/config.hpp"
 #include <vector>
+#include <map>
+
+namespace llvm {
+    class Module;
+    class ExecutionEngine;
+}
 
 namespace kiwi {
     class Type;
@@ -16,11 +22,26 @@ namespace kiwi {
     /// Internal class for store information of runtime types
     class ModuleImpl {
         friend class Module;
-    private:
-        ModuleImpl() : mainMethod(0) { }
     public:
-        std::vector<Type*> types;
-        Method*            mainMethod;
+        /// returns LLVM module
+        llvm::Module* getBackendModule() const {
+            return m_backendModule;
+        }
+    private:
+        /// module LLVM analog
+        llvm::Module* m_backendModule;
+
+        /// backend types
+        std::vector<TypePtr> m_types;
+
+        /// Main method for module
+        MethodPtr mainMethod;
+
+        /// map for named types
+        std::map<Identifier, TypePtr> m_names;
+
+        /// constructor
+        ModuleImpl();
     };
 }
 

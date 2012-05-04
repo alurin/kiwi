@@ -8,6 +8,6 @@
 
 using namespace kiwi;
 
-void kiwi::initRuntimeModule(Module* module) {
+void kiwi::initRuntimeModule(ModulePtr module) {
 
 }

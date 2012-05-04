@@ -10,7 +10,7 @@
 using namespace kiwi;
 using namespace kiwi::lang;
 
-NodeFactory::NodeFactory(Context* context, Type* thisType)
+NodeFactory::NodeFactory(ContextPtr context, TypePtr thisType)
 : m_context(context), m_this(thisType) {
 
 }
@@ -23,7 +23,7 @@ NodeFactory::~NodeFactory() {
     }
 }
 
-Module* NodeFactory::getModule() const {
+ModulePtr NodeFactory::getModule() const {
     return m_this->getModule();
 }
 
