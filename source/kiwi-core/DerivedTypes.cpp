@@ -5,12 +5,12 @@
  *******************************************************************************
  */
 #include "ContextImpl.hpp"
+#include "ModuleImpl.hpp"
 #include "TypeImpl.hpp"
 #include "Codegen/LlvmEmitter.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Members.hpp"
-#include "kiwi/Support/Array.hpp"
 #include "kiwi/Support/Cast.hpp"
 #include <llvm/Constants.h>
 #include <llvm/GlobalVariable.h>
@@ -23,7 +23,7 @@ using namespace kiwi::codegen;
 
 IntegerType::IntegerType(ModulePtr module, int32_t size, bool unsign)
 : Type(module) {
-    llvm::LLVMContext& context = module->getContext()->getContext();
+    llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
     m_meta->varType = llvm::IntegerType::get(context, size);
     m_typeID  = IntID;
     m_name    = "int";
@@ -31,7 +31,7 @@ IntegerType::IntegerType(ModulePtr module, int32_t size, bool unsign)
 
 BooleanType::BooleanType(ModulePtr module)
 : Type(module) {
-    llvm::LLVMContext& context = module->getContext()->getContext();
+    llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
     m_meta->varType = llvm::IntegerType::get(context, 1);
     m_typeID  = BoolID;
     m_name    = "bool";
@@ -39,7 +39,7 @@ BooleanType::BooleanType(ModulePtr module)
 
 VoidType::VoidType(ModulePtr module)
 : Type(module) {
-    llvm::LLVMContext& context = module->getContext()->getContext();
+    llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
     m_meta->varType = llvm::Type::getVoidTy(context);
     m_typeID  = VoidID;
     m_name    = "void";
@@ -47,7 +47,7 @@ VoidType::VoidType(ModulePtr module)
 
 CharType::CharType(ModulePtr module)
 : Type(module) {
-    llvm::LLVMContext& context = module->getContext()->getContext();
+    llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
     m_meta->varType = llvm::IntegerType::get(context, 16);
     m_typeID  = CharID;
     m_name    = "char";
@@ -61,7 +61,7 @@ ObjectType::ObjectType(ModulePtr module)
 
 StringType::StringType(ModulePtr module)
 : Type(module) {
-    llvm::LLVMContext& context = module->getContext()->getContext();
+    llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
     llvm::Type* charType       = llvm::IntegerType::get(context, 16);
     llvm::Type* sizeType       = llvm::IntegerType::get(context, 32);
     llvm::Type* bufferType     = llvm::ArrayType::get(charType, 0);
@@ -104,13 +104,14 @@ StringPtr StringType::create(ModulePtr module) {
 
 ObjectPtr ObjectType::create(ModulePtr module) {
     ObjectPtr type = ObjectPtr(new ObjectType(module));
+    module->getMetadata()->registerType(type);
     return type;
 }
 
 ObjectPtr ObjectType::create(ModulePtr module, const Identifier& name) {
     ObjectPtr type = ObjectPtr(new ObjectType(module));
     type->m_name = name;
-    module->registerType(type, name);
+    module->getMetadata()->registerType(type, name);
     return type;
 }
 
@@ -172,15 +173,19 @@ void StringType::initializate() {
     addBinary(Member::Le,  boolTy, stringTy)->setPolicy(new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLT, context));
     addBinary(Member::Lt,  boolTy, stringTy)->setPolicy(new LlvmStringCompareOperator(llvm::CmpInst::ICMP_SLE, context));
 
+    std::vector<TypePtr> types;
+    types.push_back(intTy);
+    addMultiary(Member::Subtraction, charTy, types)->setPolicy(new LlvmStringSubtraction()); // [a]
 
-    // add(Member::Add,         stringTy, stringTy,                    new LlvmStringConcatenate()); // a + b
-    addMultiary(Member::Subtraction, charTy,   makeVector(intTy, 0))->setPolicy(new LlvmStringSubtraction()); // [a]
-    addMultiary(Member::Subtraction, stringTy, makeVector(intTy, intTy, 0))->setPolicy(new LlvmStringSubtraction()); // [a, b]
+    types.clear();
+    types.push_back(intTy);
+    types.push_back(intTy);
+    addMultiary(Member::Subtraction, stringTy, types)->setPolicy(new LlvmStringSubtraction()); // [a, b]
 
     addUnary(Member::Print, voidTy)->setPolicy(new LlvmStringPrintOperator());
 }
 
-IntegerTypePtr IntegerType::get32(ContextPtr context) {
+IntegerPtr IntegerType::get32(ContextPtr context) {
     ContextImpl* meta = context->getMetadata();
     return meta->int32Ty;
 }
@@ -190,28 +195,28 @@ BooleanPtr BooleanType::get(ContextPtr context) {
     return meta->boolTy;
 }
 
-VoidTypePtr VoidType::get(ContextPtr context) {
+VoidPtr VoidType::get(ContextPtr context) {
     ContextImpl* meta = context->getMetadata();
     return meta->voidTy;
 }
 
-CharTypePtr CharType::get(ContextPtr context) {
+CharPtr CharType::get(ContextPtr context) {
     ContextImpl* meta = context->getMetadata();
     return meta->charTy;
 }
 
-StringTypePtr StringType::get(ContextPtr context) {
+StringPtr StringType::get(ContextPtr context) {
     ContextImpl* meta = context->getMetadata();
     return meta->stringTy;
 }
 
 /// add parent type
-bool ObjectType::inherit(ObjectTypePtr type) {
+bool ObjectType::inherit(ObjectPtr type) {
     m_meta->insertBase(type);
 }
 
 /// inherit type?
-bool ObjectType::isInherit(const ObjectTypePtr type) const{
+bool ObjectType::isInherit(const ObjectPtr type) const{
     return m_meta->isBase(type);
 }
 
@@ -230,26 +235,26 @@ void ObjectType::emit() {
     }
 
     // collect fields
-    llvm::LLVMContext& context = getContext()->getContext();
-    llvm::Module* module       = m_module->getModule();
+    llvm::LLVMContext& context = getContext()->getMetadata()->getBackendContext();
+    llvm::Module* module       = getModule()->getMetadata()->getBackendModule();
     std::vector<llvm::Type*> types;
 
     // add vtable to type
     llvm::Type* pointerType           = llvm::IntegerType::get(context, 8)->getPointerTo();
-    llvm::ArrayTypePtr virtualTableType = llvm::ArrayType::get(pointerType, m_meta->methods().size());
-    llvm::ArrayTypePtr virtualTableSamp = llvm::ArrayType::get(pointerType, 0);
+    llvm::ArrayType* virtualTableType = llvm::ArrayType::get(pointerType, m_meta->methods().size());
+    llvm::ArrayType* virtualTableSamp = llvm::ArrayType::get(pointerType, 0);
     types.push_back(virtualTableType);
 
     // add amap to type
     llvm::Type* sizeType            = llvm::IntegerType::get(context, 32);
-    llvm::ArrayTypePtr addressMapType = llvm::ArrayType::get(sizeType, m_meta->fields().size());
-    llvm::ArrayTypePtr addressMapSamp = llvm::ArrayType::get(sizeType, 0);
+    llvm::ArrayType* addressMapType = llvm::ArrayType::get(sizeType, m_meta->fields().size());
+    llvm::ArrayType* addressMapSamp = llvm::ArrayType::get(sizeType, 0);
     types.push_back(addressMapType);
 
     // add field to type
     int j = 0;
     for (MemberSet<Field>::const_iterator i = m_meta->fields().begin(); i != m_meta->fields().end(); ++i, ++j) {
-        Field* field = *i;
+        FieldPtr field = *i;
 
         TypePtr type = field->getFieldType();
         types.push_back(type->getVarType());
@@ -258,7 +263,7 @@ void ObjectType::emit() {
     }
 
     // emit llvm type analog
-    llvm::StructTypePtr type = 0;
+    llvm::StructType* type = 0;
     if (types.size()) {
         type = llvm::StructType::create(types);
     } else {
@@ -302,15 +307,4 @@ void ObjectType::emit() {
     // add simple constructor
     std::vector<TypePtr> empty;
     addMultiary(Member::Constructor, VoidType::get(m_module.lock()->getContext()), empty)->setPolicy(new LlvmCtorEmitter());
-}
-
-
-/// return LLVM analog for address map
-llvm::GlobalVariable* ObjectType::getVarAddressMap() const {
-    return m_meta->addressMap;
-}
-
-/// return LLVM analog for address map
-llvm::GlobalVariable* ObjectType::getVarVirtualTable() const {
-    return m_meta->virtualTable;
 }

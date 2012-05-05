@@ -5,7 +5,7 @@
  *******************************************************************************
  */
 #include "test.h" // Brings in the UnitTest++ framework
-#include "kiwi/Engine.hpp"
+#include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Members.hpp"
@@ -17,9 +17,12 @@ using namespace kiwi;
 template<typename T, typename R>
 class cast_checker {
 public:
+    typedef boost::shared_ptr<T> TargetPtr;
+    typedef boost::shared_ptr<R> RootPtr;
+
     /// check type
-    static void check(T* instType) {
-        R* anyType = instType;
+    static void check(TargetPtr instType) {
+        RootPtr anyType = instType;
 
         CHECK(classof<T>(instType));                 // check current class
         CHECK(classof<T>(anyType));                  // check root class
@@ -39,14 +42,13 @@ TEST(types_cast_check) // Declares a test named "types_cast_check"
 
     ModulePtr module = Module::create("script", context);
     cast_checker<ObjectType, Type>::check(ObjectType::create(module));
-    delete context;
 }
 
 TEST(members_cast_check) // Declares a test named "members_cast_check"
 {
     ContextPtr context = Context::create();
     ModulePtr  module  = Module::create("name", context);
-    ObjectTypePtr type = ObjectType::create(module);
+    ObjectPtr  type    = ObjectType::create(module);
 
     std::vector<TypePtr> args;
 
@@ -55,5 +57,4 @@ TEST(members_cast_check) // Declares a test named "members_cast_check"
     cast_checker<UnaryOperator, Member>::check(type->addUnary(Member::Not, type));
     cast_checker<BinaryOperator, Member>::check(type->addBinary(Member::Add, type, type));
     cast_checker<MultiaryOperator, Member>::check(type->addMultiary(Member::Constructor, type, args));
-    delete context;
 }

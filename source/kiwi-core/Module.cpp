@@ -139,10 +139,17 @@ int32_t Module::run() {
 }
 
 // register type with alias
-void Module::registerType(TypePtr type, const Identifier& name) {
+void ModuleImpl::registerType(TypePtr type, const Identifier& name) {
+    m_types.insert(type);
     throw Exception()
         << exception_message("Module::registerType not implemented");
 }
+
+/// create alias for type
+void ModuleImpl::registerType(TypePtr type) {
+    m_types.insert(type);
+}
+
 
 TypePtr Module::find(const Identifier& name) {
     throw Exception()

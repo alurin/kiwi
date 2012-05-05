@@ -13,13 +13,13 @@ using namespace kiwi;
 CallablePolicy::~CallablePolicy() {
 }
 
-CloneEmitter::CloneEmitter(Callable* callable)
+CloneEmitter::CloneEmitter(CallablePtr callable)
 : m_callable(callable) {
 }
 
 /// emit IR instruction
 ValueBuilder CloneEmitter::emit(BlockBuilder block, const ExpressionVector& values) {
-    CallablePolicy* policy = m_callable->getPolicy();
+    CallablePolicy* policy = m_callable.lock()->getPolicy();
     if (policy) {
         return policy->emit(block, values);
     } else {

@@ -8,7 +8,7 @@
 #define KIWI_MODULEIMPL_INTERNAL
 
 #include "kiwi/config.hpp"
-#include <vector>
+#include <set>
 #include <map>
 
 namespace llvm {
@@ -27,18 +27,24 @@ namespace kiwi {
         llvm::Module* getBackendModule() const {
             return m_backendModule;
         }
+
+        /// create alias for type
+        void registerType(TypePtr type, const Identifier& name);
+
+        /// create alias for type
+        void registerType(TypePtr type);
     private:
         /// module LLVM analog
         llvm::Module* m_backendModule;
 
         /// backend types
-        std::vector<TypePtr> m_types;
-
-        /// Main method for module
-        MethodPtr mainMethod;
+        std::set<TypePtr> m_types;
 
         /// map for named types
         std::map<Identifier, TypePtr> m_names;
+
+        /// Main method for module
+        MethodPtr mainMethod;
 
         /// constructor
         ModuleImpl();

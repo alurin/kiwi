@@ -32,7 +32,7 @@ namespace {
         InsertFieldListener(TypePtr owner);
 
         /// signal handler
-        void operator()(Field* field);
+        void operator()(FieldPtr field);
     };
 
     /// Inherit field listener for methods
@@ -42,7 +42,7 @@ namespace {
         InsertMethodListener(TypePtr owner);
 
         /// signal handler
-        void operator()(Method* method);
+        void operator()(MethodPtr method);
     };
 }
 
@@ -59,19 +59,19 @@ InsertMethodListener::InsertMethodListener(TypePtr owner) : TypeListener(owner) 
 }
 
 // inherit field signal handler
-void InsertFieldListener::operator()(Field* field) {
+void InsertFieldListener::operator()(FieldPtr field) {
     getMetadata().fields().inherit(field);
 }
 
 // inherit method signal handler
-void InsertMethodListener::operator()(Method* method) {
+void InsertMethodListener::operator()(MethodPtr method) {
     getMetadata().methods().inherit(method);
 }
 
 //==------------------------------------------------------------------------==//
 
 // constructor
-TypeImpl::TypeImpl(TypePtr owner)
+TypeImpl::TypeImpl(Type* owner)
 : m_owner(owner), varType(0), addressMap(0), virtualTable(0) {
     m_fields   = new MemberSet<Field>(owner);
     m_methods  = new MemberSet<Method>(owner);

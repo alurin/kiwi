@@ -40,13 +40,13 @@ ValueBuilder LlvmZeroUnaryOperator::emit(BlockBuilder block, const ExpressionVec
     llvm::APInt cst(32, 0, false);
     llvm::ConstantInt* zero = llvm::ConstantInt::get(block.getContext(), cst);
     llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, zero, values[0].getValue(), "", block.getBlock());
-    return ValueBuilder(block, result, m_type);
+    return ValueBuilder(block, result, m_type.lock());
 }
 
 // emit instruction for binary operator
 ValueBuilder LlvmBinaryOperator::emit(BlockBuilder block, const ExpressionVector& values) {
     llvm::Value* result = llvm::BinaryOperator::Create(m_opcode, values[0].getValue(), values[1].getValue(), "", block.getBlock());
-    return ValueBuilder(block, result, m_type);
+    return ValueBuilder(block, result, m_type.lock());
 }
 
 // emit instruction for binary operator
@@ -302,7 +302,7 @@ ValueBuilder LlvmCallEmitter::emit(BlockBuilder block, const ExpressionVector& v
 
      // return result of call
      llvm::Value* result = llvm::CallInst::Create(m_func, llvm::makeArrayRef(largs), "", block.getBlock());
-     return ValueBuilder(block, result, m_returnType);
+     return ValueBuilder(block, result, m_returnType.lock());
 }
 
 // emit IR instruction for binary operation

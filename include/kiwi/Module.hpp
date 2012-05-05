@@ -21,8 +21,6 @@ namespace kiwi
 
     /// Assembly of types
     class Module : public boost::enable_shared_from_this<Module>, public boost::noncopyable {
-        Module(const Module&);            ///< NOT IMPLEMENT!!!
-        Module& operator=(const Module&); ///< NOT IMPLEMENT!!!
     public:
         /// destructor
         ~Module();
@@ -42,9 +40,6 @@ namespace kiwi
         ContextPtr getContext() const {
             return m_context.lock();
         }
-
-        /// create alias for type
-        void registerType(TypePtr type, const Identifier& name);
 
         /// find type with name
         TypePtr find(const Identifier& name);

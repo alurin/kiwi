@@ -80,7 +80,7 @@ ContextImpl::~ContextImpl() {
 
 // Constructor
 Context::Context()
-: m_context(0), m_metadata(new ContextImpl()), m_optimizationLevel(1), m_debug(false) {
+: m_metadata(new ContextImpl()), m_optimizationLevel(1), m_debug(false) {
 }
 
 Context::~Context() {

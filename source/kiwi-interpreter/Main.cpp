@@ -4,7 +4,7 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-#include "kiwi/Engine.hpp"
+#include "kiwi/Context.hpp"
 #include "kiwi/Exception.hpp"
 #include "kiwi/Module.hpp"
 #include <iostream>
@@ -12,8 +12,7 @@
 using namespace kiwi;
 
 int main(int argc, char const *argv[]) {
-    ContextEngine engine;
-    ContextPtr context = engine.get();
+    ContextPtr context = Context::create();
     context->setOptimizationLevel(1);
     context->setDebug(false);
     ModulePtr module = Module::create("user.script", context);

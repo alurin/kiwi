@@ -9,10 +9,6 @@
 
 #include "kiwi/types.hpp"
 
-namespace llvm {
-    class LLVMContext;
-}
-
 namespace kiwi {
     /// Storage for internal context metadata
     class ContextImpl;
@@ -30,12 +26,6 @@ namespace kiwi {
 
         /// destructor
         virtual ~Context();
-
-        /// returns LLVM context
-        /// @todo move to internal metadata
-        llvm::LLVMContext& getContext() const {
-            return *m_context;
-        }
 
         /// returns internal context metadata
         ContextImpl* getMetadata() const {
@@ -62,7 +52,6 @@ namespace kiwi {
             m_optimizationLevel = level;
         }
     protected:
-        llvm::LLVMContext*  m_context;
         ContextImpl*        m_metadata;
 
         int8_t              m_optimizationLevel;

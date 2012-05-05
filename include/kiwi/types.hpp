@@ -24,13 +24,13 @@
 
 namespace kiwi {
     /// String contains characters in Unicode 16 encoding
-    typedef UnicodeString   String;
+    typedef UnicodeString                               String;
 
     /// ASCII string contains paths
-    typedef std::string     Path;
+    typedef std::string                                 Path;
 
     /// ASCII string for identificators
-    typedef std::string     Identifier;
+    typedef std::string                                 Identifier;
 
     //== Smart pointers: General elements
     typedef boost::shared_ptr<class Context>            ContextPtr;
@@ -52,6 +52,7 @@ namespace kiwi {
     //== Smart pointers: Members
     typedef boost::shared_ptr<class Member>             MemberPtr;
     typedef boost::shared_ptr<class Callable>           CallablePtr;
+    typedef boost::weak_ptr<class Callable>             CallableWeak;
     typedef boost::shared_ptr<class Method>             MethodPtr;
     typedef boost::shared_ptr<class Field>              FieldPtr;
     typedef boost::shared_ptr<class UnaryOperator>      UnaryPtr;

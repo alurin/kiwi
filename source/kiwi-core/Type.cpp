@@ -21,12 +21,12 @@ using namespace kiwi::codegen;
 #define KIWI_CONDITIONAL(__cond, __msg) do { if (!(__cond)) throw __msg; } while(false)
 
 #define TYPE_IMPLEMENTATION_FINDERS(_name, _type, _method) \
-    void Type::merge ## _name(_type* declared, _type* inherited) { \
+    void Type::merge ## _name(_type declared, _type inherited) { \
         m_meta->_method().merge(declared, inherited); \
     }
 
 
-TYPE_IMPLEMENTATION_FINDERS(Field, Field, fields)
+TYPE_IMPLEMENTATION_FINDERS(Field, FieldPtr, fields)
 
 namespace {
     /// Finder
@@ -37,7 +37,7 @@ namespace {
         }
 
         /// conditional for find
-        bool operator()(UnaryOperator* op) {
+        bool operator()(UnaryPtr op) {
             return op->getOpcode() == m_opcode;
         }
     private:
@@ -51,7 +51,7 @@ namespace {
         : m_opcode(opcode), m_operandType(operandType) {
         }
 
-        bool operator()(BinaryOperator* op) {
+        bool operator()(BinaryPtr op) {
             return op->getOpcode() == m_opcode && m_operandType == op->getArgument(1)->getType();
         }
     protected:
@@ -65,7 +65,7 @@ namespace {
         : m_opcode(opcode), m_arguments(arguments) {
         }
 
-        bool operator()(MultiaryOperator* op) {
+        bool operator()(MultiaryPtr op) {
             return op->getOpcode() == m_opcode && op->hasSignature(m_arguments);
         }
 
@@ -80,7 +80,7 @@ namespace {
         : m_name(name) {
         }
 
-        bool operator()(Field* field) {
+        bool operator()(FieldPtr field) {
             return field->getName() == m_name;
         }
 
@@ -94,7 +94,7 @@ namespace {
         : m_name(name), m_arguments(arguments) {
         }
 
-        bool operator()(Method* method) {
+        bool operator()(MethodPtr method) {
             return method->getName() == m_name && method->hasSignature(m_arguments);
         }
     protected:
@@ -106,7 +106,6 @@ namespace {
 
 Type::Type(ModulePtr module)
 : m_typeID((TypeID) 0), m_module(module), m_meta(new TypeImpl(this)) {
-    m_module->getMetadata()->types.push_back(this);
 }
 
 Type::~Type() {
@@ -114,74 +113,84 @@ Type::~Type() {
 }
 
 ContextPtr Type::getContext() const {
-    return m_module->getContext();
+    return getModule()->getContext();
 }
 
 // add binary operator
-UnaryOperator* Type::addUnary(
+UnaryPtr Type::addUnary(
     Member::UnaryOpcode opcode,
     TypePtr returnType
 ) {
-    return new UnaryOperator(opcode, this, returnType);
+    UnaryPtr member = UnaryPtr(new UnaryOperator(opcode, shared_from_this(), returnType));
+    m_meta->unary().insert(member);
+    return member;
 }
 
 // add binary operator
-BinaryOperator* Type::addBinary(
+BinaryPtr Type::addBinary(
     Member::BinaryOpcode opcode,
     TypePtr returnType,
     TypePtr operandType
 ) {
-    return new BinaryOperator(opcode, this, returnType, operandType);
+    BinaryPtr member = BinaryPtr(new BinaryOperator(opcode, shared_from_this(), returnType, operandType));
+    m_meta->binary().insert(member);
+    return member;
 }
 
 /// add multiary operator
-MultiaryOperator* Type::addMultiary(
+MultiaryPtr Type::addMultiary(
     Member::MultiaryOpcode opcode,
     TypePtr returnType,
     std::vector<TypePtr> arguments
 ) {
-    return new MultiaryOperator(opcode, this, returnType, arguments);
+    MultiaryPtr member = MultiaryPtr(new MultiaryOperator(opcode, shared_from_this(), returnType, arguments));
+    m_meta->multiary().insert(member);
+    return member;
 }
 
 // add field
-Field* Type::addField(const Identifier& name, TypePtr fieldType) {
-    if (Field* override = findField(name)) {
+FieldPtr Type::addField(const Identifier& name, TypePtr fieldType) {
+    if (FieldPtr override = findField(name)) {
         if (!override->isDeclared()) {
             override->declare();
             return override;
         }
     }
-    return new Field(name, this, fieldType);
+    FieldPtr member = FieldPtr(new Field(name, shared_from_this(), fieldType));
+    m_meta->fields().insert(member);
+    return member;
 }
 
 // add method
-Method* Type::addMethod(const Identifier& name, TypePtr returnType, std::vector<TypePtr> arguments) {
-    return new Method(name, this, returnType, arguments);
+MethodPtr Type::addMethod(const Identifier& name, TypePtr returnType, std::vector<TypePtr> arguments) {
+    MethodPtr member = MethodPtr(new Method(name, shared_from_this(), returnType, arguments));
+    m_meta->methods().insert(member);
+    return member;
 }
 
 // find unary operator
-UnaryOperator* Type::findUnary(Member::UnaryOpcode opcode) const {
+UnaryPtr Type::findUnary(Member::UnaryOpcode opcode) const {
     return find_if(m_meta->unary(), UnaryFinder(opcode));
 }
 
 // find binary operator
-BinaryOperator* Type::findBinary(Member::BinaryOpcode opcode, TypePtr operandType) const {
+BinaryPtr Type::findBinary(Member::BinaryOpcode opcode, TypePtr operandType) const {
     return find_if(m_meta->binary(), BinaryFinder(opcode, operandType));
 }
 
 // find binary operator
-MultiaryOperator* Type::findMultiary(Member::MultiaryOpcode opcode, std::vector<TypePtr> arguments) const {
-    return find_if(m_meta->multiary(), MultiaryFinder(opcode, makeVector(const_cast<TypePtr>(this), arguments)));
+MultiaryPtr Type::findMultiary(Member::MultiaryOpcode opcode, std::vector<TypePtr> arguments) const {
+    return find_if(m_meta->multiary(), MultiaryFinder(opcode, makeVector(const_cast<Type*>(this)->shared_from_this(), arguments)));
 }
 
 // find field
-Field* Type::findField(const Identifier& name) const {
+FieldPtr Type::findField(const Identifier& name) const {
     return find_if(m_meta->fields(), FieldFinder(name));
 }
 
 // find method
-Method* Type::findMethod(const Identifier& name, std::vector<TypePtr> arguments) const {
-    return find_if(m_meta->methods(), MethodFinder(name, makeVector(const_cast<TypePtr>(this), arguments)));
+MethodPtr Type::findMethod(const Identifier& name, std::vector<TypePtr> arguments) const {
+    return find_if(m_meta->methods(), MethodFinder(name, makeVector(const_cast<Type*>(this)->shared_from_this(), arguments)));
 }
 
 llvm::Type* Type::getVarType() const {

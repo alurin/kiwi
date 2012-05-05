@@ -7,9 +7,8 @@
 #ifndef KIWI_TYPEIMPL_INTERNAL
 #define KIWI_TYPEIMPL_INTERNAL
 
-#include "kiwi/config.hpp"
+#include "kiwi/Type.hpp"
 #include <boost/signals2.hpp>
-// #include <vector>
 #include <set>
 
 namespace llvm {
@@ -38,7 +37,7 @@ namespace kiwi {
         typedef typename std::set<reference>::const_iterator const_iterator;
 
         /// constructor
-        MemberSet(TypePtr owner);
+        MemberSet(Type* owner);
 
         /// insert member
         void insert(reference member);
@@ -71,7 +70,7 @@ namespace kiwi {
         }
     private:
         /// Owner for this implementation
-        TypePtr m_owner;
+        Type* m_owner;
 
         /// set of members
         std::set<reference> m_members;
@@ -193,7 +192,7 @@ namespace kiwi {
         }
     protected:
         /// Owner for this implementation
-        TypePtr m_owner;
+        Type* m_owner;
 
         /// set of all based types [ struct and objects ]
         std::set<TypePtr> m_bases;
@@ -214,7 +213,7 @@ namespace kiwi {
         MemberSet<MultiaryOperator>* m_multiary;
     private:
         /// Constructor
-        TypeImpl(TypePtr owner);
+        TypeImpl(Type* owner);
 
         /// destructor
         ~TypeImpl();
@@ -224,14 +223,14 @@ namespace kiwi {
 
     // constructor
     template<typename T>
-    MemberSet<T>::MemberSet(TypePtr owner) : m_owner(owner) {
+    MemberSet<T>::MemberSet(Type* owner) : m_owner(owner) {
     }
 
     // find member by predicate
     template<typename T, typename C>
     typename MemberSet<T>::reference find_if(const MemberSet<T>& members, const C& value) {
         typename MemberSet<T>::const_iterator it = std::find_if(members.begin(), members.end(), value);
-        return (it != members.end()) ? *it : 0;
+        return (it != members.end()) ? *it : typename MemberSet<T>::reference();
     }
 
     // find member by name
@@ -260,7 +259,6 @@ namespace kiwi {
             if (!(exists->isDeclared() || exists->isOverride())) {
                 m_members.erase(exists);
                 onRemove(exists);
-                delete exists;
             }
         }
 
@@ -273,7 +271,7 @@ namespace kiwi {
     void MemberSet<T>::inherit(reference member) {
         reference exists = find(member);
         if (!exists) {
-            reference newf = new T(m_owner, member); // create clone
+            reference newf = reference(new T(m_owner->shared_from_this(), member)); // create clone
             m_members.insert(newf);
         }
     }

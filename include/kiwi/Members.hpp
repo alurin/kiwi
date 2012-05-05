@@ -28,12 +28,12 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(const Member* type) {
+        static bool classof(const MemberPtr type) {
             return type->getMemberID() == UnaryID;
         }
 
         /// classof check
-        static bool classof(const UnaryOperator*) {
+        static bool classof(const UnaryPtr) {
             return true;
         }
     protected:
@@ -58,12 +58,12 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(const Member* type) {
+        static bool classof(const MemberPtr type) {
             return type->getMemberID() == BinaryID;
         }
 
         /// classof check
-        static bool classof(const BinaryOperator*) {
+        static bool classof(const BinaryPtr) {
             return true;
         }
     protected:
@@ -88,12 +88,12 @@ namespace kiwi
             return m_opcode;
         }
                 /// classof check
-        static bool classof(const Member* type) {
+        static bool classof(const MemberPtr type) {
             return type->getMemberID() == MultiaryID;
         }
 
         /// classof check
-        static bool classof(const MultiaryOperator*) {
+        static bool classof(const MultiaryPtr) {
             return true;
         }
     protected:
@@ -130,19 +130,19 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(const Member* type) {
+        static bool classof(const MemberPtr type) {
             return type->getMemberID() == MethodID;
         }
 
         /// classof check
-        static bool classof(const Method*) {
+        static bool classof(const MethodPtr) {
             return true;
         }
     protected:
         Identifier m_name;
 
         /// constructor for inhertit method
-        Method(TypePtr ownerType, Method* method);
+        Method(TypePtr ownerType, MethodPtr method);
 
         /// constructor
         Method(const Identifier& name, TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> arguments);
@@ -171,12 +171,12 @@ namespace kiwi
         }
 
         /// classof check
-        static bool classof(const Member* type) {
+        static bool classof(const MemberPtr type) {
             return type->getMemberID() == FieldID;
         }
 
         /// classof check
-        static bool classof(const Field*) {
+        static bool classof(const FieldPtr) {
             return true;
         }
     protected:
@@ -190,7 +190,7 @@ namespace kiwi
         int32_t m_position;
 
         /// constructor: inherit field field
-        Field(TypePtr ownerType, Field* field);
+        Field(TypePtr ownerType, FieldPtr field);
 
         /// constructor: declare field field
         Field(TypePtr ownerType, TypePtr fieldType);

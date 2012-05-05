@@ -26,7 +26,7 @@ namespace codegen {
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::Function* m_func;
-        TypePtr m_returnType;
+        TypeWeak m_returnType;
     }; // class LlvmCallEmitter
 
     //==--------------------------------------------------------------------==//
@@ -40,7 +40,7 @@ namespace codegen {
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::Instruction::BinaryOps m_opcode;
-        TypePtr  m_type;
+        TypeWeak m_type;
     }; /// class LlvmZeroUnaryOperator
 
     //==--------------------------------------------------------------------==//
@@ -54,7 +54,7 @@ namespace codegen {
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::Instruction::BinaryOps m_opcode;
-        TypePtr m_type;
+        TypeWeak m_type;
     }; /// class LlvmBinaryOperator
 
     //==--------------------------------------------------------------------==//

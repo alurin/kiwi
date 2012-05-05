@@ -29,12 +29,12 @@ namespace kiwi {
 
     class CloneEmitter : public CallablePolicy {
     public:
-        CloneEmitter(Callable* callable);
+        CloneEmitter(CallablePtr callable);
 
         /// emit IR instruction
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
-        Callable* m_callable;
+        CallableWeak m_callable;
     };
 
 } // namespace kiwi::codegen

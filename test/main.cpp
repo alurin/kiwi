@@ -12,16 +12,7 @@
  *
  */
 #include "test.h"
-#include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
-#include <iostream>
-#include <sstream>
-#include "kiwi/Engine.hpp"
-
-void test_crash();
 
 int main(int argc, char* argv[]) {
-    kiwi::EngineGuard guard;
     return UnitTest::RunAllTests();
 }

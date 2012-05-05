@@ -22,7 +22,7 @@ Callable::Callable(TypePtr ownerType, TypePtr returnType, TypeVector types)
 }
 
 // constructor
-Callable::Callable(TypePtr ownerType, Callable* callable)
+Callable::Callable(TypePtr ownerType, CallablePtr callable)
 : Member(ownerType), m_returnType(callable->m_returnType), m_func(0), m_policy(new CloneEmitter(callable)) {
     cloneArguments(ownerType, callable->m_args);
     kiwi_assert(m_args.size() > 0, "Callable must have minimum one argument");
@@ -57,7 +57,7 @@ void Callable::setFunction(llvm::Function* func) {
     m_func = func;
     /// @todo What if, policy already exists at this point?
     if (!getPolicy()) {
-        setPolicy(new LlvmCallEmitter(func, m_returnType));
+        setPolicy(new LlvmCallEmitter(func, m_returnType.lock()));
     }
 }
 

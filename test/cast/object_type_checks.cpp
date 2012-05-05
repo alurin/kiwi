@@ -5,7 +5,7 @@
  *******************************************************************************
  */
 #include "test.h" // Brings in the UnitTest++ framework
-#include "kiwi/Engine.hpp"
+#include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Members.hpp"
@@ -24,15 +24,15 @@ TEST(object_methods_check) {
 
     // create method "method" without argument
     {
-        Field* created = type->addField("field1", type1);
-        Field* method  = type->findField("field1");
+        FieldPtr created = type->addField("field1", type1);
+        FieldPtr method  = type->findField("field1");
         CHECK_EQUAL(created, method);
     }
 
     // create method "method" without argument
     {
-        Method* created = type->addMethod("method", type1, args);
-        Method* method  = type->findMethod("method", args);
+        MethodPtr created = type->addMethod("method", type1, args);
+        MethodPtr method  = type->findMethod("method", args);
         CHECK_EQUAL(created, method);
     }
 
@@ -40,22 +40,21 @@ TEST(object_methods_check) {
     {
         args.clear();
         args.push_back(type2);
-        Method* created = type->addMethod("method", type1, args);
-        Method* method  = type->findMethod("method", args);
+        MethodPtr created = type->addMethod("method", type1, args);
+        MethodPtr method  = type->findMethod("method", args);
         CHECK_EQUAL(created, method);
     }
-    delete context;
 }
 
 TEST(object_inheritance_check) {
     ContextPtr context = Context::create();
     ModulePtr  module  = Module::create("script", context);
 
-    ObjectTypePtr parent = ObjectType::create(module);
-    ObjectTypePtr first  = ObjectType::create(module);
-    ObjectTypePtr second = ObjectType::create(module);
-    ObjectTypePtr third  = ObjectType::create(module);
-    ObjectTypePtr any    = ObjectType::create(module);
+    ObjectPtr parent = ObjectType::create(module);
+    ObjectPtr first  = ObjectType::create(module);
+    ObjectPtr second = ObjectType::create(module);
+    ObjectPtr third  = ObjectType::create(module);
+    ObjectPtr any    = ObjectType::create(module);
 
     first->inherit(parent);
     third->inherit(first);
@@ -83,7 +82,6 @@ TEST(object_inheritance_check) {
     CHECK(third->isCastableTo(second));
     CHECK(!third->isCastableTo(any));
 
-    delete context;
 }
 
 TEST(object_field_override_check_after) {
@@ -91,9 +89,9 @@ TEST(object_field_override_check_after) {
     ModulePtr  module  = Module::create("script", context);
     TypePtr       type = IntegerType::get32(context);
 
-    ObjectTypePtr clA  = ObjectType::create(module, "A");  // A { @a, @b }
-    ObjectTypePtr clB  = ObjectType::create(module, "B");  // B { @a, @c }
-    ObjectTypePtr clC  = ObjectType::create(module, "C");  // C : A,B { @a merge A::@a, B::@a as }
+    ObjectPtr clA  = ObjectType::create(module, "A");  // A { @a, @b }
+    ObjectPtr clB  = ObjectType::create(module, "B");  // B { @a, @c }
+    ObjectPtr clC  = ObjectType::create(module, "C");  // C : A,B { @a merge A::@a, B::@a as }
 
     // inherit classes affter
     clC->inherit(clA);
@@ -108,7 +106,7 @@ TEST(object_field_override_check_after) {
     clC->inherit(clB);
 
     // merge fields
-    Field* aF = clC->addField("a", type);
+    FieldPtr aF = clC->addField("a", type);
 
     clC->mergeField(aF, clA->findField("a"));
     clC->mergeField(aF, clB->findField("a"));
@@ -123,5 +121,4 @@ TEST(object_field_override_check_after) {
     CHECK(clC->findField("c")->isOverride(clB->findField("c")));
     CHECK_EQUAL(3, clC->field_size());
 
-    delete context;
 }

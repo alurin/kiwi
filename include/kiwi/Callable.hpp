@@ -104,7 +104,7 @@ namespace kiwi {
         Callable(TypePtr ownerType, TypePtr returnType, TypeVector types);
 
         /// constructor for inherited callable
-        Callable(TypePtr ownerType, Callable* callable);
+        Callable(TypePtr ownerType, CallablePtr callable);
     private:
         /// create arguments from types
         /// @todo move in anonym namespace
