@@ -8,6 +8,7 @@
 #include "ModuleImpl.hpp"
 #include "RuntimeModule.hpp"
 #include "kiwi/Context.hpp"
+#include "kiwi/ManagedStatic.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi-runtime/core.h"
 #include <llvm/LLVMContext.h>
@@ -27,24 +28,8 @@
 
 using namespace kiwi;
 
-namespace {
-    /// Static guard
-    GuardWeak globalGuard;
-
-    /// Return or create new global guard
-    GuardPtr get_global_guard() {
-        if (globalGuard.expired()) {
-            GuardPtr guard = GuardPtr(new Guard());
-            globalGuard = guard;
-            return guard;
-        } else {
-            return globalGuard.lock();
-        }
-    }
-}
-
 // Initialize resources for vendor libraries
-Guard::Guard() {
+void kiwi::startup() {
     UErrorCode errorCode;
 
     kiwi_dummy();                       // Init kiwi-runtime (link as dummy)
@@ -58,7 +43,7 @@ Guard::Guard() {
 }
 
 // Clean up resource for vendor libraries
-Guard::~Guard() {
+void kiwi::shutdown() {
     llvm::llvm_shutdown();              // LLVM cleanup
     u_cleanup();                        // ICU cleanup
 
@@ -68,8 +53,8 @@ Guard::~Guard() {
 }
 
 // Constructor
-ContextImpl::ContextImpl() : guard(get_global_guard())
-, m_backendContext(new llvm::LLVMContext()), m_backendEngine(0) {
+ContextImpl::ContextImpl()
+: m_backendContext(new llvm::LLVMContext()), m_backendEngine(0) {
 
 }
 
@@ -95,20 +80,21 @@ ContextPtr Context::create() {
 
 void Context::initializate() {
     // create system module
-    m_metadata->runtime  = Module::create("system", shared_from_this());
-    ModuleImpl* impl     = m_metadata->runtime->getMetadata();
-    llvm::Module* module = impl->getBackendModule();
-
-    // create execution engine
-    m_metadata->m_backendEngine = llvm::EngineBuilder(module).create();
+    // m_metadata->runtime
+    ModulePtr runtime    = m_metadata->runtime = Module::create("system", shared_from_this());
 
     // create types
-    m_metadata->boolTy   = BooleanType::create(m_metadata->runtime);
-    m_metadata->int32Ty  = IntegerType::create(m_metadata->runtime, 32, false);
-    m_metadata->voidTy   = VoidType::create(m_metadata->runtime);
-    m_metadata->charTy   = CharType::create(m_metadata->runtime);
-    m_metadata->stringTy = StringType::create(m_metadata->runtime);
+    m_metadata->boolTy   = BooleanType::create(runtime);
+    m_metadata->int32Ty  = IntegerType::create(runtime, 32, false);
+    m_metadata->voidTy   = VoidType::create(runtime);
+    m_metadata->charTy   = CharType::create(runtime);
+    m_metadata->stringTy = StringType::create(runtime);
 
     // init runtime type
     initRuntimeModule(m_metadata->runtime);
+
+    // create execution engine
+    llvm::Module* module = runtime->getMetadata()->getBackendModule();
+    // @todo remove exception
+    m_metadata->m_backendEngine = llvm::EngineBuilder(module).create();
 }

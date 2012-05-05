@@ -52,7 +52,7 @@ ValueBuilder LlvmBinaryOperator::emit(BlockBuilder block, const ExpressionVector
 // emit instruction for binary operator
 ValueBuilder LlvmIntegerCompareOperator::emit(BlockBuilder block, const ExpressionVector& values) {
     llvm::Value* result = new llvm::ICmpInst(*(block.getBlock()), m_predicate, values[0].getValue(), values[1].getValue(), "");
-    return ValueBuilder(block, result, BooleanType::get(m_context));
+    return ValueBuilder(block, result, BooleanType::get(m_context.lock()));
 }
 
 // emit instruction for binary operator
@@ -109,7 +109,7 @@ ValueBuilder LlvmStringCompareOperator::emit(BlockBuilder block, const Expressio
     // compute string compare and return result
     llvm::Value* value  = llvm::CallInst::Create(compare, makeArrayRef(args), "", block.getBlock());
     llvm::Value* result = new llvm::ICmpInst(*(block.getBlock()), m_predicate, zero, value, "");
-    return ValueBuilder(block, result, BooleanType::get(m_context));
+    return ValueBuilder(block, result, BooleanType::get(m_context.lock()));
 }
 
 ValueBuilder LlvmIntegerPrintOperator::emit(BlockBuilder block, const ExpressionVector& values) {

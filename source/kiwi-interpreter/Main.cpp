@@ -4,6 +4,7 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
+#include "kiwi/ManagedStatic.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Exception.hpp"
 #include "kiwi/Module.hpp"
@@ -12,6 +13,7 @@
 using namespace kiwi;
 
 int main(int argc, char const *argv[]) {
+    kiwi::ManagedStatic guard;
     ContextPtr context = Context::create();
     context->setOptimizationLevel(1);
     context->setDebug(false);

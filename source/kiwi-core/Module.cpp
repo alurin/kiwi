@@ -26,7 +26,6 @@ ModuleImpl::ModuleImpl() : m_backendModule(0) {
 Module::Module(const Identifier& name, ContextPtr context)
 : m_name(name), m_context(context), m_metadata(new ModuleImpl()) {
     ContextImpl* meta = context->getMetadata();
-
     m_metadata->m_backendModule = new llvm::Module(name, meta->getBackendContext());
     if (llvm::ExecutionEngine* engine = meta->getBackendEngine()) {
         engine->addModule(m_metadata->m_backendModule);
@@ -41,10 +40,6 @@ ModulePtr Module::create(const Identifier& name, ContextPtr context) {
     ModulePtr module = ModulePtr(new Module(name, context));
     context->getMetadata()->registerModule(module);
     return module;
-}
-
-MethodPtr Module::getMainMethod() {
-    return m_metadata->mainMethod;
 }
 
 bool Module::includeFile(const Path& filename) {
@@ -138,11 +133,15 @@ int32_t Module::run() {
     return 0;
 }
 
+// return main method from module
+MethodPtr Module::getMainMethod() const {
+    return m_metadata->mainMethod;
+}
+
 // register type with alias
 void ModuleImpl::registerType(TypePtr type, const Identifier& name) {
     m_types.insert(type);
-    throw Exception()
-        << exception_message("Module::registerType not implemented");
+    m_names.insert(std::make_pair(name, type));
 }
 
 /// create alias for type
@@ -150,8 +149,10 @@ void ModuleImpl::registerType(TypePtr type) {
     m_types.insert(type);
 }
 
-
-TypePtr Module::find(const Identifier& name) {
-    throw Exception()
-        << exception_message("Module::find(name) not implemented");
+TypePtr Module::find(const Identifier& name) const {
+    std::map<Identifier, TypePtr>::const_iterator result = m_metadata->m_names.find(name);
+    if (result == m_metadata->m_names.end()) {
+        return TypePtr();
+    }
+    return result->second;
 }

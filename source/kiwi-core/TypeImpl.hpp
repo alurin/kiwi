@@ -271,7 +271,7 @@ namespace kiwi {
     void MemberSet<T>::inherit(reference member) {
         reference exists = find(member);
         if (!exists) {
-            reference newf = reference(new T(m_owner->shared_from_this(), member)); // create clone
+            reference newf = T::inherit(m_owner->shared_from_this(), member); // create clone
             m_members.insert(newf);
         }
     }

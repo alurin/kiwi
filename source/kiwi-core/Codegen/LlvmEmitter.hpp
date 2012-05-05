@@ -71,7 +71,7 @@ namespace codegen {
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::CmpInst::Predicate m_predicate;
-        ContextPtr m_context;
+        ContextWeak m_context;
     }; /// class LlvmIntegerCompareOperator
 
     //==--------------------------------------------------------------------==//
@@ -88,7 +88,7 @@ namespace codegen {
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
         llvm::CmpInst::Predicate m_predicate;
-        ContextPtr m_context;
+        ContextWeak m_context;
     }; /// class LlvmStringCompareOperator
 
     //==--------------------------------------------------------------------==//

@@ -17,19 +17,6 @@ namespace llvm {
 }
 
 namespace kiwi {
-    typedef boost::weak_ptr<class Guard>    GuardWeak;
-    typedef boost::shared_ptr<class Guard>  GuardPtr;
-
-    /// Guard for vendor resources
-    class Guard {
-    public:
-        /// Initialize resources for vendor libraries
-        Guard();
-
-        /// Clean up resource for vendor libraries
-        ~Guard();
-    };
-
     /// Internal class for store information of runtime types
     class ContextImpl {
         friend class Context;
@@ -67,9 +54,6 @@ namespace kiwi {
             m_modules.push_back(module);
         }
     private:
-        /// resource guard
-        GuardPtr guard;
-
         /// LLVM context
         llvm::LLVMContext* m_backendContext;
 

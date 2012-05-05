@@ -15,8 +15,6 @@ namespace llvm {
 }
 
 namespace kiwi {
-    class Argument;
-
     /// Callable implementation strategy
     class CallablePolicy;
 
@@ -24,9 +22,9 @@ namespace kiwi {
     /// Callable member, common base for all operators and methods
     class Callable : public Member {
     public:
-        typedef std::vector<TypePtr>              TypeVector;
-        typedef std::vector<Argument*>          ArgumentVector;
-        typedef ArgumentVector::const_iterator  const_iterator;
+        typedef std::vector<TypePtr>                TypeVector;
+        typedef std::vector<ArgumentPtr>            ArgumentVector;
+        typedef ArgumentVector::const_iterator      const_iterator;
 
         /// virtual destructo
         virtual ~Callable();
@@ -58,15 +56,15 @@ namespace kiwi {
         }
 
         /// returns argument by index
-        Argument* getArgument(int32_t indexAt) {
+        ArgumentPtr getArgument(int32_t indexAt) {
             if (indexAt < 0 || size() <= indexAt) {
-                return 0;
+                return ArgumentPtr();
             }
             return m_args[indexAt];
         }
 
         /// returns argument by name [not implemented]
-        Argument* getArgument(const Identifier& name);
+        ArgumentPtr getArgument(const Identifier& name);
 
         /// returns size of arguments
         size_t size() const {
@@ -101,18 +99,18 @@ namespace kiwi {
         llvm::Function* m_func;
 
         /// constructor
-        Callable(TypePtr ownerType, TypePtr returnType, TypeVector types);
+        Callable(TypePtr ownerType, TypePtr returnType);
 
         /// constructor for inherited callable
         Callable(TypePtr ownerType, CallablePtr callable);
-    private:
+
         /// create arguments from types
         /// @todo move in anonym namespace
-        void makeArgumentsFromTypes(TypeVector types);
+        void initializateArguments(TypeVector types);
 
         /// create arguments from parent callable
         /// @todo move in anonym namespace
-        void cloneArguments(TypePtr thisType, ArgumentVector args);
+        void initializateArguments(TypePtr thisType, ArgumentVector args);
     };
 }
 

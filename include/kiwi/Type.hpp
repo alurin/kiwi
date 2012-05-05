@@ -15,16 +15,6 @@ namespace llvm {
 }
 
 namespace kiwi {
-    class Context;
-    class Module;
-    class Member;
-    class Type;
-    class BinaryOperator;
-    class UnaryOperator;
-    class MultiaryOperator;
-    class Method;
-    class Field;
-    class CastOperator;
     class TypeImpl;
 
     /// Type metadata

@@ -51,6 +51,7 @@ namespace kiwi {
 
     //== Smart pointers: Members
     typedef boost::shared_ptr<class Member>             MemberPtr;
+    typedef boost::shared_ptr<class Argument>           ArgumentPtr;
     typedef boost::shared_ptr<class Callable>           CallablePtr;
     typedef boost::weak_ptr<class Callable>             CallableWeak;
     typedef boost::shared_ptr<class Method>             MethodPtr;

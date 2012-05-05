@@ -18,6 +18,9 @@ namespace kiwi {
 
     /**
      * General enter point for Kiwi language infrastructure
+     *
+     * @todo Create multiple contextes is crashed application: errors with ICU and LLVM.
+     *       View guard
      */
     class Context : public boost::enable_shared_from_this<Context>, public boost::noncopyable {
     public:

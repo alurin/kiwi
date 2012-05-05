@@ -59,7 +59,7 @@ void Type::dump() {
         bool noFirst = false;
         for (Callable::const_iterator j = method->arg_begin(); j != method->arg_end(); ++j) {
             if (noFirst) std::cerr << ", "; else noFirst = true;
-            Argument* arg = *j;
+            ArgumentPtr arg = *j;
             std::cerr << arg->getName() << " : " << arg->getType()->getName();
         }
 

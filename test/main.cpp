@@ -12,7 +12,9 @@
  *
  */
 #include "test.h"
+#include "kiwi/ManagedStatic.hpp"
 
 int main(int argc, char* argv[]) {
+    kiwi::ManagedStatic guard;
     return UnitTest::RunAllTests();
 }

@@ -13,7 +13,6 @@
 #include "kiwi/Module.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Members.hpp"
-#include "kiwi/Support/Array.hpp"
 
 using namespace kiwi;
 using namespace kiwi::codegen;
@@ -117,55 +116,28 @@ ContextPtr Type::getContext() const {
 }
 
 // add binary operator
-UnaryPtr Type::addUnary(
-    Member::UnaryOpcode opcode,
-    TypePtr returnType
-) {
-    UnaryPtr member = UnaryPtr(new UnaryOperator(opcode, shared_from_this(), returnType));
-    m_meta->unary().insert(member);
-    return member;
+UnaryPtr Type::addUnary(Member::UnaryOpcode opcode, TypePtr returnType) {
+    return UnaryOperator::create(shared_from_this(), opcode, returnType);
 }
 
 // add binary operator
-BinaryPtr Type::addBinary(
-    Member::BinaryOpcode opcode,
-    TypePtr returnType,
-    TypePtr operandType
-) {
-    BinaryPtr member = BinaryPtr(new BinaryOperator(opcode, shared_from_this(), returnType, operandType));
-    m_meta->binary().insert(member);
-    return member;
+BinaryPtr Type::addBinary(Member::BinaryOpcode opcode, TypePtr returnType, TypePtr operandType) {
+    return BinaryOperator::create(shared_from_this(), opcode, returnType, operandType);
 }
 
 /// add multiary operator
-MultiaryPtr Type::addMultiary(
-    Member::MultiaryOpcode opcode,
-    TypePtr returnType,
-    std::vector<TypePtr> arguments
-) {
-    MultiaryPtr member = MultiaryPtr(new MultiaryOperator(opcode, shared_from_this(), returnType, arguments));
-    m_meta->multiary().insert(member);
-    return member;
+MultiaryPtr Type::addMultiary(Member::MultiaryOpcode opcode, TypePtr returnType, std::vector<TypePtr> arguments) {
+    return MultiaryOperator::create(shared_from_this(), opcode, returnType, arguments);
 }
 
 // add field
 FieldPtr Type::addField(const Identifier& name, TypePtr fieldType) {
-    if (FieldPtr override = findField(name)) {
-        if (!override->isDeclared()) {
-            override->declare();
-            return override;
-        }
-    }
-    FieldPtr member = FieldPtr(new Field(name, shared_from_this(), fieldType));
-    m_meta->fields().insert(member);
-    return member;
+    return Field::create(shared_from_this(), fieldType, name);
 }
 
 // add method
 MethodPtr Type::addMethod(const Identifier& name, TypePtr returnType, std::vector<TypePtr> arguments) {
-    MethodPtr member = MethodPtr(new Method(name, shared_from_this(), returnType, arguments));
-    m_meta->methods().insert(member);
-    return member;
+    return Method::create(shared_from_this(), returnType, arguments, name);
 }
 
 // find unary operator
@@ -179,8 +151,11 @@ BinaryPtr Type::findBinary(Member::BinaryOpcode opcode, TypePtr operandType) con
 }
 
 // find binary operator
-MultiaryPtr Type::findMultiary(Member::MultiaryOpcode opcode, std::vector<TypePtr> arguments) const {
-    return find_if(m_meta->multiary(), MultiaryFinder(opcode, makeVector(const_cast<Type*>(this)->shared_from_this(), arguments)));
+MultiaryPtr Type::findMultiary(Member::MultiaryOpcode opcode, std::vector<TypePtr> types) const {
+    std::vector<TypePtr> arguments;
+    arguments.push_back(const_cast<Type*>(this)->shared_from_this());
+    arguments.insert(arguments.end(), types.begin(), types.end());
+    return find_if(m_meta->multiary(), MultiaryFinder(opcode, arguments));
 }
 
 // find field
@@ -189,8 +164,11 @@ FieldPtr Type::findField(const Identifier& name) const {
 }
 
 // find method
-MethodPtr Type::findMethod(const Identifier& name, std::vector<TypePtr> arguments) const {
-    return find_if(m_meta->methods(), MethodFinder(name, makeVector(const_cast<Type*>(this)->shared_from_this(), arguments)));
+MethodPtr Type::findMethod(const Identifier& name, std::vector<TypePtr> types) const {
+    std::vector<TypePtr> arguments;
+    arguments.push_back(const_cast<Type*>(this)->shared_from_this());
+    arguments.insert(arguments.end(), types.begin(), types.end());
+    return find_if(m_meta->methods(), MethodFinder(name, arguments));
 }
 
 llvm::Type* Type::getVarType() const {

@@ -13,7 +13,7 @@
 namespace kiwi
 {
     /// Type member
-    class Member {
+    class Member : public boost::enable_shared_from_this<Member>, public boost::noncopyable  {
     public:
         ///
         enum MemberID {

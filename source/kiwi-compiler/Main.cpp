@@ -4,6 +4,7 @@
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
+#include "kiwi/ManagedStatic.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Exception.hpp"
@@ -19,6 +20,7 @@ void printVersion() {
 }
 
 int main(int argc, char const *argv[]) {
+    kiwi::ManagedStatic guard;
     int  opt = 0;
 
     // Declare the supported options.

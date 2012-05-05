@@ -42,10 +42,10 @@ namespace kiwi
         }
 
         /// find type with name
-        TypePtr find(const Identifier& name);
+        TypePtr find(const Identifier& name) const;
 
         /// returns main method in current module
-        MethodPtr getMainMethod();
+        MethodPtr getMainMethod() const;
 
         /// build module
         void build();

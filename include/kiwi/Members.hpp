@@ -17,6 +17,9 @@ namespace kiwi
     class UnaryOperator : public Callable, public Overridable<UnaryOperator> {
         friend class Type;
     public:
+        /// create unary operator
+        static UnaryPtr create(TypePtr ownerType, UnaryOpcode opcode, TypePtr returnType);
+
         /// returns binary operator opcode
         UnaryOpcode getOpcode() const {
             return m_opcode;
@@ -40,11 +43,7 @@ namespace kiwi
         UnaryOpcode             m_opcode;
 
         /// constructor
-        UnaryOperator(
-            UnaryOpcode opcode,
-            TypePtr ownerType,
-            TypePtr returnType
-        );
+        UnaryOperator(UnaryOpcode opcode, TypePtr ownerType, TypePtr returnType);
     };
 
     //==--------------------------------------------------------------------==//
@@ -52,6 +51,9 @@ namespace kiwi
     class BinaryOperator : public Callable, public Overridable<BinaryOperator> {
         friend class Type;
     public:
+        /// create binary operator
+        static BinaryPtr create(TypePtr ownerType, BinaryOpcode opcode, TypePtr returnType, TypePtr operandType);
+
         /// returns binary opcode
         BinaryOpcode getOpcode() const {
             return m_opcode;
@@ -70,12 +72,7 @@ namespace kiwi
         BinaryOpcode m_opcode;
 
         /// constructor
-        BinaryOperator(
-            BinaryOpcode opcode,
-            TypePtr ownerType,
-            TypePtr returnType,
-            TypePtr operandType
-        );
+        BinaryOperator(BinaryOpcode opcode, TypePtr ownerType, TypePtr returnType);
     };
 
     //==--------------------------------------------------------------------==//
@@ -83,6 +80,9 @@ namespace kiwi
     class MultiaryOperator : public Callable, public Overridable<MultiaryOperator> {
         friend class Type;
     public:
+        /// create multiary operator
+        static MultiaryPtr create(TypePtr ownerType, MultiaryOpcode opcode, TypePtr returnType, TypeVector types);
+
         /// returns multiary opcode
         MultiaryOpcode getOpcode() const {
             return m_opcode;
@@ -99,13 +99,8 @@ namespace kiwi
     protected:
         MultiaryOpcode            m_opcode;
 
-        // constructor
-        MultiaryOperator(
-            MultiaryOpcode opcode,
-            TypePtr ownerType,
-            TypePtr returnType,
-            TypeVector types
-        );
+        /// constructor
+        MultiaryOperator(MultiaryOpcode opcode, TypePtr ownerType, TypePtr returnType);
     };
 
     //==--------------------------------------------------------------------==//
@@ -114,19 +109,12 @@ namespace kiwi
         friend class Type;
         template<class Method> friend class MemberSet;
     public:
+        /// Create method add register in type
+        static MethodPtr create(TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> arguments, const Identifier& name = "");
+
         /// Returns method name
         Identifier getName() const {
             return m_name;
-        }
-
-        /// returns this is static method?
-        bool isStatic() const {
-            return false;
-        }
-
-        /// returns this is abstract method?
-        bool isAbstract() const {
-            return false;
         }
 
         /// classof check
@@ -141,11 +129,14 @@ namespace kiwi
     protected:
         Identifier m_name;
 
+        /// constructor
+        Method(const Identifier& name, TypePtr ownerType, TypePtr returnType);
+
         /// constructor for inhertit method
         Method(TypePtr ownerType, MethodPtr method);
 
-        /// constructor
-        Method(const Identifier& name, TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> arguments);
+        /// inherit member from base type
+        static MethodPtr inherit(TypePtr ownerType, MethodPtr method);
     };
 
     //==--------------------------------------------------------------------==//
@@ -155,6 +146,9 @@ namespace kiwi
         friend class ObjectType;
         template<class Field> friend class MemberSet;
     public:
+        /// create field
+        static FieldPtr create(TypePtr ownerType, TypePtr fieldType, const Identifier& name = "");
+
         /// returns field name
         Identifier getName() const {
             return m_name;
@@ -162,7 +156,7 @@ namespace kiwi
 
         /// returns field type
         TypePtr getFieldType() const {
-            return m_fieldType;
+            return m_fieldType.lock();
         }
 
         /// returns position in address map
@@ -184,7 +178,7 @@ namespace kiwi
         Identifier m_name;
 
         /// field type
-        TypePtr m_fieldType;
+        TypeWeak m_fieldType;
 
         /// field position in address map for class
         int32_t m_position;
@@ -207,15 +201,8 @@ namespace kiwi
         void setName(const Identifier& name) {
             m_name = name;
         }
-    };
-
-    //==--------------------------------------------------------------------==//
-    /// Cast operator
-    class CastOperator : public Callable, public Overridable<CastOperator> {
-        friend class Type;
-    protected:
-        /// constructor
-        CastOperator(TypePtr sourceType, TypePtr destType);
+        /// inherit field from base type
+        static FieldPtr inherit(TypePtr ownerType, FieldPtr field);
     };
 }
 

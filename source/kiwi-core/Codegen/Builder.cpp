@@ -183,8 +183,8 @@ llvm::FunctionType* FunctionBuilder::getFunctionType() const {
     llvm::Type* returnType = m_nativeCallable->getReturnType()->getVarType();
 
     // collect explicit arguments
-    for (std::vector<Argument*>::const_iterator i = m_nativeCallable->arg_begin(); i != m_nativeCallable->arg_end(); ++i) {
-        Argument* arg = *i;
+    for (std::vector<ArgumentPtr>::const_iterator i = m_nativeCallable->arg_begin(); i != m_nativeCallable->arg_end(); ++i) {
+        ArgumentPtr arg = *i;
         args.push_back(arg->getType()->getVarType());
     }
 
@@ -208,7 +208,7 @@ llvm::Function* FunctionBuilder::getFunction() const {
             // set argument name
             size_t j = 0;
             for (llvm::Function::arg_iterator i = m_func->arg_begin(); i != m_func->arg_end(); ++i, ++j) {
-                Argument* arg = m_nativeCallable->getArgument(j);
+                ArgumentPtr arg = m_nativeCallable->getArgument(j);
                 if (j) {
                     i->setName(arg->getName());
                 } else {
