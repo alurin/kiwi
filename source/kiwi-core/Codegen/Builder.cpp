@@ -429,7 +429,7 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, CallablePtr ctor, std::vect
     bufferIdx.push_back(llvm::ConstantInt::get(*m_context, llvm::APInt(32, 0, false)));
     bufferIdx.push_back(llvm::ConstantInt::get(*m_context, llvm::APInt(32, 0, false)));
     llvm::Value* amapLoc = llvm::GetElementPtrInst::CreateInBounds(variable, makeArrayRef(bufferIdx), "", m_block);
-    llvm::Value* amap    = type->getMetadata()->addressMap;
+    llvm::Value* amap    = type->getMetadata()->getAddressMap().getBackendVariable();
     new llvm::StoreInst(amap, amapLoc, "", m_block);
 
     // new llvm::(stringCst, stringType, "string.val", m_block);
@@ -467,7 +467,7 @@ llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, FieldPtr field) {
     // load amap
     std::vector<llvm::Value*> addressIdx;
     addressIdx.push_back(makeConstantInt(*m_context, 0));
-    addressIdx.push_back(makeConstantInt(*m_context, 1));
+    addressIdx.push_back(makeConstantInt(*m_context, 0));
     llvm::Value* amapOffset = llvm::GetElementPtrInst::Create(value, makeArrayRef(addressIdx), "", m_block);
     llvm::Value* amap       = new llvm::LoadInst(amapOffset, "amap", m_block);
 

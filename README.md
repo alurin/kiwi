@@ -3,13 +3,13 @@ Kiwi 0.1
 
 Description
 -----------
-My hobby. Experemental language used capabilities of parsing generators
-Bison & Flex, code generation from LLVM and unicode support from ICU.
+My hobby. Experemental language used capabilities of parsing generators by
+Bison & Flex, code generation by LLVM and unicode support by ICU.
 
 Feel free submit patches and issues. Who knows, maybe in feature...
 
 My current goals
-* Static OOP language
+* Static OOP language with support of extendable object (e.g. simple adding method and field in runtime)
 * Multi inheritance:
     * Objects as methods and field sets (parent class included only one)
     * Interfaces as abstract classes
@@ -33,7 +33,7 @@ Prerequisites
 This project requires:
 * Cross-platform Make (CMake) v2.8+
 * GNU Make or equivalent.
-* GCC or an alternative, reasonably conformant C++ compiler.
+* GCC 4.6 or an alternative, reasonably conformant C++ compiler.
 * Boost C++ Libraries v1.37+ (v1.46 recomended) [HEADERS and LIBRARIES]
 * LLVM 3.0
 * ICU 4.4+

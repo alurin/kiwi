@@ -54,6 +54,9 @@ namespace kiwi {
         void setOptimizationLevel(int8_t level) {
             m_optimizationLevel = level;
         }
+
+        /// Run main method from module and return result
+        int32_t run(ModulePtr module);
     protected:
         ContextImpl*        m_metadata;
 

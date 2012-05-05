@@ -65,11 +65,11 @@ int main(int argc, char const *argv[]) {
             }
 
             // build module and dump or execute
-            module->build();
             if (vm.count("ir-dump")) {
+                module->build();
                 module->dump();
             } else {
-                return module->run();
+                return context->run(module);
             }
         } catch (Exception& ex) {
             std::cerr << ex << "\n";

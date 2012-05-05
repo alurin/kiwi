@@ -72,12 +72,14 @@ void InsertMethodListener::operator()(MethodPtr method) {
 
 // constructor
 TypeImpl::TypeImpl(Type* owner)
-: m_owner(owner), varType(0), addressMap(0), virtualTable(0) {
-    m_fields   = new MemberSet<Field>(owner);
-    m_methods  = new MemberSet<Method>(owner);
-    m_unary    = new MemberSet<UnaryOperator>(owner);
-    m_binary   = new MemberSet<BinaryOperator>(owner);
-    m_multiary = new MemberSet<MultiaryOperator>(owner);
+: m_owner(owner), varType(0), m_addressMap(), m_virtualTable() {
+    m_addressMap   = new AddressMap(owner->getModule());
+    m_virtualTable = new VirtualTable();
+    m_fields       = new MemberSet<Field>(owner);
+    m_methods      = new MemberSet<Method>(owner);
+    m_unary        = new MemberSet<UnaryOperator>(owner);
+    m_binary       = new MemberSet<BinaryOperator>(owner);
+    m_multiary     = new MemberSet<MultiaryOperator>(owner);
 }
 
 // destructor
@@ -87,6 +89,8 @@ TypeImpl::~TypeImpl() {
     delete m_unary;
     delete m_binary;
     delete m_multiary;
+    delete m_addressMap;
+    delete m_virtualTable;
 }
 
 void TypeImpl::insertBase(TypePtr type) {

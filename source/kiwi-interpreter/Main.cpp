@@ -28,8 +28,7 @@ int main(int argc, char const *argv[]) {
         // parse file
         if (module->includeFile(argv[1])) {
             // build module and execute this
-            module->build();
-            return module->run();
+            return context->run(module);
         }
         return 1;
     } catch (Exception& ex) {

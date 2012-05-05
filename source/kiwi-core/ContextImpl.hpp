@@ -14,6 +14,8 @@
 namespace llvm {
     class LLVMContext;
     class ExecutionEngine;
+    class FunctionPassManager;
+    class PassManager;
 }
 
 namespace kiwi {
@@ -49,6 +51,16 @@ namespace kiwi {
             return m_backendEngine;
         }
 
+        /// returns LLVM function pass manager
+        llvm::FunctionPassManager* getBackendFunctionPassManager() {
+            return m_backendFunctionPassManager;
+        }
+
+        /// returns LLVM module pass manager
+        llvm::PassManager* getBackendModulePassManager() {
+            return m_backendModulePassManager;
+        }
+
         /// Register module in context
         void registerModule(ModulePtr module) {
             m_modules.push_back(module);
@@ -59,6 +71,12 @@ namespace kiwi {
 
         /// LLVM execution engine
         llvm::ExecutionEngine* m_backendEngine;
+
+        /// LLVM function pass manager
+        llvm::FunctionPassManager* m_backendFunctionPassManager;
+
+        /// LLVM module pass manager
+        llvm::PassManager* m_backendModulePassManager;
 
         /// list of modules
         std::vector<ModulePtr> m_modules;

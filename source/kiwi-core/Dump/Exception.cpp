@@ -136,7 +136,7 @@ std::ostream& kiwi::operator<<(std::ostream& stream, const Exception& ex) {
         }
     }
 
-    return stream;
+    return stream << ANSI_COLOR_RESET;
 }
 
 #include "../Lang/location.hh"

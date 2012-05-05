@@ -15,10 +15,9 @@
 #include "kiwi/Support/Cast.hpp"
 #include "llvm/Module.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/PassManager.h"
 
 using namespace kiwi;
-
-typedef int32_t (*ReturnMainPoint)();
 
 ModuleImpl::ModuleImpl() : m_backendModule(0) {
 }
@@ -61,76 +60,27 @@ bool Module::includeFile(const Path& filename) {
 // Build module
 /// @todo Constant propagation pass not worked
 void Module::build() {
-    // llvm::FunctionPassManager funcManager(m_module);
-    // llvm::PassManager moduleManager;
+    /// create startup function
+    MethodPtr mainMethod = getMainMethod();
+    if (mainMethod) {
+        FunctionBuilder builder(mainMethod);
+        builder.createJITStartupPoint();
+    }
 
-    // /// create startup function
-    // Method* mainMethod = getMainMethod();
-    // if (mainMethod) {
-    //     FunctionBuilder builder(mainMethod);
-    //     builder.createJITStartupPoint();
-    // }
+    // run function optimizations passes
+    ContextImpl* meta    = getContext()->getMetadata();
+    llvm::Module& module = *m_metadata->getBackendModule();
+    for (llvm::Module::iterator func = module.begin(); func != module.end(); ++func) {
+        meta->getBackendFunctionPassManager()->run(*func);
+    }
 
-    // // Set up the optimizer pipeline.  Start with registering info about how the
-    // // target lays out data structures.
-    // funcManager.add(new llvm::TargetData(*m_engine->getTargetData()));
-
-    // int8_t level = getContext()->getOptimizationLevel();
-
-    // // First level optimizations
-    // if (level > 0) {
-    //     // Do simple "peephole" optimizations and bit-twiddling optzns.
-    //     funcManager.add(llvm::createInstructionCombiningPass());
-    //     // Provide basic AliasAnalysis support for GVN.
-    //     funcManager.add(llvm::createBasicAliasAnalysisPass());
-    // }
-
-    // // Second level optimizations
-    // if (level > 1) {
-    //     // Reassociate expressions.
-    //     funcManager.add(llvm::createReassociatePass());
-    //     // Eliminate Common SubExpressions.
-    //     funcManager.add(llvm::createGVNPass());
-    //     // Simplify the control flow graph (deleting unreachable blocks, etc).
-    //     funcManager.add(llvm::createCFGSimplificationPass());
-    //     funcManager.add(llvm::createConstantPropagationPass());
-    // }
-
-    // // Third level optimizations
-    // if (level > 2) {
-    //     funcManager.add(llvm::createDeadCodeEliminationPass());
-    //     funcManager.add(llvm::createDeadStoreEliminationPass());
-    //     moduleManager.add(llvm::createGlobalOptimizerPass());
-    //     moduleManager.add(llvm::createStripDeadPrototypesPass());
-    //     moduleManager.add(llvm::createConstantMergePass());
-    // }
-
-    // /// run optimizations passes for all functions in module
-    // funcManager.doInitialization();
-    // for (llvm::Module::iterator func = m_module->begin(); func != m_module->end(); ++func) {
-    //     funcManager.run(*func);
-    // }
-    // /// run module optimizations passes
-    // moduleManager.run(*m_module);
+    /// run module optimizations passes
+    meta->getBackendModulePassManager()->run(module);
 }
 
 // Dump module
 void Module::dump() {
     getMetadata()->getBackendModule()->dump();
-}
-
-// Run module main function
-int32_t Module::run() {
-    // // JIT the function, returning a function pointer.
-    // llvm::Function* mainFunc = m_module->getFunction("__start");
-    // if (mainFunc) {
-    //     void *pointFunc          = m_engine->getPointerToFunction(mainFunc);
-    //     ReturnMainPoint main     = reinterpret_cast<ReturnMainPoint>(reinterpret_cast<intptr_t>(pointFunc));
-    //     return main();
-    // }
-
-    // throw "Not found main function";
-    return 0;
 }
 
 // return main method from module

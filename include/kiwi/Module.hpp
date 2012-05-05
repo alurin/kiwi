@@ -33,6 +33,11 @@ namespace kiwi
             return m_metadata;
         }
 
+        /// return name of module
+        Identifier getName() const {
+            return m_name;
+        }
+
         /// include and run file as script
         bool includeFile(const Path& filename);
 
@@ -52,9 +57,6 @@ namespace kiwi
 
         /// dump module
         void dump();
-
-        /// run main function in module
-        int32_t run();
     protected:
         /// module name
         Identifier m_name;
