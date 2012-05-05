@@ -20,10 +20,6 @@ namespace kiwi {
     class Field;
     class Method;
     class Type;
-    class Callable;
-    class UnaryOperator;
-    class BinaryOperator;
-    class MultiaryOperator;
 
 //==------------------------------------------------------------------------==//
 
@@ -48,21 +44,6 @@ namespace kiwi {
         /// return set of methods
         MemberSet<Method>& methods() const {
             return *m_methods;
-        }
-
-        /// return set of unary operators
-        MemberSet<UnaryOperator>& unary() const {
-            return *m_unary;
-        }
-
-        /// return set of binary operators
-        MemberSet<BinaryOperator>& binary() const {
-            return *m_binary;
-        }
-
-        /// return set of multiary operators
-        MemberSet<MultiaryOperator>& multiary() const {
-            return *m_multiary;
         }
 
         /// return iterator pointed for begin of bases
@@ -96,15 +77,6 @@ namespace kiwi {
 
         /// set of methods
         MemberSet<Method>* m_methods;
-
-        /// set of unary operators
-        MemberSet<UnaryOperator>* m_unary;
-
-        /// set of binary operators
-        MemberSet<BinaryOperator>* m_binary;
-
-        /// set of multiary operators
-        MemberSet<MultiaryOperator>* m_multiary;
 
         /// virtual table
         VirtualTable* m_virtualTable;

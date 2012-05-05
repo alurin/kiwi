@@ -81,7 +81,6 @@ TEST(object_inheritance_check) {
     CHECK(third->isCastableTo(first));
     CHECK(third->isCastableTo(second));
     CHECK(!third->isCastableTo(any));
-
 }
 
 TEST(object_field_override_check_after) {
@@ -120,5 +119,4 @@ TEST(object_field_override_check_after) {
     CHECK(clC->findField("b")->isOverride(clA->findField("b")));
     CHECK(clC->findField("c")->isOverride(clB->findField("c")));
     CHECK_EQUAL(3, clC->field_size());
-
 }

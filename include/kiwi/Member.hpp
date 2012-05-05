@@ -19,25 +19,21 @@ namespace kiwi
         enum MemberID {
             FieldID = 1,
             MethodID,
-            BinaryID,
-            UnaryID,
-            MultiaryID,
             CastID
         };
 
         /// Unary operation code
-        enum UnaryOpcode {
+        enum MethodOpcode {
+            /// Unary operations opcodes
             Pos = 1,
             Neg,
             Not,
             Dec,  // [ Not implemented                  ]
             Inc,  // [ Not implemented                  ]
-            Print // [ Remove in favor of console.print ]
-        };
+            Print, // [ Remove in favor of console.print ]
 
-        /// Binary operation code
-        enum BinaryOpcode {
-            Add = 1,
+            /// Binary operations opcodes
+            Add,
             Sub,
             Mul,
             Div,
@@ -50,15 +46,22 @@ namespace kiwi
             Ge,
             Le,
             Gt,
-            Lt
-        };
+            Lt,
 
-        /// Multiary operation code
-        enum MultiaryOpcode {
-            Constructor = 1,
-            // Append,      // [   ] =
-            Subtraction, // [...]
-            Invoke       // (   )
+            /// Multiary operations opcodes
+            Subroutine,         // simple method
+            Constructor,        // ctore
+            Append,             // [...] =
+            Subtraction,        // = [...]
+            Invoke,             // (   )
+
+            /// Information about
+            UnaryFirstElement   = Pos,
+            UnaryLastElement    = Print,
+            BinaryFirstElement  = Add,
+            BinaryLastElement   = Lt,
+            // CompareFirstElement = Or,
+            // CompareLastElement  = Lt
         };
     public:
         /// virtual destructor
@@ -78,13 +81,7 @@ namespace kiwi
         bool isInherit() const;
 
         /// temp: get name of operator by opcode
-        static Identifier getOperatorName(UnaryOpcode opcode);
-
-        /// temp: get name of operator by opcode
-        static Identifier getOperatorName(BinaryOpcode opcode);
-
-        /// temp: get name of operator by opcode
-        static Identifier getOperatorName(MultiaryOpcode opcode);
+        static Identifier getOperatorName(MethodOpcode opcode);
     protected:
         /// member class identifier
         MemberID m_memberID;

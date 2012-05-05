@@ -17,7 +17,7 @@ Member::Member(TypePtr type)
 Member::~Member() {
 }
 
-Identifier Member::getOperatorName(UnaryOpcode opcode) {
+Identifier Member::getOperatorName(MethodOpcode opcode) {
     switch (opcode) {
         case Pos:
             return "Pos [+]";
@@ -31,13 +31,6 @@ Identifier Member::getOperatorName(UnaryOpcode opcode) {
             return "Inc [11]";
         case Print:
             return "Print";
-        default:
-            return "unknown";
-    };
-}
-
-Identifier Member::getOperatorName(BinaryOpcode opcode) {
-    switch (opcode) {
         case Add:
             return "Add [+]";
         case Sub:
@@ -66,19 +59,16 @@ Identifier Member::getOperatorName(BinaryOpcode opcode) {
             return "Gt [>]";
         case Lt:
             return "Lt [<]";
-        default:
-            return "unknown";
-    };
-}
-
-Identifier Member::getOperatorName(MultiaryOpcode opcode) {
-    switch (opcode) {
         case Constructor:
             return "Constructor";
         case Subtraction:
             return "Subtraction";
         case Invoke:
             return "Invoke";
+        case Subroutine:
+            return "Method";
+        case Append:
+            return "Append";
         default:
             return "unknown";
     };

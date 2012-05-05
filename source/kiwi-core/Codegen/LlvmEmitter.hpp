@@ -18,7 +18,7 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM emitter for function from source code
-    class LlvmCallEmitter : public CallablePolicy {
+    class LlvmCallEmitter : public MethodPolicy {
     public:
         LlvmCallEmitter(llvm::Function* func, TypePtr returnType);
 
@@ -31,7 +31,7 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM integer unary operators emitter
-    class LlvmZeroUnaryOperator : public CallablePolicy {
+    class LlvmZeroUnaryOperator : public MethodPolicy {
     public:
         /// constructor
         LlvmZeroUnaryOperator(llvm::Instruction::BinaryOps opcode, TypePtr type);
@@ -45,7 +45,7 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM binary operators emitter
-    class LlvmBinaryOperator : public CallablePolicy {
+    class LlvmBinaryOperator : public MethodPolicy {
     public:
         /// constructor
         LlvmBinaryOperator(llvm::Instruction::BinaryOps opcode, TypePtr type);
@@ -59,7 +59,7 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM binary operators emitter for compare integers
-    class LlvmIntegerCompareOperator : public CallablePolicy {
+    class LlvmIntegerCompareOperator : public MethodPolicy {
     public:
         /// constructor
         LlvmIntegerCompareOperator(
@@ -76,7 +76,7 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM binary operators emitter for compare strings
-    class LlvmStringCompareOperator : public CallablePolicy {
+    class LlvmStringCompareOperator : public MethodPolicy {
     public:
         /// constructor
         LlvmStringCompareOperator(
@@ -92,28 +92,28 @@ namespace codegen {
     }; /// class LlvmStringCompareOperator
 
     //==--------------------------------------------------------------------==//
-    class LlvmIntegerPrintOperator : public CallablePolicy {
+    class LlvmIntegerPrintOperator : public MethodPolicy {
     public:
         /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; // class LlvmIntegerPrintOperator
 
     //==--------------------------------------------------------------------==//
-    class LlvmBoolPrintOperator : public CallablePolicy {
+    class LlvmBoolPrintOperator : public MethodPolicy {
     public:
         /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; // class LlvmBoolPrintOperator
 
     //==--------------------------------------------------------------------==//
-    class LlvmCharPrintOperator : public CallablePolicy {
+    class LlvmCharPrintOperator : public MethodPolicy {
     public:
         /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; // class LlvmCharPrintOperator
 
     //==--------------------------------------------------------------------==//
-    class LlvmStringPrintOperator : public CallablePolicy {
+    class LlvmStringPrintOperator : public MethodPolicy {
     public:
         /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
@@ -138,14 +138,14 @@ namespace codegen {
     }; /// class LlvmStringEmitter
 
     //==--------------------------------------------------------------------==//
-    class LlvmStringConcatenate : public CallablePolicy {
+    class LlvmStringConcatenate : public MethodPolicy {
     public:
         /// emit llvm operator
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     }; /// class LlvmStringConcatenate
 
     //==--------------------------------------------------------------------==//
-    class LlvmStringSubtraction : public CallablePolicy {
+    class LlvmStringSubtraction : public MethodPolicy {
     public:
         /// emit IR instruction for binary operation
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
@@ -153,7 +153,7 @@ namespace codegen {
 
     //==--------------------------------------------------------------------==//
     /// LLVM emitter for empty constructors
-    class LlvmCtorEmitter : public CallablePolicy {
+    class LlvmCtorEmitter : public MethodPolicy {
     public:
         /// emit IR instruction for binary operation
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
@@ -161,7 +161,7 @@ namespace codegen {
     }; // class LlvmCallEmitter
 
     /// Llvm emitter for up cast
-    class LlvmUpcast : public CallablePolicy {
+    class LlvmUpcast : public MethodPolicy {
     public:
         /// emit IR instruction for binary operation
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);

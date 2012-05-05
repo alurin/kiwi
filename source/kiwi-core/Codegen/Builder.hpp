@@ -83,7 +83,7 @@ namespace kiwi {
     class FunctionBuilder : public Builder {
     public:
         /// Constructor
-        FunctionBuilder(CallablePtr analog);
+        FunctionBuilder(MethodPtr analog);
 
         /// Constructor
         FunctionBuilder(TypePtr type, llvm::Function* func);
@@ -107,7 +107,7 @@ namespace kiwi {
         BlockBuilder createBlock(const Identifier& name);
 
         /// return native callable
-        CallablePtr getNativeCallable() const {
+        MethodPtr getNativeCallable() const {
             return m_nativeCallable;
         }
 
@@ -120,7 +120,7 @@ namespace kiwi {
         mutable llvm::Function* m_func;
 
         /// Cullable analog
-        CallablePtr m_nativeCallable;
+        MethodPtr m_nativeCallable;
 
         /// Cullable analog
         TypePtr m_nativeOwner;
@@ -164,7 +164,7 @@ namespace kiwi {
         ValueBuilder createLoad(ValueBuilder variable);
 
         /// Create new object
-        ValueBuilder createNew(ObjectPtr type, CallablePtr ctor = CallablePtr(), std::vector<ValueBuilder> args = std::vector<ValueBuilder>());
+        ValueBuilder createNew(ObjectPtr type, MethodPtr ctor = MethodPtr(), std::vector<ValueBuilder> args = std::vector<ValueBuilder>());
 
         /// Create store in object field
         ValueBuilder createStore(ValueBuilder thisValue, FieldPtr field, ValueBuilder value);
@@ -173,7 +173,7 @@ namespace kiwi {
         ValueBuilder createLoad(ValueBuilder thisValue, FieldPtr field);
 
         /// Create call for callable with arguments
-        ValueBuilder createCall(CallablePtr call, std::vector<ValueBuilder> args);
+        ValueBuilder createCall(MethodPtr call, std::vector<ValueBuilder> args);
 
         /// Create integer constant
         ValueBuilder createIntConst(int32_t value);

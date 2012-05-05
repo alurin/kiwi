@@ -91,7 +91,7 @@ Builder& Builder::operator=(const Builder& builder) {
 }
 
 // Constructor
-FunctionBuilder::FunctionBuilder(CallablePtr analog)
+FunctionBuilder::FunctionBuilder(MethodPtr analog)
 : Builder(analog->getOwnerType()->getModule()), m_nativeCallable(analog)
 , m_nativeOwner(analog->getOwnerType()) , m_func(0) {
     BUILDER_FUNCTION_ASSERT();
@@ -399,7 +399,7 @@ void BlockBuilder::createBr(BlockBuilder block) {
 }
 
 // Create new object
-ValueBuilder BlockBuilder::createNew(ObjectPtr type, CallablePtr ctor, std::vector<ValueBuilder> args) {
+ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector<ValueBuilder> args) {
     // find size of allocation
     llvm::Type* elementType = type->getVarType();
     llvm::Constant* null    = llvm::Constant::getNullValue(elementType);
@@ -451,8 +451,8 @@ ValueBuilder BlockBuilder::createLoad(ValueBuilder thisValue, FieldPtr field) {
 }
 
 // Create call for callable with arguments
-ValueBuilder BlockBuilder::createCall(CallablePtr call, std::vector<ValueBuilder> args) {
-    CallablePolicy* policy = call->getPolicy();
+ValueBuilder BlockBuilder::createCall(MethodPtr call, std::vector<ValueBuilder> args) {
+    MethodPolicy* policy = call->getPolicy();
     if (policy) {
         return policy->emit(*this, args);
     }

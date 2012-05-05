@@ -55,13 +55,19 @@ namespace kiwi {
         llvm::Type* getVarType() const;
 
         /// add unary operator
-        UnaryPtr addUnary(Member::UnaryOpcode opcode, TypePtr returnType);
+        /// @deprecated
+        /// @see addMethod
+        MethodPtr addUnary(Member::MethodOpcode opcode, TypePtr returnType);
 
         /// add binary operator
-        BinaryPtr addBinary(Member::BinaryOpcode opcode, TypePtr returnType, TypePtr operandType);
+        /// @deprecated
+        /// @see addMethod
+        MethodPtr addBinary(Member::MethodOpcode opcode, TypePtr returnType, TypePtr operandType);
 
         /// add binary operator
-        MultiaryPtr addMultiary(Member::MultiaryOpcode opcode, TypePtr returnType, std::vector<TypePtr> arguments);
+        /// @deprecated
+        /// @see addMethod
+        MethodPtr addMultiary(Member::MethodOpcode opcode, TypePtr returnType, std::vector<TypePtr> arguments);
 
         /// add field
         FieldPtr addField(const Identifier& name, TypePtr type);
@@ -76,16 +82,25 @@ namespace kiwi {
         MethodPtr addMethod(const Identifier& name, TypePtr returnType, std::vector<TypePtr> arguments);
 
         /// find unary operator
-        UnaryPtr findUnary(Member::UnaryOpcode opcode) const;
+        /// @deprecated
+        /// @see findMethod
+        MethodPtr findUnary(Member::MethodOpcode opcode) const;
 
         /// find binary operator
-        BinaryPtr findBinary(Member::BinaryOpcode opcode, TypePtr operandType) const;
+        /// @deprecated
+        /// @see findMethod
+        MethodPtr findBinary(Member::MethodOpcode opcode, TypePtr operandType) const;
 
         /// find binary operator
-        MultiaryPtr findMultiary(Member::MultiaryOpcode opcode, std::vector<TypePtr> arguments) const;
+        /// @deprecated
+        /// @see findMethod
+        MethodPtr findMultiary(Member::MethodOpcode opcode, std::vector<TypePtr> arguments) const;
 
         /// find method
         MethodPtr findMethod(const Identifier& name, std::vector<TypePtr> arguments) const;
+
+        /// find method
+        MethodPtr findMethod(Member::MethodOpcode opcode, std::vector<TypePtr> arguments) const;
 
         //==--------------------------------------------------------------------------------------------------------==//
         //          Method for work with type system

@@ -77,18 +77,12 @@ TypeImpl::TypeImpl(Type* owner)
     m_virtualTable = new VirtualTable();
     m_fields       = new MemberSet<Field>(owner);
     m_methods      = new MemberSet<Method>(owner);
-    m_unary        = new MemberSet<UnaryOperator>(owner);
-    m_binary       = new MemberSet<BinaryOperator>(owner);
-    m_multiary     = new MemberSet<MultiaryOperator>(owner);
 }
 
 // destructor
 TypeImpl::~TypeImpl() {
     delete m_fields;
     delete m_methods;
-    delete m_unary;
-    delete m_binary;
-    delete m_multiary;
     delete m_addressMap;
     delete m_virtualTable;
 }
@@ -106,9 +100,6 @@ void TypeImpl::insertBase(TypePtr type) {
         // inherit tables
         fields().inherit(meta->fields());
         methods().inherit(meta->methods());
-
-        // merge already existes members from base type
-
     }
 }
 

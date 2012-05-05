@@ -7,114 +7,109 @@
 #ifndef KIWI_MEMBERS_INCLUDED
 #define KIWI_MEMBERS_INCLUDED
 
-#include "kiwi/Callable.hpp"
+#include "kiwi/Member.hpp"
 #include "kiwi/Overridable.hpp"
+
+/// @todo Remove public dependense
+namespace llvm {
+    class Function;
+}
 
 namespace kiwi
 {
-    //==--------------------------------------------------------------------==//
-    /// Unary operator
-    class UnaryOperator : public Callable, public Overridable<UnaryOperator> {
-        friend class Type;
-    public:
-        /// create unary operator
-        static UnaryPtr create(TypePtr ownerType, UnaryOpcode opcode, TypePtr returnType);
-
-        /// returns binary operator opcode
-        UnaryOpcode getOpcode() const {
-            return m_opcode;
-        }
-
-        /// returns result type
-        TypePtr getReturnType() const {
-            return m_returnType.lock();
-        }
-
-        /// classof check
-        static bool classof(const MemberPtr type) {
-            return type->getMemberID() == UnaryID;
-        }
-
-        /// classof check
-        static bool classof(const UnaryPtr) {
-            return true;
-        }
-    protected:
-        UnaryOpcode             m_opcode;
-
-        /// constructor
-        UnaryOperator(UnaryOpcode opcode, TypePtr ownerType, TypePtr returnType);
-    };
-
-    //==--------------------------------------------------------------------==//
-    /// Binary operator
-    class BinaryOperator : public Callable, public Overridable<BinaryOperator> {
-        friend class Type;
-    public:
-        /// create binary operator
-        static BinaryPtr create(TypePtr ownerType, BinaryOpcode opcode, TypePtr returnType, TypePtr operandType);
-
-        /// returns binary opcode
-        BinaryOpcode getOpcode() const {
-            return m_opcode;
-        }
-
-        /// classof check
-        static bool classof(const MemberPtr type) {
-            return type->getMemberID() == BinaryID;
-        }
-
-        /// classof check
-        static bool classof(const BinaryPtr) {
-            return true;
-        }
-    protected:
-        BinaryOpcode m_opcode;
-
-        /// constructor
-        BinaryOperator(BinaryOpcode opcode, TypePtr ownerType, TypePtr returnType);
-    };
-
-    //==--------------------------------------------------------------------==//
-    /// Method argument
-    class MultiaryOperator : public Callable, public Overridable<MultiaryOperator> {
-        friend class Type;
-    public:
-        /// create multiary operator
-        static MultiaryPtr create(TypePtr ownerType, MultiaryOpcode opcode, TypePtr returnType, TypeVector types);
-
-        /// returns multiary opcode
-        MultiaryOpcode getOpcode() const {
-            return m_opcode;
-        }
-                /// classof check
-        static bool classof(const MemberPtr type) {
-            return type->getMemberID() == MultiaryID;
-        }
-
-        /// classof check
-        static bool classof(const MultiaryPtr) {
-            return true;
-        }
-    protected:
-        MultiaryOpcode            m_opcode;
-
-        /// constructor
-        MultiaryOperator(MultiaryOpcode opcode, TypePtr ownerType, TypePtr returnType);
-    };
+/// Method implementation strategy
+    class MethodPolicy;
 
     //==--------------------------------------------------------------------==//
     /// Method member
-    class Method : public Callable, public Overridable<Method> {
+    class Method : public Member, public Overridable<Method> {
         friend class Type;
         template<class Method> friend class MemberSet;
     public:
-        /// Create method add register in type
+        typedef std::vector<TypePtr>                TypeVector;
+        typedef std::vector<ArgumentPtr>            ArgumentVector;
+        typedef ArgumentVector::const_iterator      const_iterator;
+
+        /// virtual destructor
+        virtual ~Method();
+
+
+        /// Create method
         static MethodPtr create(TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> arguments, const Identifier& name = "");
+
+        /// Create operator
+        static MethodPtr create(TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> arguments, const MethodOpcode& opcode);
 
         /// Returns method name
         Identifier getName() const {
             return m_name;
+        }
+
+        /// method identifier
+        MethodOpcode getOpcode() const{
+            return m_opcode;
+        }
+
+        /// Method is operation?
+        bool isOperator() const {
+            return m_opcode != Member::Subroutine;
+        }
+
+        /// returns callable's return type
+        TypePtr getReturnType() const {
+            return m_returnType.lock();
+        }
+
+        /// Check signature
+        bool hasSignature(const TypeVector& types, bool isCast = false) const;
+
+        /// get callable implementation policy
+        MethodPolicy* getPolicy() const {
+            return m_policy;
+        }
+
+        /// set callable implementation policy
+        void setPolicy(MethodPolicy* policy) {
+            m_policy = policy;
+        }
+
+        /// get LLVM analog function
+        void setFunction(llvm::Function* func);
+
+        /// return LLVM analog function
+        llvm::Function* getFunction() const {
+            return m_func;
+        }
+
+        /// returns argument by index
+        ArgumentPtr getArgument(int32_t indexAt) {
+            if (indexAt < 0 || size() <= indexAt) {
+                return ArgumentPtr();
+            }
+            return m_args[indexAt];
+        }
+
+        /// returns argument by name [not implemented]
+        ArgumentPtr getArgument(const Identifier& name);
+
+        /// returns size of arguments
+        size_t size() const {
+            return m_args.size();
+        }
+
+        /// empty arguments?
+        bool empty() const {
+            return m_args.empty();
+        }
+
+        /// returns pointer to first argument from callable (iterator)
+        const_iterator arg_begin() const {
+            return m_args.begin();
+        }
+
+        /// return pointer after last argument from callable (iterator)
+        const_iterator arg_end() const {
+            return m_args.end();
         }
 
         /// classof check
@@ -127,16 +122,41 @@ namespace kiwi
             return true;
         }
     protected:
+        /// method identifier
         Identifier m_name;
+
+        /// method identifier
+        MethodOpcode m_opcode;
+
+        /// return type
+        TypeWeak m_returnType;
+
+        /// list of arguments
+        ArgumentVector m_args;
+
+        /// Emitter for generate IR code
+        MethodPolicy* m_policy;
+
+        /// Function
+        llvm::Function* m_func;
 
         /// constructor
         Method(const Identifier& name, TypePtr ownerType, TypePtr returnType);
+
+        /// constructor
+        Method(MethodOpcode opcode, TypePtr ownerType, TypePtr returnType);
 
         /// constructor for inhertit method
         Method(TypePtr ownerType, MethodPtr method);
 
         /// inherit member from base type
         static MethodPtr inherit(TypePtr ownerType, MethodPtr method);
+
+        /// create arguments from types
+        void initializateArguments(TypeVector types);
+
+        /// create arguments from parent callable
+        void initializateArguments(TypePtr thisType, ArgumentVector args);
     };
 
     //==--------------------------------------------------------------------==//

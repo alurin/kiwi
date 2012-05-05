@@ -89,7 +89,7 @@ BlockBuilder PrintStatement::emitImpl(Driver& driver, BlockBuilder block) const 
 
     // find emitter
     TypePtr type = result.getType();
-    UnaryPtr op = type->findUnary(UnaryOperator::Print);
+    MethodPtr op = type->findUnary(Member::Print);
 
     // emit instruction
     if (op) {

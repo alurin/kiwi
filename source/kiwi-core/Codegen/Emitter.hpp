@@ -14,27 +14,27 @@ namespace kiwi {
     class Callable;
 
     /// Abstract emmiter for unary operators
-    class CallablePolicy {
+    class MethodPolicy {
     public:
         /// type for vector of expressions
         typedef std::vector<ValueBuilder> ExpressionVector;
 
         /// virtual destructor
-        virtual ~CallablePolicy();
+        virtual ~MethodPolicy();
 
         /// emit IR instruction
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values) =0;
     }; // class Emitter
 
 
-    class CloneEmitter : public CallablePolicy {
+    class CloneEmitter : public MethodPolicy {
     public:
-        CloneEmitter(CallablePtr callable);
+        CloneEmitter(MethodPtr callable);
 
         /// emit IR instruction
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
-        CallableWeak m_callable;
+        MethodWeak m_callable;
     };
 
 } // namespace kiwi::codegen

@@ -109,7 +109,7 @@ namespace lang {
         virtual ValueBuilder emitCall(Driver& driver, BlockBuilder block, std::vector<ValueBuilder> args) const;
 
         /// Find callable for current node
-        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const =0;
+        virtual MethodPtr findCallable(Driver& driver, std::vector<TypePtr> types) const =0;
     };
 
     //==--------------------------------------------------------------------==//
@@ -117,13 +117,13 @@ namespace lang {
     class BinaryNode : public CallableNode {
     public:
         /// Constructor
-        BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic = false);
+        BinaryNode(Member::MethodOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic = false);
 
         /// Find callable for current node
-        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
+        virtual MethodPtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
     protected:
         /// Binary operation opcode
-        Member::BinaryOpcode m_opcode;
+        Member::MethodOpcode m_opcode;
 
         // Binary operator (`and` or `or`) is logic?
         bool m_logic;
@@ -134,14 +134,14 @@ namespace lang {
     class UnaryNode : public CallableNode {
     public:
         /// Constructor
-        UnaryNode(Member::UnaryOpcode opcode, ExpressionNode* value, bool post = false);
+        UnaryNode(Member::MethodOpcode opcode, ExpressionNode* value, bool post = false);
 
 
         /// Find callable for current node
-        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
+        virtual MethodPtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
     protected:
         /// Unary operation opcode
-        Member::UnaryOpcode m_opcode;
+        Member::MethodOpcode m_opcode;
 
         /// Post expression
         /// @todo Remove. ++ -- is operators for mutable expressions
@@ -153,15 +153,15 @@ namespace lang {
     class MultiaryNode : public CallableNode {
     public:
         /// constructor
-        MultiaryNode(Member::MultiaryOpcode opcode, ExpressionNode* value);
+        MultiaryNode(Member::MethodOpcode opcode, ExpressionNode* value);
 
         /// Find callable for current node
-        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
+        virtual MethodPtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
     protected:
-        Member::MultiaryOpcode m_opcode;
+        Member::MethodOpcode m_opcode;
 
         /// constructor for new
-        MultiaryNode(Member::MultiaryOpcode opcode);
+        MultiaryNode(Member::MethodOpcode opcode);
     };
 
     //==--------------------------------------------------------------------==//
@@ -172,7 +172,7 @@ namespace lang {
         CallNode(ExpressionNode* expr, const Identifier& method);
 
         /// Find callable for current node
-        virtual CallablePtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
+        virtual MethodPtr findCallable(Driver& driver, std::vector<TypePtr> types) const;
     protected:
         Identifier                  m_method;
     };

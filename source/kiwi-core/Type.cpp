@@ -28,51 +28,8 @@ using namespace kiwi::codegen;
 TYPE_IMPLEMENTATION_FINDERS(Field, FieldPtr, fields)
 
 namespace {
-    /// Finder
-    class UnaryFinder {
-    public:
-        /// constructor
-        UnaryFinder(Member::UnaryOpcode opcode) : m_opcode(opcode) {
-        }
 
-        /// conditional for find
-        bool operator()(UnaryPtr op) {
-            return op->getOpcode() == m_opcode;
-        }
-    private:
-        /// opcode
-        Member::UnaryOpcode m_opcode;
-    };
-
-    class BinaryFinder {
-    public:
-        BinaryFinder(Member::BinaryOpcode opcode, TypePtr operandType)
-        : m_opcode(opcode), m_operandType(operandType) {
-        }
-
-        bool operator()(BinaryPtr op) {
-            return op->getOpcode() == m_opcode && m_operandType == op->getArgument(1)->getType();
-        }
-    protected:
-        Member::BinaryOpcode m_opcode;
-        TypePtr m_operandType;
-    };
-
-    class MultiaryFinder {
-    public:
-        MultiaryFinder(Member::MultiaryOpcode opcode, std::vector<TypePtr> arguments)
-        : m_opcode(opcode), m_arguments(arguments) {
-        }
-
-        bool operator()(MultiaryPtr op) {
-            return op->getOpcode() == m_opcode && op->hasSignature(m_arguments);
-        }
-
-    protected:
-        Member::MultiaryOpcode m_opcode;
-        std::vector<TypePtr> m_arguments;
-    };
-
+    /// Field finder
     class FieldFinder {
     public:
         FieldFinder(const Identifier& name)
@@ -90,13 +47,18 @@ namespace {
     class MethodFinder {
     public:
         MethodFinder(const Identifier& name, std::vector<TypePtr> arguments)
-        : m_name(name), m_arguments(arguments) {
+        : m_name(name), m_arguments(arguments), m_opcode(Member::Subroutine) {
+        }
+
+        MethodFinder(Member::MethodOpcode opcode, std::vector<TypePtr> arguments)
+        :  m_arguments(arguments), m_opcode(opcode) {
         }
 
         bool operator()(MethodPtr method) {
             return method->getName() == m_name && method->hasSignature(m_arguments);
         }
     protected:
+        Member::MethodOpcode m_opcode;
         Identifier m_name;
         std::vector<TypePtr> m_arguments;
     };
@@ -116,18 +78,23 @@ ContextPtr Type::getContext() const {
 }
 
 // add binary operator
-UnaryPtr Type::addUnary(Member::UnaryOpcode opcode, TypePtr returnType) {
-    return UnaryOperator::create(shared_from_this(), opcode, returnType);
+MethodPtr Type::addUnary(Member::MethodOpcode opcode, TypePtr returnType) {
+    std::vector<TypePtr> arguments;
+    arguments.push_back(shared_from_this());
+    return Method::create(shared_from_this(), returnType, arguments, opcode);
 }
 
 // add binary operator
-BinaryPtr Type::addBinary(Member::BinaryOpcode opcode, TypePtr returnType, TypePtr operandType) {
-    return BinaryOperator::create(shared_from_this(), opcode, returnType, operandType);
+MethodPtr Type::addBinary(Member::MethodOpcode opcode, TypePtr returnType, TypePtr operandType) {
+    std::vector<TypePtr> arguments;
+    arguments.push_back(shared_from_this());
+    arguments.push_back(operandType);
+    return Method::create(shared_from_this(), returnType, arguments, opcode);
 }
 
 /// add multiary operator
-MultiaryPtr Type::addMultiary(Member::MultiaryOpcode opcode, TypePtr returnType, std::vector<TypePtr> arguments) {
-    return MultiaryOperator::create(shared_from_this(), opcode, returnType, arguments);
+MethodPtr Type::addMultiary(Member::MethodOpcode opcode, TypePtr returnType, std::vector<TypePtr> arguments) {
+    return Method::create(shared_from_this(), returnType, arguments, opcode);
 }
 
 // add field
@@ -141,21 +108,26 @@ MethodPtr Type::addMethod(const Identifier& name, TypePtr returnType, std::vecto
 }
 
 // find unary operator
-UnaryPtr Type::findUnary(Member::UnaryOpcode opcode) const {
-    return find_if(m_meta->unary(), UnaryFinder(opcode));
+MethodPtr Type::findUnary(Member::MethodOpcode opcode) const {
+    std::vector<TypePtr> arguments;
+    arguments.push_back(const_cast<Type*>(this)->shared_from_this());
+    return find_if(m_meta->methods(), MethodFinder(opcode, arguments));
 }
 
 // find binary operator
-BinaryPtr Type::findBinary(Member::BinaryOpcode opcode, TypePtr operandType) const {
-    return find_if(m_meta->binary(), BinaryFinder(opcode, operandType));
+MethodPtr Type::findBinary(Member::MethodOpcode opcode, TypePtr operandType) const {
+    std::vector<TypePtr> arguments;
+    arguments.push_back(const_cast<Type*>(this)->shared_from_this());
+    arguments.push_back(operandType);
+    return find_if(m_meta->methods(), MethodFinder(opcode, arguments));
 }
 
 // find binary operator
-MultiaryPtr Type::findMultiary(Member::MultiaryOpcode opcode, std::vector<TypePtr> types) const {
+MethodPtr Type::findMultiary(Member::MethodOpcode opcode, std::vector<TypePtr> types) const {
     std::vector<TypePtr> arguments;
     arguments.push_back(const_cast<Type*>(this)->shared_from_this());
     arguments.insert(arguments.end(), types.begin(), types.end());
-    return find_if(m_meta->multiary(), MultiaryFinder(opcode, arguments));
+    return find_if(m_meta->methods(), MethodFinder(opcode, arguments));
 }
 
 // find field
@@ -169,6 +141,14 @@ MethodPtr Type::findMethod(const Identifier& name, std::vector<TypePtr> types) c
     arguments.push_back(const_cast<Type*>(this)->shared_from_this());
     arguments.insert(arguments.end(), types.begin(), types.end());
     return find_if(m_meta->methods(), MethodFinder(name, arguments));
+}
+
+/// find method
+MethodPtr Type::findMethod(Member::MethodOpcode opcode, std::vector<TypePtr> types) const {
+    std::vector<TypePtr> arguments;
+    arguments.push_back(const_cast<Type*>(this)->shared_from_this());
+    arguments.insert(arguments.end(), types.begin(), types.end());
+    return find_if(m_meta->methods(), MethodFinder(opcode, arguments));
 }
 
 llvm::Type* Type::getVarType() const {

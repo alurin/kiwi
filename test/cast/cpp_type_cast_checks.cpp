@@ -54,7 +54,7 @@ TEST(members_cast_check) // Declares a test named "members_cast_check"
 
     cast_checker<Field, Member>::check(type->addField("field", type));
     cast_checker<Method, Member>::check(type->addMethod("method", type, args));
-    cast_checker<UnaryOperator, Member>::check(type->addUnary(Member::Not, type));
-    cast_checker<BinaryOperator, Member>::check(type->addBinary(Member::Add, type, type));
-    cast_checker<MultiaryOperator, Member>::check(type->addMultiary(Member::Constructor, type, args));
+    cast_checker<Method, Member>::check(type->addUnary(Member::Not, type));
+    cast_checker<Method, Member>::check(type->addBinary(Member::Add, type, type));
+    cast_checker<Method, Member>::check(type->addMultiary(Member::Constructor, type, args));
 }

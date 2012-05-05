@@ -9,5 +9,5 @@
 using namespace kiwi;
 
 // constructor
-Argument::Argument(CallablePtr owner, TypePtr type, int32_t position)
+Argument::Argument(MethodPtr owner, TypePtr type, int32_t position)
 : m_owner(owner), m_type(type) { }

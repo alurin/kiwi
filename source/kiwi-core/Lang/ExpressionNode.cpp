@@ -31,23 +31,23 @@ namespace {
     }
 }
 
-BinaryNode::BinaryNode(Member::BinaryOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic)
+BinaryNode::BinaryNode(Member::MethodOpcode opcode, ExpressionNode* left, ExpressionNode* right, bool logic)
 : m_opcode(opcode), m_logic(logic) {
     append(left);
     append(right);
 }
 
-UnaryNode::UnaryNode(Member::UnaryOpcode opcode, ExpressionNode* value, bool post)
+UnaryNode::UnaryNode(Member::MethodOpcode opcode, ExpressionNode* value, bool post)
 : m_opcode(opcode), m_post(post) {
     append(value);
 }
 
-MultiaryNode::MultiaryNode(Member::MultiaryOpcode opcode, ExpressionNode* value)
+MultiaryNode::MultiaryNode(Member::MethodOpcode opcode, ExpressionNode* value)
 : m_opcode(opcode) {
     append(value);
 }
 
-MultiaryNode::MultiaryNode(Member::MultiaryOpcode opcode)
+MultiaryNode::MultiaryNode(Member::MethodOpcode opcode)
 : m_opcode(opcode) {
 }
 
@@ -178,7 +178,7 @@ ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vec
     }
 
     /// find call
-    CallablePtr call = call = findCallable(driver, types);
+    MethodPtr call = call = findCallable(driver, types);
 
     if (!call) {
         throw LangException()
@@ -188,8 +188,8 @@ ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vec
     return block.createCall(call, args);
 }
 
-CallablePtr BinaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
-    CallablePtr call = types[0]->findBinary(m_opcode, types[1]);
+MethodPtr BinaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
+    MethodPtr call = types[0]->findBinary(m_opcode, types[1]);
     if (!call) {
         throw LangException()
             << exception_format("Not found binary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
@@ -198,8 +198,8 @@ CallablePtr BinaryNode::findCallable(Driver& driver, std::vector<TypePtr> types)
     return call;
 }
 
-CallablePtr UnaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
-    CallablePtr call = types[0]->findUnary(m_opcode);
+MethodPtr UnaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
+    MethodPtr call = types[0]->findUnary(m_opcode);
     if (!call) {
         throw LangException()
             << exception_format("Not found unary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
@@ -208,10 +208,10 @@ CallablePtr UnaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) 
     return call;
 }
 
-CallablePtr MultiaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
+MethodPtr MultiaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
     kiwi_assert(types.size() > 0, "MultiaryNode::findCallable must recive at last one argument");
     std::vector<TypePtr> args(types.begin() + 1, types.end());
-    CallablePtr call = types[0]->findMultiary(m_opcode, args);
+    MethodPtr call = types[0]->findMultiary(m_opcode, args);
     if (!call) {
         throw LangException()
             << exception_format("Not found multiary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
@@ -220,9 +220,9 @@ CallablePtr MultiaryNode::findCallable(Driver& driver, std::vector<TypePtr> type
     return call;
 }
 
-CallablePtr CallNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
+MethodPtr CallNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
     std::vector<TypePtr> args(types.begin() + 1, types.end());
-    CallablePtr call = types[0]->findMethod(m_method, args);
+    MethodPtr call = types[0]->findMethod(m_method, args);
     if (!call) {
         throw LangException()
             << exception_format("Not found method %1%(%2%)", m_method % format_call(types))

@@ -11,15 +11,15 @@
 
 namespace kiwi {
     class Type;
-    class Callable;
+    class Method;
 
     //==--------------------------------------------------------------------==//
     /// Method argument
     class Argument {
-        friend class Callable;
+        friend class Method;
     public:
         /// return argument owner
-        CallablePtr getOwner() const {
+        MethodPtr getOwner() const {
             return m_owner.lock();
         }
 
@@ -44,7 +44,7 @@ namespace kiwi {
         }
     protected:
         /// argument owner method
-        CallableWeak m_owner;
+        MethodWeak m_owner;
 
         /// argument name
         Identifier m_name;
@@ -55,7 +55,7 @@ namespace kiwi {
         /// argument position
         int32_t m_position;
 
-        Argument(CallablePtr owner, TypePtr type, int32_t position);
+        Argument(MethodPtr owner, TypePtr type, int32_t position);
     };
 }
 

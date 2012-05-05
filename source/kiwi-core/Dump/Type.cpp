@@ -54,10 +54,15 @@ void Type::dump() {
             std::cerr << "    * ";
         }
 
-        std::cerr << method->getName() << " : " << method->getReturnType()->getName() << "(";
+        if (method->isOperator()) {
+            std::cerr << Method::getOperatorName(method->getOpcode());
+        } else {
+            std::cerr << method->getName();
+        }
+        std::cerr << " : " << method->getReturnType()->getName() << "(";
 
         bool noFirst = false;
-        for (Callable::const_iterator j = method->arg_begin(); j != method->arg_end(); ++j) {
+        for (Method::const_iterator j = method->arg_begin(); j != method->arg_end(); ++j) {
             if (noFirst) std::cerr << ", "; else noFirst = true;
             ArgumentPtr arg = *j;
             std::cerr << arg->getName() << " : " << arg->getType()->getName();

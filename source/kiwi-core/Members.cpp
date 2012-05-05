@@ -9,27 +9,10 @@
 #include "Codegen/LlvmEmitter.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Type.hpp"
+#include "kiwi/Argument.hpp"
 
 using namespace kiwi;
 using namespace kiwi::codegen;
-
-// constructor
-UnaryOperator::UnaryOperator(Member::UnaryOpcode opcode, TypePtr ownerType, TypePtr returnType)
-: Callable(ownerType, returnType), Overridable<UnaryOperator>(true), m_opcode(opcode) {
-    m_memberID = UnaryID;
-}
-
-// constructor
-BinaryOperator::BinaryOperator(Member::BinaryOpcode opcode, TypePtr ownerType, TypePtr returnType)
-: Callable(ownerType, returnType), Overridable<BinaryOperator>(true), m_opcode(opcode) {
-    m_memberID = BinaryID;
-}
-
-// constructor
-MultiaryOperator::MultiaryOperator(Member::MultiaryOpcode opcode, TypePtr ownerType, TypePtr returnType)
-: Callable(ownerType, returnType), Overridable<MultiaryOperator>(true), m_opcode(opcode) {
-    m_memberID = MultiaryID;
-}
 
 // constructor
 Field::Field(TypePtr ownerType, FieldPtr field)
@@ -45,19 +28,49 @@ Field::Field(const Identifier& name, TypePtr ownerType, TypePtr fieldType)
 
 // constructor
 Method::Method(const Identifier& name, TypePtr ownerType, TypePtr returnType)
-: Callable(ownerType, returnType), Overridable<Method>(true), m_name(name) {
+: Member(ownerType), m_returnType(returnType), Overridable<Method>(true), m_name(name), m_opcode(Subroutine)
+, m_policy(0){
+    m_memberID = MethodID;
+}
+
+// constructor
+Method::Method(MethodOpcode opcode, TypePtr ownerType, TypePtr returnType)
+: Member(ownerType), m_returnType(returnType), Overridable<Method>(true), m_opcode(opcode)
+, m_policy(0){
     m_memberID = MethodID;
 }
 
 // constructor
 Method::Method(TypePtr ownerType, MethodPtr method)
-: Callable(ownerType, method), Overridable<Method>(false), m_name(method->getName()) {
+: Member(ownerType), m_returnType(method->getReturnType()), Overridable<Method>(false), m_name(method->getName())
+, m_opcode(method->getOpcode()), m_policy(new CloneEmitter(method)) {
     override(method);
+}
+
+// destructor
+Method::~Method() {
+    delete m_policy;
 }
 
 // Create method add register in type
 MethodPtr Method::create(TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> types, const Identifier& name) {
     MethodPtr method = MethodPtr(new Method(name, ownerType, returnType));
+    ownerType->getMetadata()->methods().insert(method);
+
+    TypeVector arguments;
+    arguments.push_back(ownerType);
+    arguments.insert(arguments.end(), types.begin(), types.end());
+    method->initializateArguments(arguments);
+    return method;
+}
+
+MethodPtr Method::create(TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> types, const MethodOpcode& opcode) {
+    kiwi_assert(!(Member::UnaryFirstElement   <= opcode && opcode <= Member::UnaryLastElement  ) || types.size() == 1,
+        "Unary operator has only one arguments");
+    kiwi_assert(!(Member::BinaryFirstElement  <= opcode && opcode <= Member::BinaryLastElement ) || types.size() == 2,
+        "Binary operator has only two arguments");
+
+    MethodPtr method = MethodPtr(new Method(opcode, ownerType, returnType));
     ownerType->getMetadata()->methods().insert(method);
 
     TypeVector arguments;
@@ -84,37 +97,51 @@ FieldPtr Field::inherit(TypePtr ownerType, FieldPtr override) {
     return field;
 }
 
-// create unary operator
-UnaryPtr UnaryOperator::create(TypePtr ownerType, UnaryOpcode opcode, TypePtr returnType) {
-    UnaryPtr op = UnaryPtr(new UnaryOperator(opcode, ownerType, returnType));
-    ownerType->getMetadata()->unary().insert(op);
+// Check signature
+bool Method::hasSignature(const TypeVector& types, bool isCast) const {
+    if (types.size() != m_args.size())
+        return false;
 
-    TypeVector arguments;
-    arguments.push_back(ownerType);
-    op->initializateArguments(arguments);
-    return op;
+    for (int i = 0; i < m_args.size(); ++i) {
+        /// @todo Replace for simple check
+        if (m_args[i]->getType() != types[i])
+            if (!types[i]->isCastableTo(m_args[i]->getType()))
+                return false;
+    }
+
+    return true;
 }
 
-// create binary operator
-BinaryPtr BinaryOperator::create(TypePtr ownerType, BinaryOpcode opcode, TypePtr returnType, TypePtr operandType) {
-    BinaryPtr op = BinaryPtr(new BinaryOperator(opcode, ownerType, returnType));
-    ownerType->getMetadata()->binary().insert(op);
-
-    TypeVector arguments;
-    arguments.push_back(ownerType);
-    arguments.push_back(operandType);
-    op->initializateArguments(arguments);
-    return op;
+void Method::setFunction(llvm::Function* func) {
+    m_func = func;
+    /// @todo What if, policy already exists at this point?
+    if (!getPolicy()) {
+        setPolicy(new LlvmCallEmitter(func, m_returnType.lock()));
+    }
 }
 
-// create multiary operator
-MultiaryPtr MultiaryOperator::create(TypePtr ownerType, MultiaryOpcode opcode, TypePtr returnType, TypeVector types) {
-    MultiaryPtr op = MultiaryPtr(new MultiaryOperator(opcode, ownerType, returnType));
-    ownerType->getMetadata()->multiary().insert(op);
+void Method::initializateArguments(TypeVector types) {
+    for (TypeVector::iterator i = types.begin(); i != types.end(); ++i) {
+        TypePtr type = *i;
+        ArgumentPtr arg = ArgumentPtr(new Argument(MethodPtr(shared_from_this(), this), type, m_args.size()));
+        m_args.push_back(arg);
+    }
+    kiwi_assert(m_args.size() > 0, "Method must have minimum one argument");
+    kiwi_assert(m_args[0]->getType() == m_ownerType.lock(), "First argument for callable must be owner type");
+}
 
-    TypeVector arguments;
-    arguments.push_back(ownerType);
-    arguments.insert(arguments.end(), types.begin(), types.end());
-    op->initializateArguments(arguments);
-    return op;
+void Method::initializateArguments(TypePtr thisType, ArgumentVector args) {
+    int j = 0;
+    for (ArgumentVector::iterator i = args.begin(); i != args.end(); ++i, ++j) {
+        if (j) {
+            ArgumentPtr oarg = *i;
+            ArgumentPtr arg = ArgumentPtr(new Argument(*oarg));
+            m_args.push_back(arg);
+        } else {
+            ArgumentPtr arg = ArgumentPtr(new Argument(MethodPtr(shared_from_this(), this), thisType, 0));
+            m_args.push_back(arg);
+        }
+    }
+    kiwi_assert(m_args.size() > 0, "Method must have minimum one argument");
+    kiwi_assert(m_args[0]->getType() == m_ownerType.lock(), "First argument for callable must be owner type");
 }
