@@ -10,7 +10,6 @@
 #include "kiwi/config.hpp"
 
 namespace kiwi {
-
     /// simple check if object is instance of class B
     template<typename D, typename S>
     bool classof(const boost::shared_ptr<S> obj) {

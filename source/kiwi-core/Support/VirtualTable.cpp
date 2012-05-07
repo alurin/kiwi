@@ -5,3 +5,10 @@
  *******************************************************************************
  */
 #include "VirtualTable.hpp"
+
+using namespace kiwi;
+
+VirtualTable::VirtualTable(Type* owner, ModulePtr module)
+: MemberSet<Method>(owner), m_backendVariable(0) {
+
+}

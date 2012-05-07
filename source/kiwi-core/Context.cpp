@@ -84,29 +84,19 @@ ContextPtr Context::create() {
 
 void Context::initializate() {
     // create system module
-    // m_metadata->runtime
     ModulePtr runtime    = m_metadata->runtime = Module::create("system", shared_from_this());
 
-    // create types
-    m_metadata->boolTy   = BooleanType::create(runtime);
-    m_metadata->int32Ty  = IntegerType::create(runtime, 32, false);
-    m_metadata->voidTy   = VoidType::create(runtime);
-    m_metadata->charTy   = CharType::create(runtime);
-    m_metadata->stringTy = StringType::create(runtime);
-
-    // init runtime type
-    initRuntimeModule(m_metadata->runtime);
-
     // create execution engine
-    llvm::Module* module = runtime->getMetadata()->getBackendModule();
-    m_metadata->m_backendEngine = llvm::EngineBuilder(module).create();
+    llvm::Module* module                    = runtime->getMetadata()->getBackendModule();
+    m_metadata->m_backendEngine             = llvm::EngineBuilder(module).create();
+    m_metadata->m_backendTargetData         = new llvm::TargetData(*m_metadata->m_backendEngine->getTargetData());
 
     // Set up the optimizer pipeline.
-    llvm::FunctionPassManager* funcManager = new llvm::FunctionPassManager(module);
-    llvm::PassManager* moduleManager       = new llvm::PassManager();
+    llvm::FunctionPassManager* funcManager  = new llvm::FunctionPassManager(module);
+    llvm::PassManager* moduleManager        = new llvm::PassManager();
 
     // Start with registering info about how the target lays out data structures.
-    funcManager->add(new llvm::TargetData(*m_metadata->m_backendEngine->getTargetData()));
+    funcManager->add(m_metadata->m_backendTargetData);
 
     // First level optimizations
     switch (getOptimizationLevel()) {
@@ -114,7 +104,7 @@ void Context::initializate() {
             moduleManager->add(llvm::createGlobalOptimizerPass());
             moduleManager->add(llvm::createStripDeadPrototypesPass());
         case 2:
-        funcManager->add(llvm::createDeadCodeEliminationPass());
+            funcManager->add(llvm::createDeadCodeEliminationPass());
             funcManager->add(llvm::createDeadStoreEliminationPass());
 
         case 1:
@@ -132,6 +122,7 @@ void Context::initializate() {
             funcManager->add(llvm::createCFGSimplificationPass());
             // Merge constants, e.g. strings
             moduleManager->add(llvm::createConstantMergePass());
+        default:
             break;
     }
     /// run optimizations passes for all functions in module
@@ -139,6 +130,16 @@ void Context::initializate() {
 
     m_metadata->m_backendFunctionPassManager = funcManager;
     m_metadata->m_backendModulePassManager   = moduleManager;
+
+    // create types
+    m_metadata->boolTy   = BooleanType::create(runtime);
+    m_metadata->int32Ty  = IntegerType::create(runtime, 32, false);
+    m_metadata->voidTy   = VoidType::create(runtime);
+    m_metadata->charTy   = CharType::create(runtime);
+    m_metadata->stringTy = StringType::create(runtime);
+
+    // init runtime type
+    initRuntimeModule(m_metadata->runtime);
 }
 
 int32_t Context::run(ModulePtr module) {

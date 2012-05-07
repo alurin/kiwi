@@ -5,6 +5,7 @@
  *******************************************************************************
  */
 #include "LlvmEmitter.hpp"
+#include "../TypeImpl.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Exception.hpp"
@@ -14,6 +15,16 @@
 
 using namespace kiwi;
 using namespace kiwi::codegen;
+
+//===--------------------------------------------------------------------------------------------------------------===//
+//    Utils
+//===--------------------------------------------------------------------------------------------------------------===//
+namespace {
+    llvm::ConstantInt* makeConstantInt(llvm::LLVMContext& context, int32_t value) {
+        llvm::APInt cst(32, value, false);
+        return llvm::ConstantInt::get(context, cst);
+    }
+}
 
 LlvmCallEmitter::LlvmCallEmitter(llvm::Function* func, TypePtr returnType)
 : m_func(func), m_returnType(returnType) {
@@ -116,7 +127,7 @@ ValueBuilder LlvmIntegerPrintOperator::emit(BlockBuilder block, const Expression
     llvm::Module*       module = block.getModule();
     llvm::LLVMContext& context = block.getContext();
     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
-    llvm::Type*           type = values[0].getType()->getVarType();
+    llvm::Type*           type = values[0].getType()->getMetadata()->getBackendVariableType();
 
     llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_integer", voidType, type, NULL));
 
@@ -132,7 +143,7 @@ ValueBuilder LlvmBoolPrintOperator::emit(BlockBuilder block, const ExpressionVec
     llvm::Module*       module = block.getModule();
     llvm::LLVMContext& context = block.getContext();
     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
-    llvm::Type*           type = values[0].getType()->getVarType();
+    llvm::Type*           type = values[0].getType()->getMetadata()->getBackendVariableType();
 
     llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_bool", voidType, type, NULL));
 
@@ -148,7 +159,7 @@ ValueBuilder LlvmCharPrintOperator::emit(BlockBuilder block, const ExpressionVec
     llvm::Module*       module = block.getModule();
     llvm::LLVMContext& context = block.getContext();
     llvm::Type*       voidType = llvm::Type::getVoidTy(context);
-    llvm::Type*           type = values[0].getType()->getVarType();
+    llvm::Type*           type = values[0].getType()->getMetadata()->getBackendVariableType();
 
     llvm::Function* print   = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_print_char", voidType, type, NULL));
 
@@ -275,7 +286,7 @@ ValueBuilder LlvmStringSubtraction::emit(BlockBuilder block, const ExpressionVec
         substraction = llvm::dyn_cast<llvm::Function>(
             module->getOrInsertFunction(
                 "kiwi_substring",
-                returnType->getVarType(),
+                returnType->getMetadata()->getBackendVariableType(),
                 bufferType,
                 lengthType,
                 lengthType,
@@ -296,8 +307,16 @@ ValueBuilder LlvmStringSubtraction::emit(BlockBuilder block, const ExpressionVec
 // emit IR instruction for binary operation
 ValueBuilder LlvmCallEmitter::emit(BlockBuilder block, const ExpressionVector& values) {
     std::vector<llvm::Value*> largs;
-    for (ExpressionVector::const_iterator i = values.begin(); i != values.end(); ++i) {
-        largs.push_back(i->getValue());
+    int j = 0;
+    for (ExpressionVector::const_iterator i = values.begin(); i != values.end(); ++i, ++j) {
+        ValueBuilder expr = *i;
+        if (0 == j) {
+            ThisConverter* converter = i->getType()->getMetadata()->getThisConverter();
+            if (converter != 0) {
+                expr = converter->emitToThis(block, expr);
+            }
+        }
+        largs.push_back(expr.getValue());
     }
 
      // return result of call
@@ -315,4 +334,34 @@ ValueBuilder LlvmCtorEmitter::emit(BlockBuilder bloc, const ExpressionVector& va
 ValueBuilder LlvmUpcast::emit(BlockBuilder bloc, const ExpressionVector& values) {
     throw Exception()
             << exception_message("Not implemented");
+}
+
+/// Convert from variable to this
+ValueBuilder ObjectThisConverter::emitToThis(BlockBuilder block, ValueBuilder variableValue) {
+    llvm::LLVMContext& context = block.getContext();
+
+    std::vector<llvm::Value*> bufferIdx;
+    bufferIdx.push_back(makeConstantInt(context, 0));
+    bufferIdx.push_back(makeConstantInt(context, 2));
+
+    llvm::Value* dataOffset = llvm::GetElementPtrInst::CreateInBounds(variableValue.getValue(), llvm::makeArrayRef(bufferIdx), "", block.getBlock());
+    dataOffset = new llvm::LoadInst(dataOffset, "calle", block.getBlock());
+    return ValueBuilder(block, dataOffset, variableValue.getType());
+}
+
+/// Convert from this to variable
+ValueBuilder ObjectThisConverter::emitFromThis(BlockBuilder block, ValueBuilder thisValue) {
+    llvm::LLVMContext& context = block.getContext();
+    llvm::Module* module       = block.getModule();
+    llvm::Type* pointerType    = llvm::IntegerType::get(context, 8)->getPointerTo();
+
+    llvm::Function* cast       = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_dyn_cast", pointerType, pointerType, pointerType, NULL));
+    llvm::Value* typeValue     = thisValue.getType()->getMetadata()->getBackendPointer(); // new llvm::LoadInst(thisValue.getType()->getMetadata()->getBackendPointer(), "type", block.getBlock());
+
+    std::vector<llvm::Value*> args;
+    args.push_back(thisValue.getValue());
+    args.push_back(typeValue);
+    llvm::Value* value = llvm::CallInst::Create(cast, makeArrayRef(args), "", block.getBlock());
+    llvm::Value* castValue = new llvm::BitCastInst(value, thisValue.getType()->getMetadata()->getBackendVariableType()->getPointerTo(), "this", block.getBlock());
+    return ValueBuilder(block, castValue, thisValue.getType());
 }

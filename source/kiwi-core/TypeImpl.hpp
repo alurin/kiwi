@@ -20,6 +20,7 @@ namespace kiwi {
     class Field;
     class Method;
     class Type;
+    class ThisConverter;
 
 //==------------------------------------------------------------------------==//
 
@@ -27,8 +28,43 @@ namespace kiwi {
     class TypeImpl {
         friend class Type;
     public:
-        /// LLVM analog
-        llvm::Type* varType;
+        /// returns LLVM analog for variables types
+        llvm::Type* getBackendVariableType() const {
+            return m_backendVariableType;
+        }
+
+        /// set LLVM analog for variables types
+        void setBackendVariableType(llvm::Type* type) {
+            m_backendVariableType = type;
+        }
+
+        /// returns LLVM anolog for stack types
+        llvm::Type* getBackendThisType() const {
+            if (m_backendThisType) {
+                return m_backendThisType;
+            }
+            return getBackendVariableType();
+        }
+
+        /// set LLVM anolog for stack types
+        void setBackendThisType(llvm::Type* type) {
+            m_backendThisType = type;
+        }
+
+        /// LLVM pointer to type
+        llvm::GlobalVariable* getBackendPointer() {
+            return m_backendPointer;
+        }
+
+        /// returns this converter
+        ThisConverter* getThisConverter() const {
+            return m_thisConverter;
+        }
+
+        /// set this converter
+        void setThisConverter(ThisConverter* converter) {
+            m_thisConverter = converter;
+        }
 
         /// insert base type
         void insertBase(TypePtr type);
@@ -83,9 +119,21 @@ namespace kiwi {
 
         /// address map
         AddressMap* m_addressMap;
+
+        /// this/variable converter
+        ThisConverter* m_thisConverter;
+
+        /// LLVM analog for variables types
+        llvm::Type* m_backendVariableType;
+
+        /// LLVM anolog for stack types
+        llvm::Type* m_backendThisType;
+
+        /// LLVM pointer to type
+        llvm::GlobalVariable* m_backendPointer;
     private:
         /// Constructor
-        TypeImpl(Type* owner);
+        TypeImpl(Type* owner, ModulePtr module);
 
         /// destructor
         ~TypeImpl();

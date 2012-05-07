@@ -178,7 +178,7 @@ ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vec
     }
 
     /// find call
-    MethodPtr call = call = findCallable(driver, types);
+    MethodPtr call = findCallable(driver, types);
 
     if (!call) {
         throw LangException()
@@ -317,13 +317,5 @@ ValueBuilder InstanceExpressionNode::emitImpl(Driver& driver, BlockBuilder block
 
 #include <llvm/Function.h>
 ValueBuilder ThisNode::emitImpl(Driver& driver, BlockBuilder block) const {
-    llvm::Function* func = block.getFunction();
-    if (func->arg_empty()) {
-        throw LangException()
-            << exception_message("This or self argument not found")
-            << exception_location(to_location(this));
-    }
-    TypePtr type = m_thisType->getType();
-    kiwi_assert(type, "Type is null");
-    return ValueBuilder(block, func->arg_begin(), type);
+    return block.createThis();
 }

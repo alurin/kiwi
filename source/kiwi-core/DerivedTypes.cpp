@@ -25,33 +25,33 @@ using namespace kiwi::codegen;
 IntegerType::IntegerType(ModulePtr module, int32_t size, bool unsign)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
-    m_meta->varType = llvm::IntegerType::get(context, size);
     m_typeID  = IntID;
     m_name    = "int";
+    m_meta->setBackendVariableType(llvm::IntegerType::get(context, size));
 }
 
 BooleanType::BooleanType(ModulePtr module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
-    m_meta->varType = llvm::IntegerType::get(context, 1);
     m_typeID  = BoolID;
     m_name    = "bool";
+    m_meta->setBackendVariableType(llvm::IntegerType::get(context, 1));
 }
 
 VoidType::VoidType(ModulePtr module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
-    m_meta->varType = llvm::Type::getVoidTy(context);
     m_typeID  = VoidID;
     m_name    = "void";
+    m_meta->setBackendVariableType(llvm::Type::getVoidTy(context));
 }
 
 CharType::CharType(ModulePtr module)
 : Type(module) {
     llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
-    m_meta->varType = llvm::IntegerType::get(context, 16);
     m_typeID  = CharID;
     m_name    = "char";
+    m_meta->setBackendVariableType(llvm::IntegerType::get(context, 16));
 }
 
 ObjectType::ObjectType(ModulePtr module)
@@ -62,6 +62,7 @@ ObjectType::ObjectType(ModulePtr module)
 
 StringType::StringType(ModulePtr module)
 : Type(module) {
+    m_typeID                   = StringID;
     llvm::LLVMContext& context = module->getContext()->getMetadata()->getBackendContext();
     llvm::Type* charType       = llvm::IntegerType::get(context, 16);
     llvm::Type* sizeType       = llvm::IntegerType::get(context, 32);
@@ -70,8 +71,7 @@ StringType::StringType(ModulePtr module)
     elements.push_back(sizeType);
     elements.push_back(bufferType);
     llvm::Type* stringType     = llvm::StructType::create(context, llvm::makeArrayRef(elements), "string", false);
-    m_meta->varType          = stringType->getPointerTo(0);
-    m_typeID                   = StringID;
+    m_meta->setBackendVariableType(stringType->getPointerTo(0));
 }
 
 IntegerPtr IntegerType::create(ModulePtr module, int32_t size, bool unsign) {
@@ -231,16 +231,44 @@ bool ObjectType::isInherit(const ObjectPtr type) const{
 
 // Emit type structure
 void ObjectType::emit() {
-    if (m_meta->varType != 0) {
+    if (m_meta->getBackendVariableType() != 0) {
         return;
     }
 
-    throw Exception()
-        << exception_message("Not implement");
+    // collect fields
+    llvm::LLVMContext& context  = getContext()->getMetadata()->getBackendContext();
+    llvm::Module* module        = getModule()->getMetadata()->getBackendModule();
 
-    // // collect fields
-    // llvm::LLVMContext& context = getContext()->getMetadata()->getBackendContext();
-    // llvm::Module* module       = getModule()->getMetadata()->getBackendModule();
+    llvm::Type* pointerType     = llvm::IntegerType::get(context, 8)->getPointerTo();
+    llvm::Type* vtable          = llvm::ArrayType::get(pointerType, 0);
+
+    llvm::Type* offsetType      = llvm::IntegerType::get(context, 32);
+    llvm::Type* amap            = llvm::ArrayType::get(offsetType, 0);
+
+    llvm::Type* dataType        = pointerType; // it pointers
+
+    llvm::Type* vmeta           = vtable->getPointerTo();
+    llvm::Type* ameta           = vtable->getPointerTo();
+
+    std::vector<llvm::Type*> types;
+
+    /// storage type
+    types.push_back(pointerType);
+    types.push_back(dataType);
+    llvm::Type* storageType     = llvm::StructType::create(types)->getPointerTo();
+
+    /// variable type
+    types.clear();
+    types.push_back(vmeta);
+    types.push_back(ameta);
+    types.push_back(storageType);
+    llvm::Type* varType         = llvm::StructType::create(types);
+
+    /// store types
+    m_meta->setBackendVariableType(varType);
+    m_meta->setBackendThisType(storageType);
+    m_meta->setThisConverter(new ObjectThisConverter());
+
     // std::vector<llvm::Type*> types;
 
     // // // add vtable to type

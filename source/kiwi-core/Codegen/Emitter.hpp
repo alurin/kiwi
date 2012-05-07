@@ -37,6 +37,16 @@ namespace kiwi {
         MethodWeak m_callable;
     };
 
+    /// Abstract converter from this type to concrete type and vice versa
+    class ThisConverter {
+    public:
+        /// Convert from variable to this
+        virtual ValueBuilder emitToThis(BlockBuilder block, ValueBuilder variableValue) =0;
+
+        /// Convert from this to variable
+        virtual ValueBuilder emitFromThis(BlockBuilder block, ValueBuilder thisValue) =0;
+    };
+
 } // namespace kiwi::codegen
 
 #endif

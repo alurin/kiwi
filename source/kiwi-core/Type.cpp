@@ -13,6 +13,7 @@
 #include "kiwi/Module.hpp"
 #include "kiwi/Context.hpp"
 #include "kiwi/Members.hpp"
+#include "kiwi/Exception.hpp"
 
 using namespace kiwi;
 using namespace kiwi::codegen;
@@ -55,7 +56,7 @@ namespace {
         }
 
         bool operator()(MethodPtr method) {
-            return method->getName() == m_name && method->hasSignature(m_arguments);
+            return m_opcode == method->getOpcode() && method->getName() == m_name && method->hasSignature(m_arguments);
         }
     protected:
         Member::MethodOpcode m_opcode;
@@ -66,7 +67,7 @@ namespace {
 }
 
 Type::Type(ModulePtr module)
-: m_typeID((TypeID) 0), m_module(module), m_meta(new TypeImpl(this)) {
+: m_typeID((TypeID) 0), m_module(module), m_meta(new TypeImpl(this, module)) {
 }
 
 Type::~Type() {
@@ -80,14 +81,12 @@ ContextPtr Type::getContext() const {
 // add binary operator
 MethodPtr Type::addUnary(Member::MethodOpcode opcode, TypePtr returnType) {
     std::vector<TypePtr> arguments;
-    arguments.push_back(shared_from_this());
     return Method::create(shared_from_this(), returnType, arguments, opcode);
 }
 
 // add binary operator
 MethodPtr Type::addBinary(Member::MethodOpcode opcode, TypePtr returnType, TypePtr operandType) {
     std::vector<TypePtr> arguments;
-    arguments.push_back(shared_from_this());
     arguments.push_back(operandType);
     return Method::create(shared_from_this(), returnType, arguments, opcode);
 }
@@ -151,10 +150,6 @@ MethodPtr Type::findMethod(Member::MethodOpcode opcode, std::vector<TypePtr> typ
     return find_if(m_meta->methods(), MethodFinder(opcode, arguments));
 }
 
-llvm::Type* Type::getVarType() const {
-    return m_meta->varType;
-}
-
 bool Type::isInherit(const TypePtr type, bool duckCast) const {
     return m_meta->isBase(type);
 }
@@ -168,6 +163,27 @@ size_t Type::field_size() const {
     return m_meta->fields().size();
 }
 
+void* Type::getVTablePointer(TypePtr type) {
+    if (type.get() == this)
+        return m_meta->getVirtualTable().getPointer();
+    else if (m_meta->isBase(type)) {
+
+    }
+
+    throw Exception() << exception_message("Received type is not base for current type");
+}
+
+void* Type::getAMapPointer(TypePtr type) {
+    if (type.get() == this)
+        return m_meta->getAddressMap().getPointer();
+    else if (m_meta->isBase(type)) {
+
+    }
+
+    throw Exception() << exception_message("Received type is not base for current type");
+}
+
 // Emit type structure
 void Type::emit() {
+
 }

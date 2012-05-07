@@ -166,6 +166,16 @@ namespace codegen {
         /// emit IR instruction for binary operation
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     };
+
+    /// Converter from this type to object type and vice versa
+    class ObjectThisConverter : public ThisConverter {
+    public:
+        /// Convert from variable to this
+        virtual ValueBuilder emitToThis(BlockBuilder block, ValueBuilder variableValue);
+
+        /// Convert from this to variable
+        virtual ValueBuilder emitFromThis(BlockBuilder block, ValueBuilder thisValue);
+    };
 } // namesapce codegen
 } // namesapce  kiwi
 

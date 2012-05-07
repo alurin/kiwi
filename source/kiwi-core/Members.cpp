@@ -29,21 +29,21 @@ Field::Field(const Identifier& name, TypePtr ownerType, TypePtr fieldType)
 // constructor
 Method::Method(const Identifier& name, TypePtr ownerType, TypePtr returnType)
 : Member(ownerType), m_returnType(returnType), Overridable<Method>(true), m_name(name), m_opcode(Subroutine)
-, m_policy(0){
+, m_policy(0), m_func(0) {
     m_memberID = MethodID;
 }
 
 // constructor
 Method::Method(MethodOpcode opcode, TypePtr ownerType, TypePtr returnType)
 : Member(ownerType), m_returnType(returnType), Overridable<Method>(true), m_opcode(opcode)
-, m_policy(0){
+, m_policy(0), m_func(0) {
     m_memberID = MethodID;
 }
 
 // constructor
 Method::Method(TypePtr ownerType, MethodPtr method)
 : Member(ownerType), m_returnType(method->getReturnType()), Overridable<Method>(false), m_name(method->getName())
-, m_opcode(method->getOpcode()), m_policy(new CloneEmitter(method)) {
+, m_opcode(method->getOpcode()), m_policy(0), m_func(0) {
     override(method);
 }
 
@@ -65,9 +65,9 @@ MethodPtr Method::create(TypePtr ownerType, TypePtr returnType, std::vector<Type
 }
 
 MethodPtr Method::create(TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> types, const MethodOpcode& opcode) {
-    kiwi_assert(!(Member::UnaryFirstElement   <= opcode && opcode <= Member::UnaryLastElement  ) || types.size() == 1,
+    kiwi_assert(!(Member::UnaryFirstElement   <= opcode && opcode <= Member::UnaryLastElement  ) || types.size() == 0,
         "Unary operator has only one arguments");
-    kiwi_assert(!(Member::BinaryFirstElement  <= opcode && opcode <= Member::BinaryLastElement ) || types.size() == 2,
+    kiwi_assert(!(Member::BinaryFirstElement  <= opcode && opcode <= Member::BinaryLastElement ) || types.size() == 1,
         "Binary operator has only two arguments");
 
     MethodPtr method = MethodPtr(new Method(opcode, ownerType, returnType));

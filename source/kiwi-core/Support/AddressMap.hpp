@@ -7,21 +7,26 @@
 #ifndef KIWI_SUPPORT_ADDRESSMAP_INTERNAL
 #define KIWI_SUPPORT_ADDRESSMAP_INTERNAL
 
-#include "kiwi/types.hpp"
+#include "MemberSet.hpp"
 
 namespace llvm {
     class GlobalVariable;
 }
 
 namespace kiwi {
-    class AddressMap {
+    class AddressMap : public MemberSet<Field> {
     public:
         /// constructor
-        AddressMap(ModulePtr module);
+        AddressMap(Type* owner, ModulePtr module);
 
         /// returns LLVM variable for current address map
         llvm::GlobalVariable* getBackendVariable() const {
             return m_backendVariable;
+        }
+
+        /// return pointer for address map
+        void* getPointer() {
+            return 0;
         }
     protected:
         llvm::GlobalVariable* m_backendVariable;

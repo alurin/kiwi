@@ -7,7 +7,7 @@
 #ifndef KIWI_SUPPORT_MEMBERSET_INTERNAL
 #define KIWI_SUPPORT_MEMBERSET_INTERNAL
 
-#include "kiwi/types.hpp"
+#include "kiwi/Type.hpp"
 #include <boost/signals2.hpp>
 #include <set>
 

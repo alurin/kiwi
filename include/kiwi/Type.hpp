@@ -10,10 +10,6 @@
 #include "kiwi/Member.hpp"
 #include <vector>
 
-namespace llvm {
-    class Type;
-}
-
 namespace kiwi {
     class TypeImpl;
 
@@ -50,9 +46,6 @@ namespace kiwi {
         TypeImpl* getMetadata() const {
             return m_meta;
         }
-
-        /// return LLVM analog for variables
-        llvm::Type* getVarType() const;
 
         /// add unary operator
         /// @deprecated
@@ -101,6 +94,15 @@ namespace kiwi {
 
         /// find method
         MethodPtr findMethod(Member::MethodOpcode opcode, std::vector<TypePtr> arguments) const;
+
+        //==--------------------------------------------------------------------------------------------------------==//
+        //          Method for work with type system
+        //==--------------------------------------------------------------------------------------------------------==//
+        /// return pointer to vtable
+        void* getVTablePointer(TypePtr type = TypePtr());
+
+        /// return pointer to amap
+        void* getAMapPointer(TypePtr type = TypePtr());
 
         //==--------------------------------------------------------------------------------------------------------==//
         //          Method for work with type system

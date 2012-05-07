@@ -4,7 +4,7 @@ Object structure
 * **vtable**      = array of int8*                          /// -- vector                   ## pointers to functions
 * **amap**        = array of int32                          /// -- vector                   ## offset of fields
 * **data**        = struct of uint32, ...                   /// -- structure                ## attributes storage
-                                                        ///    1. Count of fields
+                                                            ///    1. Count of fields
 * **vmeta**       = vtable*                                 /// -- global variable          ## virtual table
 * **ameta**       = amap*                                   /// -- global variable          ## address map
 * **dmeta**       = struct of type*, data*                  /// -- struct for allocate      ## metadata storage

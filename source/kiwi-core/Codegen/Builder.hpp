@@ -17,6 +17,7 @@ namespace llvm {
     class FunctionType;
     class BasicBlock;
     class Value;
+    class Argument;
 }
 
 namespace kiwi {
@@ -156,6 +157,9 @@ namespace kiwi {
 
         /// Allocate memory in stack for mutable variable
         ValueBuilder createVariable(const Identifier& name, TypePtr type, bool autoInit = true);
+
+        /// Allocate memory in stack for mutable variable
+        ValueBuilder createThis();
 
         /// Create store in mutable variable
         ValueBuilder createStore(ValueBuilder variable, ValueBuilder value);

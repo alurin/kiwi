@@ -9,6 +9,12 @@
 
 #include "kiwi/config.hpp"
 
+struct KiwiVTable;
+struct KiwiAMap;
+struct KiwiType;
+struct KiwiData;
+struct KiwiObject;
+
 /// Start up kiwi runtime and prepare dependences
 KIWI_RUNTIME
 void kiwi_startup();
@@ -24,5 +30,8 @@ void kiwi_dummy();
 /// Include file with Kiwi source code and execute, if avaible
 KIWI_RUNTIME
 void kiwi_include(const char* filename);
+
+KIWI_RUNTIME
+KiwiObject* kiwi_dyn_cast(KiwiData* data, KiwiType* type);
 
 #endif

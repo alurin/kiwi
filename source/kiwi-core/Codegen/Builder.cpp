@@ -180,12 +180,17 @@ llvm::FunctionType* FunctionBuilder::getFunctionType() const {
 
     // collect arguments types
     std::vector<llvm::Type*> args;
-    llvm::Type* returnType = m_nativeCallable->getReturnType()->getVarType();
+    llvm::Type* returnType = m_nativeCallable->getReturnType()->getMetadata()->getBackendVariableType();
 
     // collect explicit arguments
-    for (std::vector<ArgumentPtr>::const_iterator i = m_nativeCallable->arg_begin(); i != m_nativeCallable->arg_end(); ++i) {
+    int j = 0;
+    for (std::vector<ArgumentPtr>::const_iterator i = m_nativeCallable->arg_begin(); i != m_nativeCallable->arg_end(); ++i, ++j) {
         ArgumentPtr arg = *i;
-        args.push_back(arg->getType()->getVarType());
+        if (j) {
+            args.push_back(arg->getType()->getMetadata()->getBackendVariableType());
+        } else {
+            args.push_back(arg->getType()->getMetadata()->getBackendThisType());
+        }
     }
 
     // generate type and yeld
@@ -295,13 +300,27 @@ void BlockBuilder::createReturn(ValueBuilder value) {
 
 // Allocate memory in stack for mutable varaible
 ValueBuilder BlockBuilder::createVariable(const Identifier& name, TypePtr type, bool autoInit) {
-    llvm::Type* analog = type->getVarType();
+    llvm::Type* analog = type->getMetadata()->getBackendVariableType();
     llvm::AllocaInst* variable = new llvm::AllocaInst(analog, name, m_block);
     if (autoInit) {
-        llvm::Value* null = llvm::Constant::getNullValue(type->getVarType());
+        llvm::Value* null = llvm::Constant::getNullValue(type->getMetadata()->getBackendVariableType());
         new llvm::StoreInst(null, variable, m_block);
     }
     return ValueBuilder(*this, variable, type);
+}
+
+// Allocate memory in stack for mutable variable
+ValueBuilder BlockBuilder::createThis() {
+    TypePtr type         = getNativeOwner();
+    llvm::Function* func = getFunction();
+    kiwi_assert(!func->arg_empty(), "Function must have minimum one argument");
+
+    ValueBuilder result(*this, func->arg_begin(), type);
+    ThisConverter* converter = type->getMetadata()->getThisConverter();
+    if (converter != 0) {
+        return converter->emitFromThis(*this, result);
+    }
+    return result;
 }
 
 // Create store in mutable variable
@@ -378,8 +397,8 @@ ValueBuilder BlockBuilder::createStringConst(const String& value) {
         "string.cst"
      );
     stringCst->setUnnamedAddr(true); // Binary equal strings must be merged
-    llvm::Type* stringType = type->getVarType();
-    llvm::Value* result = new llvm::BitCastInst(stringCst, stringType, "string.val", m_block);
+    llvm::Type* stringType  = type->getMetadata()->getBackendVariableType();
+    llvm::Value* result     = new llvm::BitCastInst(stringCst, stringType, "string.val", m_block);
     return ValueBuilder(*this, result, type);
 }
 
@@ -399,40 +418,59 @@ void BlockBuilder::createBr(BlockBuilder block) {
 }
 
 // Create new object
-ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector<ValueBuilder> args) {
-    // find size of allocation
-    llvm::Type* elementType = type->getVarType();
-    llvm::Constant* null    = llvm::Constant::getNullValue(elementType);
-
-    // create variable for compare
-    llvm::APInt cst = llvm::APInt(32, 1, false);
-    llvm::ConstantInt* one = llvm::ConstantInt::get(*m_context, cst);
-
-    std::vector<llvm::Value*> bufferIdx; // buffer
-    bufferIdx.push_back(one);
-
-    // find first string for method
-    llvm::Value* size = llvm::GetElementPtrInst::CreateInBounds(null, makeArrayRef(bufferIdx), "", m_block);
-    size = new llvm::PtrToIntInst(size, llvm::IntegerType::get(*m_context, 32), "sizeof", m_block);
-
-    std::vector<llvm::Value*> callocArgs;
-    callocArgs.push_back(size);
-
-    // allocate memory for object
+ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector<ValueBuilder> cargs) {
+    // get allocation function
     llvm::FunctionType* mallocType = llvm::FunctionType::get(llvm::IntegerType::get(*m_context, 8)->getPointerTo(), llvm::IntegerType::get(*m_context, 32), 0);
     llvm::Function* mallocFunc     = llvm::dyn_cast<llvm::Function>(m_module->getOrInsertFunction("kiwi_malloc", mallocType));
-    llvm::Value* value    = llvm::CallInst::Create(mallocFunc, makeArrayRef(callocArgs), "alloca", m_block);
-    llvm::Value* variable = new llvm::BitCastInst(value, type->getVarType(), "obj", m_block);
 
-    // store amap and vtable about object
+    // 1. sizeof data buffer
+    llvm::Value* size = makeConstantInt(*m_context, 1000);
+
+    // 2. alloca data buffer
+    std::vector<llvm::Value*> args;
+    args.push_back(size);
+    llvm::Value* dataValue = llvm::CallInst::Create(mallocFunc, llvm::makeArrayRef(args), "data", m_block);
+
+    // 3. alloca metadata
+    std::vector<llvm::Value*> bufferIdx;
+    llvm::Type* metadataType    = type->getMetadata()->getBackendThisType();
+    llvm::Constant* null        = llvm::Constant::getNullValue(metadataType);
+    bufferIdx.push_back(makeConstantInt(*m_context, 1));
+    size                        = llvm::GetElementPtrInst::CreateInBounds(null, llvm::makeArrayRef(bufferIdx), "", m_block);
+    size                        = new llvm::PtrToIntInst(size, llvm::IntegerType::get(*m_context, 32), "", m_block);
+    args.clear();
+    args.push_back(size);
+    llvm::Value* metadataValue  = llvm::CallInst::Create(mallocFunc, llvm::makeArrayRef(args), "meta_alloc", m_block);
+    metadataValue = new llvm::BitCastInst(metadataValue, metadataType, "meta", m_block);
+
+    // 4. @todo store type
     bufferIdx.clear();
-    bufferIdx.push_back(llvm::ConstantInt::get(*m_context, llvm::APInt(32, 0, false)));
-    bufferIdx.push_back(llvm::ConstantInt::get(*m_context, llvm::APInt(32, 0, false)));
-    llvm::Value* amapLoc = llvm::GetElementPtrInst::CreateInBounds(variable, makeArrayRef(bufferIdx), "", m_block);
-    llvm::Value* amap    = type->getMetadata()->getAddressMap().getBackendVariable();
-    new llvm::StoreInst(amap, amapLoc, "", m_block);
+    bufferIdx.push_back(makeConstantInt(*m_context, 0));
+    bufferIdx.push_back(makeConstantInt(*m_context, 0));
+    llvm::Value* typeOffset = llvm::GetElementPtrInst::CreateInBounds(metadataValue, llvm::makeArrayRef(bufferIdx), "", m_block);
+    llvm::Value* typeValue  = type->getMetadata()->getBackendPointer(); // new llvm::LoadInst(, "type", m_block);
+    new llvm::StoreInst(typeValue, typeOffset, "", m_block);
 
-    // new llvm::(stringCst, stringType, "string.val", m_block);
+    // 5. @todo store data
+    bufferIdx.clear();
+    bufferIdx.push_back(makeConstantInt(*m_context, 0));
+    bufferIdx.push_back(makeConstantInt(*m_context, 1));
+    llvm::Value* dataOffset = llvm::GetElementPtrInst::CreateInBounds(metadataValue, llvm::makeArrayRef(bufferIdx), "", m_block);
+    new llvm::StoreInst(dataValue, dataOffset, "", m_block);
+
+    // 6. allocate variable
+    llvm::Value* variable = new llvm::AllocaInst(type->getMetadata()->getBackendVariableType(), "object", m_block);
+
+    // 7. @todo store vtable
+    // 8. @todo store amap
+    // 9. @todo store metadata
+    bufferIdx.clear();
+    bufferIdx.push_back(makeConstantInt(*m_context, 0));
+    bufferIdx.push_back(makeConstantInt(*m_context, 2));
+    llvm::Value* metadataOffset = llvm::GetElementPtrInst::CreateInBounds(variable, llvm::makeArrayRef(bufferIdx), "", m_block);
+    new llvm::StoreInst(metadataValue, metadataOffset, "", m_block);
+
+    // // new llvm::(stringCst, stringType, "string.val", m_block);
     return ValueBuilder(*this, variable, type);
 }
 
@@ -464,6 +502,9 @@ ValueBuilder BlockBuilder::createCall(MethodPtr call, std::vector<ValueBuilder> 
 llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, FieldPtr field) {
     llvm::Value* value    = thisValue.getValue();
 
+    throw Exception()
+        << exception_message("Not implement");
+
     // load amap
     std::vector<llvm::Value*> addressIdx;
     addressIdx.push_back(makeConstantInt(*m_context, 0));
@@ -484,7 +525,7 @@ llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, FieldPtr field) {
     llvm::Value* summInst    = llvm::BinaryOperator::Create(llvm::Instruction::Add, castNull, castOffset, "", m_block);
 
     // cast to field type and return
-    llvm::Type* fieldType = field->getFieldType()->getVarType()->getPointerTo();
+    llvm::Type* fieldType    = field->getFieldType()->getMetadata()->getBackendVariableType()->getPointerTo();
     llvm::Value* offset      = new llvm::IntToPtrInst(summInst, fieldType, "offset", m_block);
     return offset;
 }
