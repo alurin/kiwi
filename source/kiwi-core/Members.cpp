@@ -10,6 +10,8 @@
 #include "kiwi/Members.hpp"
 #include "kiwi/Type.hpp"
 #include "kiwi/Argument.hpp"
+#include "kiwi/Context.hpp"
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;
@@ -29,21 +31,21 @@ Field::Field(const Identifier& name, TypePtr ownerType, TypePtr fieldType)
 // constructor
 Method::Method(const Identifier& name, TypePtr ownerType, TypePtr returnType)
 : Member(ownerType), m_returnType(returnType), Overridable<Method>(true), m_name(name), m_opcode(Subroutine)
-, m_policy(0), m_func(0) {
+, m_policy(0), m_func(0), m_pointerTo(0), m_position(-1) {
     m_memberID = MethodID;
 }
 
 // constructor
 Method::Method(MethodOpcode opcode, TypePtr ownerType, TypePtr returnType)
 : Member(ownerType), m_returnType(returnType), Overridable<Method>(true), m_opcode(opcode)
-, m_policy(0), m_func(0) {
+, m_policy(0), m_func(0), m_pointerTo(0), m_position(-1) {
     m_memberID = MethodID;
 }
 
 // constructor
 Method::Method(TypePtr ownerType, MethodPtr method)
 : Member(ownerType), m_returnType(method->getReturnType()), Overridable<Method>(false), m_name(method->getName())
-, m_opcode(method->getOpcode()), m_policy(0), m_func(0) {
+, m_opcode(method->getOpcode()), m_policy(0), m_func(0), m_pointerTo(0), m_position(-1) {
     override(method);
 }
 
@@ -112,12 +114,38 @@ bool Method::hasSignature(const TypeVector& types, bool isCast) const {
     return true;
 }
 
+// set function
 void Method::setFunction(llvm::Function* func) {
     m_func = func;
     /// @todo What if, policy already exists at this point?
     if (!getPolicy()) {
-        setPolicy(new LlvmCallEmitter(func, m_returnType.lock()));
+        setPolicy(new LlvmCallEmitter(MethodPtr(shared_from_this(), this), m_returnType.lock()));
     }
+}
+
+// return method position in vtable
+int32_t Method::getPosition() const {
+    if (m_position == -1) {
+        m_position = getOwnerType()->getMetadata()->getVirtualTable().nextPosition();
+    }
+    return m_position;
+}
+
+// return pointer to function
+void* Method::getPointerTo() const {
+    if (m_pointerTo) {
+        return m_pointerTo;
+    }
+
+
+    // map vtable to pointer
+    if (m_func) {
+        ContextImpl* meta             = getOwnerType()->getContext()->getMetadata();
+        llvm::ExecutionEngine* engine = meta->getBackendEngine();
+        m_pointerTo                   = engine->getPointerToFunctionOrStub(m_func);
+        return m_pointerTo;
+    }
+    return 0;
 }
 
 void Method::initializateArguments(TypeVector types) {
@@ -132,10 +160,14 @@ void Method::initializateArguments(TypeVector types) {
 
 void Method::initializateArguments(TypePtr thisType, ArgumentVector args) {
     int j = 0;
+    if(0 == args.size()) {
+        ArgumentPtr arg = ArgumentPtr(new Argument(MethodPtr(shared_from_this(), this), thisType, 0));
+        m_args.push_back(arg);
+    }
     for (ArgumentVector::iterator i = args.begin(); i != args.end(); ++i, ++j) {
-        if (j) {
+        if (0 != j) {
             ArgumentPtr oarg = *i;
-            ArgumentPtr arg = ArgumentPtr(new Argument(*oarg));
+            ArgumentPtr arg = ArgumentPtr(new Argument(MethodPtr(shared_from_this(), this), oarg->getType(), j));
             m_args.push_back(arg);
         } else {
             ArgumentPtr arg = ArgumentPtr(new Argument(MethodPtr(shared_from_this(), this), thisType, 0));

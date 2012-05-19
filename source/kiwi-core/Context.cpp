@@ -40,7 +40,7 @@ void kiwi::startup() {
     llvm::InitializeNativeTarget();     // LLVM JIT init
 
     #ifdef KIWI_GC
-    GC_INIT();                          // GC init
+    GC_enable_incremental();            // GC init
     #endif
 }
 
@@ -155,6 +155,6 @@ int32_t Context::run(ModulePtr module) {
         return main();
     }
 
-    throw Exception()
-        << exception_format("Not found `main` function in module `%1%`", module->getName());
+    BOOST_THROW_EXCEPTION(Exception()
+        << exception_format("Not found `main` function in module `%1%`", module->getName()));
 }

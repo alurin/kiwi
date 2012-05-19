@@ -31,6 +31,7 @@ int main(int argc, char const *argv[]) {
         ("optimization,O", po::value<int>(&opt)->default_value(0), "optimization level [0-3]")
         ("debug", "debug parser and scanner")
         ("ir-dump", "dump generated LLVM module")
+        ("run", "run script, even if --ir-dump enabled")
         ("input-file", po::value< std::vector< std::string > >(), "input file")
     ;
 
@@ -68,7 +69,8 @@ int main(int argc, char const *argv[]) {
             if (vm.count("ir-dump")) {
                 module->build();
                 module->dump();
-            } else {
+            }
+            if (!vm.count("ir-dump") || vm.count("run")) {
                 return context->run(module);
             }
         } catch (Exception& ex) {

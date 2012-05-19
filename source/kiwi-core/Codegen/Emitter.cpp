@@ -23,7 +23,7 @@ ValueBuilder CloneEmitter::emit(BlockBuilder block, const ExpressionVector& valu
     if (policy) {
         return policy->emit(block, values);
     } else {
-        throw Exception()
-            << exception_message("Policy not found for function");
+        BOOST_THROW_EXCEPTION(Exception()
+            << exception_message("Policy not found for function"));
     }
 }

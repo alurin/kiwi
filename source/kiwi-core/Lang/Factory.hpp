@@ -118,9 +118,9 @@ namespace lang {
         }
 
         TypeNode* createArrayTy(TypeNode* type, const location& loc) {
-            throw Exception()
+            BOOST_THROW_EXCEPTION(Exception()
                 << exception_message("Not implemented")
-                << exception_location(to_location(loc));
+                << exception_location(to_location(loc)));
         }
 
         //===--------------------------------------------------------------===//

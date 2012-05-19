@@ -32,9 +32,9 @@ TypePtr QualifiedTypeNode::get(Driver& driver) {
     ModulePtr module = driver.getModule();
     TypePtr   type   = module->find(m_name);
     if (!type) {
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_format("Type '%1%' not found", m_name)
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
     }
     return type;
 }

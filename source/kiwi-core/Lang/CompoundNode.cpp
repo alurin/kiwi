@@ -56,13 +56,13 @@ void ClassNode::generateType(Driver& driver) {
         if (ObjectPtr parent = dyn_cast<ObjectType>(type)) {
             current->inherit(parent);
         } else if (type) {
-            throw LangException()
+            BOOST_THROW_EXCEPTION(LangException()
                 << exception_format("Type '%1%' is not class", m_name)
-                << exception_location(to_location(this));
+                << exception_location(to_location(this)));
         } else {
-            throw LangException()
+            BOOST_THROW_EXCEPTION(LangException()
                 << exception_format("Type '%1%' not found", m_name)
-                << exception_location(to_location(this));
+                << exception_location(to_location(this)));
         }
     }
 }
@@ -78,9 +78,6 @@ void CompoundNode::generateMembers(Driver& driver) {
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
         (*i)->generateMember(driver, m_type);
     }
-
-    /// Emit type structure
-    m_type->emit();
 }
 
 // Emit IR signature
@@ -101,4 +98,6 @@ void CompoundNode::generateIRCode(Driver& driver) {
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
         (*i)->generateIRCode(driver, m_type);
     }
+
+    m_type->update();
 }

@@ -25,12 +25,25 @@ namespace kiwi {
             return m_backendVariable;
         }
 
+        /// update virtual table
+        void update();
+
         /// return pointer for virtual table
         void* getPointer() {
             return 0;
         }
+
+        /// return next position from virtual table
+        int32_t nextPosition();
     protected:
+        /// global variable for store pointer to vtable
         llvm::GlobalVariable* m_backendVariable;
+
+        /// size of last vtable
+        int32_t m_lastSize;
+
+        /// last position
+        int32_t m_lastPosition;
     };
 }
 

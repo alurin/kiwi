@@ -24,7 +24,9 @@ namespace kiwi
     /// Method member
     class Method : public Member, public Overridable<Method> {
         friend class Type;
-        template<class Method> friend class MemberSet;
+        friend class VirtualTable;
+        template<class Method>
+        friend class MemberSet;
     public:
         typedef std::vector<TypePtr>                TypeVector;
         typedef std::vector<ArgumentPtr>            ArgumentVector;
@@ -32,7 +34,6 @@ namespace kiwi
 
         /// virtual destructor
         virtual ~Method();
-
 
         /// Create method
         static MethodPtr create(TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> arguments, const Identifier& name = "");
@@ -80,6 +81,17 @@ namespace kiwi
         llvm::Function* getFunction() const {
             return m_func;
         }
+
+        /// returns pointer to function
+        void* getPointerTo() const;
+
+        /// set pointer to function
+        void setPointerTo(void* pointerTo) {
+            m_pointerTo = pointerTo;
+        }
+
+        /// returns position in address map
+        int32_t getPosition() const;
 
         /// returns argument by index
         ArgumentPtr getArgument(int32_t indexAt) {
@@ -140,6 +152,12 @@ namespace kiwi
         /// Function
         llvm::Function* m_func;
 
+        /// Pointer to function
+        mutable void* m_pointerTo;
+
+        /// field position in address map for class
+        mutable int32_t m_position;
+
         /// constructor
         Method(const Identifier& name, TypePtr ownerType, TypePtr returnType);
 
@@ -157,6 +175,11 @@ namespace kiwi
 
         /// create arguments from parent callable
         void initializateArguments(TypePtr thisType, ArgumentVector args);
+
+        /// Set position
+        void setPosition(int32_t position) {
+            m_position = position;
+        }
     };
 
     //==--------------------------------------------------------------------==//

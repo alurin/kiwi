@@ -25,7 +25,6 @@ using namespace kiwi::codegen;
         m_meta->_method().merge(declared, inherited); \
     }
 
-
 TYPE_IMPLEMENTATION_FINDERS(Field, FieldPtr, fields)
 
 namespace {
@@ -170,7 +169,7 @@ void* Type::getVTablePointer(TypePtr type) {
 
     }
 
-    throw Exception() << exception_message("Received type is not base for current type");
+    BOOST_THROW_EXCEPTION(Exception() << exception_message("Received type is not base for current type"));
 }
 
 void* Type::getAMapPointer(TypePtr type) {
@@ -180,10 +179,10 @@ void* Type::getAMapPointer(TypePtr type) {
 
     }
 
-    throw Exception() << exception_message("Received type is not base for current type");
+    BOOST_THROW_EXCEPTION(Exception() << exception_message("Received type is not base for current type"));
 }
 
 // Emit type structure
-void Type::emit() {
+void Type::update() {
 
 }

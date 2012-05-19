@@ -41,9 +41,9 @@ Driver* Driver::createFromFile(ContextPtr context, TypePtr thisType, const std::
     std::ifstream* in = new std::ifstream(filename.c_str(), std::ios::binary | std::ios::in);
     if (!in->good()) {
         delete in;
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_message("File %s not found or not readable")
-            << exception_filename(filename);
+            << exception_filename(filename));
     }
     return new Driver(context, thisType, in, filename, true);
 }
@@ -75,9 +75,9 @@ bool Driver::parse() {
 }
 
 void Driver::error(const class location& l, const std::string& m) {
-    throw LangException()
+    BOOST_THROW_EXCEPTION(LangException()
         << exception_message(m)
-        << exception_location(to_location(l));
+        << exception_location(to_location(l)));
 }
 
 DriverRef::DriverRef(ContextPtr context, TypePtr thisType)

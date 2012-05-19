@@ -206,7 +206,7 @@ namespace kiwi {
         }
 
         /// emit LLVM analog for type
-        virtual void emit();
+        virtual void update();
     protected:
 
         // anonym object constructor

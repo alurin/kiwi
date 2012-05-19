@@ -5,6 +5,7 @@
  *******************************************************************************
  */
 #include "kiwi/Exception.hpp"
+ #include <boost/exception/all.hpp>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
@@ -79,6 +80,12 @@ std::ostream& kiwi::operator<<(std::ostream& stream, const Exception& ex) {
 
     if (hasEndl) stream << std::endl;
 
+    stream << ANSI_COLOR_RESET;
+
+    #ifdef KIWI_DEBUG
+        stream << diagnostic_information(ex) << std::endl;
+    #endif
+
     // Output part of file around location
     if (location) {
         Location loc = *location;
@@ -136,7 +143,7 @@ std::ostream& kiwi::operator<<(std::ostream& stream, const Exception& ex) {
         }
     }
 
-    return stream << ANSI_COLOR_RESET;
+    return stream;
 }
 
 #include "../Lang/location.hh"

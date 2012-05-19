@@ -116,8 +116,8 @@ ArgumentNode* FunctionNode::get(const Identifier& name) {
     if (it != m_args.end()) {
         return it->second;
     } else {
-        throw LangException()
-                << exception_format("Variable '%1%' not found in current scope", name);
+        BOOST_THROW_EXCEPTION(LangException()
+                << exception_format("Variable '%1%' not found in current scope", name));
     }
 }
   // declare scope variable with initilizator

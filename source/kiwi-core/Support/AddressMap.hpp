@@ -24,6 +24,9 @@ namespace kiwi {
             return m_backendVariable;
         }
 
+        /// update address map
+        void update();
+
         /// return pointer for address map
         void* getPointer() {
             return 0;

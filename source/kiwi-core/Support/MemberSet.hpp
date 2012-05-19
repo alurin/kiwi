@@ -56,7 +56,7 @@ namespace kiwi {
         size_t size() const {
             return m_members.size();
         }
-    private:
+    protected:
         /// Owner for this implementation
         Type* m_owner;
 

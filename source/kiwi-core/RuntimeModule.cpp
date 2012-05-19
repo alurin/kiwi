@@ -9,5 +9,6 @@
 using namespace kiwi;
 
 void kiwi::initRuntimeModule(ModulePtr module) {
-
+    // InterfaceType* request
+    // ObjectType* type = new
 }

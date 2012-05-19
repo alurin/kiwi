@@ -20,12 +20,12 @@ namespace codegen {
     /// LLVM emitter for function from source code
     class LlvmCallEmitter : public MethodPolicy {
     public:
-        LlvmCallEmitter(llvm::Function* func, TypePtr returnType);
+        LlvmCallEmitter(MethodPtr method, TypePtr returnType);
 
         /// emit IR instruction for binary operation
         virtual ValueBuilder emit(BlockBuilder block, const ExpressionVector& values);
     protected:
-        llvm::Function* m_func;
+        MethodWeak m_method;
         TypeWeak m_returnType;
     }; // class LlvmCallEmitter
 

@@ -232,8 +232,8 @@ llvm::Function* FunctionBuilder::getFunction() const {
 llvm::Function* FunctionBuilder::createJITStartupPoint() {
     ObjectPtr self = dyn_cast<ObjectType>(m_nativeCallable->getOwnerType());
     if (!self) {
-        throw Exception()
-            << exception_message("Self type must be Object type");
+        BOOST_THROW_EXCEPTION(Exception()
+            << exception_message("Self type must be Object type"));
     }
 
     /// create startup function
@@ -329,8 +329,8 @@ ValueBuilder BlockBuilder::createStore(ValueBuilder variable, ValueBuilder value
         llvm::StoreInst* inst = new llvm::StoreInst(value.getValue(), variable.getValue(), m_block);
         return ValueBuilder(*this, value.getValue(), value.getType());
     }
-    throw Exception()
-            << exception_message("Cast unknown");
+    BOOST_THROW_EXCEPTION(Exception()
+            << exception_message("Cast unknown"));
 }
 
 // Create load from mutable variable
@@ -406,8 +406,8 @@ ValueBuilder BlockBuilder::createStringConst(const String& value) {
 void BlockBuilder::createCond(ValueBuilder value, BlockBuilder blockTrue, BlockBuilder blockFalse) {
     llvm::Value* cond = value.getValue();
     if (!cond->getType()->isIntegerTy(1)) {
-        throw Exception()
-            << exception_message("Condition must be boolean type");
+        BOOST_THROW_EXCEPTION(Exception()
+            << exception_message("Condition must be boolean type"));
     }
     llvm::IRBuilder<>(m_block).CreateCondBr(cond, blockTrue.getBlock(), blockFalse.getBlock());
 }
@@ -423,8 +423,13 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
     llvm::FunctionType* mallocType = llvm::FunctionType::get(llvm::IntegerType::get(*m_context, 8)->getPointerTo(), llvm::IntegerType::get(*m_context, 32), 0);
     llvm::Function* mallocFunc     = llvm::dyn_cast<llvm::Function>(m_module->getOrInsertFunction("kiwi_malloc", mallocType));
 
+    /// **vtable
+    /// **amap
+    /// **data
+
     // 1. sizeof data buffer
     llvm::Value* size = makeConstantInt(*m_context, 1000);
+    TypeImpl* meta    = type->getMetadata();
 
     // 2. alloca data buffer
     std::vector<llvm::Value*> args;
@@ -433,45 +438,36 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
 
     // 3. alloca metadata
     std::vector<llvm::Value*> bufferIdx;
-    llvm::Type* metadataType    = type->getMetadata()->getBackendThisType();
-    llvm::Constant* null        = llvm::Constant::getNullValue(metadataType);
+    llvm::Type* objectType = meta->getBackendThisType();
+    llvm::Constant* null   = llvm::Constant::getNullValue(objectType);
     bufferIdx.push_back(makeConstantInt(*m_context, 1));
-    size                        = llvm::GetElementPtrInst::CreateInBounds(null, llvm::makeArrayRef(bufferIdx), "", m_block);
-    size                        = new llvm::PtrToIntInst(size, llvm::IntegerType::get(*m_context, 32), "", m_block);
+    size = llvm::GetElementPtrInst::CreateInBounds(null, llvm::makeArrayRef(bufferIdx), "", m_block);
+    size = new llvm::PtrToIntInst(size, llvm::IntegerType::get(*m_context, 32), "", m_block);
     args.clear();
     args.push_back(size);
-    llvm::Value* metadataValue  = llvm::CallInst::Create(mallocFunc, llvm::makeArrayRef(args), "meta_alloc", m_block);
-    metadataValue = new llvm::BitCastInst(metadataValue, metadataType, "meta", m_block);
+    llvm::Value* object = llvm::CallInst::Create(mallocFunc, llvm::makeArrayRef(args), "meta", m_block);
+    object = new llvm::BitCastInst(object, objectType, "object", m_block);
 
-    // 4. @todo store type
-    bufferIdx.clear();
-    bufferIdx.push_back(makeConstantInt(*m_context, 0));
-    bufferIdx.push_back(makeConstantInt(*m_context, 0));
-    llvm::Value* typeOffset = llvm::GetElementPtrInst::CreateInBounds(metadataValue, llvm::makeArrayRef(bufferIdx), "", m_block);
-    llvm::Value* typeValue  = type->getMetadata()->getBackendPointer(); // new llvm::LoadInst(, "type", m_block);
-    new llvm::StoreInst(typeValue, typeOffset, "", m_block);
+    // 4. Store pointer to vtable
+    {
+        llvm::Value* vtable = meta->getVirtualTable().getBackendVariable();    /// pointer to vtable
+        bufferIdx.clear();
+        bufferIdx.push_back(makeConstantInt(*m_context, 0));
+        bufferIdx.push_back(makeConstantInt(*m_context, 0));
+        llvm::Value* vloc = llvm::GetElementPtrInst::CreateInBounds(object, llvm::makeArrayRef(bufferIdx), "", m_block);
+        new llvm::StoreInst(vtable, vloc, "", m_block);
+    }
 
-    // 5. @todo store data
-    bufferIdx.clear();
-    bufferIdx.push_back(makeConstantInt(*m_context, 0));
-    bufferIdx.push_back(makeConstantInt(*m_context, 1));
-    llvm::Value* dataOffset = llvm::GetElementPtrInst::CreateInBounds(metadataValue, llvm::makeArrayRef(bufferIdx), "", m_block);
-    new llvm::StoreInst(dataValue, dataOffset, "", m_block);
-
-    // 6. allocate variable
-    llvm::Value* variable = new llvm::AllocaInst(type->getMetadata()->getBackendVariableType(), "object", m_block);
-
-    // 7. @todo store vtable
-    // 8. @todo store amap
-    // 9. @todo store metadata
-    bufferIdx.clear();
-    bufferIdx.push_back(makeConstantInt(*m_context, 0));
-    bufferIdx.push_back(makeConstantInt(*m_context, 2));
-    llvm::Value* metadataOffset = llvm::GetElementPtrInst::CreateInBounds(variable, llvm::makeArrayRef(bufferIdx), "", m_block);
-    new llvm::StoreInst(metadataValue, metadataOffset, "", m_block);
-
-    // // new llvm::(stringCst, stringType, "string.val", m_block);
-    return ValueBuilder(*this, variable, type);
+    // 4. Store pointer to amap
+    {
+        llvm::Value* amap   = meta->getAddressMap().getBackendVariable();      /// pointer to amap
+        bufferIdx.clear();
+        bufferIdx.push_back(makeConstantInt(*m_context, 0));
+        bufferIdx.push_back(makeConstantInt(*m_context, 1));
+        llvm::Value* aloc = llvm::GetElementPtrInst::CreateInBounds(object, llvm::makeArrayRef(bufferIdx), "", m_block);
+        new llvm::StoreInst(amap, aloc, "", m_block);
+    }
+    return ValueBuilder(*this, object, type);
 }
 
 // Create store in object field
@@ -494,16 +490,16 @@ ValueBuilder BlockBuilder::createCall(MethodPtr call, std::vector<ValueBuilder> 
     if (policy) {
         return policy->emit(*this, args);
     }
-    throw Exception()
-            << exception_message("Function not implemented");
+    BOOST_THROW_EXCEPTION(Exception()
+            << exception_message("Function not implemented"));
 }
 
 // Returns pointer to value of field obkect
 llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, FieldPtr field) {
     llvm::Value* value    = thisValue.getValue();
 
-    throw Exception()
-        << exception_message("Not implement");
+    BOOST_THROW_EXCEPTION(Exception()
+        << exception_message("Not implement"));
 
     // load amap
     std::vector<llvm::Value*> addressIdx;

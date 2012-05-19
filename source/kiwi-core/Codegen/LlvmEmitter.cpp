@@ -8,6 +8,7 @@
 #include "../TypeImpl.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Module.hpp"
+#include "kiwi/Members.hpp"
 #include "kiwi/Exception.hpp"
 #include <llvm/Instructions.h>
 #include <llvm/Constants.h>
@@ -26,8 +27,8 @@ namespace {
     }
 }
 
-LlvmCallEmitter::LlvmCallEmitter(llvm::Function* func, TypePtr returnType)
-: m_func(func), m_returnType(returnType) {
+LlvmCallEmitter::LlvmCallEmitter(MethodPtr method, TypePtr returnType)
+: m_method(method), m_returnType(returnType) {
 
 }
 
@@ -240,8 +241,8 @@ ValueBuilder LlvmStringConcatenate::emit(BlockBuilder block, const ExpressionVec
 // emit IR instruction for string substraction
 ValueBuilder LlvmStringSubtraction::emit(BlockBuilder block, const ExpressionVector& values) {
     if (values.size() != 2 && values.size() != 3) {
-        throw Exception()
-            << exception_message("Not implemented");
+        BOOST_THROW_EXCEPTION(Exception()
+            << exception_message("Not implemented"));
     }
 
     ContextPtr         t_context = block.getNativeContext();
@@ -304,7 +305,7 @@ ValueBuilder LlvmStringSubtraction::emit(BlockBuilder block, const ExpressionVec
     return ValueBuilder(block, returnValue, returnType);
 }
 
-// emit IR instruction for binary operation
+// emit IR instruction for call method
 ValueBuilder LlvmCallEmitter::emit(BlockBuilder block, const ExpressionVector& values) {
     std::vector<llvm::Value*> largs;
     int j = 0;
@@ -319,9 +320,37 @@ ValueBuilder LlvmCallEmitter::emit(BlockBuilder block, const ExpressionVector& v
         largs.push_back(expr.getValue());
     }
 
-     // return result of call
-     llvm::Value* result = llvm::CallInst::Create(m_func, llvm::makeArrayRef(largs), "", block.getBlock());
-     return ValueBuilder(block, result, m_returnType.lock());
+    MethodPtr method = m_method.lock();
+    kiwi_assert(method->getPosition() != -1, "Location for method not founded");
+
+    // constants
+    llvm::APInt cst(32, 0, false);
+    llvm::ConstantInt* zero = llvm::ConstantInt::get(block.getContext(), cst);
+    cst = llvm::APInt(32, method->getPosition(), false);
+    llvm::ConstantInt* pos = llvm::ConstantInt::get(block.getContext(), cst);
+
+    // load vtable
+    std::vector<llvm::Value*> bufferIdx; // buffer
+    bufferIdx.push_back(zero);
+    bufferIdx.push_back(zero);
+    llvm::Value* vtable = llvm::GetElementPtrInst::CreateInBounds(largs[0], makeArrayRef(bufferIdx), "vtable_pos", block.getBlock());
+
+    // dereference vtable
+    vtable = new llvm::LoadInst(vtable, "vtable_val", block.getBlock());
+    vtable = new llvm::LoadInst(vtable, "vtable", block.getBlock());
+
+    // load vslot
+    bufferIdx.clear();
+    bufferIdx.push_back(zero);
+    bufferIdx.push_back(pos);
+    llvm::Value* vslot = llvm::GetElementPtrInst::Create(vtable, makeArrayRef(bufferIdx), "vslot_pos", block.getBlock());
+    vslot = new llvm::LoadInst(vslot, "vslot_val", block.getBlock());
+
+    // return result of call
+    llvm::Type* funcType = method->getFunction()->getFunctionType();
+    vslot = new llvm::BitCastInst(vslot, funcType->getPointerTo(), "vslot", block.getBlock());
+    llvm::Value* result = llvm::CallInst::Create(vslot, llvm::makeArrayRef(largs), "", block.getBlock());
+    return ValueBuilder(block, result, m_returnType.lock());
 }
 
 // emit IR instruction for binary operation
@@ -332,8 +361,8 @@ ValueBuilder LlvmCtorEmitter::emit(BlockBuilder bloc, const ExpressionVector& va
 
 /// emit IR instruction for binary operation
 ValueBuilder LlvmUpcast::emit(BlockBuilder bloc, const ExpressionVector& values) {
-    throw Exception()
-            << exception_message("Not implemented");
+    BOOST_THROW_EXCEPTION(Exception()
+            << exception_message("Not implemented"));
 }
 
 /// Convert from variable to this

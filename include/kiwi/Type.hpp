@@ -114,7 +114,7 @@ namespace kiwi {
         virtual bool isCastableTo(const TypePtr type, bool duckCast = true) const;
 
         /// emit type metadata and structure
-        virtual void emit();
+        virtual void update();
 
         /// returns name of type
         Identifier getName() const {

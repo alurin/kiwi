@@ -98,9 +98,9 @@ BlockBuilder PrintStatement::emitImpl(Driver& driver, BlockBuilder block) const 
         return block.createCall(op, args);
     }
 
-    throw LangException()
+    BOOST_THROW_EXCEPTION(LangException()
             << exception_format("Not found rules for print value of '%1%' ", result.getType()->getName())
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
 }
 
 /// emit instructions for statement

@@ -181,9 +181,9 @@ ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vec
     MethodPtr call = findCallable(driver, types);
 
     if (!call) {
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_message("Not found rules for call")
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
     }
     return block.createCall(call, args);
 }
@@ -191,9 +191,9 @@ ValueBuilder CallableNode::emitCall(Driver& driver, BlockBuilder block, std::vec
 MethodPtr BinaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
     MethodPtr call = types[0]->findBinary(m_opcode, types[1]);
     if (!call) {
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_format("Not found binary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
     }
     return call;
 }
@@ -201,9 +201,9 @@ MethodPtr BinaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) c
 MethodPtr UnaryNode::findCallable(Driver& driver, std::vector<TypePtr> types) const {
     MethodPtr call = types[0]->findUnary(m_opcode);
     if (!call) {
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_format("Not found unary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
     }
     return call;
 }
@@ -213,9 +213,9 @@ MethodPtr MultiaryNode::findCallable(Driver& driver, std::vector<TypePtr> types)
     std::vector<TypePtr> args(types.begin() + 1, types.end());
     MethodPtr call = types[0]->findMultiary(m_opcode, args);
     if (!call) {
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_format("Not found multiary operator %1%(%2%)", Member::getOperatorName(m_opcode) % format_call(types))
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
     }
     return call;
 }
@@ -224,9 +224,9 @@ MethodPtr CallNode::findCallable(Driver& driver, std::vector<TypePtr> types) con
     std::vector<TypePtr> args(types.begin() + 1, types.end());
     MethodPtr call = types[0]->findMethod(m_method, args);
     if (!call) {
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_format("Not found method %1%(%2%)", m_method % format_call(types))
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
     }
     return call;
 }
@@ -237,9 +237,9 @@ ValueBuilder NewNode::emitImpl(Driver& driver, BlockBuilder block) const {
     if (ObjectPtr objType = dyn_cast<ObjectType>(type)) {
         return block.createNew(objType);
     } else {
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_format("Type '%1%' is not constructable", type->getName())
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
     }
 }
 
@@ -251,9 +251,9 @@ ValueBuilder AssignNode::emitImpl(Driver& driver, BlockBuilder block) const {
 ValueBuilder NamedMutableNode::emitImpl(Driver& driver, ValueBuilder value) const {
     ValueBuilder* builder = o_var->findBuilder(value.getFunction());
     if (!builder) {
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_message("Not found value builder for store value in varaible")
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
     }
     return value.createStore(*builder, value);
 }
@@ -261,9 +261,9 @@ ValueBuilder NamedMutableNode::emitImpl(Driver& driver, ValueBuilder value) cons
 ValueBuilder NamedExpressionNode::emitImpl(Driver& driver, BlockBuilder block) const {
     ValueBuilder* builder = o_var->findBuilder(block.getFunction());
     if (!builder)
-        throw LangException()
+        BOOST_THROW_EXCEPTION(LangException()
             << exception_message("Not found value builder for store value in varaible")
-            << exception_location(to_location(this));
+            << exception_location(to_location(this)));
     return block.createLoad(*builder);
 }
 
@@ -294,9 +294,9 @@ ValueBuilder InstanceMutableNode::emitImpl(Driver& driver, ValueBuilder value) c
             return thisValue.createStore(thisValue, field, value);
         }
     }
-    throw LangException()
+    BOOST_THROW_EXCEPTION(LangException()
         << exception_format("Field '%1%' not found in type '%2%'", m_name % type->getName())
-        << exception_location(to_location(this));
+        << exception_location(to_location(this)));
 }
 
 /// @todo Remove copy past
@@ -310,9 +310,9 @@ ValueBuilder InstanceExpressionNode::emitImpl(Driver& driver, BlockBuilder block
             return thisValue.createLoad(thisValue, field);
         }
     }
-    throw LangException()
+    BOOST_THROW_EXCEPTION(LangException()
         << exception_format("Field '%1%' not found in type '%2%'", m_name % type->getName())
-        << exception_location(to_location(this));
+        << exception_location(to_location(this)));
 }
 
 #include <llvm/Function.h>

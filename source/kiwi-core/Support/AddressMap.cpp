@@ -23,7 +23,10 @@ AddressMap::AddressMap(Type* owner, ModulePtr module)
     llvm::Type* addressMapType  = addressMapStub->getPointerTo();
 
     /// Store stub variable
-    m_backendVariable = new llvm::GlobalVariable(*backendModule, addressMapType, false, llvm::GlobalValue::PrivateLinkage, 0, "amap");
+    llvm::Constant* nullValue = llvm::Constant::getNullValue(addressMapType);
+    m_backendVariable = new llvm::GlobalVariable(*backendModule, addressMapType, false, llvm::GlobalValue::PrivateLinkage, nullValue, "::_amap");
+}
 
-    /// Attach events handlers
+void AddressMap::update() {
+    m_backendVariable->setName(m_owner->getName() + "::_amap");
 }
