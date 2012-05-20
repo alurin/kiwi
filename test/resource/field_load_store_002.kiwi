@@ -1,0 +1,53 @@
+#!/usr/bin/env kiwi
+/* Test script for object fields */
+
+#!/usr/bin/env kiwi
+
+class A {
+    int @a;
+
+    void set(int $a) {
+        @a = $a;
+    }
+
+    void write() {
+        print "Value: ";
+        print @a;
+        print "\n";
+    }
+}
+
+class B {
+    int @c;
+    int @b;
+
+    inherit A;
+
+    void setB(int $b, int $c) {
+        @b = $b;
+        @c = $c;
+    }
+
+    void writeB() {
+        print "Value: ";
+        print @b;
+        print "\n";
+
+        print "Value: ";
+        print @c;
+        print "\n";
+    }
+}
+
+/// Main function
+void main() {
+    auto $a = new B();
+    $a.set(10);
+    $a.setB(11, 12);
+    $a.write();
+    $a.writeB();
+    $a.setB(13, 14);
+    $a.set(15);
+    $a.writeB();
+    $a.write();
+}

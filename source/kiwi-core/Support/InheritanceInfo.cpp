@@ -167,29 +167,29 @@ AddressMap::AddressMap(InheritanceInfo* owner)
 
 // allocate new slot for field
 int32_t AddressMap::allocaSlot(FieldPtr field) {
+    update();
 }
 
 void AddressMap::update() {
     llvm::LLVMContext& context = m_owner->getOriginalType()->getContext()->getMetadata()->getBackendContext();
     llvm::Module*       module = m_owner->getOriginalType()->getModule()->getMetadata()->getBackendModule();
 
-    // original
+    MemberSet<Field>& fields = m_owner->getOriginalType()->getMetadata()->fields();
+    if (fields.size() == 0) {
+        return;
+    }
+
+    std::vector<llvm::Type*> elements;
+    elements.push_back(llvm::IntegerType::get(context, 8)->getPointerTo());
+    for (MemberSet<Field>::const_iterator i = fields.begin(); i != fields.end(); ++i) {
+        FieldPtr field = *i;
+        elements.push_back(field->getFieldType()->getMetadata()->getBackendVariableType());
+    }
+    llvm::StructType* layoutType = llvm::StructType::get(context, elements, false);
+
+    // Populate offsets
+    std::vector<llvm::Constant*> positions(fields.size(), 0);
     if (m_owner->getOriginalType() == m_owner->getDerivedType()) {
-        MemberSet<Field>& fields = m_owner->getOriginalType()->getMetadata()->fields();
-        if (fields.size() == 0) {
-            return;
-        }
-
-        std::vector<llvm::Type*> elements;
-        elements.push_back(llvm::IntegerType::get(context, 8)->getPointerTo());
-        for (MemberSet<Field>::const_iterator i = fields.begin(); i != fields.end(); ++i) {
-            FieldPtr field = *i;
-            elements.push_back(field->getFieldType()->getMetadata()->getBackendVariableType());
-        }
-        llvm::StructType* layoutType = llvm::StructType::get(context, elements, false);
-
-        ///
-        std::vector<llvm::Constant*> positions(fields.size(), 0);
         int j = 0;
         for (MemberSet<Field>::const_iterator i = fields.begin(); i != fields.end(); ++i, ++j) {
             FieldPtr field = *i;
@@ -200,27 +200,33 @@ void AddressMap::update() {
             }
             positions[pos] = llvm::ConstantExpr::getOffsetOf(layoutType, j + 1);
         }
-
-        llvm::Type* offsetType    = llvm::IntegerType::get(context, 64);
-        llvm::ArrayType* amapType = llvm::ArrayType::get(offsetType, positions.size());
-        llvm::Constant* amapValue = llvm::ConstantArray::get(amapType, positions);
-
-        // map table to pointer
-        kiwi_assert(m_amap, "AMap is not nullable");
-        ContextImpl* meta             = m_owner->getOriginalType()->getContext()->getMetadata();
-        llvm::ExecutionEngine* engine = meta->getBackendEngine();
-        engine->InitializeMemory(amapValue, m_amap);
     } else {
-        BOOST_THROW_EXCEPTION(Exception() << exception_message("Not implemented"));
-
-        MemberSet<Field>& fields = m_owner->getOriginalType()->getMetadata()->fields();
-        MemberSet<Field>& owned  = m_owner->getDerivedType()->getMetadata()->fields();
-        for (MemberSet<Field>::const_iterator i = fields.begin(); i != fields.end(); ++i) {
+        MemberSet<Field>& overrides = m_owner->getDerivedType()->getMetadata()->fields();
+        int j = 0;
+        for (MemberSet<Field>::const_iterator i = fields.begin(); i != fields.end(); ++i, ++j) {
             FieldPtr field    = *i;
+            FieldPtr override = overrides.find(field);
+            int32_t pos       = field->getPosition();
 
-            // FieldPtr override = owned->
+            kiwi_assert(override, "Overridable field not found");
+            if (pos == -1) {
+                pos = nextPosition();
+                field->setPosition(pos);
+            }
+            positions[pos] = llvm::ConstantExpr::getOffsetOf(layoutType, j + 1);
         }
     }
+
+    // Compute offset with JIT
+    llvm::Type* offsetType    = llvm::IntegerType::get(context, 64);
+    llvm::ArrayType* amapType = llvm::ArrayType::get(offsetType, positions.size());
+    llvm::Constant* amapValue = llvm::ConstantArray::get(amapType, positions);
+
+    // map table to pointer
+    kiwi_assert(m_amap, "AMap is not nullable");
+    ContextImpl* meta             = m_owner->getOriginalType()->getContext()->getMetadata();
+    llvm::ExecutionEngine* engine = meta->getBackendEngine();
+    engine->InitializeMemory(amapValue, m_amap);
 }
 
 // override slot for field
