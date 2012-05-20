@@ -228,9 +228,12 @@ void FunctionNode::generateIRCode(Driver& driver, TypePtr ownerType) {
         }
     }
 
-    // // emit instructions
+    // emit instructions
     entry = m_root->emit(driver, entry);
     entry.createTrailReturn();
+
+    // fill vtable slot
+    m_method->complete();
 }
 
 BlockBuilder ScopeNode::emitImpl(Driver& driver, BlockBuilder block) const {

@@ -24,6 +24,15 @@ namespace kiwi {
 
         typedef typename std::set<reference>::const_iterator const_iterator;
 
+        /// Signal for insert new field
+        boost::signals2::signal<void (reference)> onInsert;
+
+        /// Signal for insert new field
+        boost::signals2::signal<void (reference)> onRemove;
+
+        /// Signal for override field
+        boost::signals2::signal<void (reference, reference)> onOverride;
+
         /// constructor
         MemberSet(Type* owner);
 
@@ -62,15 +71,6 @@ namespace kiwi {
 
         /// set of members
         std::set<reference> m_members;
-
-        /// Signal for insert new field
-        boost::signals2::signal<void (reference)> onInsert;
-
-        /// Signal for insert new field
-        boost::signals2::signal<void (reference)> onRemove;
-
-        /// Signal for override field
-        boost::signals2::signal<void (reference, reference)> onOverride;
     };
 
 //==------------------------------------------------------------------------==//

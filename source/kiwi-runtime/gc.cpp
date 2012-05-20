@@ -15,23 +15,17 @@
 // Allocate memory from GC
 void* kiwi_malloc(size_t size) {
 #ifdef KIWI_GC
-    void* result =  GC_MALLOC(size);
-    KIWI_DUMP("Allocate from GC " << size << " bytes at " << result);
+    return GC_MALLOC(size);
 #else
-    void* result =  malloc(size);
-    KIWI_DUMP("Allocate " << size << " bytes at " << result);
+    return malloc(size);
 #endif
-    return result;
 }
 
 // Allocat memory buffer from GC.
 void* kiwi_malloc_atomic(size_t size) {
 #ifdef KIWI_GC
-    void* result =  GC_MALLOC_ATOMIC(size);
-    KIWI_DUMP("Allocate atomic from GC" << size << " bytes at " << result);
+    return GC_MALLOC_ATOMIC(size);
 #else
-    void* result =  malloc(size);
-    KIWI_DUMP("Allocate atomic " << size << " bytes at " << result);
+    return malloc(size);
 #endif
-    return result;
 }

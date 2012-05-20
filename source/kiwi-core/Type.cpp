@@ -102,6 +102,13 @@ FieldPtr Type::addField(const Identifier& name, TypePtr fieldType) {
 
 // add method
 MethodPtr Type::addMethod(const Identifier& name, TypePtr returnType, std::vector<TypePtr> arguments) {
+    MethodPtr method = findMethod(name, arguments);
+    if (method) {
+        if (method->getReturnType() != returnType) {
+            BOOST_THROW_EXCEPTION(Exception() << exception_message("Method signature vailate"));
+        }
+        return method;
+    }
     return Method::create(shared_from_this(), returnType, arguments, name);
 }
 
@@ -163,23 +170,11 @@ size_t Type::field_size() const {
 }
 
 void* Type::getVTablePointer(TypePtr type) {
-    if (type.get() == this)
-        return m_meta->getVirtualTable().getPointer();
-    else if (m_meta->isBase(type)) {
-
-    }
-
-    BOOST_THROW_EXCEPTION(Exception() << exception_message("Received type is not base for current type"));
+    return m_meta->getOriginalMetadata(type)->getVirtualTable().getPointer();
 }
 
 void* Type::getAMapPointer(TypePtr type) {
-    if (type.get() == this)
-        return m_meta->getAddressMap().getPointer();
-    else if (m_meta->isBase(type)) {
-
-    }
-
-    BOOST_THROW_EXCEPTION(Exception() << exception_message("Received type is not base for current type"));
+    return m_meta->getOriginalMetadata(type)->getAddressMap().getPointer();
 }
 
 // Emit type structure

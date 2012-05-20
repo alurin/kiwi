@@ -9,8 +9,7 @@
 
 #include "kiwi/Type.hpp"
 #include "Support/MemberSet.hpp"
-#include "Support/VirtualTable.hpp"
-#include "Support/AddressMap.hpp"
+#include "Support/InheritanceInfo.hpp"
 
 namespace llvm {
     class Type;
@@ -72,6 +71,13 @@ namespace kiwi {
         /// insert base type
         bool isBase(const TypePtr type) const;
 
+        /// return information about virtual table and address map for this type
+        InheritanceInfo* getOriginalMetadata();
+
+        /// return information about virtual table and address map for this or
+        /// original type
+        InheritanceInfo* getOriginalMetadata(TypePtr type);
+
         /// return set of fields
         MemberSet<Field>& fields() const {
             return *m_fields;
@@ -92,15 +98,8 @@ namespace kiwi {
             return m_bases.end();
         }
 
-        /// virtual table
-        VirtualTable& getVirtualTable() {
-            return *m_virtualTable;
-        }
-
-        /// address map
-        AddressMap& getAddressMap() {
-            return *m_addressMap;
-        }
+        /// Signal for complete method
+        boost::signals2::signal<void (MethodPtr)> onMethodComplete;
     protected:
         /// Owner for this implementation
         Type* m_owner;
@@ -108,17 +107,14 @@ namespace kiwi {
         /// set of all based types [ struct and objects ]
         std::set<TypePtr> m_bases;
 
+        /// set of all based types [ struct and objects ]
+        std::map<TypePtr, InheritanceInfo*> m_inheritances;
+
         /// set of fields
         MemberSet<Field>* m_fields;
 
         /// set of methods
         MemberSet<Method>* m_methods;
-
-        /// virtual table
-        VirtualTable* m_virtualTable;
-
-        /// address map
-        AddressMap* m_addressMap;
 
         /// this/variable converter
         ThisConverter* m_thisConverter;

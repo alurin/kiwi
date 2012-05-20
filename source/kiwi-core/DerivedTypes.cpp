@@ -67,20 +67,23 @@ ObjectType::ObjectType(ModulePtr module)
     llvm::Type* offsetType      = llvm::IntegerType::get(context, 32);
     llvm::Type* amap            = llvm::ArrayType::get(offsetType, 0);
 
-    llvm::Type* dataType        = pointerType; // it pointers
-
     llvm::Type* vmeta           = vtable->getPointerTo()->getPointerTo();
     llvm::Type* ameta           = amap->getPointerTo()->getPointerTo();
+
+    std::vector<llvm::Type*> elements;
+    elements.push_back(pointerType);
+    llvm::Type* dataType = llvm::StructType::get(context, llvm::makeArrayRef(elements))->getPointerTo();
 
     // storage type
     std::vector<llvm::Type*> types;
     types.push_back(vmeta);
     types.push_back(ameta);
-    types.push_back(pointerType->getPointerTo());
-    llvm::Type* varType = llvm::StructType::create(types)->getPointerTo();
+    types.push_back(dataType);
+    llvm::Type* varType = llvm::StructType::get(context, types)->getPointerTo();
 
     // store types
     m_meta->setBackendVariableType(varType);
+    m_meta->setThisConverter(new ObjectThisConverter());
 }
 
 StringType::StringType(ModulePtr module)
@@ -135,6 +138,7 @@ ObjectPtr ObjectType::create(ModulePtr module) {
 ObjectPtr ObjectType::create(ModulePtr module, const Identifier& name) {
     ObjectPtr type = ObjectPtr(new ObjectType(module));
     type->m_name = name;
+    type->m_meta->getBackendPointer()->setName(name + "::_type");
     module->getMetadata()->registerType(type, name);
     return type;
 }
@@ -246,7 +250,5 @@ bool ObjectType::isInherit(const ObjectPtr type) const{
 
 // Emit type structure
 void ObjectType::update() {
-    // update vtable and vmap
-    m_meta->getVirtualTable().update();
-    m_meta->getAddressMap().update();
+
 }

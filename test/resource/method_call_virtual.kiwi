@@ -2,7 +2,7 @@
 /* Test script for call method from child class */
 
 class A {
-    void getClassName() {
+    string getClassName() {
         return "A";
     }
 
@@ -14,7 +14,7 @@ class A {
 class B {
     inherit A;
 
-    void getClassName() {
+    string getClassName() {
         return "B";
     }
 }
@@ -22,7 +22,7 @@ class B {
 class C {
     inherit A;
 
-    void getClassName() {
+    string getClassName() {
         return "C";
     }
 }
@@ -30,7 +30,7 @@ class C {
 class D {
     inherit A;
 
-    void getClassName() {
+    string getClassName() {
         return "D";
     }
 }

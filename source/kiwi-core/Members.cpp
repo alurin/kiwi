@@ -11,7 +11,9 @@
 #include "kiwi/Type.hpp"
 #include "kiwi/Argument.hpp"
 #include "kiwi/Context.hpp"
+#include "kiwi/Exception.hpp"
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/Function.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;
@@ -45,7 +47,7 @@ Method::Method(MethodOpcode opcode, TypePtr ownerType, TypePtr returnType)
 // constructor
 Method::Method(TypePtr ownerType, MethodPtr method)
 : Member(ownerType), m_returnType(method->getReturnType()), Overridable<Method>(false), m_name(method->getName())
-, m_opcode(method->getOpcode()), m_policy(0), m_func(0), m_pointerTo(0), m_position(-1) {
+, m_opcode(method->getOpcode()), m_policy(new CloneEmitter(method)), m_func(0), m_pointerTo(0), m_position(-1) {
     override(method);
 }
 
@@ -125,9 +127,6 @@ void Method::setFunction(llvm::Function* func) {
 
 // return method position in vtable
 int32_t Method::getPosition() const {
-    if (m_position == -1) {
-        m_position = getOwnerType()->getMetadata()->getVirtualTable().nextPosition();
-    }
     return m_position;
 }
 
@@ -137,13 +136,22 @@ void* Method::getPointerTo() const {
         return m_pointerTo;
     }
 
-
     // map vtable to pointer
     if (m_func) {
+        if (m_func->empty()) {
+            return 0;
+        }
         ContextImpl* meta             = getOwnerType()->getContext()->getMetadata();
         llvm::ExecutionEngine* engine = meta->getBackendEngine();
+        kiwi_assert(m_func, "Abstract function has not have a JIT stub");
         m_pointerTo                   = engine->getPointerToFunctionOrStub(m_func);
         return m_pointerTo;
+    } else if (m_overrides.size() == 1) {
+        MethodPtr parent = m_overrides.begin()->lock();
+        return parent->getPointerTo();
+    } else {
+        BOOST_THROW_EXCEPTION(Exception()
+            << exception_format("Abstract method %0%::%1%", getOwnerType()->getName() % getName()));
     }
     return 0;
 }
@@ -176,4 +184,9 @@ void Method::initializateArguments(TypePtr thisType, ArgumentVector args) {
     }
     kiwi_assert(m_args.size() > 0, "Method must have minimum one argument");
     kiwi_assert(m_args[0]->getType() == m_ownerType.lock(), "First argument for callable must be owner type");
+}
+
+/// @todo Complex method
+void Method::complete() {
+    getOwnerType()->getMetadata()->onMethodComplete(MethodPtr(shared_from_this(), this));
 }

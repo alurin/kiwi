@@ -96,7 +96,7 @@ namespace kiwi {
         MethodPtr findMethod(Member::MethodOpcode opcode, std::vector<TypePtr> arguments) const;
 
         //==--------------------------------------------------------------------------------------------------------==//
-        //          Method for work with type system
+        //          Method for work with type system in runtime
         //==--------------------------------------------------------------------------------------------------------==//
         /// return pointer to vtable
         void* getVTablePointer(TypePtr type = TypePtr());

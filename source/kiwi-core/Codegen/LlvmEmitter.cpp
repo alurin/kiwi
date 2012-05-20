@@ -321,6 +321,9 @@ ValueBuilder LlvmCallEmitter::emit(BlockBuilder block, const ExpressionVector& v
     }
 
     MethodPtr method = m_method.lock();
+
+    // forced update for vtable
+    method->getOwnerType()->getMetadata()->getOriginalMetadata()->getVirtualTable();
     kiwi_assert(method->getPosition() != -1, "Location for method not founded");
 
     // constants
@@ -346,6 +349,17 @@ ValueBuilder LlvmCallEmitter::emit(BlockBuilder block, const ExpressionVector& v
     llvm::Value* vslot = llvm::GetElementPtrInst::Create(vtable, makeArrayRef(bufferIdx), "vslot_pos", block.getBlock());
     vslot = new llvm::LoadInst(vslot, "vslot_val", block.getBlock());
 
+    // {
+    //     llvm::Value* typeValue  = values[0].getType()->getMetadata()->getBackendPointer();
+    //     llvm::Type* pointerType = llvm::IntegerType::get(block.getContext(), 8)->getPointerTo();
+    //     llvm::Function* dump_pointer = llvm::dyn_cast<llvm::Function>(block.getModule()->getOrInsertFunction("kiwi_dump_ptr", llvm::Type::getVoidTy(block.getContext()), pointerType, typeValue->getType(), NULL));
+
+    //     std::vector<llvm::Value*> args;
+    //     args.push_back(new llvm::BitCastInst(vslot, pointerType, "", block.getBlock()));
+    //     args.push_back(typeValue);
+    //     llvm::Value* value = llvm::CallInst::Create(dump_pointer, makeArrayRef(args), "", block.getBlock());
+    // }
+
     // return result of call
     llvm::Type* funcType = method->getFunction()->getFunctionType();
     vslot = new llvm::BitCastInst(vslot, funcType->getPointerTo(), "vslot", block.getBlock());
@@ -367,15 +381,7 @@ ValueBuilder LlvmUpcast::emit(BlockBuilder bloc, const ExpressionVector& values)
 
 /// Convert from variable to this
 ValueBuilder ObjectThisConverter::emitToThis(BlockBuilder block, ValueBuilder variableValue) {
-    llvm::LLVMContext& context = block.getContext();
-
-    std::vector<llvm::Value*> bufferIdx;
-    bufferIdx.push_back(makeConstantInt(context, 0));
-    bufferIdx.push_back(makeConstantInt(context, 2));
-
-    llvm::Value* dataOffset = llvm::GetElementPtrInst::CreateInBounds(variableValue.getValue(), llvm::makeArrayRef(bufferIdx), "", block.getBlock());
-    dataOffset = new llvm::LoadInst(dataOffset, "calle", block.getBlock());
-    return ValueBuilder(block, dataOffset, variableValue.getType());
+    return ValueBuilder(block, variableValue.getValue(), variableValue.getType());
 }
 
 /// Convert from this to variable
@@ -384,13 +390,13 @@ ValueBuilder ObjectThisConverter::emitFromThis(BlockBuilder block, ValueBuilder 
     llvm::Module* module       = block.getModule();
     llvm::Type* pointerType    = llvm::IntegerType::get(context, 8)->getPointerTo();
 
-    llvm::Function* cast       = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_dyn_cast", pointerType, pointerType, pointerType, NULL));
-    llvm::Value* typeValue     = thisValue.getType()->getMetadata()->getBackendPointer(); // new llvm::LoadInst(thisValue.getType()->getMetadata()->getBackendPointer(), "type", block.getBlock());
+    llvm::Function* cast       = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_up_cast", pointerType, pointerType, pointerType, NULL));
+    llvm::Value* typeValue     = thisValue.getType()->getMetadata()->getBackendPointer();
 
     std::vector<llvm::Value*> args;
     args.push_back(thisValue.getValue());
     args.push_back(typeValue);
     llvm::Value* value = llvm::CallInst::Create(cast, makeArrayRef(args), "", block.getBlock());
-    llvm::Value* castValue = new llvm::BitCastInst(value, thisValue.getType()->getMetadata()->getBackendVariableType()->getPointerTo(), "this", block.getBlock());
+    llvm::Value* castValue = new llvm::BitCastInst(value, thisValue.getType()->getMetadata()->getBackendVariableType(), "this", block.getBlock());
     return ValueBuilder(block, castValue, thisValue.getType());
 }

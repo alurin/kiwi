@@ -82,6 +82,10 @@ namespace kiwi
             return m_func;
         }
 
+        /// call this method after create non abstraact LLVM function for
+        /// fill vtable slot
+        void complete();
+
         /// returns pointer to function
         void* getPointerTo() const;
 
@@ -156,7 +160,7 @@ namespace kiwi
         mutable void* m_pointerTo;
 
         /// field position in address map for class
-        mutable int32_t m_position;
+        int32_t m_position;
 
         /// constructor
         Method(const Identifier& name, TypePtr ownerType, TypePtr returnType);
