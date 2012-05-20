@@ -1,5 +1,7 @@
 #!/usr/bin/env kiwi
-/* Test script for recursive call ( as loop :) ) */
+/*
+ * Test script for recursive call ( as loop :) ) and 'inline' calls
+ */
 
 void loop(int $a) {
     print $a; print "\n";
@@ -8,4 +10,5 @@ void loop(int $a) {
 
 void main() {
     loop(4);
+    loop 2;     // inline call
 }

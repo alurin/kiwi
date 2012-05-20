@@ -151,7 +151,8 @@ namespace kiwi { namespace lang {
      IFELSE = 300,
      PRINT = 301,
      UNARY = 302,
-     PRE = 303
+     PRE = 303,
+     MINIM = 304
    };
 
     };
@@ -331,7 +332,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 35 of lalr1.cc  */
-#line 335 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
+#line 336 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/parser.hpp"
 
 
 

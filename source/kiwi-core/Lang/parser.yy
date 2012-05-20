@@ -139,9 +139,10 @@
 %left       '*' '/' '%'
 %right      UNARY '!'
 %right      PRE '.' '[' '('
+%nonassoc   MINIM
 
 %type   <typenode>      type type_complex type_primary
-%type   <rightnode>     expression right
+%type   <rightnode>     expression right call_inline
 %type   <leftnode>      left
 %type   <stmtnode>      statement scope scope_end return_statement print_statement conditional_statement
 %type   <stmtnode>      variable_declare
@@ -149,7 +150,7 @@
 %type   <stringVal>     qualified_identifier
 
 %destructor { delete $$; } IDENT VAR_LOCAL VAR_INSTANCE
-%destructor { delete $$; } expression right
+%destructor { delete $$; } expression right call_inline
 %destructor { delete $$; } type type_complex type_primary
 %destructor { delete $$; } statement scope scope_end return_statement print_statement conditional_statement
 %destructor { delete $$; } variable_declare
@@ -223,7 +224,8 @@ statements
     ;
 
 statement
-    : expression       ';'       { $$ = driver.createExpr($1);       }
+    : call_inline      ';'       { $$ = driver.createExpr($1);       }
+    | expression       ';'       { $$ = driver.createExpr($1);       }
     | scope
     | conditional_statement
     | return_statement ';'
@@ -296,11 +298,20 @@ variable_declare
                                             }
     ;
 
+call_start
+    : IDENT                             { driver.call(*$1, @1); yyfree($1);  }
+    | right '.' IDENT                   { driver.call($1, *$3, @1 + @3); yyfree($3); }
+    ;
+
+call_inline
+    : call_start
+        call_arguments                  { $$ = driver.callEnd(@1); }
+    ;
+
 expression
     : '-' expression %prec UNARY        { $$ = driver.createNeg($2, @1); }
     | '+' expression %prec UNARY        { $$ = driver.createPos($2, @1); }
     | '!' expression %prec UNARY        { $$ = driver.createNot($2, @1); }
-
 
     | expression '+'   expression       { $$ = driver.createAdd($1, $3, @2); }
     | expression '-'   expression       { $$ = driver.createSub($1, $3, @2); }
@@ -325,11 +336,8 @@ expression
     | expression                        { driver.subBegin($1, @1);           }
         '[' call_arguments_required ']' { $$ = driver.callEnd(@3 + @5);      }
 
-    | IDENT                             { driver.call(*$1, @1); yyfree($1);  }
+    | call_start
         '(' call_arguments ')'          { $$ = driver.callEnd(@1);           }
-
-    | right '.' IDENT                   { driver.call($1, *$3, @1 + @3); yyfree($3); }
-        '(' call_arguments ')'          { $$ = driver.callEnd(@3);                   }
 
     | NEW type                          { driver.newBegin($2, @1);              }
         '(' call_arguments ')'          { $$ = driver.callEnd(@1 + @2);         }
