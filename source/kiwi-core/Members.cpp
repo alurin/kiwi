@@ -59,12 +59,14 @@ Method::~Method() {
 // Create method add register in type
 MethodPtr Method::create(TypePtr ownerType, TypePtr returnType, std::vector<TypePtr> types, const Identifier& name) {
     MethodPtr method = MethodPtr(new Method(name, ownerType, returnType));
-    ownerType->getMetadata()->methods().insert(method);
 
     TypeVector arguments;
     arguments.push_back(ownerType);
     arguments.insert(arguments.end(), types.begin(), types.end());
     method->initializateArguments(arguments);
+
+    // insert and return
+    ownerType->getMetadata()->methods().insert(method);
     return method;
 }
 
@@ -75,18 +77,20 @@ MethodPtr Method::create(TypePtr ownerType, TypePtr returnType, std::vector<Type
         "Binary operator has only two arguments");
 
     MethodPtr method = MethodPtr(new Method(opcode, ownerType, returnType));
-    ownerType->getMetadata()->methods().insert(method);
 
     TypeVector arguments;
     arguments.push_back(ownerType);
     arguments.insert(arguments.end(), types.begin(), types.end());
     method->initializateArguments(arguments);
+
+    // insert and return
+    ownerType->getMetadata()->methods().insert(method);
     return method;
 }
 
 MethodPtr Method::inherit(TypePtr ownerType, MethodPtr override) {
     MethodPtr method = MethodPtr(new Method(ownerType, override));
-    method->initializateArguments(ownerType, method->m_args);
+    method->initializateArguments(ownerType, override->m_args);
     return method;
 }
 
@@ -164,14 +168,13 @@ void Method::initializateArguments(TypeVector types) {
     }
     kiwi_assert(m_args.size() > 0, "Method must have minimum one argument");
     kiwi_assert(m_args[0]->getType() == m_ownerType.lock(), "First argument for callable must be owner type");
+    m_args[0]->setName("this");
 }
 
 void Method::initializateArguments(TypePtr thisType, ArgumentVector args) {
+    kiwi_assert(args.size() > 0, "Original method must have minimum one argument");
+
     int j = 0;
-    if(0 == args.size()) {
-        ArgumentPtr arg = ArgumentPtr(new Argument(MethodPtr(shared_from_this(), this), thisType, 0));
-        m_args.push_back(arg);
-    }
     for (ArgumentVector::iterator i = args.begin(); i != args.end(); ++i, ++j) {
         if (0 != j) {
             ArgumentPtr oarg = *i;
@@ -184,6 +187,7 @@ void Method::initializateArguments(TypePtr thisType, ArgumentVector args) {
     }
     kiwi_assert(m_args.size() > 0, "Method must have minimum one argument");
     kiwi_assert(m_args[0]->getType() == m_ownerType.lock(), "First argument for callable must be owner type");
+    m_args[0]->setName("this");
 }
 
 /// @todo Complex method

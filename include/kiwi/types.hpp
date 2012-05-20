@@ -48,6 +48,7 @@ namespace kiwi {
     typedef boost::shared_ptr<class StringType>         StringPtr;
     typedef boost::shared_ptr<class InterfaceType>      InterfacePtr;
     typedef boost::shared_ptr<class ObjectType>         ObjectPtr;
+    typedef boost::weak_ptr<class ObjectType>           ObjectWeak;
 
     //== Smart pointers: Members
     typedef boost::shared_ptr<class Member>             MemberPtr;

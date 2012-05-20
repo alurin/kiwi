@@ -11,6 +11,7 @@
 #include "kiwi/Members.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Type.hpp"
+#include "kiwi/Argument.hpp"
 #include "../Codegen/Builder.hpp"
 #include <vector>
 
@@ -189,10 +190,17 @@ void FunctionNode::generateMember(Driver& driver, TypePtr ownerType) {
     // collect arguments
     for (std::vector<ArgumentNode*>::iterator i = m_positions.begin(); i != m_positions.end(); ++i) {
         ArgumentNode* arg           = *i;
-        TypePtr         frontend_type = arg->getType()->get(driver);
+        TypePtr       frontend_type = arg->getType()->get(driver);
         frontendArgs.push_back(frontend_type);
     }
     m_method = ownerType->addMethod(m_name, returnType, frontendArgs);
+
+    size_t j = 1;
+    for (std::vector<ArgumentNode*>::iterator i = m_positions.begin(); i != m_positions.end(); ++i, ++j) {
+        ArgumentNode* arg    = *i;
+        ArgumentPtr argFront = m_method->getArgument(j);
+        argFront->setName(arg->getName());
+    }
 }
 
 #include <llvm/Instructions.h>

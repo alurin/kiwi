@@ -9,7 +9,9 @@
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Members.hpp"
+#include "kiwi/Argument.hpp"
 #include "kiwi/Exception.hpp"
+#include "kiwi/Support/Cast.hpp"
 #include <llvm/Instructions.h>
 #include <llvm/Constants.h>
 #include <llvm/Module.h>
@@ -25,6 +27,11 @@ namespace {
         llvm::APInt cst(32, value, false);
         return llvm::ConstantInt::get(context, cst);
     }
+}
+
+
+UpcastConverter::UpcastConverter(ObjectPtr type)
+: m_type(type) {
 }
 
 LlvmCallEmitter::LlvmCallEmitter(MethodPtr method, TypePtr returnType)
@@ -308,19 +315,30 @@ ValueBuilder LlvmStringSubtraction::emit(BlockBuilder block, const ExpressionVec
 // emit IR instruction for call method
 ValueBuilder LlvmCallEmitter::emit(BlockBuilder block, const ExpressionVector& values) {
     std::vector<llvm::Value*> largs;
+    MethodPtr method = m_method.lock();
+
+    // collect arguments
     int j = 0;
     for (ExpressionVector::const_iterator i = values.begin(); i != values.end(); ++i, ++j) {
         ValueBuilder expr = *i;
-        if (0 == j) {
-            ThisConverter* converter = i->getType()->getMetadata()->getThisConverter();
-            if (converter != 0) {
-                expr = converter->emitToThis(block, expr);
+
+        /// cast to actual type
+        ArgumentPtr arg = method->getArgument(j);
+        TypePtr exceptedType = arg->getType();
+        TypePtr actualType   = expr.getType();
+
+        if (exceptedType != actualType) {
+            ObjectPtr objType = dyn_cast<ObjectType>(exceptedType);
+            if (objType == 0) {
+                BOOST_THROW_EXCEPTION(Exception()
+                    << exception_message("Not implemented"));
             }
+            expr  = UpcastConverter(objType).emitCast(block, expr);
+            block = expr;
         }
+
         largs.push_back(expr.getValue());
     }
-
-    MethodPtr method = m_method.lock();
 
     // forced update for vtable
     method->getOwnerType()->getMetadata()->getOriginalMetadata()->getVirtualTable();
@@ -372,7 +390,6 @@ ValueBuilder LlvmCtorEmitter::emit(BlockBuilder bloc, const ExpressionVector& va
     return values[0];
 }
 
-
 /// emit IR instruction for binary operation
 ValueBuilder LlvmUpcast::emit(BlockBuilder bloc, const ExpressionVector& values) {
     BOOST_THROW_EXCEPTION(Exception()
@@ -380,18 +397,23 @@ ValueBuilder LlvmUpcast::emit(BlockBuilder bloc, const ExpressionVector& values)
 }
 
 /// Convert from variable to this
-ValueBuilder ObjectThisConverter::emitToThis(BlockBuilder block, ValueBuilder variableValue) {
+ValueBuilder UpcastConverter::emitToThis(BlockBuilder block, ValueBuilder variableValue) {
     return ValueBuilder(block, variableValue.getValue(), variableValue.getType());
 }
 
 /// Convert from this to variable
-ValueBuilder ObjectThisConverter::emitFromThis(BlockBuilder block, ValueBuilder thisValue) {
+ValueBuilder UpcastConverter::emitFromThis(BlockBuilder block, ValueBuilder thisValue) {
+    return emitCast(block, thisValue);
+}
+
+/// Convert from this to variable
+ValueBuilder UpcastConverter::emitCast(BlockBuilder block, ValueBuilder thisValue) {
     llvm::LLVMContext& context = block.getContext();
     llvm::Module* module       = block.getModule();
     llvm::Type* pointerType    = llvm::IntegerType::get(context, 8)->getPointerTo();
 
     llvm::Function* cast       = llvm::dyn_cast<llvm::Function>(module->getOrInsertFunction("kiwi_up_cast", pointerType, pointerType, pointerType, NULL));
-    llvm::Value* typeValue     = thisValue.getType()->getMetadata()->getBackendPointer();
+    llvm::Value* typeValue     = m_type.lock()->getMetadata()->getBackendPointer();
 
     std::vector<llvm::Value*> args;
     args.push_back(thisValue.getValue());

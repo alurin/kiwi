@@ -1,0 +1,31 @@
+#!/usr/bin/env kiwi
+/* Test script for call virtual method from other methods + up cast  */
+
+class A {
+    void test(int $a) {
+        print "Integer: ";
+        print $a;
+        print "\n";
+    }
+}
+
+class B {
+    inherit A;
+
+    void test(int $a) {
+        print "Override: ";
+        print $a;
+        print "\n";
+    }
+}
+
+void test(A $var, int $a) {
+    $var.test($a);
+}
+
+/// Main function
+void main() {
+    print "Main worked\n";
+    test(new A(), 10);
+    test(new B(), 11);
+}

@@ -83,7 +83,6 @@ ObjectType::ObjectType(ModulePtr module)
 
     // store types
     m_meta->setBackendVariableType(varType);
-    m_meta->setThisConverter(new ObjectThisConverter());
 }
 
 StringType::StringType(ModulePtr module)
@@ -250,5 +249,5 @@ bool ObjectType::isInherit(const ObjectPtr type) const{
 
 // Emit type structure
 void ObjectType::update() {
-
+    m_meta->setThisConverter(new UpcastConverter(ObjectPtr(shared_from_this(), this)));
 }

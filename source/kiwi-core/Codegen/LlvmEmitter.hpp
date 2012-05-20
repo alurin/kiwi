@@ -168,13 +168,21 @@ namespace codegen {
     };
 
     /// Converter from this type to object type and vice versa
-    class ObjectThisConverter : public ThisConverter {
+    class UpcastConverter : public ThisConverter {
     public:
+        /// Constructor
+        UpcastConverter(ObjectPtr type);
+
         /// Convert from variable to this
         virtual ValueBuilder emitToThis(BlockBuilder block, ValueBuilder variableValue);
 
         /// Convert from this to variable
         virtual ValueBuilder emitFromThis(BlockBuilder block, ValueBuilder thisValue);
+
+        /// Convert from this to variable
+        virtual ValueBuilder emitCast(BlockBuilder block, ValueBuilder thisValue);
+    protected:
+        ObjectWeak m_type;
     };
 } // namesapce codegen
 } // namesapce  kiwi
