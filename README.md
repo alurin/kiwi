@@ -9,6 +9,7 @@ Bison & Flex, code generation by LLVM and unicode support by ICU.
 Feel free submit patches and issues. Who knows, maybe in feature...
 
 My current goals
+----------------
 * Static OOP language with support of extendable object (e.g. simple adding method and field in runtime)
 * Multi inheritance:
     * Objects as methods and field sets (parent class included only one)

@@ -10,8 +10,6 @@ Source code clean up
 * Add compound type for struct and object types
 * Add base for interface and object type
 * Add normal handle for inheritance and implements
-* Abstract base for Unary, minary, multiary, calls and e.t.c:
-    * Types casting, if requested
 * Array type
 * Range expression
 * Subtraction and invoke operators
