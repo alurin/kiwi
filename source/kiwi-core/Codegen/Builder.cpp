@@ -430,7 +430,7 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
     // 2. alloca data buffer
     llvm::Value* dataValue = 0;
     {
-        llvm::Type* pointerType     = llvm::IntegerType::get(*m_context, 8)->getPointerTo();
+        llvm::Type* pointerType = llvm::IntegerType::get(*m_context, 8)->getPointerTo();
         std::vector<llvm::Type*> elements;
         elements.push_back(pointerType);
         llvm::Type* dataType = llvm::StructType::get(*m_context, llvm::makeArrayRef(elements), false)->getPointerTo();
@@ -526,30 +526,78 @@ llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, FieldPtr field) {
     llvm::Value* value    = thisValue.getValue();
 
     // load amap
-    std::vector<llvm::Value*> addressIdx;
-    addressIdx.push_back(makeConstantInt(*m_context, 0));
-    addressIdx.push_back(makeConstantInt(*m_context, 1));
-    llvm::Value* amapOffset = llvm::GetElementPtrInst::Create(value, makeArrayRef(addressIdx), "", m_block);
-    llvm::Value* amap       = new llvm::LoadInst(amapOffset, "amap", m_block);
+    llvm::Value* amap = 0;
+    {
+        std::vector<llvm::Value*> addressIdx;
+        addressIdx.push_back(makeConstantInt(*m_context, 0));
+        addressIdx.push_back(makeConstantInt(*m_context, 1));
+        llvm::Value* amapOffset = llvm::GetElementPtrInst::Create(value, makeArrayRef(addressIdx), "", m_block);
+        amap = new llvm::LoadInst(amapOffset, "amap_ptr", m_block);
+
+        // dereference amap
+        amap = new llvm::LoadInst(amap, "amap", m_block);
+    }
+
+    // load data
+    llvm::Value* data = 0;
+    {
+        std::vector<llvm::Value*> addressIdx;
+        addressIdx.push_back(makeConstantInt(*m_context, 0));
+        addressIdx.push_back(makeConstantInt(*m_context, 2));
+        llvm::Value* dataOffset = llvm::GetElementPtrInst::Create(value, makeArrayRef(addressIdx), "", m_block);
+        data = new llvm::LoadInst(dataOffset, "data", m_block);
+    }
 
     // load offset
-    addressIdx.clear();
-    addressIdx.push_back(makeConstantInt(*m_context, 0));
-    addressIdx.push_back(makeConstantInt(*m_context, field->getPosition()));
-    llvm::Value* position    = llvm::GetElementPtrInst::Create(amap, makeArrayRef(addressIdx), "position", m_block);
-    llvm::Value* fieldOffset = new llvm::LoadInst(position, "", m_block);
+    llvm::Value* fieldOffset = 0;
+    {
+        std::vector<llvm::Value*> addressIdx;
+        addressIdx.push_back(makeConstantInt(*m_context, 0));
+        addressIdx.push_back(makeConstantInt(*m_context, field->getPosition()));
+        llvm::Value* position = llvm::GetElementPtrInst::Create(amap, makeArrayRef(addressIdx), "position", m_block);
+        fieldOffset = new llvm::LoadInst(position, "", m_block);
+    }
 
     // calculate actual offset
-    llvm::Value* castNull    = new llvm::PtrToIntInst(value, llvm::IntegerType::get(*m_context, 64), "", m_block);
-    llvm::Value* castOffset  = new llvm::PtrToIntInst(fieldOffset, llvm::IntegerType::get(*m_context, 64), "", m_block);
-    llvm::Value* summInst    = llvm::BinaryOperator::Create(llvm::Instruction::Add, castNull, castOffset, "", m_block);
+    llvm::Value* castNull   = new llvm::PtrToIntInst(data, llvm::IntegerType::get(*m_context, 64), "", m_block);
+    llvm::Value* castOffset = new llvm::ZExtInst(fieldOffset, llvm::IntegerType::get(*m_context, 64), "", m_block);
+    llvm::Value* summInst   = llvm::BinaryOperator::Create(llvm::Instruction::Add, castNull, castOffset, "", m_block);
 
     /// @todo Add check for load instructions
 
     // cast to field type and return
-    llvm::Type* fieldType    = field->getFieldType()->getMetadata()->getBackendVariableType()->getPointerTo();
-    llvm::Value* offset      = new llvm::IntToPtrInst(summInst, fieldType, "offset", m_block);
+    llvm::Type* fieldType = field->getFieldType()->getMetadata()->getBackendVariableType()->getPointerTo();
+    llvm::Value* offset   = new llvm::IntToPtrInst(summInst, fieldType, "offset", m_block);
 
-    BOOST_THROW_EXCEPTION(Exception() << exception_message("Not implement"));
+    // {
+    //     llvm::Value* typeValue  = thisValue.getType()->getMetadata()->getBackendPointer();
+    //     llvm::Type* pointerType = llvm::IntegerType::get(getContext(), 8)->getPointerTo();
+    //     llvm::Function* dump_pointer = llvm::dyn_cast<llvm::Function>(getModule()->getOrInsertFunction("kiwi_dump_ptr", llvm::Type::getVoidTy(getContext()), pointerType, typeValue->getType(), NULL));
+    //     std::vector<llvm::Value*> args;
+    //     args.push_back(new llvm::IntToPtrInst(fieldOffset, pointerType, "", getBlock()));
+    //     args.push_back(typeValue);
+    //     llvm::Value* value = llvm::CallInst::Create(dump_pointer, makeArrayRef(args), "", getBlock());
+    // }
+
+    // {
+    //     llvm::Value* typeValue  = thisValue.getType()->getMetadata()->getBackendPointer();
+    //     llvm::Type* pointerType = llvm::IntegerType::get(getContext(), 8)->getPointerTo();
+    //     llvm::Function* dump_pointer = llvm::dyn_cast<llvm::Function>(getModule()->getOrInsertFunction("kiwi_dump_ptr", llvm::Type::getVoidTy(getContext()), pointerType, typeValue->getType(), NULL));
+    //     std::vector<llvm::Value*> args;
+    //     args.push_back(new llvm::BitCastInst(data, pointerType, "", getBlock()));
+    //     args.push_back(typeValue);
+    //     llvm::Value* value = llvm::CallInst::Create(dump_pointer, makeArrayRef(args), "", getBlock());
+    // }
+
+    {
+        llvm::Value* typeValue  = thisValue.getType()->getMetadata()->getBackendPointer();
+        llvm::Type* pointerType = llvm::IntegerType::get(getContext(), 8)->getPointerTo();
+        llvm::Function* dump_pointer = llvm::dyn_cast<llvm::Function>(getModule()->getOrInsertFunction("kiwi_dump_ptr", llvm::Type::getVoidTy(getContext()), pointerType, typeValue->getType(), NULL));
+        std::vector<llvm::Value*> args;
+        args.push_back(new llvm::BitCastInst(offset, pointerType, "", getBlock()));
+        args.push_back(typeValue);
+        llvm::Value* value = llvm::CallInst::Create(dump_pointer, makeArrayRef(args), "", getBlock());
+    }
+
     return offset;
 }

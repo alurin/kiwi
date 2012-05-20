@@ -190,7 +190,7 @@ namespace kiwi
     /// Field member
     class Field : public Member, public Overridable<Field> {
         friend class Type;
-        friend class ObjectType;
+        friend class AddressMap;
         template<class Field> friend class MemberSet;
     public:
         /// create field

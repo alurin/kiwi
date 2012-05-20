@@ -64,7 +64,7 @@ ObjectType::ObjectType(ModulePtr module)
     llvm::Type* pointerType     = llvm::IntegerType::get(context, 8)->getPointerTo();
     llvm::Type* vtable          = llvm::ArrayType::get(pointerType, 0);
 
-    llvm::Type* offsetType      = llvm::IntegerType::get(context, 32);
+    llvm::Type* offsetType      = llvm::IntegerType::get(context, 64);
     llvm::Type* amap            = llvm::ArrayType::get(offsetType, 0);
 
     llvm::Type* vmeta           = vtable->getPointerTo()->getPointerTo();
@@ -250,4 +250,5 @@ bool ObjectType::isInherit(const ObjectPtr type) const{
 // Emit type structure
 void ObjectType::update() {
     m_meta->setThisConverter(new UpcastConverter(ObjectPtr(shared_from_this(), this)));
+    m_meta->getOriginalMetadata()->getAddressMap().update();
 }

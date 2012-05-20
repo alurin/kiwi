@@ -80,6 +80,16 @@ namespace kiwi {
         ///
         /// @internal
         void resize(size_t size);
+
+        ///
+        void update();
+        /// dump address map
+        void dump();
+    protected:
+        int64_t *m_amap;
+
+        size_t m_offset;
+        size_t m_sizeof;
     };
 
 //==------------------------------------------------------------------------==//
@@ -109,7 +119,7 @@ namespace kiwi {
         /// @internal
         void resize(size_t size);
 
-        ///
+        /// dump virtual table
         void dump();
     protected:
         void** m_vtable;

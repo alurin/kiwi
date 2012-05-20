@@ -78,6 +78,9 @@ void CompoundNode::generateMembers(Driver& driver) {
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
         (*i)->generateMember(driver, m_type);
     }
+
+    /// Update structure
+    m_type->update();
 }
 
 // Emit IR signature
@@ -98,6 +101,4 @@ void CompoundNode::generateIRCode(Driver& driver) {
     for (std::vector<lang::MemberNode*>::const_iterator i = m_members.begin(); i != m_members.end(); ++i) {
         (*i)->generateIRCode(driver, m_type);
     }
-
-    m_type->update();
 }

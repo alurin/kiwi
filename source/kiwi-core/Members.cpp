@@ -20,13 +20,15 @@ using namespace kiwi::codegen;
 
 // constructor
 Field::Field(TypePtr ownerType, FieldPtr field)
-: Member(ownerType), m_name(field->getName()), m_fieldType(field->getFieldType()), Overridable<Field>(false) {
+: Member(ownerType), m_name(field->getName()), m_fieldType(field->getFieldType()), Overridable<Field>(false)
+, m_position(-1) {
     override(field);
 }
 
 // constructor
 Field::Field(const Identifier& name, TypePtr ownerType, TypePtr fieldType)
-: Member(ownerType), m_name(name), m_fieldType(fieldType), Overridable<Field>(true) {
+: Member(ownerType), m_name(name), m_fieldType(fieldType), Overridable<Field>(true)
+, m_position(-1) {
     m_memberID = FieldID;
 }
 

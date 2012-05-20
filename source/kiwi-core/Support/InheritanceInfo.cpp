@@ -9,11 +9,12 @@
 #include "kiwi/Context.hpp"
 #include "kiwi/Module.hpp"
 #include "kiwi/Members.hpp"
+#include "kiwi/Exception.hpp"
 #include "../TypeImpl.hpp"
 #include "../ModuleImpl.hpp"
 #include "../ContextImpl.hpp"
 #include <llvm/Module.h>
-#include <llvm/Constant.h>
+#include <llvm/Constants.h>
 #include <llvm/DerivedTypes.h>
 #include <llvm/GlobalVariable.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
@@ -96,9 +97,9 @@ void CompleteSlot::operator()(MethodPtr method) {
 
 /// conect event listeners for member set
 template<typename Table, typename Member>
-void connect(Table& table, MemberSet<Member>& members) {
+void connect(Table& table, MemberSet<Member>& members, MemberSet<Member>& members2) {
     members.onInsert.connect(CreateSlot<Table, Member>(table));
-    members.onOverride.connect(OverrideSlot<Table, Member>(table));
+    members2.onOverride.connect(OverrideSlot<Table, Member>(table));
     if (table.size() != members.size()) {
         table.resize(members.size());
         for (typename MemberSet<Member>::const_iterator i = members.begin(); i != members.end(); ++i) {
@@ -155,27 +156,84 @@ void DynamicTable::setArrayPointer(void* newArray) {
 
 //==------------------------------------------------------------------------==//
 AddressMap::AddressMap(InheritanceInfo* owner)
-: DynamicTable(owner) {
+: DynamicTable(owner), m_amap(0) {
     // Create stub for address map
     llvm::Module* backendModule = m_owner->getDerivedType()->getModule()->getMetadata()->getBackendModule();
     llvm::LLVMContext& context  = backendModule->getContext();
-    llvm::Type* offsetType      = llvm::Type::getInt32Ty(context);
+    llvm::Type* offsetType      = llvm::Type::getInt64Ty(context);
     createBackendVariable("::_amap", offsetType);
-    connect(*this, owner->getOriginalType()->getMetadata()->fields());
+    connect(*this, owner->getOriginalType()->getMetadata()->fields(), owner->getDerivedType()->getMetadata()->fields());
 }
 
 // allocate new slot for field
 int32_t AddressMap::allocaSlot(FieldPtr field) {
 }
 
+void AddressMap::update() {
+    llvm::LLVMContext& context = m_owner->getOriginalType()->getContext()->getMetadata()->getBackendContext();
+    llvm::Module*       module = m_owner->getOriginalType()->getModule()->getMetadata()->getBackendModule();
+
+    // original
+    if (m_owner->getOriginalType() == m_owner->getDerivedType()) {
+        MemberSet<Field>& fields = m_owner->getOriginalType()->getMetadata()->fields();
+        if (fields.size() == 0) {
+            return;
+        }
+
+        std::vector<llvm::Type*> elements;
+        elements.push_back(llvm::IntegerType::get(context, 8)->getPointerTo());
+        for (MemberSet<Field>::const_iterator i = fields.begin(); i != fields.end(); ++i) {
+            FieldPtr field = *i;
+            elements.push_back(field->getFieldType()->getMetadata()->getBackendVariableType());
+        }
+        llvm::StructType* layoutType = llvm::StructType::get(context, elements, false);
+
+        ///
+        std::vector<llvm::Constant*> positions(fields.size(), 0);
+        int j = 0;
+        for (MemberSet<Field>::const_iterator i = fields.begin(); i != fields.end(); ++i, ++j) {
+            FieldPtr field = *i;
+            int32_t pos    = field->getPosition();
+            if (pos == -1) {
+                pos = nextPosition();
+                field->setPosition(pos);
+            }
+            positions[pos] = llvm::ConstantExpr::getOffsetOf(layoutType, j + 1);
+        }
+
+        llvm::Type* offsetType    = llvm::IntegerType::get(context, 64);
+        llvm::ArrayType* amapType = llvm::ArrayType::get(offsetType, positions.size());
+        llvm::Constant* amapValue = llvm::ConstantArray::get(amapType, positions);
+
+        // map table to pointer
+        kiwi_assert(m_amap, "AMap is not nullable");
+        ContextImpl* meta             = m_owner->getOriginalType()->getContext()->getMetadata();
+        llvm::ExecutionEngine* engine = meta->getBackendEngine();
+        engine->InitializeMemory(amapValue, m_amap);
+    } else {
+        BOOST_THROW_EXCEPTION(Exception() << exception_message("Not implemented"));
+
+        MemberSet<Field>& fields = m_owner->getOriginalType()->getMetadata()->fields();
+        MemberSet<Field>& owned  = m_owner->getDerivedType()->getMetadata()->fields();
+        for (MemberSet<Field>::const_iterator i = fields.begin(); i != fields.end(); ++i) {
+            FieldPtr field    = *i;
+
+            // FieldPtr override = owned->
+        }
+    }
+}
+
 // override slot for field
 int32_t AddressMap::overrideMember(FieldPtr field, FieldPtr inherit) {
+    BOOST_THROW_EXCEPTION(Exception() << exception_message("Not implemented"));
 }
 
 // resize dynamic table to size
 void AddressMap::resize(size_t size) {
     if (m_lastSize < size) {
-
+        m_lastSize = size;
+        m_amap     = da_resize<int64_t>(m_amap, size);
+        setArrayPointer(m_amap);
     }
 }
 
@@ -187,7 +245,7 @@ VirtualTable::VirtualTable(InheritanceInfo* owner)
     llvm::LLVMContext& context  = backendModule->getContext();
     llvm::Type* pointerType     = llvm::Type::getInt8Ty(context)->getPointerTo();
     createBackendVariable("::_vtable", pointerType);
-    connect(*this, owner->getOriginalType()->getMetadata()->methods());
+    connect(*this, owner->getOriginalType()->getMetadata()->methods(), owner->getDerivedType()->getMetadata()->methods());
     owner->getDerivedType()->getMetadata()->onMethodComplete.connect(CompleteSlot(*this));
 }
 
@@ -199,7 +257,7 @@ int32_t VirtualTable::allocaSlot(MethodPtr method) {
         method->setPosition(pos);
     }
 
-    if (pos > size()) {
+    if (pos >= size()) {
         resize(size() * 1.5);
     }
     updateSlot(method);
@@ -207,7 +265,7 @@ int32_t VirtualTable::allocaSlot(MethodPtr method) {
 
 // override slot for method
 int32_t VirtualTable::overrideMember(MethodPtr method, MethodPtr inherit) {
-    int32_t pos = inherit->getPosition();
+    BOOST_THROW_EXCEPTION(Exception() << exception_message("Not implemented"));
 }
 
 // set pointer to method

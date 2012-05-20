@@ -30,3 +30,21 @@ void VirtualTable::dump() {
     }
     std::cerr << "] at " << m_vtable << std::endl;
 }
+
+// dump information about type
+void AddressMap::dump() {
+    bool isNotFirst = false;
+    std::cerr << "amap"
+              << " from " << m_owner->getDerivedType()->getName()
+              << " to " << m_owner->getOriginalType()->getName()
+              << ": " << size() << "[";
+    for (int i = 0; i < size(); ++i) {
+        if (isNotFirst) {
+            std::cerr << ", ";
+        } else {
+            isNotFirst = true;
+        }
+        std::cerr << m_amap[i];
+    }
+    std::cerr << "] at " << m_amap << std::endl;
+}

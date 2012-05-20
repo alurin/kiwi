@@ -179,5 +179,5 @@ void* Type::getAMapPointer(TypePtr type) {
 
 // Emit type structure
 void Type::update() {
-
+    m_meta->getOriginalMetadata()->getAddressMap().update();
 }
