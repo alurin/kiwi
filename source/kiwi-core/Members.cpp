@@ -151,7 +151,7 @@ int32_t Field::getPosition() const {
 /// return
 
 // return pointer to function
-void* Method::getPointerTo() const {
+void* Method::getNativePointer() const {
     if (m_pointerTo) {
         return m_pointerTo;
     }
@@ -167,7 +167,7 @@ void* Method::getPointerTo() const {
         return m_pointerTo;
     } else if (m_overrides.size() == 1) {
         MethodPtr parent = m_overrides.begin()->lock();
-        return parent->getPointerTo();
+        return parent->getNativePointer();
     } else {
         BOOST_THROW_EXCEPTION(Exception()
             << exception_format("Abstract method %0%::%1%", getOwnerType()->getName() % getName()));

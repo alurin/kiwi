@@ -27,7 +27,7 @@ namespace kiwi {
         llvm::GlobalVariable* getBackendVariable() const;
 
         /// return pointer for dynamic table
-        void* getPointer() const;
+        void* getNativePointer() const;
 
         /// update layout
         void update();

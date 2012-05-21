@@ -106,8 +106,8 @@ llvm::GlobalVariable* VirtualTable::getBackendVariable() const {
     return m_dtable.getBackendVariable();
 }
 
-void* VirtualTable::getPointer() const {
-    return m_dtable.getPointer();
+void* VirtualTable::getNativePointer() const {
+    return m_dtable.getNativePointer();
 }
 
 // returns size of address map
@@ -138,7 +138,7 @@ void UpcastVirtualTable::update() {
         for (MemberSet<Method>::const_iterator i = methods.begin(); i != methods.end(); ++i) {
             MethodPtr method = *i;
             MethodPtr override = overrides.find(method);
-            updateSlot(method, override->getPointerTo());
+            updateSlot(method, override->getNativePointer());
         }
     }
 }
@@ -146,7 +146,7 @@ void UpcastVirtualTable::update() {
 // update method in vtable
 void VirtualTable::updateSlot(MethodPtr method, void* px) {
     int32_t idx = method->getPosition();
-    px = px ?: method->getPointerTo();
+    px = px ?: method->getNativePointer();
 
     if (idx >= m_dtable.size()) {
         m_dtable.resize(idx * 1.6);
@@ -172,7 +172,7 @@ void MethodInsert::operator()(MethodPtr method) {
 // @todo testes
 void MethodOverride::operator()(MethodPtr method, MethodPtr inherit) {
     if (inherit->getOwnerType() == m_vtable->getType()) {
-        m_vtable->updateSlot(inherit, method->getPointerTo());
+        m_vtable->updateSlot(inherit, method->getNativePointer());
     }
 }
 
@@ -187,6 +187,6 @@ void MethodOverrideComplete::operator()(MethodPtr method) {
     MemberSet<Method>& overrides = m_vtable->getDerivedType()->getMetadata()->getMethods();
     MethodPtr override = overrides.find(method);
     if (override && method->getOwnerType() == m_vtable->getType()) {
-        m_vtable->updateSlot(method, override->getPointerTo());
+        m_vtable->updateSlot(method, override->getNativePointer());
     }
 }

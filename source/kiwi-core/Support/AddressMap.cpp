@@ -68,8 +68,8 @@ llvm::GlobalVariable* AddressMap::getBackendVariable() const {
     return m_dtable.getBackendVariable();
 }
 
-void* AddressMap::getPointer() const {
-    return m_dtable.getPointer();
+void* AddressMap::getNativePointer() const {
+    return m_dtable.getNativePointer();
 }
 
 /// returns size of address map

@@ -87,7 +87,7 @@ namespace kiwi
         void complete();
 
         /// returns pointer to function
-        void* getPointerTo() const;
+        void* getNativePointer() const;
 
         /// set pointer to function
         void setPointerTo(void* pointerTo) {

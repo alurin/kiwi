@@ -55,7 +55,7 @@ DynamicTable<T>::~DynamicTable() {
 //////==------------------------------------------------------------------------==//
 // return pointer for dynamic table
 template<typename T>
-void* DynamicTable<T>::getPointer() const {
+void* DynamicTable<T>::getNativePointer() const {
     // map table to pointer
     ContextImpl* meta             = getModule()->getContext()->getMetadata();
     llvm::ExecutionEngine* engine = meta->getBackendEngine();
@@ -79,7 +79,7 @@ void DynamicTable<T>::resize(size_t size) {
     m_dtable = newTable;
 
     // update pointer to dtable
-    T** pointer = (T**) getPointer();
+    T** pointer = (T**) getNativePointer();
     *pointer = m_dtable;
 }
 

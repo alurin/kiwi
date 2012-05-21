@@ -44,7 +44,7 @@ namespace kiwi {
         }
 
         /// return pointer for dynamic table
-        void* getPointer() const;
+        void* getNativePointer() const;
 
         /// return position of last empty slot and move pointer to next
         int32_t nextPosition();

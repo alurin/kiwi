@@ -27,7 +27,7 @@ namespace kiwi {
         llvm::GlobalVariable* getBackendVariable() const;
 
         /// return pointer for dynamic table
-        void* getPointer() const;
+        void* getNativePointer() const;
 
         /// dump dynamic table
         void dump() const;
@@ -73,7 +73,7 @@ namespace kiwi {
         TypePtr getDerivedType() const {
             return m_derived.lock();
         }
-        
+
         /// fill dynamic table
         void update();
     protected:

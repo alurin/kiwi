@@ -213,16 +213,16 @@ bool Type::isCastableTo(const TypePtr type, bool duckCast) const {
 
 void* Type::getVTablePointer(TypePtr type) {
     if (0 == type) {
-        return m_meta->getVirtualTable().getPointer();
+        return m_meta->getVirtualTable().getNativePointer();
     }
-    return m_meta->getAncestorMetadata(type)->getVirtualTable().getPointer();
+    return m_meta->getAncestorMetadata(type)->getVirtualTable().getNativePointer();
 }
 
 void* Type::getAMapPointer(TypePtr type) {
     if (0 == type) {
-        return m_meta->getAddressMap().getPointer();
+        return m_meta->getAddressMap().getNativePointer();
     }
-    return m_meta->getAncestorMetadata(type)->getAddressMap().getPointer();
+    return m_meta->getAncestorMetadata(type)->getAddressMap().getNativePointer();
 }
 
 // Emit type structure
