@@ -160,7 +160,7 @@ namespace kiwi
         mutable void* m_pointerTo;
 
         /// field position in address map for class
-        mutable int32_t m_position;
+        int32_t m_position;
 
         /// constructor
         Method(const Identifier& name, TypePtr ownerType, TypePtr returnType);
@@ -179,11 +179,6 @@ namespace kiwi
 
         /// create arguments from parent callable
         void initializateArguments(TypePtr thisType, ArgumentVector args);
-
-        /// Set position
-        void setPosition(int32_t position) {
-            m_position = position;
-        }
     };
 
     //==--------------------------------------------------------------------==//
@@ -227,7 +222,7 @@ namespace kiwi
         TypeWeak m_fieldType;
 
         /// field position in address map for class
-        mutable int32_t m_position;
+        int32_t m_position;
 
         /// constructor: inherit field field
         Field(TypePtr ownerType, FieldPtr field);
@@ -237,11 +232,6 @@ namespace kiwi
 
         /// constructor: declare anonym field
         Field(const Identifier& name, TypePtr ownerType, TypePtr fieldType);
-
-        /// Set position
-        void setPosition(int32_t position) {
-            m_position = position;
-        }
 
         /// Set name
         void setName(const Identifier& name) {

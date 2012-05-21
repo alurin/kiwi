@@ -14,26 +14,26 @@ namespace {
     class FieldInsert {
     public:
         /// constructor
-        FieldInsert(StaticVirtualTable* amap);
+        FieldInsert(StaticAddressMap* amap);
 
         /// handler
         void operator()(FieldPtr Field);
     protected:
         /// amap
-        StaticVirtualTable* m_amap;
+        StaticAddressMap* m_amap;
     };
 
     /// Override Fields listeners
     class FieldOverride {
     public:
         /// constructor
-        FieldOverride(UpcastVirtualTable* amap);
+        FieldOverride(UpcastAddressMap* amap);
 
         /// handler
         void operator()(FieldPtr Field, FieldPtr inherit);
     protected:
         /// amap
-        UpcastVirtualTable* m_amap;
+        UpcastAddressMap* m_amap;
     };
 }
 
@@ -42,22 +42,26 @@ AddressMap::AddressMap(TypePtr type, ModulePtr module)
 
 }
 
-FieldInsert::FieldInsert(StaticVirtualTable* amap)
+FieldInsert::FieldInsert(StaticAddressMap* amap)
 : m_amap(amap) {
 }
 
-FieldOverride::FieldOverride(UpcastVirtualTable* amap)
+FieldOverride::FieldOverride(UpcastAddressMap* amap)
 : m_amap(amap) {
 }
 
 // constructor
 StaticAddressMap::StaticAddressMap(TypePtr owner)
 : AddressMap(owner, owner->getModule()) {
+    TypeImpl* meta = owner->getMetadata();
+    meta->getFields().onInsert.connect(FieldInsert(this));
 }
 
 // constructor
 UpcastAddressMap::UpcastAddressMap(TypePtr ancestor, TypePtr derived)
 : AddressMap(ancestor, derived->getModule()), m_derived(derived) {
+    TypeImpl* meta = derived->getMetadata();
+    meta->getFields().onOverride.connect(FieldOverride(this));
 }
 
 llvm::GlobalVariable* AddressMap::getBackendVariable() const {
@@ -75,7 +79,9 @@ size_t AddressMap::size() const {
 
 /// insert Field in amap
 void StaticAddressMap::insertSlot(FieldPtr field) {
-    field->setPosition(m_dtable.nextPosition());
+    if (field->m_position == -1) { // guard from recursion
+        field->m_position = m_dtable.nextPosition();
+    }
 }
 
 void AddressMap::update() {
@@ -106,12 +112,11 @@ void AddressMap::update() {
     llvm::Constant* amapValue = llvm::ConstantArray::get(amapType, positions);
 
     // map table to pointer
+    m_dtable.resize(positions.size());
     kiwi_assert(m_dtable.get(), "AMap is not nullable");
     ContextImpl* meta             = getType()->getContext()->getMetadata();
     llvm::ExecutionEngine* engine = meta->getBackendEngine();
     engine->InitializeMemory(amapValue, m_dtable.get());
-
-    dump();
 }
 
 // compute layout offset

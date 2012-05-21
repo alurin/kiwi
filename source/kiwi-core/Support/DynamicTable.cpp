@@ -24,99 +24,6 @@
 #include <stdlib.h>
 
 using namespace kiwi;
-//
-//namespace {
-//    /// Storage for base information about member
-//    template<typename Table>
-//    class VirtualSlot {
-//    protected:
-//        Table& m_dtable;
-//
-//        /// constructor
-//        VirtualSlot(Table& dtable);
-//    };
-//
-//    /// Create dynamic table slot
-//    template<typename Table, typename Member>
-//    class CreateSlot : public VirtualSlot<Table> {
-//    public:
-//        CreateSlot(Table& dtable);
-//
-//        void operator()(boost::shared_ptr<Member> method);
-//    };
-//
-//    /// Override dynamic table slot
-//    template<typename Table, typename Member>
-//    class OverrideSlot : public VirtualSlot<Table> {
-//    public:
-//        OverrideSlot(Table& dtable);
-//
-//        void operator()(boost::shared_ptr<Member> method, boost::shared_ptr<Member> second);
-//    };
-//
-//    /// Override dynamic table slot
-//    class CompleteSlot : public VirtualSlot<VirtualTable> {
-//    public:
-//        CompleteSlot(VirtualTable& dtable);
-//
-//        void operator()(MethodPtr method);
-//    };
-//}
-//
-////==------------------------------------------------------------------------==//
-///// conect event listeners for member set
-//template<typename Table, typename Member>
-//void connectCreateSlot(Table* table, MemberSet<Member>& members) {
-//   members.onInsert.connect(CreateSlot<Table, Member>(*table));
-//}
-///// conect event listeners for member set
-//template<typename Table>
-//void connectCompleteSlot(Table* table, TypePtr type) {
-//    TypeImpl* meta = type->getMetadata();
-//    meta->onMethodComplete.connect(CompleteSlot(*table));
-//}
-//
-////==------------------------------------------------------------------------==//
-//template<typename Table>
-//VirtualSlot<Table>::VirtualSlot(Table& dtable)
-//: m_dtable(dtable) {
-//}
-//
-//template<typename Table, typename Member>
-//CreateSlot<Table, Member>::CreateSlot(Table& dtable)
-//: VirtualSlot<Table>(dtable) {
-//}
-//
-//template<typename Table, typename Member>
-//OverrideSlot<Table, Member>::OverrideSlot(Table& dtable)
-//: VirtualSlot<Table>(dtable) {
-//}
-//
-//CompleteSlot::CompleteSlot(VirtualTable& dtable)
-//: VirtualSlot<VirtualTable>(dtable) {
-//}
-//
-///// Insert new slot in dynamic table
-//template<typename Table, typename Member>
-//void CreateSlot<Table, Member>::operator()(boost::shared_ptr<Member> member) {
-//    KIWI_DUMP("Create slot " << member->getName());
-//    VirtualSlot<Table>::m_dtable.insertSlot(member);
-//}
-//
-///// Override value in slot form dynamic table
-//template<typename Table, typename Member>
-//void OverrideSlot<Table, Member>::operator()(boost::shared_ptr<Member> member, boost::shared_ptr<Member> second) {
-//    BOOST_THROW_EXCEPTION(Exception() << exception_message("Not implemented"));
-//    // VirtualSlot<Table>::m_dtable.overrideMember(member, second);
-//}
-//
-//void CompleteSlot::operator()(MethodPtr method) {
-//    KIWI_DUMP("Complete slot " << method->getName());
-//    VirtualSlot<VirtualTable>::m_dtable.updateSlot(method);
-//}
-//
-//==------------------------------------------------------------------------==//
-// constructor
 
 template<typename T>
 DynamicTable<T>::DynamicTable(ModulePtr module)
@@ -172,7 +79,7 @@ void DynamicTable<T>::resize(size_t size) {
     m_dtable = newTable;
 
     // update pointer to dtable
-    void** pointer = (void**) getPointer();
+    T** pointer = (T**) getPointer();
     *pointer = m_dtable;
 }
 

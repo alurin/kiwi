@@ -19,6 +19,7 @@
 #include "llvm/BasicBlock.h"
 #include "llvm/Instructions.h"
 #include "llvm/Constants.h"
+#include "Algorithm.hpp"
 #include <llvm/Support/IRBuilder.h>
 
 #define EMPTY_WHILE_WRAP(_stmt_) do { _stmt_ } while(0)
@@ -482,6 +483,7 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
         bufferIdx.push_back(makeConstantInt(*m_context, 1));
         llvm::Value* aloc = llvm::GetElementPtrInst::CreateInBounds(object, llvm::makeArrayRef(bufferIdx), "", m_block);
         new llvm::StoreInst(amap, aloc, "", m_block);
+
     }
 
     // 6. Store data pointer to data
@@ -548,6 +550,7 @@ llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, FieldPtr field) {
     // load offset
     llvm::Value* fieldOffset = 0;
     {
+        kiwi_assert(field->getPosition() != -1, "Position for field is unknown");
         std::vector<llvm::Value*> addressIdx;
         addressIdx.push_back(makeConstantInt(*m_context, 0));
         addressIdx.push_back(makeConstantInt(*m_context, field->getPosition()));
@@ -566,35 +569,6 @@ llvm::Value* BlockBuilder::offsetField(ValueBuilder thisValue, FieldPtr field) {
     llvm::Type* fieldType = field->getFieldType()->getMetadata()->getBackendVariableType()->getPointerTo();
     llvm::Value* offset   = new llvm::IntToPtrInst(summInst, fieldType, "offset", m_block);
 
-    // {
-    //     llvm::Value* typeValue  = thisValue.getType()->getMetadata()->getBackendPointer();
-    //     llvm::Type* pointerType = llvm::IntegerType::get(getContext(), 8)->getPointerTo();
-    //     llvm::Function* dump_pointer = llvm::dyn_cast<llvm::Function>(getModule()->getOrInsertFunction("kiwi_dump_ptr", llvm::Type::getVoidTy(getContext()), pointerType, typeValue->getType(), NULL));
-    //     std::vector<llvm::Value*> args;
-    //     args.push_back(new llvm::IntToPtrInst(fieldOffset, pointerType, "", getBlock()));
-    //     args.push_back(typeValue);
-    //     llvm::Value* value = llvm::CallInst::Create(dump_pointer, makeArrayRef(args), "", getBlock());
-    // }
-
-    // {
-    //     llvm::Value* typeValue  = thisValue.getType()->getMetadata()->getBackendPointer();
-    //     llvm::Type* pointerType = llvm::IntegerType::get(getContext(), 8)->getPointerTo();
-    //     llvm::Function* dump_pointer = llvm::dyn_cast<llvm::Function>(getModule()->getOrInsertFunction("kiwi_dump_ptr", llvm::Type::getVoidTy(getContext()), pointerType, typeValue->getType(), NULL));
-    //     std::vector<llvm::Value*> args;
-    //     args.push_back(new llvm::BitCastInst(data, pointerType, "", getBlock()));
-    //     args.push_back(typeValue);
-    //     llvm::Value* value = llvm::CallInst::Create(dump_pointer, makeArrayRef(args), "", getBlock());
-    // }
-
-    {
-        llvm::Value* typeValue  = thisValue.getType()->getMetadata()->getBackendPointer();
-        llvm::Type* pointerType = llvm::IntegerType::get(getContext(), 8)->getPointerTo();
-        llvm::Function* dump_pointer = llvm::dyn_cast<llvm::Function>(getModule()->getOrInsertFunction("kiwi_dump_ptr", llvm::Type::getVoidTy(getContext()), pointerType, typeValue->getType(), NULL));
-        std::vector<llvm::Value*> args;
-        args.push_back(new llvm::BitCastInst(offset, pointerType, "", getBlock()));
-        args.push_back(typeValue);
-        llvm::Value* value = llvm::CallInst::Create(dump_pointer, makeArrayRef(args), "", getBlock());
-    }
 
     return offset;
 }

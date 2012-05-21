@@ -47,8 +47,15 @@ KiwiObject kiwi_up_cast(KiwiObject obj, KiwiType type) {
     return parent;
 }
 
+#include <unicode/ustream.h>
 KIWI_RUNTIME
-void kiwi_dump_ptr(void* ptr, KiwiType type) {
-    TypePtr derived = kiwi_icast(type);
-    KIWI_DUMP("Call method at " << ptr << " from " << derived->getName());
+void kiwi_debug_pointer(void* ptr, const UChar* buffer, const int32_t length) {
+    String string(buffer, length);
+    KIWI_DUMP(string << ": " << ptr);
+}
+
+KIWI_RUNTIME
+void kiwi_debug_integer(int64_t ptr, const UChar* buffer, const int32_t length) {
+    String string(buffer, length);
+    KIWI_DUMP(string << ": " << ptr);
 }

@@ -7,8 +7,10 @@
 #ifndef KIWI_CODEGEN_ALGORITHM_INTERNAL
 #define KIWI_CODEGEN_ALGORITHM_INTERNAL
 
-namespace kiwi {
+#include "Builder.hpp"
 
+namespace kiwi {
+    BlockBuilder llvmDumpValue(BlockBuilder block, llvm::Value* value, String text);
 }
 
 #endif

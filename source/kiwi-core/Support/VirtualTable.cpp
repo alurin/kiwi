@@ -158,7 +158,9 @@ void VirtualTable::updateSlot(MethodPtr method, void* px) {
 
 // insert method in vtable
 void StaticVirtualTable::insertSlot(MethodPtr method) {
-    method->setPosition(m_dtable.nextPosition());
+    if (method->m_position == -1) { // guard from recursion
+        method->m_position = m_dtable.nextPosition();
+    }
 }
 
 // handler

@@ -53,14 +53,10 @@ namespace kiwi {
         }
 
         /// returns LLVM function pass manager
-        llvm::FunctionPassManager* getBackendFunctionPassManager() const {
-            return m_backendFunctionPassManager;
-        }
+        llvm::FunctionPassManager* getBackendFunctionPassManager() const;
 
         /// returns LLVM module pass manager
-        llvm::PassManager* getBackendModulePassManager() const {
-            return m_backendModulePassManager;
-        }
+        llvm::PassManager* getBackendModulePassManager() const;
 
         /// LLVM target data
         llvm::TargetData* getBackendTargetData() const {
@@ -72,6 +68,9 @@ namespace kiwi {
             m_modules.push_back(module);
         }
     private:
+        /// Owner context
+        Context* m_owner;
+
         /// list of modules
         std::vector<ModulePtr> m_modules;
 
@@ -82,19 +81,22 @@ namespace kiwi {
         llvm::ExecutionEngine* m_backendEngine;
 
         /// LLVM function pass manager
-        llvm::FunctionPassManager* m_backendFunctionPassManager;
+        mutable llvm::FunctionPassManager* m_backendFunctionPassManager;
 
         /// LLVM module pass manager
-        llvm::PassManager* m_backendModulePassManager;
+        mutable llvm::PassManager* m_backendModulePassManager;
 
         /// LLVM target data
         llvm::TargetData* m_backendTargetData;
 
         /// constructor
-        ContextImpl();
+        ContextImpl(Context* context);
 
         /// destructor
         ~ContextImpl();
+
+        /// init pass managers and target data
+        void initPassManagers() const;
     };
 }
 
