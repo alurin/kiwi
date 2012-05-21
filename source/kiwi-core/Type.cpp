@@ -14,6 +14,7 @@
 #include "kiwi/Context.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Exception.hpp"
+#include "kiwi/Support/Iterator.hpp"
 
 using namespace kiwi;
 using namespace kiwi::codegen;
@@ -25,7 +26,7 @@ using namespace kiwi::codegen;
         m_meta->_method().merge(declared, inherited); \
     }
 
-TYPE_IMPLEMENTATION_FINDERS(Field, FieldPtr, fields)
+TYPE_IMPLEMENTATION_FINDERS(Field, FieldPtr, getFields)
 
 namespace {
 
@@ -63,6 +64,25 @@ namespace {
         std::vector<TypePtr> m_arguments;
     };
 
+    /// Collect ancessors
+    class AncestorPropogation : public AncestorIterator {
+    public:
+        /// return ancestors
+        std::vector<TypePtr> getAncestors() const {
+            return m_ancestors;
+        }
+    protected:
+        /// vector of ancestors
+        std::vector<TypePtr> m_ancestors;
+
+        /// visitor pattern
+        virtual void visit(AncestorPtr ancestor);
+    };
+}
+
+void AncestorPropogation::visit(AncestorPtr ancestor) {
+    TypePtr type = ancestor->getAncestorType();
+    m_ancestors.push_back(type);
 }
 
 Type::Type(ModulePtr module)
@@ -90,7 +110,7 @@ MethodPtr Type::addBinary(Member::MethodOpcode opcode, TypePtr returnType, TypeP
     return Method::create(shared_from_this(), returnType, arguments, opcode);
 }
 
-/// add multiary operator
+// add multiary operator
 MethodPtr Type::addMultiary(Member::MethodOpcode opcode, TypePtr returnType, std::vector<TypePtr> arguments) {
     return Method::create(shared_from_this(), returnType, arguments, opcode);
 }
@@ -116,7 +136,7 @@ MethodPtr Type::addMethod(const Identifier& name, TypePtr returnType, std::vecto
 MethodPtr Type::findUnary(Member::MethodOpcode opcode) const {
     std::vector<TypePtr> arguments;
     arguments.push_back(const_cast<Type*>(this)->shared_from_this());
-    return find_if(m_meta->methods(), MethodFinder(opcode, arguments));
+    return find_if(m_meta->getMethods(), MethodFinder(opcode, arguments));
 }
 
 // find binary operator
@@ -124,7 +144,7 @@ MethodPtr Type::findBinary(Member::MethodOpcode opcode, TypePtr operandType) con
     std::vector<TypePtr> arguments;
     arguments.push_back(const_cast<Type*>(this)->shared_from_this());
     arguments.push_back(operandType);
-    return find_if(m_meta->methods(), MethodFinder(opcode, arguments));
+    return find_if(m_meta->getMethods(), MethodFinder(opcode, arguments));
 }
 
 // find binary operator
@@ -132,12 +152,12 @@ MethodPtr Type::findMultiary(Member::MethodOpcode opcode, std::vector<TypePtr> t
     std::vector<TypePtr> arguments;
     arguments.push_back(const_cast<Type*>(this)->shared_from_this());
     arguments.insert(arguments.end(), types.begin(), types.end());
-    return find_if(m_meta->methods(), MethodFinder(opcode, arguments));
+    return find_if(m_meta->getMethods(), MethodFinder(opcode, arguments));
 }
 
 // find field
 FieldPtr Type::findField(const Identifier& name) const {
-    return find_if(m_meta->fields(), FieldFinder(name));
+    return find_if(m_meta->getFields(), FieldFinder(name));
 }
 
 // find method
@@ -145,39 +165,132 @@ MethodPtr Type::findMethod(const Identifier& name, std::vector<TypePtr> types) c
     std::vector<TypePtr> arguments;
     arguments.push_back(const_cast<Type*>(this)->shared_from_this());
     arguments.insert(arguments.end(), types.begin(), types.end());
-    return find_if(m_meta->methods(), MethodFinder(name, arguments));
+    return find_if(m_meta->getMethods(), MethodFinder(name, arguments));
 }
 
-/// find method
+// find method
 MethodPtr Type::findMethod(Member::MethodOpcode opcode, std::vector<TypePtr> types) const {
     std::vector<TypePtr> arguments;
     arguments.push_back(const_cast<Type*>(this)->shared_from_this());
     arguments.insert(arguments.end(), types.begin(), types.end());
-    return find_if(m_meta->methods(), MethodFinder(opcode, arguments));
+    return find_if(m_meta->getMethods(), MethodFinder(opcode, arguments));
 }
 
-bool Type::isInherit(const TypePtr type, bool duckCast) const {
-    return m_meta->isBase(type);
+// Add type ancestor
+bool Type::addAncestor(TypePtr type) {
+    if (type.get() != this && !this->isAncestor(type) && !this->isDerived(type)) {
+        // collect ancestors
+        std::vector<TypePtr> ancestors;
+        {
+            AncestorPropogation it;
+            type->each(it);
+            ancestors = it.getAncestors();
+        }
+
+        // add ancestors in this type
+        for (int i = 0; i < ancestors.size(); ++i) {
+            TypePtr base = ancestors[i];
+            if (!this->isAncestor(base)) {
+                AncestorPtr ancestor = AncestorPtr(new Ancestor(shared_from_this(), base));
+                m_meta->addAncestor(ancestor);
+            }
+        }
+
+        // add type as ancestor to this type
+        AncestorPtr ancestor = AncestorPtr(new Ancestor(shared_from_this(), type));
+        return m_meta->addAncestor(ancestor);
+    }
+    return false;
+}
+
+bool Type::isAncestor(const TypePtr type) const {
+    return m_meta->isAncestor(type);
 }
 
 bool Type::isCastableTo(const TypePtr type, bool duckCast) const {
-    return m_meta->isBase(type);
-}
-
-// return size of fields set
-size_t Type::field_size() const {
-    return m_meta->fields().size();
+    return m_meta->isAncestor(type);
 }
 
 void* Type::getVTablePointer(TypePtr type) {
-    return m_meta->getOriginalMetadata(type)->getVirtualTable().getPointer();
+    if (0 == type) {
+        return m_meta->getVirtualTable().getPointer();
+    }
+    return m_meta->getAncestorMetadata(type)->getVirtualTable().getPointer();
 }
 
 void* Type::getAMapPointer(TypePtr type) {
-    return m_meta->getOriginalMetadata(type)->getAddressMap().getPointer();
+    if (0 == type) {
+        return m_meta->getAddressMap().getPointer();
+    }
+    return m_meta->getAncestorMetadata(type)->getAddressMap().getPointer();
 }
 
 // Emit type structure
 void Type::update() {
-    m_meta->getOriginalMetadata()->getAddressMap().update();
+    if (hasFields()) {
+        m_meta->getAddressMap().update();
+    }
+}
+
+// iterate over type members
+void Type::each(MemberIterator& it) {
+    each(static_cast<FieldIterator&>(it));
+    each(static_cast<MethodIterator&>(it));
+}
+
+// iterate over type methods
+void Type::each(MethodIterator& it) {
+    MemberSet<Method>::const_iterator current = m_meta->getMethods().begin();
+    MemberSet<Method>::const_iterator end = m_meta->getMethods().end();
+    for (; current != end; ++current) {
+        it.visit(*current);
+    }
+}
+
+// iterate over
+void Type::each(FieldIterator& it) {
+    MemberSet<Field>::const_iterator current = m_meta->getFields().begin();
+    MemberSet<Field>::const_iterator end = m_meta->getFields().end();
+    for (; current != end; ++current) {
+        it.visit(*current);
+    }
+}
+
+// iterate over
+void Type::each(AncestorIterator& it) {
+    AncestorMap::const_iterator current = m_meta->getAncestors().begin();
+    AncestorMap::const_iterator end = m_meta->getAncestors().end();
+    for (; current != end; ++current) {
+        it.visit(current->second);
+    }
+}
+
+// has type contains ancestors?
+bool Type::hasAncestors() const {
+    return m_meta->getMethods().empty();
+}
+
+// has type contains fields?
+bool Type::hasFields() const {
+    return m_meta->getFields().empty();
+}
+
+// has type contains methods?
+bool Type::hasMethods() const {
+    return m_meta->getAncestors().empty();
+}
+
+// return count of ancestors
+size_t Type::getAncestorsCount() const {
+    return m_meta->getAncestors().size();
+}
+
+// return count of methods
+size_t Type::getMethodsCount() const {
+    return m_meta->getMethods().size();
+}
+
+// return count of fields
+size_t Type::getFieldsCount() const {
+    return m_meta->getFields().size();
 }

@@ -26,3 +26,4 @@ include/kiwi/machine.hpp
 
 # My files and documents
 .idea
+nbproject

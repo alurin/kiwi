@@ -422,12 +422,9 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
     // get allocation function
     llvm::FunctionType* mallocType = llvm::FunctionType::get(llvm::IntegerType::get(*m_context, 8)->getPointerTo(), llvm::IntegerType::get(*m_context, 32), 0);
     llvm::Function* mallocFunc     = llvm::dyn_cast<llvm::Function>(m_module->getOrInsertFunction("kiwi_malloc", mallocType));
+    TypeImpl* meta                 = type->getMetadata();
 
-    // 1. sizeof data buffer
-    TypeImpl* meta        = type->getMetadata();
-    InheritanceInfo* info = meta->getOriginalMetadata();
-
-    // 2. alloca data buffer
+    // 1. alloca data buffer
     llvm::Value* dataValue = 0;
     {
         llvm::Type* pointerType = llvm::IntegerType::get(*m_context, 8)->getPointerTo();
@@ -441,7 +438,7 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
         dataValue = new llvm::BitCastInst(dataValue, dataType, "type", m_block);
     }
 
-    // 3. store pointer to type metadata
+    // 2. store pointer to type metadata
     {
         llvm::Value* tmeta = meta->getBackendPointer();    /// pointer to tmeta
         std::vector<llvm::Value*> bufferIdx;
@@ -451,7 +448,7 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
         new llvm::StoreInst(tmeta, tloc, "", m_block);
     }
 
-    // 4. alloca object
+    // 3. alloca object
     llvm::Value* object = 0;
     {
         std::vector<llvm::Value*> bufferIdx;
@@ -467,9 +464,9 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
         object = new llvm::BitCastInst(object, objectType, "object", m_block);
     }
 
-    // 5. Store pointer to vtable
+    // 4. Store pointer to vtable
     {
-        llvm::Value* vtable = info->getVirtualTable().getBackendVariable();
+        llvm::Value* vtable = meta->getVirtualTable().getBackendVariable();
         std::vector<llvm::Value*> bufferIdx;
         bufferIdx.push_back(makeConstantInt(*m_context, 0));
         bufferIdx.push_back(makeConstantInt(*m_context, 0));
@@ -477,9 +474,9 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
         new llvm::StoreInst(vtable, vloc, "", m_block);
     }
 
-    // 6. Store pointer to amap
+    // 5. Store pointer to amap
     {
-        llvm::Value* amap = info->getAddressMap().getBackendVariable();
+        llvm::Value* amap = meta->getAddressMap().getBackendVariable();
         std::vector<llvm::Value*> bufferIdx;
         bufferIdx.push_back(makeConstantInt(*m_context, 0));
         bufferIdx.push_back(makeConstantInt(*m_context, 1));
@@ -487,7 +484,7 @@ ValueBuilder BlockBuilder::createNew(ObjectPtr type, MethodPtr ctor, std::vector
         new llvm::StoreInst(amap, aloc, "", m_block);
     }
 
-    // 7. Store data pointer to data
+    // 6. Store data pointer to data
     {
         std::vector<llvm::Value*> bufferIdx;
         bufferIdx.push_back(makeConstantInt(*m_context, 0));

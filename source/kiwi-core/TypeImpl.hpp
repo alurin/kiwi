@@ -9,7 +9,10 @@
 
 #include "kiwi/Type.hpp"
 #include "Support/MemberSet.hpp"
-#include "Support/InheritanceInfo.hpp"
+#include "Support/AncestorMap.hpp"
+#include "Support/AncestorMetadata.hpp"
+#include "Support/AddressMap.hpp"
+#include "Support/VirtualTable.hpp"
 
 namespace llvm {
     class Type;
@@ -27,6 +30,11 @@ namespace kiwi {
     class TypeImpl {
         friend class Type;
     public:
+        /// return owner type
+        TypePtr getOwner() const {
+            return m_owner->shared_from_this();
+        }
+
         /// returns LLVM analog for variables types
         llvm::Type* getBackendVariableType() const {
             return m_backendVariableType;
@@ -66,37 +74,29 @@ namespace kiwi {
         }
 
         /// insert base type
-        void insertBase(TypePtr type);
+        bool addAncestor(AncestorPtr ancestor);
 
         /// insert base type
-        bool isBase(const TypePtr type) const;
-
-        /// return information about virtual table and address map for this type
-        InheritanceInfo* getOriginalMetadata();
+        bool isAncestor(const TypePtr type) const;
 
         /// return information about virtual table and address map for this or
         /// original type
-        InheritanceInfo* getOriginalMetadata(TypePtr type);
+        AncestorMetadata* getAncestorMetadata(TypePtr type);
 
         /// return set of fields
-        MemberSet<Field>& fields() const {
-            return *m_fields;
-        }
+        MemberSet<Field>& getFields() const;
 
         /// return set of methods
-        MemberSet<Method>& methods() const {
-            return *m_methods;
-        }
+        MemberSet<Method>& getMethods() const;
 
-        /// return iterator pointed for begin of bases
-        std::set<TypePtr>::const_iterator base_begin() const {
-            return m_bases.begin();
-        }
+        /// return map of accestors
+        AncestorMap& getAncestors() const;
 
-        /// return iterator pointed after end of bases
-        std::set<TypePtr>::const_iterator base_end() const {
-            return m_bases.end();
-        }
+        /// returns virtual table
+        StaticVirtualTable& getVirtualTable() const;
+
+        /// returns address map
+        StaticAddressMap& getAddressMap() const;
 
         /// Signal for complete method
         boost::signals2::signal<void (MethodPtr)> onMethodComplete;
@@ -104,17 +104,20 @@ namespace kiwi {
         /// Owner for this implementation
         Type* m_owner;
 
-        /// set of all based types [ struct and objects ]
-        std::set<TypePtr> m_bases;
-
-        /// set of all based types [ struct and objects ]
-        std::map<TypePtr, InheritanceInfo*> m_inheritances;
+        /// map for all ancestor types
+        mutable AncestorMap* m_ancestors;
 
         /// set of fields
-        MemberSet<Field>* m_fields;
+        mutable MemberSet<Field>* m_fields;
 
         /// set of methods
-        MemberSet<Method>* m_methods;
+        mutable MemberSet<Method>* m_methods;
+
+        /// virtual table
+        mutable StaticVirtualTable* m_virtualTable;
+
+        /// address map
+        mutable StaticAddressMap* m_addressMap;
 
         /// this/variable converter
         ThisConverter* m_thisConverter;

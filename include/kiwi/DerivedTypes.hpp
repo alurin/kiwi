@@ -37,8 +37,7 @@ namespace kiwi {
 
     //==--------------------------------------------------------------------==//
     /// Integers types metadata
-    class IntegerType : public Type
-    {
+    class IntegerType : public Type {
         friend class Context;
     public:
         /// returns 32-bit signed integer type for context
@@ -66,8 +65,7 @@ namespace kiwi {
 
     //==--------------------------------------------------------------------==//
     /// Boolean type metadata
-    class BooleanType : public Type
-    {
+    class BooleanType : public Type {
         friend class Context;
     public:
         /// returns boolean type from context

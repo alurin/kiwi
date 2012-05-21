@@ -341,7 +341,7 @@ ValueBuilder LlvmCallEmitter::emit(BlockBuilder block, const ExpressionVector& v
     }
 
     // forced update for vtable
-    method->getOwnerType()->getMetadata()->getOriginalMetadata()->getVirtualTable();
+    method->getOwnerType()->getMetadata()->getVirtualTable();
     kiwi_assert(method->getPosition() != -1, "Location for method not founded");
 
     // constants

@@ -12,6 +12,7 @@
 #include "kiwi/Members.hpp"
 #include "kiwi/Type.hpp"
 #include "kiwi/Exception.hpp"
+#include "kiwi/Support/Iterator.hpp"
 #include "Codegen/Emitter.hpp"
 #include <llvm/Module.h>
 #include <llvm/Constants.h>
@@ -24,21 +25,20 @@ using namespace kiwi;
 namespace {
     class MethodComplete {
     public:
-        MethodComplete(Type* type);
+        MethodComplete(TypeImpl* type);
 
         void operator()(MethodPtr method);
     private:
-        Type* m_type;
+        TypeImpl* m_meta;
     };
 }
 
-MethodComplete::MethodComplete(Type* type)
-: m_type(type) {
+MethodComplete::MethodComplete(TypeImpl* meta)
+: m_meta(meta) {
 }
 
 void MethodComplete::operator()(MethodPtr method) {
-    TypeImpl* meta     = m_type->getMetadata();
-    MethodPtr declared = meta->methods().find(method);
+    MethodPtr declared = m_meta->getMethods().find(method);
 
     /// @todo This is bug?? Because declared must have self body
     if (declared) {
@@ -48,11 +48,9 @@ void MethodComplete::operator()(MethodPtr method) {
 
 // constructor
 TypeImpl::TypeImpl(Type* owner, ModulePtr module)
-: m_owner(owner), m_backendVariableType(0)
-, m_backendThisType(0), m_thisConverter(0), m_backendPointer(0) {
-    m_fields       = new MemberSet<Field>(owner);
-    m_methods      = new MemberSet<Method>(owner);
-
+: m_owner(owner), m_backendVariableType(0) , m_backendThisType(0)
+, m_thisConverter(0), m_backendPointer(0), m_virtualTable(0), m_addressMap(0)
+, m_fields(0), m_methods(0), m_ancestors(0) {
     llvm::Module* backendModule = module->getMetadata()->getBackendModule();
     llvm::LLVMContext& context  = backendModule->getContext();
 
@@ -68,50 +66,83 @@ TypeImpl::TypeImpl(Type* owner, ModulePtr module)
 
 // destructor
 TypeImpl::~TypeImpl() {
-    for (std::map<TypePtr, InheritanceInfo*>::const_iterator i = m_inheritances.begin(); i != m_inheritances.end(); ++i) {
-        InheritanceInfo* info = i->second;
-        delete info;
-    }
     delete m_thisConverter;
+    delete m_fields;
+    delete m_methods;
+    delete m_ancestors;
+    delete m_virtualTable;
+    delete m_addressMap;
 }
 
-void TypeImpl::insertBase(TypePtr type) {
-    TypeImpl* parentImpl = type->getMetadata();
-    for (std::set<TypePtr>::iterator i = parentImpl->m_bases.begin(); i != parentImpl->m_bases.end(); ++i) {
-        insertBase(*i);
+bool TypeImpl::addAncestor(AncestorPtr ancestor) {
+    if (getAncestors().insert(ancestor)) {
+        TypeImpl* meta = ancestor->getAncestorType()->getMetadata();
+        getFields().inherit(meta->getFields());
+        getMethods().inherit(meta->getMethods());
+        onMethodComplete.connect(MethodComplete(this));
+        return true;
     }
+    return false;
+}
 
-    std::pair<std::set<TypePtr>::const_iterator, bool> result = m_bases.insert(type);
-    if (result.second) {
-        TypeImpl* meta = type->getMetadata();
-
-        // inherit tables
-        fields().inherit(meta->fields());
-        methods().inherit(meta->methods());
-        meta->onMethodComplete.connect(MethodComplete(m_owner));
+bool TypeImpl::isAncestor(const TypePtr type) const {
+    if (m_ancestors) {
+        return m_ancestors->find(type).get() != 0;
     }
+    return false;
 }
 
-bool TypeImpl::isBase(const TypePtr type) const {
-    return std::find(m_bases.begin(), m_bases.end(), type) != m_bases.end();
-}
-
-// return information about virtual table and address map for this type
-InheritanceInfo* TypeImpl::getOriginalMetadata() {
-    return getOriginalMetadata(m_owner->shared_from_this());
-}
 
 // return information about virtual table and address map for original type
-InheritanceInfo* TypeImpl::getOriginalMetadata(TypePtr type) {
-    if (m_owner == type.get() || isBase(type)) {
-        std::map<TypePtr, InheritanceInfo*>::const_iterator result = m_inheritances.find(type);
-        if (result == m_inheritances.end()) {
-            InheritanceInfo* info = new InheritanceInfo(type.get(), m_owner);
-            m_inheritances.insert(std::make_pair(type, info));
-            return info;
+AncestorMetadata* TypeImpl::getAncestorMetadata(TypePtr type) {
+    if (m_ancestors) {
+        AncestorPtr ancestor = m_ancestors->find(type);
+        if (ancestor) {
+            return ancestor->getMetadata();
         }
-        return result->second;
     }
 
     BOOST_THROW_EXCEPTION(Exception() << exception_message("Received type is not base for current type"));
+}
+
+// return set of fields
+MemberSet<Field>& TypeImpl::getFields() const {
+    if (!m_fields) {
+        m_fields = new MemberSet<Field>(m_owner);
+    }
+    return *m_fields;
+}
+
+// return set of methods
+MemberSet<Method>& TypeImpl::getMethods() const {
+    if (!m_methods) {
+        m_methods = new MemberSet<Method>(m_owner);
+    }
+    return *m_methods;
+}
+
+// return map of accestors
+AncestorMap& TypeImpl::getAncestors() const {
+    if (!m_ancestors) {
+        m_ancestors = new AncestorMap(m_owner);
+    }
+    return *m_ancestors;
+}
+
+// returns virtual table
+StaticVirtualTable& TypeImpl::getVirtualTable() const {
+    if (!m_virtualTable) {
+        m_virtualTable = new StaticVirtualTable(getOwner());
+        m_virtualTable->update();
+    }
+    return *m_virtualTable;
+}
+
+// returns address map
+StaticAddressMap& TypeImpl::getAddressMap() const {
+    if (!m_addressMap) {
+        m_addressMap = new StaticAddressMap(getOwner());
+        m_addressMap->update();
+    }
+    return *m_addressMap;
 }

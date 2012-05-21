@@ -239,16 +239,16 @@ StringPtr StringType::get(ContextPtr context) {
 
 /// add parent type
 bool ObjectType::inherit(ObjectPtr type) {
-    m_meta->insertBase(type);
+    addAncestor(type);
 }
 
 /// inherit type?
-bool ObjectType::isInherit(const ObjectPtr type) const{
-    return m_meta->isBase(type);
+bool ObjectType::isInherit(const ObjectPtr type) const {
+    return isAncestor(type);
 }
 
 // Emit type structure
 void ObjectType::update() {
     m_meta->setThisConverter(new UpcastConverter(ObjectPtr(shared_from_this(), this)));
-    m_meta->getOriginalMetadata()->getAddressMap().update();
+    Type::update();
 }

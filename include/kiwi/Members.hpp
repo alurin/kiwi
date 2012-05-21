@@ -24,7 +24,7 @@ namespace kiwi
     /// Method member
     class Method : public Member, public Overridable<Method> {
         friend class Type;
-        friend class VirtualTable;
+        friend class StaticVirtualTable;
         template<class Method>
         friend class MemberSet;
     public:
@@ -160,7 +160,7 @@ namespace kiwi
         mutable void* m_pointerTo;
 
         /// field position in address map for class
-        int32_t m_position;
+        mutable int32_t m_position;
 
         /// constructor
         Method(const Identifier& name, TypePtr ownerType, TypePtr returnType);
@@ -190,8 +190,9 @@ namespace kiwi
     /// Field member
     class Field : public Member, public Overridable<Field> {
         friend class Type;
-        friend class AddressMap;
-        template<class Field> friend class MemberSet;
+        friend class StaticAddressMap;
+        template<class Field>
+        friend class MemberSet;
     public:
         /// create field
         static FieldPtr create(TypePtr ownerType, TypePtr fieldType, const Identifier& name = "");
@@ -207,9 +208,7 @@ namespace kiwi
         }
 
         /// returns position in address map
-        int32_t getPosition() const {
-            return m_position;
-        }
+        int32_t getPosition() const;
 
         /// classof check
         static bool classof(const MemberPtr type) {
@@ -228,7 +227,7 @@ namespace kiwi
         TypeWeak m_fieldType;
 
         /// field position in address map for class
-        int32_t m_position;
+        mutable int32_t m_position;
 
         /// constructor: inherit field field
         Field(TypePtr ownerType, FieldPtr field);

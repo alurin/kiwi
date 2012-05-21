@@ -5,15 +5,24 @@ Git
 ---
 Add submodule for [LLVM](git://github.com/earl/llvm-mirror.git)
 
+**MEMORY LEAKS**
+----------------
+* source/kiwi-core/Lang/Factory.cpp:70
+* source/kiwi-core/Lang/Factory.hpp:117
+
+Current
+-------
+* Array type
+* Range expression
+* Vardiac params
+* Boxing/Unboxing for primary types
+
 Source code clean up
 --------------------
 * Add compound type for struct and object types
 * Add base for interface and object type
 * Add normal handle for inheritance and implements
-* Array type
-* Range expression
 * Subtraction and invoke operators
-* Clean up memory leaks!!!
 * Warning and errors
 
 Runtime

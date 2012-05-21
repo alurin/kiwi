@@ -50,11 +50,11 @@ TEST(object_inheritance_check) {
     ContextPtr context = Context::create();
     ModulePtr  module  = Module::create("script", context);
 
-    ObjectPtr parent = ObjectType::create(module);
-    ObjectPtr first  = ObjectType::create(module);
-    ObjectPtr second = ObjectType::create(module);
-    ObjectPtr third  = ObjectType::create(module);
-    ObjectPtr any    = ObjectType::create(module);
+    ObjectPtr parent = ObjectType::create(module, "parent");
+    ObjectPtr first  = ObjectType::create(module, "first");
+    ObjectPtr second = ObjectType::create(module, "second");
+    ObjectPtr third  = ObjectType::create(module, "third");
+    ObjectPtr any    = ObjectType::create(module, "any");
 
     first->inherit(parent);
     third->inherit(first);
@@ -64,16 +64,27 @@ TEST(object_inheritance_check) {
     CHECK(first->isInherit(parent));
 
     // third type inherit direct from first and second, and indirect from first
+
+    // parent is ancesstor for third
     CHECK(third->isInherit(parent));
+    CHECK(third->isAncestor(parent));
+    CHECK(parent->isDerived(third));
+
+    // first is ancesstor for third
     CHECK(third->isInherit(first));
+    CHECK(third->isAncestor(first));
+    CHECK(parent->isDerived(third));
+
+    // second is ancesstor for third
     CHECK(third->isInherit(second));
+    CHECK(third->isAncestor(second));
+    CHECK(second->isDerived(third));
 
     // not one type inherit from any
     CHECK(!parent->isInherit(any));
     CHECK(!first->isInherit(any));
     CHECK(!second->isInherit(any));
     CHECK(!third->isInherit(any));
-
 
     // types must be castable to parents (Liskov substitution principle)
     CHECK(first->isCastableTo(parent));
@@ -90,7 +101,7 @@ TEST(object_field_override_check_after) {
 
     ObjectPtr clA  = ObjectType::create(module, "A");  // A { @a, @b }
     ObjectPtr clB  = ObjectType::create(module, "B");  // B { @a, @c }
-    ObjectPtr clC  = ObjectType::create(module, "C");  // C : A,B { @a merge A::@a, B::@a as }
+    ObjectPtr clC  = ObjectType::create(module, "C");  // C : A, B { @a merge A::@a, B::@a as }
 
     // inherit classes affter
     clC->inherit(clA);
@@ -118,5 +129,5 @@ TEST(object_field_override_check_after) {
     CHECK(clC->findField("a")->isOverride(clB->findField("a")));
     CHECK(clC->findField("b")->isOverride(clA->findField("b")));
     CHECK(clC->findField("c")->isOverride(clB->findField("c")));
-    CHECK_EQUAL(3, clC->field_size());
+    CHECK_EQUAL(3, clC->getFieldsCount());
 }

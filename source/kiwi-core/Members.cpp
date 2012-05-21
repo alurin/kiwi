@@ -68,7 +68,7 @@ MethodPtr Method::create(TypePtr ownerType, TypePtr returnType, std::vector<Type
     method->initializateArguments(arguments);
 
     // insert and return
-    ownerType->getMetadata()->methods().insert(method);
+    ownerType->getMetadata()->getMethods().insert(method);
     return method;
 }
 
@@ -86,7 +86,7 @@ MethodPtr Method::create(TypePtr ownerType, TypePtr returnType, std::vector<Type
     method->initializateArguments(arguments);
 
     // insert and return
-    ownerType->getMetadata()->methods().insert(method);
+    ownerType->getMetadata()->getMethods().insert(method);
     return method;
 }
 
@@ -98,7 +98,7 @@ MethodPtr Method::inherit(TypePtr ownerType, MethodPtr override) {
 
 FieldPtr Field::create(TypePtr ownerType, TypePtr fieldType, const Identifier& name) {
     FieldPtr field = FieldPtr(new Field(name, ownerType, fieldType));
-    ownerType->getMetadata()->fields().insert(field);
+    ownerType->getMetadata()->getFields().insert(field);
     return field;
 }
 
@@ -133,8 +133,22 @@ void Method::setFunction(llvm::Function* func) {
 
 // return method position in vtable
 int32_t Method::getPosition() const {
+    if (m_position == -1) {
+        MethodPtr self = MethodPtr(shared_from_this(), const_cast<Method*>(this));
+        getOwnerType()->getMetadata()->getVirtualTable().insertSlot(self);
+    }
     return m_position;
 }
+
+// return method position in vtable
+int32_t Field::getPosition() const {
+    if (m_position == -1) {
+        FieldPtr self = FieldPtr(shared_from_this(), const_cast<Field*>(this));
+        getOwnerType()->getMetadata()->getAddressMap().insertSlot(self);
+    }
+    return m_position;
+}
+/// return
 
 // return pointer to function
 void* Method::getPointerTo() const {
@@ -149,7 +163,6 @@ void* Method::getPointerTo() const {
         }
         ContextImpl* meta             = getOwnerType()->getContext()->getMetadata();
         llvm::ExecutionEngine* engine = meta->getBackendEngine();
-        kiwi_assert(m_func, "Abstract function has not have a JIT stub");
         m_pointerTo                   = engine->getPointerToFunctionOrStub(m_func);
         return m_pointerTo;
     } else if (m_overrides.size() == 1) {

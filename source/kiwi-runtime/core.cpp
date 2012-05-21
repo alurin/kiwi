@@ -50,5 +50,5 @@ KiwiObject kiwi_up_cast(KiwiObject obj, KiwiType type) {
 KIWI_RUNTIME
 void kiwi_dump_ptr(void* ptr, KiwiType type) {
     TypePtr derived = kiwi_icast(type);
-    // KIWI_DUMP("Call method at " << ptr << " from " << derived->getName());
+    KIWI_DUMP("Call method at " << ptr << " from " << derived->getName());
 }

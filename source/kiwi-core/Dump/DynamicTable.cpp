@@ -9,42 +9,36 @@
 #include "kiwi/Members.hpp"
 #include <iostream>
 #include "../TypeImpl.hpp"
-#include "../Support/InheritanceInfo.hpp"
+#include "../Support/AncestorMetadata.hpp"
 
 using namespace kiwi;
 
 // dump information about type
-void VirtualTable::dump() {
-    bool isNotFirst = false;
-    std::cerr << "vtable"
-              << " from " << m_owner->getDerivedType()->getName()
-              << " to " << m_owner->getOriginalType()->getName()
-              << ": " <<  size() << "[";
-    for (int i = 0; i < size(); ++i) {
-        if (isNotFirst) {
-            std::cerr << ", ";
-        } else {
-            isNotFirst = true;
-        }
-        std::cerr << m_vtable[i];
-    }
-    std::cerr << "] at " << m_vtable << std::endl;
+void VirtualTable::dump() const {
+   bool isNotFirst = false;
+   std::cerr << "vtable [" << size() << "[";
+   for (int i = 0; i < size(); ++i) {
+       if (isNotFirst) {
+           std::cerr << ", ";
+       } else {
+           isNotFirst = true;
+       }
+       std::cerr << m_dtable[i];
+   }
+   std::cerr << "] at " << m_dtable.get() << std::endl;
 }
 
 // dump information about type
-void AddressMap::dump() {
-    bool isNotFirst = false;
-    std::cerr << "amap"
-              << " from " << m_owner->getDerivedType()->getName()
-              << " to " << m_owner->getOriginalType()->getName()
-              << ": " << size() << "[";
-    for (int i = 0; i < size(); ++i) {
-        if (isNotFirst) {
-            std::cerr << ", ";
-        } else {
-            isNotFirst = true;
-        }
-        std::cerr << m_amap[i];
-    }
-    std::cerr << "] at " << m_amap << std::endl;
+void AddressMap::dump() const {
+   bool isNotFirst = false;
+   std::cerr << "amap " << size() << "[";
+   for (int i = 0; i < size(); ++i) {
+       if (isNotFirst) {
+           std::cerr << ", ";
+       } else {
+           isNotFirst = true;
+       }
+       std::cerr << m_dtable[i];
+   }
+   std::cerr << "] at " << m_dtable.get() << std::endl;
 }

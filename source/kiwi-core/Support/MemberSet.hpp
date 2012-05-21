@@ -65,6 +65,11 @@ namespace kiwi {
         size_t size() const {
             return m_members.size();
         }
+
+        /// is empty?
+        bool empty() const {
+            return m_members.empty();
+        }
     protected:
         /// Owner for this implementation
         Type* m_owner;

@@ -56,6 +56,8 @@ namespace kiwi {
     typedef boost::shared_ptr<class Method>             MethodPtr;
     typedef boost::weak_ptr<class Method>               MethodWeak;
     typedef boost::shared_ptr<class Field>              FieldPtr;
+    typedef boost::shared_ptr<class Ancestor>           AncestorPtr;
+    typedef boost::weak_ptr<class Ancestor>             AncestorWeak;
 }
 
 #endif
