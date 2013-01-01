@@ -1,14 +1,21 @@
-Kiwi 0.2 [![Build Status](https://secure.travis-ci.org/alurin/kiwi.png)](http://travis-ci.org/alurin/kiwi)
-==========================================================================================================
+Kiwi 0.2 [![Build Status](https://travis-ci.org/alurin/kiwi.png?branch=master)](https://travis-ci.org/alurin/kiwi)
+==================================================================================================================
 
 Description
 -----------
-My hobby. Experemental language used capabilities of parsing generators by
+My experemental language, where I'm use capabilities of parsing created by
 Bison & Flex, code generation by LLVM and unicode support by ICU.
 
 Feel free submit patches and issues. Who knows, maybe in feature...
 
-My current goals
+Current goal
+============
+
+* Simple Python- or NodeJS- like module system
+* Full api for work with unicode strings
+* Private user-land input/output system as PhysFS
+
+My non goals
 ----------------
 * Static OOP language with support of extendable object (e.g. simple adding method and field in runtime)
 * Multi inheritance:

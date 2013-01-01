@@ -13,6 +13,9 @@ namespace kiwi {
     /// Base type for dynamic virtual tables
     class VirtualTable {
     public:
+        /// Destructor
+        virtual ~VirtualTable();
+
         /// returns type
         TypePtr getType() const {
             return m_type.lock();

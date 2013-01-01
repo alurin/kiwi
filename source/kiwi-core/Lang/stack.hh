@@ -39,7 +39,7 @@
 namespace kiwi { namespace lang {
 
 /* Line 1149 of lalr1.cc  */
-#line 43 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/stack.hh"
+#line 43 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/stack.hh"
   template <class T, class S = std::deque<T> >
   class stack
   {
@@ -129,7 +129,7 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 1235 of lalr1.cc  */
-#line 133 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/stack.hh"
+#line 133 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/stack.hh"
 
 #endif // not BISON_STACK_HH[]dnl
 

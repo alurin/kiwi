@@ -62,7 +62,8 @@ void* kiwi_substring(const UChar* buffer, const int32_t length, int32_t indexAt,
     void*    memory     = kiwi_malloc_atomic(sizeof(int32_t) + countAt * sizeof(UChar));
     int32_t* destLength = (int32_t*) memory;
     UChar*   dest       = (UChar*) (destLength + 1);
-    UChar*   src        = (UChar*) (((void*) buffer) + (sizeof(UChar) * indexAt ));
+    /// TODO: Remove this void math. It's dangerous
+    UChar*   src        = (UChar*) (buffer + indexAt);
 
     // copy substring
     *destLength = countAt;

@@ -42,6 +42,9 @@ AddressMap::AddressMap(TypePtr type, ModulePtr module)
 
 }
 
+AddressMap::~AddressMap()
+{ }
+
 FieldInsert::FieldInsert(StaticAddressMap* amap)
 : m_amap(amap) {
 }

@@ -86,6 +86,9 @@ VirtualTable::VirtualTable(TypePtr type, ModulePtr module)
 
 }
 
+VirtualTable::~VirtualTable()
+{ }
+
 // constructor
 StaticVirtualTable::StaticVirtualTable(TypePtr owner)
 : VirtualTable(owner, owner->getModule()) {

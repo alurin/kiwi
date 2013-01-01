@@ -1,2 +1,42 @@
 #! /bin/bash
-(cd build >/dev/null 2>&1 && cmake .. "$@")
+
+# *****************************************
+# This function convert the first letter
+# into uppercase letters.
+function ucfirst () {
+    if [ -n "$1" ]; then
+        perl -e 'print ucfirst('$1')'
+    else
+        cat - | perl -ne 'print ucfirst($_)'
+    fi
+}
+
+# Change arguments from:
+#   --<name>    to -D<Name>=On
+#   --no-<name> to -D<Name>=Off
+args=""
+for var in "$@"
+do
+    if [[ $var == "--clang" ]]; then
+        export CC=/usr/bin/clang
+        export CXX=/usr/bin/clang++
+    else
+        prefix=${var:0:2}
+        if [[ $prefix == '--' ]]; then
+            var=${var:2}
+            prefix=${var:0:3}
+            if [[ $prefix == 'no-' ]]; then
+                var=${var:3}
+                var=`ucfirst $var`
+                args="$args -D$var=Off"
+            else
+                var=`ucfirst $var`
+                args="$args -D$var=On"
+            fi
+        else
+            args="$args $var"
+        fi
+    fi
+done
+
+(cd build >/dev/null 2>&1 && cmake .. $args)

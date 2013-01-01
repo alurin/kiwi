@@ -46,7 +46,7 @@
 namespace kiwi { namespace lang {
 
 /* Line 37 of location.cc  */
-#line 50 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/position.hh"
+#line 50 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/position.hh"
   /// Abstract a position.
   class position
   {
@@ -157,5 +157,5 @@ namespace kiwi { namespace lang {
 } } // kiwi::lang
 
 /* Line 144 of location.cc  */
-#line 161 "/home/alurin/workplace/project/kiwi/source/kiwi-core/Lang/position.hh"
+#line 161 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/position.hh"
 #endif // not BISON_POSITION_HH

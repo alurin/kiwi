@@ -13,6 +13,9 @@ namespace kiwi {
     /// Base type for dynamic address maps
     class AddressMap {
     public:
+        /// Destructor
+        virtual ~AddressMap();
+
         /// returns type
         TypePtr getType() const {
             return m_type.lock();
