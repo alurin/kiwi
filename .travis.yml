@@ -5,7 +5,7 @@ compiler:
 before_install:
   - sudo add-apt-repository ppa:dr-graef/llvm-3.1.precise -y
   - sudo apt-get update -qq -y
-  - sudo apt-get install -y cmake libunittest++-dev libicu-dev llvm-3.1-dev libboost-program-options-dev
+  - sudo apt-get install -y cmake libunittest++-dev libicu-dev llvm-3.1-dev libboost-program-options1.50-dev libboost-signals1.50-dev
 before_script: ./configure
 branches:
   only:
