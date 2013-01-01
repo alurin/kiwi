@@ -1,5 +1,5 @@
-Kiwi 0.1
-========
+Kiwi 0.2 [![Build Status](https://secure.travis-ci.org/alurin/kiwi.png)](http://travis-ci.org/alurin/kiwi)
+==========================================================================================================
 
 Description
 -----------
@@ -36,7 +36,7 @@ This project requires:
 * GNU Make or equivalent.
 * GCC 4.6 or an alternative, reasonably conformant C++ compiler.
 * Boost C++ Libraries v1.37+ (v1.46 recomended) [HEADERS and LIBRARIES]
-* LLVM 3.0
+* LLVM 3.1
 * ICU 4.4+
 
 Building
