@@ -1,0 +1,9 @@
+#!/usr/bin/env kiwi
+/* Test script for method call with variables */
+
+import method_call_002;
+
+void main()
+{
+    print method_call_002.summa(1, 2); // Must print 3
+}

@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <unicode/utypes.h>
 
-
 /// Compare two string
 /// @see u_strCompare
 KIWI_RUNTIME
