@@ -1,6 +1,6 @@
-#line 2 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.cpp"
+#line 2 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.cpp"
 
-#line 4 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.cpp"
+#line 4 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -17,7 +17,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_SUBMINOR_VERSION 39
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -212,8 +212,13 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
 /* %if-not-reentrant */
-extern int yyleng;
+extern yy_size_t yyleng;
 /* %endif */
 
 /* %if-c-only */
@@ -226,6 +231,7 @@ extern int yyleng;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
+    #define YY_LINENO_REWIND_TO(ptr)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -242,11 +248,6 @@ extern int yyleng;
 	while ( 0 )
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
-
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
@@ -270,7 +271,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	int yy_n_chars;
+	yy_size_t yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -389,6 +390,8 @@ typedef unsigned char YY_CHAR;
 #define yytext_ptr yytext
 
 #include <FlexLexer.h>
+
+/* %% [1.5] DFA */
 
 /* %if-c-only Standard (non-C++) definition */
 /* %endif */
@@ -623,14 +626,14 @@ static yyconst flex_int16_t yy_rule_linenum[70] =
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
-#line 1 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 1 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 /*
  *******************************************************************************
  *   Copyright (C) 2012 Vasiliy Sheredeko
  *   MIT license. All Rights Reserved.
  *******************************************************************************
  */
-#line 8 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 8 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 
 #include "kiwi/types.hpp"
 #include <string>
@@ -659,14 +662,14 @@ typedef kiwi::lang::Parser::token_type token_type;
 /* enables the use of start condition stacks */
 /* The following paragraph suffices to track locations accurately. Each time
  * yylex is invoked, the begin position is moved onto the end position. */
-#line 52 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 52 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 #define YY_USER_ACTION  yylloc->columns(yyleng);
 /* States */
 
 
 
 
-#line 670 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.cpp"
+#line 673 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.cpp"
 
 #define INITIAL 0
 #define comment 1
@@ -831,22 +834,6 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-/* %% [7.0] user's declarations go here */
-#line 61 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
-
-
- /* code to place at the beginning of yylex() */
-
-    // reset location
-    yylloc->step();
-
-    std::stringstream stringBuffer;
-
-
- /*** BEGIN EXAMPLE - Change the example lexer rules below ***/
-
-#line 849 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.cpp"
-
 	if ( !(yy_init) )
 		{
 		(yy_init) = 1;
@@ -881,6 +868,23 @@ YY_DECL
 		yy_load_buffer_state(  );
 		}
 
+	{
+/* %% [7.0] user's declarations go here */
+#line 61 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
+
+
+ /* code to place at the beginning of yylex() */
+
+    // reset location
+    yylloc->step();
+
+    std::stringstream stringBuffer;
+
+
+ /*** BEGIN EXAMPLE - Change the example lexer rules below ***/
+
+#line 887 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.cpp"
+
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
 /* %% [8.0] yymore()-related code goes here */
@@ -899,7 +903,7 @@ YY_DECL
 yy_match:
 		do
 			{
-			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
+			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)] ;
 			if ( yy_accept[yy_current_state] )
 				{
 				(yy_last_accepting_state) = yy_current_state;
@@ -956,192 +960,192 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 73 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 73 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_LSH;                     }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 74 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 74 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_RSH;                     }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 75 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 75 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_OR;                      }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 76 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 76 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_AND;                     }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 77 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 77 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_EQ;                      }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 78 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 78 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_NE;                      }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 79 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 79 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_GE;                      }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 80 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 80 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_LE;                      }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 81 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 81 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_INC;                     }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 82 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 82 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_DEC;                     }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 83 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 83 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_AADD;                    }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 84 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 84 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_ASUB;                    }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 85 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 85 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_ADIV;                    }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 86 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 86 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_AMUL;                    }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 87 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 87 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_ASHL;                    }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 88 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 88 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_ASHR;                    }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 89 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 89 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_AAND;                    }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 90 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 90 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::OP_AOR;                     }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 92 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 92 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::TYPE_VOID;                  }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 93 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 93 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::TYPE_INT;                   }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 94 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 94 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::TYPE_BOOL;                  }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 95 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 95 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::TYPE_STRING;                }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 96 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 96 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::TYPE_CHAR;                  }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 97 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 97 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::TYPE_AUTO;                  }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 99 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 99 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::CLASS;                      }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 100 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 100 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::INHERIT;                    }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 101 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 101 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::IMPLEMENT;                  }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 103 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 103 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::RETURN;                     }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 104 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 104 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::IF;                         }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 105 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 105 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::ELSE;                       }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 106 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 106 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::IFELSE;                     }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 107 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 107 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::PRINT;                      }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 108 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 108 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::BOOL_TRUE;                  }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 109 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 109 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::BOOL_FALSE;                 }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 110 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 110 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::THIS;                       }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 111 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 111 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::THIS;                       }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 112 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 112 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { return token::NEW;                        }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 114 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 114 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 {
     yylval->stringVal = new std::string(yytext, yyleng);
     return token::IDENT;
@@ -1149,7 +1153,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 119 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 119 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 {
     yylval->stringVal = new std::string(yytext+1, yyleng-1);
     return token::VAR_LOCAL;
@@ -1157,7 +1161,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 124 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 124 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 {
     yylval->stringVal = new std::string(yytext+1, yyleng-1);
     return token::VAR_INSTANCE;
@@ -1165,7 +1169,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 129 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 129 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 {
     yylval->integerVal = atoi(yytext);
     return token::INTEGER;
@@ -1174,7 +1178,7 @@ YY_RULE_SETUP
 /* gobble up white-spaces */
 case 42:
 YY_RULE_SETUP
-#line 135 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 135 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 {
     yylloc->step();
 }
@@ -1182,7 +1186,7 @@ YY_RULE_SETUP
 case 43:
 /* rule 43 can match eol */
 YY_RULE_SETUP
-#line 138 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 138 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 {
     yylloc->lines(yyleng);
     yylloc->step();
@@ -1191,49 +1195,49 @@ YY_RULE_SETUP
 /* comments and strings */
 case 44:
 YY_RULE_SETUP
-#line 144 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 144 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { BEGIN(comment);      }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 145 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 145 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { BEGIN(line_comment); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 146 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 146 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { BEGIN(line_comment); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 147 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 147 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { BEGIN(string_state); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 148 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 148 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { BEGIN(char_state);   }
 	YY_BREAK
 
 case 49:
 YY_RULE_SETUP
-#line 151 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 151 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { /* eat anything that's not a '*' */    }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 152 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 152 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { /* eat up '*'s not followed by '/'s */ }
 	YY_BREAK
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
-#line 153 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 153 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { yylloc->lines(yyleng); yylloc->step(); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 154 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 154 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { BEGIN(INITIAL);  yylloc->step();       }
 	YY_BREAK
 
@@ -1241,19 +1245,19 @@ YY_RULE_SETUP
 case 53:
 /* rule 53 can match eol */
 YY_RULE_SETUP
-#line 158 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 158 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { yylloc->lines(yyleng); BEGIN(INITIAL); yylloc->step(); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 159 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 159 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 
 	YY_BREAK
 
 
 case 55:
 YY_RULE_SETUP
-#line 163 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 163 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 {
                             /* saw closing quote - all done */
                              BEGIN(INITIAL);
@@ -1264,76 +1268,76 @@ YY_RULE_SETUP
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 171 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 171 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { stringBuffer << '\n';      }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 172 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 172 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { stringBuffer << '\t';      }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 173 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 173 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { stringBuffer << '\r';      }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 174 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 174 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { stringBuffer << '\b';      }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 175 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 175 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { stringBuffer << '\f';      }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 176 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 176 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { stringBuffer << yytext[1]; }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 177 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 177 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { stringBuffer << yytext[0]; }
 	YY_BREAK
 
 
 case 63:
 YY_RULE_SETUP
-#line 181 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 181 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { yylval->charVal = '\n'; BEGIN(INITIAL); return token::CHAR;      }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 182 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 182 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { yylval->charVal = '\t'; BEGIN(INITIAL); return token::CHAR;      }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 183 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 183 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { yylval->charVal = '\r'; BEGIN(INITIAL); return token::CHAR;      }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 184 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 184 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { yylval->charVal = '\b'; BEGIN(INITIAL); return token::CHAR;      }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 185 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 185 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { yylval->charVal = '\f'; BEGIN(INITIAL); return token::CHAR;      }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 186 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 186 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 { yylval->charVal = yytext[0]; BEGIN(INITIAL); return token::CHAR; }
 	YY_BREAK
 
 /* pass all other characters up to bison */
 case 69:
 YY_RULE_SETUP
-#line 190 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 190 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 {
     return static_cast<token_type>(*yytext);
 }
@@ -1341,10 +1345,10 @@ YY_RULE_SETUP
 /*** END EXAMPLE - Change the example lexer rules above ***/
 case 70:
 YY_RULE_SETUP
-#line 196 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 196 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 ECHO;
 	YY_BREAK
-#line 1348 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.cpp"
+#line 1352 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comment):
 case YY_STATE_EOF(line_comment):
@@ -1481,6 +1485,7 @@ case YY_STATE_EOF(char_state):
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
+	} /* end of user's declarations */
 } /* end of yylex */
 /* %ok-for-header */
 
@@ -1636,21 +1641,21 @@ int yyFlexLexer::yy_get_next_buffer()
 
 	else
 		{
-			int num_to_read =
+			yy_size_t num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
 
 			int yy_c_buf_p_offset =
 				(int) ((yy_c_buf_p) - b->yy_ch_buf);
 
 			if ( b->yy_is_our_buffer )
 				{
-				int new_size = b->yy_buf_size * 2;
+				yy_size_t new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -1681,7 +1686,7 @@ int yyFlexLexer::yy_get_next_buffer()
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), (size_t) num_to_read );
+			(yy_n_chars), num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -1789,7 +1794,7 @@ int yyFlexLexer::yy_get_next_buffer()
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 179);
 
-	return yy_is_jam ? 0 : yy_current_state;
+		return yy_is_jam ? 0 : yy_current_state;
 }
 
 /* %if-c-only */
@@ -1808,7 +1813,7 @@ int yyFlexLexer::yy_get_next_buffer()
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		register int number_to_move = (yy_n_chars) + 2;
+		register yy_size_t number_to_move = (yy_n_chars) + 2;
 		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
 		register char *source =
@@ -1859,7 +1864,7 @@ int yyFlexLexer::yy_get_next_buffer()
 
 		else
 			{ /* need more input */
-			int offset = (yy_c_buf_p) - (yytext_ptr);
+			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -2042,15 +2047,6 @@ int yyFlexLexer::yy_get_next_buffer()
 	Examplefree((void *) b  );
 }
 
-/* %if-c-only */
-/* %endif */
-
-/* %if-c++-only */
-
-extern "C" int isatty (int );
-
-/* %endif */
-
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a yyrestart() or at EOF.
@@ -2191,7 +2187,7 @@ void yyFlexLexer::yypop_buffer_state (void)
 void yyFlexLexer::yyensure_buffer_stack(void)
 /* %endif */
 {
-	int num_to_alloc;
+	yy_size_t num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -2397,7 +2393,7 @@ void Examplefree (void * ptr )
 
 /* %ok-for-header */
 
-#line 196 "/home/alurin/workplace/.library/kiwi_001/source/kiwi-core/Lang/scanner.ll"
+#line 195 "/home/alurin/projects/archive/languages/kiwi/source/kiwi-core/Lang/scanner.ll"
 
 
 

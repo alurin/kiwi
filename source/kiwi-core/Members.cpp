@@ -13,7 +13,7 @@
 #include "kiwi/Context.hpp"
 #include "kiwi/Exception.hpp"
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/Function.h>
+#include <llvm/IR/Function.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;

@@ -14,13 +14,13 @@
 #include "kiwi/Members.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include "kiwi/Support/Cast.hpp"
-#include "llvm/Module.h"
-#include "llvm/Function.h"
-#include "llvm/BasicBlock.h"
-#include "llvm/Instructions.h"
-#include "llvm/Constants.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Constants.h"
 #include "Algorithm.hpp"
-#include <llvm/Support/IRBuilder.h>
+#include <llvm/IR/IRBuilder.h>
 
 #define EMPTY_WHILE_WRAP(_stmt_) do { _stmt_ } while(0)
 

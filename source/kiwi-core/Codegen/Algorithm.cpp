@@ -5,14 +5,14 @@
  *******************************************************************************
  */
 
-#include <llvm/Instructions.h>
+#include <llvm/IR/Instructions.h>
 
 #include "kiwi/Exception.hpp"
 #include "Algorithm.hpp"
 #include "LlvmEmitter.hpp"
-#include "llvm/Type.h"
-#include "llvm/Module.h"
-#include <llvm/Support/IRBuilder.h>
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Module.h"
+#include <llvm/IR/IRBuilder.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;

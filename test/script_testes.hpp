@@ -1,3 +1,5 @@
+
+
 #include "test.h" // Brings in the UnitTest++ framework
 #include <iostream>
 #include <fstream>
@@ -9,8 +11,8 @@
 using namespace std;
 using namespace boost::algorithm;
 
-#define TEST_EXE                "../../bin/kiwic "
-#define TEST_RESOURCE_PATH      "../../test/resource/"
+#define TEST_EXE                "../bin/kiwic "
+#define TEST_RESOURCE_PATH      "../test/resource/"
 #define TEST_RESOURCE_INPUT     ".kiwi"
 #define TEST_RESOURCE_OUTPUT    ".out"
 #define LINE_BREAK              \

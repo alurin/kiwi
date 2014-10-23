@@ -41,11 +41,46 @@ ENDIF( Debug OR  _TYPE STREQUAL "DEBUG")
 
 MESSAGE(STATUS "Build ${CMAKE_BUILD_TYPE} version of project")
 
-IF (CMAKE_COMPILER_IS_GNUCC)
+# Options for GNU C++
+if (CMAKE_COMPILER_IS_GNUCC)
+    # Only support GNU C++ version 4.8 or greater
+    execute_process (COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    if (NOT GCC_VERSION VERSION_GREATER 4.8 AND NOT GCC_VERSION VERSION_EQUAL 4.8)
+        message (FATAL_ERROR
+            "C++ compiler not supported C++11 standart."
+            "-- Please compile with GNU C++ version 4.8 or greater"
+        )
+    endif (NOT GCC_VERSION VERSION_GREATER 4.8 AND NOT GCC_VERSION VERSION_EQUAL 4.8)
+
+    # Fix x64 issues on Linux
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" AND NOT APPLE)
+        add_definitions(-fPIC)
+    endif()
+
+    # Set compiler c++11 mode
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+    # Treat all errors and warnings
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
+    # Noise and noise utilities not worked without exceptions support
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
+
+    # Boost program options not worked without RTTI support
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti")
+
+    # Add compile flags for release mode
+    set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_DEBUG} -O3 -fomit-frame-pointer")
+    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -fomit-frame-pointer")
+
     # Add compile flags for debug mode
-    SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   -g3 -gdwarf-2 -g -O0")
-    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3 -gdwarf-2 -g -O0")
-ENDIF (CMAKE_COMPILER_IS_GNUCC)
+    set (CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG} -O0 -g -ggdb") #-g3 -gdwarf-4")
+    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -ggdb") # -g3 -gdwarf-4")
+
+    # Enable multi threaded support
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lpthread")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
+endif (CMAKE_COMPILER_IS_GNUCC)
 
 
 IF( CMAKE_COMPILER_IS_GNUCC AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
@@ -73,7 +108,7 @@ INCLUDE_DIRECTORIES("${MAINFOLDER}/include")
 #
 # Locate Project Prerequisites
 #
-SET (Boost_ADDITIONAL_VERSIONS "1.46" "1.46.0" "1.47" "1.47.0" "1.48" "1.48.0" "1.49" "1.49.0" "1.50" "1.50.0")
+SET (Boost_ADDITIONAL_VERSIONS "1.50" "1.50.0" "1.53" "1.53.0" "1.54" "1.54.0" "1.55" "1.55.0")
 FIND_PACKAGE (Boost 1.37 COMPONENTS "program_options" REQUIRED)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})

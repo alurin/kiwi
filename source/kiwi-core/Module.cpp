@@ -13,9 +13,9 @@
 #include "kiwi/Members.hpp"
 #include "kiwi/Exception.hpp"
 #include "kiwi/Support/Cast.hpp"
-#include "llvm/Module.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/PassManager.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
-#include "llvm/PassManager.h"
 
 using namespace kiwi;
 
@@ -69,9 +69,9 @@ void Module::build() {
 
     // run function optimizations passes
     ContextImpl* meta    = getContext()->getMetadata();
-    llvm::Module& module = *m_metadata->getBackendModule();
-    for (llvm::Module::iterator func = module.begin(); func != module.end(); ++func) {
-        meta->getBackendFunctionPassManager()->run(*func);
+    llvm::Module* module = m_metadata->getBackendModule();
+    for (llvm::Module::iterator func = module->begin(); func != module->end(); ++func) {
+        meta->getBackendFunctionPassManager()->run(func);
     }
 
     /// run module optimizations passes

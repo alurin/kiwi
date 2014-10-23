@@ -1,6 +1,6 @@
 FILE (GLOB_RECURSE runtime_SOURCES *.c *.h *.cpp *.hpp)
 
-SET (runtime_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} icuuc icuio)
+SET (runtime_LIBS ${Boost_LIBRARIES} ${ICU_LIBRARIES} icuuc icuio pthread tinfo z)
 SET (runtime_LIB "${PROJECT_NAME}-runtime")
 
 ADD_LIBRARY(${runtime_LIB} SHARED ${runtime_SOURCES})

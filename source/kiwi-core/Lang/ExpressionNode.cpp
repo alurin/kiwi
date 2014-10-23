@@ -315,7 +315,7 @@ ValueBuilder InstanceExpressionNode::emitImpl(Driver& driver, BlockBuilder block
         << exception_location(to_location(this)));
 }
 
-#include <llvm/Function.h>
+#include <llvm/IR/Function.h>
 ValueBuilder ThisNode::emitImpl(Driver& driver, BlockBuilder block) const {
     return block.createThis();
 }

@@ -12,7 +12,7 @@
 # standard CMake syntax, e.g. find_package(BISON 2.1.3)
 
 SET(LLVM_FOUND FALSE)
-FIND_PROGRAM(LLVM_CONFIG NAMES llvm-config llvm-config-3.1)
+FIND_PROGRAM(LLVM_CONFIG NAMES llvm-config llvm-config-3.5)
 
 MACRO(_llvm_config output separate flags)
     EXECUTE_PROCESS(

@@ -8,8 +8,8 @@
 #define KIWI_CODEGEN_LLVMEMITTER_INTERNAL
 
 #include "Emitter.hpp"
-#include <llvm/Instruction.h>
-#include <llvm/InstrTypes.h>
+#include <llvm/IR/Instruction.h>
+#include <llvm/IR/InstrTypes.h>
 
 namespace kiwi {
     class Type;

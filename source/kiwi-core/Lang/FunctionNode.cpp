@@ -203,8 +203,8 @@ void FunctionNode::generateMember(Driver& driver, TypePtr ownerType) {
     }
 }
 
-#include <llvm/Instructions.h>
-#include <llvm/Function.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Function.h>
 
 void FunctionNode::generateIRSignature(Driver& driver, TypePtr owner) {
     m_func = FunctionBuilder(m_method).getFunction();

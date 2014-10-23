@@ -12,9 +12,9 @@
 #include "kiwi/Argument.hpp"
 #include "kiwi/Exception.hpp"
 #include "kiwi/Support/Cast.hpp"
-#include <llvm/Instructions.h>
-#include <llvm/Constants.h>
-#include <llvm/Module.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/Module.h>
 
 using namespace kiwi;
 using namespace kiwi::codegen;

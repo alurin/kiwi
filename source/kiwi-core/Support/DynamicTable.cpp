@@ -14,12 +14,12 @@
 #include "../TypeImpl.hpp"
 #include "../ModuleImpl.hpp"
 #include "../ContextImpl.hpp"
-#include <llvm/Module.h>
-#include <llvm/Constants.h>
-#include <llvm/DerivedTypes.h>
-#include <llvm/GlobalVariable.h>
+#include <llvm/IR/Module.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/GlobalVariable.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/Support/TypeBuilder.h>
+#include <llvm/IR/TypeBuilder.h>
 #include "kiwi-runtime/gc.h"
 #include <stdlib.h>
 

@@ -10,13 +10,13 @@
 #include "kiwi/config.hpp"
 #include "kiwi/DerivedTypes.hpp"
 #include <vector>
+#include <llvm/IR/PassManager.h>
 
 namespace llvm {
     class LLVMContext;
     class ExecutionEngine;
     class FunctionPassManager;
-    class PassManager;
-    class TargetData;
+    class ModulePassManager;
 }
 
 namespace kiwi {
@@ -56,12 +56,7 @@ namespace kiwi {
         llvm::FunctionPassManager* getBackendFunctionPassManager() const;
 
         /// returns LLVM module pass manager
-        llvm::PassManager* getBackendModulePassManager() const;
-
-        /// LLVM target data
-        llvm::TargetData* getBackendTargetData() const {
-            return m_backendTargetData;
-        }
+        llvm::ModulePassManager* getBackendModulePassManager() const;
 
         /// Register module in context
         void registerModule(ModulePtr module) {
@@ -84,10 +79,7 @@ namespace kiwi {
         mutable llvm::FunctionPassManager* m_backendFunctionPassManager;
 
         /// LLVM module pass manager
-        mutable llvm::PassManager* m_backendModulePassManager;
-
-        /// LLVM target data
-        llvm::TargetData* m_backendTargetData;
+        mutable llvm::ModulePassManager* m_backendModulePassManager;
 
         /// constructor
         ContextImpl(Context* context);

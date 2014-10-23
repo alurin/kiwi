@@ -13,11 +13,11 @@
 #include "kiwi/Module.hpp"
 #include "kiwi-runtime/core.h"
 #include <unicode/uclean.h>
-#include <llvm/Module.h>
-#include <llvm/LLVMContext.h>
+#include <llvm/IR/Module.h>
+#include <llvm/IR/PassManager.h>
+#include <llvm/IR/LLVMContext.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/JIT.h>
-#include <llvm/Target/TargetData.h>
 #include <llvm/Support/ManagedStatic.h>
 #include <llvm/Support/TargetSelect.h>
 #ifdef KIWI_GC
@@ -32,7 +32,7 @@ void kiwi::startup() {
 
     kiwi_dummy();                       // Init kiwi-runtime (link as dummy)
     u_init(&errorCode);                 // ICU init
-    llvm::llvm_start_multithreaded();   // LLVM init as multithreaded
+//    llvm::llvm_start_multithreaded();   // LLVM init as multithreaded
     llvm::InitializeNativeTarget();     // LLVM JIT init
 
     #ifdef KIWI_GC
@@ -71,8 +71,7 @@ void Context::initializate() {
 
     // create execution engine
     llvm::Module* module            = runtime->getMetadata()->getBackendModule();
-    m_metadata->m_backendEngine     = llvm::EngineBuilder(module).create();
-    m_metadata->m_backendTargetData = new llvm::TargetData(*m_metadata->m_backendEngine->getTargetData());
+    m_metadata->m_backendEngine     = llvm::EngineBuilder(module).setEngineKind(llvm::EngineKind::JIT).create();
 
     // create types
     m_metadata->boolTy   = BooleanType::create(runtime);

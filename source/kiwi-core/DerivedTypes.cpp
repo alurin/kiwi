@@ -13,8 +13,8 @@
 #include "kiwi/Module.hpp"
 #include "kiwi/Members.hpp"
 #include "kiwi/Support/Cast.hpp"
-#include <llvm/Constants.h>
-#include <llvm/GlobalVariable.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/GlobalVariable.h>
 #include <llvm/ADT/ArrayRef.h>
 
 #include <stack>
