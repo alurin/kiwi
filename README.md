@@ -3,10 +3,8 @@ Kiwi 0.2 [![Build Status](https://travis-ci.org/alurin/kiwi.png?branch=master)](
 
 Description
 -----------
-My experemental language, where I'm use capabilities of parsing created by
+My discontinued experemental language, where I'm use capabilities of parsing created by
 Bison & Flex, code generation by LLVM and unicode support by ICU.
-
-Feel free submit patches and issues. Who knows, maybe in feature...
 
 Current goal
 ============
